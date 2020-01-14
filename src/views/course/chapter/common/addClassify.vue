@@ -55,7 +55,6 @@
 </template>
 
 <script>
-import bus from '../../../../bus'
 export default {
   data () {
     return {
@@ -78,7 +77,7 @@ export default {
     }
   },
   created () {
-    bus.$on('addClassifyBox', () => {
+    this.$bus.on('addClassifyBox', () => {
       this.isShowAddClassify = true
     })
   },
@@ -96,6 +95,9 @@ export default {
     cancel () {
       this.isShowAddClassify = false
     }
+  },
+  beforeDestroy () {
+    this.$bus.off('addClassifyBox')
   }
 }
 </script>

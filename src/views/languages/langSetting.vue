@@ -61,7 +61,6 @@
 
 <script>
 import LangItemComp from './common/langItem'
-import bus from '../../bus'
 
 export default {
   data () {
@@ -109,7 +108,7 @@ export default {
   },
   methods: {
     addLang () {
-      bus.$emit('addLangBox')
+      this.$bus.emit('addLangBox')
     }
   }
 }
