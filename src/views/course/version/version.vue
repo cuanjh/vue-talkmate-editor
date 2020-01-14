@@ -1,7 +1,7 @@
 <template>
   <div class="version-container">
     <div class="version-wrap">
-      <div class="version-item create">
+      <div class="version-item create" @click="addVersion">
         <i class="el-icon-plus"></i>
         <span>创建新版本</span>
       </div>
@@ -51,19 +51,28 @@
         </div>
       </div>
     </div>
+    <add-version ref="addVersion"/>
   </div>
 </template>
 
 <script>
+import AddVersion from './add'
 export default {
   data () {
     return {
-      outerVisible: false
+      outerVisible: false,
+      centerDialogVisible: true
     }
+  },
+  components: {
+    AddVersion
   },
   methods: {
     switchVersion (version) {
       this.$emit('switchVersion', version)
+    },
+    addVersion () {
+      this.$refs['addVersion'].show()
     }
   }
 }
