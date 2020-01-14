@@ -47,6 +47,24 @@ const routes = [
         component: () => import(/* webpackChunkName: "part" */ '../views/course/part/part.vue')
       }
     ]
+  },
+  {
+    path: '/lang',
+    redirect: 'lang/lang-courses',
+    name: 'lang',
+    component: () => import(/* webpackChunkName: "lang" */ '../views/languages/index.vue'),
+    children: [
+      {
+        path: 'lang-courses',
+        name: 'langCourses',
+        component: () => import(/* webpackChunkName: "langs" */ '../views/languages/langCourses.vue')
+      },
+      {
+        path: 'lang-setting',
+        name: 'langSetting',
+        component: () => import(/* webpackChunkName: "langSetting" */ '../views/languages/langSetting.vue')
+      }
+    ]
   }
 ]
 
