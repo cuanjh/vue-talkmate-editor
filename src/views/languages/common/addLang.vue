@@ -51,7 +51,7 @@
 </template>
 
 <script>
-import bus from '../../../bus'
+
 export default {
   data () {
     return {
@@ -68,7 +68,7 @@ export default {
     }
   },
   created () {
-    bus.$on('addLangBox', () => {
+    this.$bus.on('addLangBox', () => {
       this.isShowAddLang = true
     })
   },
@@ -106,6 +106,9 @@ export default {
       this.fileRaw = {}
       this.imageUrl = 'http://course-assets.talkmate.com/course/icons/ENG-3x.webp?v=4&imageView2/0/w/200/h/200/format/jpg'
     }
+  },
+  beforeDestroy () {
+    this.$bus.off('addLangBox')
   }
 }
 </script>

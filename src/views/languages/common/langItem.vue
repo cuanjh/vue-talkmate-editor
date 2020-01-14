@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import bus from '../../../bus'
+
 export default {
   props: ['item'],
   data () {
@@ -44,7 +44,7 @@ export default {
       this.hotText = params
     },
     changedImg () {
-      bus.$emit('showUpCourseImg')
+      this.$bus.emit('showUpCourseImg')
     }
   }
 }

@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import bus from '../../../bus'
+
 export default {
   data () {
     return {
@@ -38,7 +38,7 @@ export default {
     }
   },
   created () {
-    bus.$on('showUpCourseImg', () => {
+    this.$bus.on('showUpCourseImg', () => {
       this.isSowUpImg = true
     })
   },
@@ -76,6 +76,9 @@ export default {
       this.fileRaw = {}
       this.imageUrl = 'http://course-assets.talkmate.com/course/icons/ENG-3x.webp?v=4&imageView2/0/w/200/h/200/format/jpg'
     }
+  },
+  beforeDestroy () {
+    this.$bus.off('showUpCourseImg')
   }
 }
 </script>

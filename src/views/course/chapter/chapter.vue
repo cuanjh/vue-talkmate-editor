@@ -51,7 +51,6 @@
 </template>
 
 <script>
-import bus from '../../../bus'
 import AddClassify from './common/addClassify'
 
 export default {
@@ -118,7 +117,7 @@ export default {
     },
     // 新建目录
     newly () {
-      bus.$emit('addClassifyBox')
+      this.$bus.emit('addClassifyBox')
     }
   }
 }
