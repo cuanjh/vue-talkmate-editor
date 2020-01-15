@@ -70,6 +70,9 @@ export default {
       this.showProcess2 = false
       this.$bus.emit('showProcess3')
     }
+  },
+  beforeDestroy () {
+    this.$bus.off('showProcess2')
   }
 }
 </script>

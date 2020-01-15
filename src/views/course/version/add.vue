@@ -10,8 +10,10 @@
           <div class="content-wrap">
             <div class="version-num">
               <span>版本号：</span>
-              <input type="text" v-model="version">
-              <a href="javascript:;">修改</a>
+              <span class="text-ver" v-if="!isChange">{{version}}</span>
+              <input type="text" id="input" autofocus v-model="version" v-else>
+              <a href="javascript:;" v-if="!isChange" @click="changeVer()">修改</a>
+              <a href="javascript:;" class="determine" v-else @click="determine()">确定</a>
             </div>
             <div class="course-content">
               <span>课程内容：</span>
@@ -42,6 +44,7 @@ import CopyVersion from './copyVersion'
 export default {
   data () {
     return {
+      isChange: false,
       isActive: -1,
       isShow: false,
       version: 'V3'
@@ -49,8 +52,7 @@ export default {
   },
   created () {
     this.$bus.on('closeAdd', () => {
-      this.isShow = false
-      this.isActive = -1
+      this.close()
     })
   },
   components: {
@@ -64,10 +66,25 @@ export default {
     close () {
       this.isShow = false
       this.isActive = -1
+      this.isChange = false
+      this.version = 'V3'
     },
     addVersion (params) {
       this.isActive = params
+    },
+    changeVer () {
+      this.version = ''
+      this.isChange = true
+    },
+    determine () {
+      if (!this.version) {
+        this.version = 'V3'
+      }
+      this.isChange = false
     }
+  },
+  beforeDestroy () {
+    this.$bus.off('closeAdd')
   }
 }
 </script>
@@ -130,6 +147,13 @@ export default {
           font-weight:400;
           color:rgba(0,0,0,.4);
           line-height:14px;
+        }
+        .determine {
+          color: #007AFF;
+        }
+        .text-ver {
+          display: inline-block;
+          width: 60px;
         }
       }
       .course-content {

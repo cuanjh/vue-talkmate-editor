@@ -66,6 +66,9 @@ export default {
       this.showProcess1 = false
       this.$bus.emit('showProcess2')
     }
+  },
+  beforeDestroy () {
+    this.$bus.off('showProcess1')
   }
 }
 </script>

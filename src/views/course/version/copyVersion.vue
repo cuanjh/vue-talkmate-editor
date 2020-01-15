@@ -142,6 +142,7 @@ export default {
       background:rgba(255,255,255,1);
       border-radius:4px;
       margin-right: 20px;
+      cursor: pointer;
       .content {
         min-height:200px;
         .title {

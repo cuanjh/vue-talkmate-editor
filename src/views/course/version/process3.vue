@@ -69,6 +69,9 @@ export default {
     },
     success () {
     }
+  },
+  beforeDestroy () {
+    this.$bus.off('showProcess3')
   }
 }
 </script>
