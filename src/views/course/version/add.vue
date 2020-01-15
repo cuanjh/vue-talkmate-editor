@@ -1,28 +1,34 @@
 <template>
   <transition name="fade">
-    <div class="add-version-container" v-show="isShow">
+    <div class="add-version-container" v-if="isShow">
       <div class="add-version-wrap">
         <div class="close" @click="close">
           <i class="el-icon-close"></i>
         </div>
         <div class="content">
-          <div class="title">创建新版本</div>
-          <table>
-            <tr>
-              <td>版本号：</td>
-              <td>
-                <input type="text" v-model="version">
-                <a href="javascript:;">修改</a>
-              </td>
-            </tr>
-            <tr>
-              <td>课程内容：</td>
-              <td>
-                <div class="btn">复制现有版本<small>（适用于现有版本基础上的修改）</small></div>
-                <div class="btn">重新编写内容<small>（适用于重建或较大的修改）</small></div>
-              </td>
-            </tr>
-          </table>
+          <h1>创建新版本</h1>
+          <div class="content-wrap">
+            <div class="version-num">
+              <span>版本号：</span>
+              <input type="text" v-model="version">
+              <a href="javascript:;">修改</a>
+            </div>
+            <div class="course-content">
+              <span>课程内容：</span>
+              <div class="buttons">
+                <a href="javascript:;"
+                  class="copy"
+                  :class="{'active': isActive == true}"
+                  @click="addVersion(true)">复制现有版本<small>（适用于现有版本基础上的修改）</small></a>
+                <a href="javascript:;"
+                  class="add-new"
+                  :class="{'active': isActive == false}"
+                  @click="addVersion(false)">重新编写内容<small>（适用于重建或较大的修改）</small></a>
+              </div>
+            </div>
+          </div>
+          <new-version v-show="isActive == false"/>
+          <copy-version v-show="isActive == true"/>
         </div>
       </div>
     </div>
@@ -30,12 +36,26 @@
 </template>
 
 <script>
+import NewVersion from './newVersion'
+import CopyVersion from './copyVersion'
+
 export default {
   data () {
     return {
+      isActive: -1,
       isShow: false,
       version: 'V3'
     }
+  },
+  created () {
+    this.$bus.on('closeAdd', () => {
+      this.isShow = false
+      this.isActive = -1
+    })
+  },
+  components: {
+    NewVersion,
+    CopyVersion
   },
   methods: {
     show () {
@@ -43,6 +63,10 @@ export default {
     },
     close () {
       this.isShow = false
+      this.isActive = -1
+    },
+    addVersion (params) {
+      this.isActive = params
     }
   }
 }
@@ -72,17 +96,76 @@ export default {
       cursor: pointer;
     }
     .content {
-      padding: 0 70px;
-      .title {
+      h1 {
         color: #000;
         font-size: 18px;
         font-weight: 600;
         line-height: 25px;
         text-align: center;
+        margin-bottom: 36px;
         margin-top: 40px;
       }
-      table {
-        width: 100%;
+    }
+    .content-wrap {
+      padding:0 40px 40px;
+      span {
+        font-size:14px;
+        font-weight:400;
+        color:rgba(0,0,0,1);
+        line-height:20px;
+      }
+      input {
+        border: none;
+        background: transparent;
+        font-size:14px;
+        font-weight:400;
+        color:rgba(0,0,0,1);
+        line-height:20px;
+        width: 60px;
+      }
+      .version-num {
+        margin-bottom: 40px;
+        a {
+          font-size:10px;
+          font-weight:400;
+          color:rgba(0,0,0,.4);
+          line-height:14px;
+        }
+      }
+      .course-content {
+        display: flex;
+        span {
+          margin-top: 10px;
+        }
+        .buttons {
+          display: flex;
+          flex-direction: column;
+          a {
+            font-size:14px;
+            font-weight:400;
+            color:rgba(0,0,0,.6);
+            line-height:20px;
+            padding: 10px 28px;
+            box-sizing: border-box;
+            border-radius:4px;
+            background: #fff;
+            margin-bottom: 20px;
+            &:last-child {
+              margin-bottom: 0;
+            }
+            small {
+              font-size: 10px;
+            }
+            &:hover {
+              background: #007AFF;
+              color: #fff;
+            }
+            &.active {
+              background: #007AFF;
+              color: #fff;
+            }
+          }
+        }
       }
     }
   }

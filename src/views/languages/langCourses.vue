@@ -234,11 +234,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-// .langs-container {
-//   padding: 0px 18px 0;
-//   box-sizing: border-box;
-//   height: 100%;
-//   display: flex;
   .langs-head {
     position: relative;
     padding-bottom: 42px;
@@ -339,5 +334,4 @@ export default {
     border-radius:1px;
     opacity:0.1;
   }
-// }
 </style>
