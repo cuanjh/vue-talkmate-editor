@@ -4,7 +4,7 @@
       <input type="text" v-model="searchKey" placeholder="输入内容关键字">
       <span>搜索</span>
     </div>
-    <div class="chapter-list test" :style="{'height': height + 'px'}">
+    <div class="chapter-list" id="chapter-list" :style="{'height': height + 'px'}">
       <div class="chapter-item" v-for="item in chapters" :key="item.index">
         <div class="more" @mouseleave="isShow = false">
           <i class="el-icon-more" @mouseenter="isShow = true"></i>
@@ -34,6 +34,7 @@
 </template>
 
 <script>
+import Sortable from 'sortablejs'
 export default {
   data () {
     return {
@@ -62,6 +63,12 @@ export default {
       obj['cover'] = 'http://course-assets.talkmate.com/course/images/icon/1700*130/1.jpg?v=qoiuoiewurpooo'
       this.chapters.push(obj)
     }
+    let $chapterList = document.getElementById('chapter-list')
+    let sortable = new Sortable($chapterList, {
+      swapThreshold: 1,
+      animation: 150
+    })
+    console.log(sortable)
   }
 }
 </script>

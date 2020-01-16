@@ -91,3 +91,24 @@ table thead,tbody tr,tfoot tr,thead tr {
     background: #0061CC;
   }
 }
+
+/* el-tree */
+.el-tree {
+  background: #002742 !important;
+  color: rgba($color: #fff, $alpha: 0.6) !important;
+}
+
+.el-tree-node {
+  margin: 0 3px;
+}
+
+.el-tree-node:focus>.el-tree-node__content{
+  background-color:#007AFF !important;
+  color: white;
+  border-radius: 4px;
+}
+.el-tree-node__content:hover{
+  background-color:rgba($color: #007AFF, $alpha: 0.5) !important;
+  color: rgba($color: #fff, $alpha: 0.8);
+  border-radius: 4px;
+}

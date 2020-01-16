@@ -21,7 +21,7 @@
     </div>
     <div class="catalog">
       <div class="title">目录</div>
-      <ul class="level" @mouseenter="isShowScroll = true" @mouseleave="isShowScroll = false" :style="{'height': levelHeight + 'px', 'overflow': isShowScroll ? 'auto' : 'hidden'}">
+      <!-- <ul class="level" @mouseenter="isShowScroll = true" @mouseleave="isShowScroll = false" :style="{'height': levelHeight + 'px', 'overflow': isShowScroll ? 'auto' : 'hidden'}">
         <li>
           <div :class="['name', {active: 'ENG-Basic-Level1' == selCatalog}]" @click="switchCatalog('ENG-Basic-Level1', 'level')">
             <span>初级A1</span>
@@ -103,12 +103,32 @@
         <li>
           <div :class="['name', {active: 'ENG-Basic-Level6' == selCatalog}]" @click="switchCatalog('ENG-Basic-Level6', 'level')">高级C2</div>
         </li>
-      </ul>
+      </ul> -->
+      <div class="level" @mouseenter="isShowScroll = true" @mouseleave="isShowScroll = false" :style="{'height': levelHeight + 'px', 'overflow': isShowScroll ? 'auto' : 'hidden'}">
+        <el-tree
+          :data="catalog"
+          node-key="id"
+          default-expand-all
+          @node-drag-start="handleDragStart"
+          @node-drag-enter="handleDragEnter"
+          @node-drag-leave="handleDragLeave"
+          @node-drag-over="handleDragOver"
+          @node-drag-end="handleDragEnd"
+          @node-drop="handleDrop"
+          @node-contextmenu="rightClick"
+          @node-click="nodeClick"
+          draggable
+          :allow-drop="allowDrop"
+          :allow-drag="allowDrag">
+        </el-tree>
+      </div>
     </div>
+    <right-menu ref="rightMenu"></right-menu>
   </div>
 </template>
 
 <script>
+import RightMenu from './rightMenu'
 export default {
   data () {
     return {
@@ -127,12 +147,135 @@ export default {
       curVersion: '',
       selCatalog: '',
       levelHeight: 0,
-      selLayer: 'project'
+      selLayer: 'project',
+      catalog: [{
+        id: 1,
+        label: '初级A1',
+        layer: 'level',
+        children: [{
+          id: 11,
+          label: '课程1',
+          layer: 'chapter',
+          children: [{
+            id: 111,
+            layer: 'part',
+            label: '核心1'
+          }, {
+            id: 112,
+            layer: 'part',
+            label: '核心2'
+          }]
+        }, {
+          id: 12,
+          label: '课程2',
+          children: [{
+            id: 121,
+            label: '核心1'
+          }, {
+            id: 122,
+            label: '核心2'
+          }]
+        }, {
+          id: 13,
+          label: '课程3',
+          children: [{
+            id: 131,
+            label: '核心1'
+          }, {
+            id: 132,
+            label: '核心2'
+          }]
+        }, {
+          id: 14,
+          label: '课程4',
+          children: [{
+            id: 141,
+            label: '核心1'
+          }, {
+            id: 142,
+            label: '核心2'
+          }]
+        }, {
+          id: 15,
+          label: '课程5',
+          children: [{
+            id: 151,
+            label: '核心1'
+          }, {
+            id: 152,
+            label: '核心2'
+          }]
+        }]
+      }, {
+        id: 2,
+        label: '初级A2',
+        layer: 'level',
+        children: [{
+          id: 21,
+          label: '课程1',
+          layer: 'chapter'
+        }, {
+          id: 22,
+          label: '课程2',
+          layer: 'chapter'
+        }]
+      }, {
+        id: 3,
+        label: '中级B1',
+        layer: 'level',
+        children: [{
+          id: 31,
+          label: '课程1',
+          layer: 'chapter'
+        }, {
+          id: 32,
+          label: '课程2',
+          layer: 'chapter',
+          children: [{
+            id: 321,
+            layer: 'part',
+            label: '核心1'
+          }, {
+            id: 322,
+            layer: 'part',
+            label: '核心2'
+          }, {
+            id: 323,
+            layer: 'part',
+            label: '核心3'
+          }]
+        }]
+      }, {
+        id: 4,
+        label: '中级B2',
+        layer: 'level',
+        children: []
+      }, {
+        id: 5,
+        label: '高级C1',
+        layer: 'level'
+      }, {
+        id: 6,
+        label: '高级C2',
+        layer: 'level'
+      }],
+      defaultProps: {
+        children: 'children',
+        label: 'label'
+      }
     }
+  },
+  components: {
+    RightMenu
   },
   mounted () {
     let h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
     this.levelHeight = h - 280
+    document.addEventListener('click', () => {
+      if (this.$refs['rightMenu']) {
+        this.$refs['rightMenu'].hide()
+      }
+    })
   },
   methods: {
     tolangManage () {},
@@ -161,6 +304,63 @@ export default {
         default:
           break
       }
+    },
+    handleDragStart (node, ev) {
+      console.log('drag start', node)
+    },
+    handleDragEnter (draggingNode, dropNode, ev) {
+      console.log('tree drag enter: ', dropNode.label)
+    },
+    handleDragLeave (draggingNode, dropNode, ev) {
+      console.log('tree drag leave: ', dropNode.label)
+    },
+    handleDragOver (draggingNode, dropNode, ev) {
+      console.log('tree drag over: ', dropNode.label)
+    },
+    handleDragEnd (draggingNode, dropNode, dropType, ev) {
+      console.log('tree drag end: ', dropNode && dropNode.label, dropType)
+    },
+    handleDrop (draggingNode, dropNode, dropType, ev) {
+      console.log('tree drop: ', dropNode.label, dropType)
+    },
+    rightClick (ev, data, node, self) {
+      console.log(ev)
+      // console.log(data)
+      // console.log(node)
+      // console.log(self)
+      this.$refs['rightMenu'].show({ left: ev.x, top: ev.y })
+    },
+    nodeClick (data, node, self) {
+      if (this.$refs['rightMenu']) {
+        this.$refs['rightMenu'].hide()
+      }
+      // console.log(data)
+      // console.log(node)
+      // console.log(self)
+      this.selLayer = data.layer
+      switch (data.layer) {
+        case 'level':
+          this.$router.push({ path: '/layout/level/' + data.id })
+          break
+        case 'chapter':
+          this.$router.push({ path: '/layout/chapter/' + data.id })
+          break
+        case 'part':
+          this.$router.push({ path: '/layout/part/' + data.id })
+          break
+        default:
+          break
+      }
+    },
+    allowDrop (draggingNode, dropNode, type) {
+      if (dropNode.data.label === '二级 3-1') {
+        return type !== 'inner'
+      } else {
+        return true
+      }
+    },
+    allowDrag (draggingNode) {
+      return draggingNode.data.label.indexOf('三级 3-2-2') === -1
     }
   }
 }
