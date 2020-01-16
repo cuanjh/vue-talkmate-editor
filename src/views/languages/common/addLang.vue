@@ -43,7 +43,7 @@
         </div>
         <div class="btns">
           <a class="cancel" href="javascript:;" @click="cancel()">取消</a>
-          <a class="determine" href="javascript:;" @click="determine()">确定</a>
+          <a class="determine active" href="javascript:;" @click="determine()">确定</a>
         </div>
       </div>
     </div>
@@ -210,15 +210,20 @@ export default {
       font-size:14px;
       font-weight:400;
       border-radius:4px;
-    }
-    .cancel {
       color:rgba(0,122,255,1);
       border:1px solid rgba(0,122,255,1);
       margin-right: 48px;
-    }
-    .determine {
-      color:rgba(255,255,255,1);
-      background: #007AFF;
+      &:last-child {
+        margin-right: 0;
+      }
+      &:hover {
+        color:rgba(255,255,255,1);
+        background: #007AFF;
+      }
+      &.active {
+        color:rgba(255,255,255,1);
+        background: #007AFF;
+      }
     }
   }
 }
