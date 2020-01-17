@@ -7,7 +7,10 @@
       </div>
     </div>
     <div class="project">
-      <div class="title">项目</div>
+      <div class="title">
+        <span>项目</span>
+        <router-link :to="{path: '/layout/edit-project'}">编辑</router-link>
+      </div>
       <ul>
         <li
           v-for="item in projects"
@@ -391,6 +394,16 @@ export default {
       margin-top: 10px;
       margin-left: 20px;
       margin-bottom: 10px;
+      margin-right: 20px;
+      display: flex;
+      justify-content: space-between;
+      a {
+        cursor: pointer;
+        font-size:10px;
+        font-weight:400;
+        color:rgba(0,122,255,1);
+        line-height:14px;
+      }
     }
     ul {
       padding-bottom: 9px;

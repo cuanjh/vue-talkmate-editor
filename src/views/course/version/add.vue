@@ -18,19 +18,19 @@
             <div class="course-content">
               <span>课程内容：</span>
               <div class="buttons">
-                <a href="javascript:;"
+                <a
                   class="copy"
                   :class="{'active': isActive == true}"
                   @click="addVersion(true)">复制现有版本<small>（适用于现有版本基础上的修改）</small></a>
-                <a href="javascript:;"
+                <a
                   class="add-new"
                   :class="{'active': isActive == false}"
                   @click="addVersion(false)">重新编写内容<small>（适用于重建或较大的修改）</small></a>
               </div>
             </div>
           </div>
+          <copy-version ref="copyVer" v-show="isActive == true"/>
           <new-version v-show="isActive == false"/>
-          <copy-version v-show="isActive == true"/>
         </div>
       </div>
     </div>
@@ -71,6 +71,10 @@ export default {
     },
     addVersion (params) {
       this.isActive = params
+      console.log(params)
+      if (params) {
+        this.$refs.copyVer.showCopy()
+      }
     },
     changeVer () {
       this.version = ''
@@ -155,6 +159,11 @@ export default {
           display: inline-block;
           width: 60px;
         }
+        input {
+          &:focus {
+            color: #007AFF;
+          }
+        }
       }
       .course-content {
         display: flex;
@@ -165,6 +174,7 @@ export default {
           display: flex;
           flex-direction: column;
           a {
+            cursor: pointer;
             font-size:14px;
             font-weight:400;
             color:rgba(0,0,0,.6);

@@ -234,6 +234,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  .content {
+    height: 100%;
+  }
   .langs-head {
     position: relative;
     padding-bottom: 42px;

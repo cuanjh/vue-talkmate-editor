@@ -45,6 +45,11 @@ const routes = [
         path: 'part/:id',
         name: 'part',
         component: () => import(/* webpackChunkName: "part" */ '../views/course/part/part.vue')
+      },
+      {
+        path: 'edit-project',
+        name: 'editProject',
+        component: () => import(/* webpackChunkName: "editProject" */ '../views/editProject/editor.vue')
       }
     ]
   },

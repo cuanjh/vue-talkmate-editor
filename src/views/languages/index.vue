@@ -32,5 +32,6 @@ export default {
 }
 .langs-content {
   padding-top: 30px;
+  width: 100%;
 }
 </style>
