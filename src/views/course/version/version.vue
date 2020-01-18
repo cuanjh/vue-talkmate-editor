@@ -1,5 +1,6 @@
 <template>
   <div class="version-container">
+    <el-button plain size="small" @click="edit">编辑</el-button>
     <div class="version-wrap">
       <div class="version-item create" @click="addVersion">
         <i class="el-icon-plus"></i>
@@ -73,6 +74,9 @@ export default {
     },
     addVersion () {
       this.$refs['addVersion'].show()
+    },
+    edit () {
+      this.$router.push({ path: '/course-content', query: { lang: 'ENG', project: 'pro', version: 1 } })
     }
   }
 }

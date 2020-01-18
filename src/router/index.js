@@ -49,6 +49,16 @@ const routes = [
     ]
   },
   {
+    path: '/course-content',
+    name: 'courseContent',
+    props: (route) => ({
+      lang: route.query.lang,
+      project: route.query.project,
+      version: route.query.version
+    }),
+    component: () => import(/* webpackChunkName: "course-content" */ '../views/course/content/content.vue')
+  },
+  {
     path: '/lang',
     redirect: 'lang/lang-courses',
     name: 'lang',
