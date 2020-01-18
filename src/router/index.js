@@ -20,39 +20,52 @@ const routes = [
     name: 'login',
     component: () => import(/* webpackChunkName: "login" */ '../views/auth/login.vue')
   },
-  {
-    path: '/layout',
-    redirect: 'layout/version/pro',
-    name: 'layout',
-    component: () => import(/* webpackChunkName: "layout" */ '../views/layout/index.vue'),
-    children: [
-      {
-        path: 'version/:project',
-        name: 'version',
-        component: () => import(/* webpackChunkName: "version" */ '../views/course/version/version.vue')
-      },
-      {
-        path: 'level/:id',
-        name: 'level',
-        component: () => import(/* webpackChunkName: "level" */ '../views/course/level/level.vue')
-      },
-      {
-        path: 'chapter/:id',
-        name: 'chapter',
-        component: () => import(/* webpackChunkName: "chapter" */ '../views/course/chapter/chapter.vue')
-      },
-      {
-        path: 'part/:id',
-        name: 'part',
-        component: () => import(/* webpackChunkName: "part" */ '../views/course/part/part.vue')
-      },
-      {
-        path: 'edit-project',
-        name: 'editProject',
-        component: () => import(/* webpackChunkName: "editProject" */ '../views/editProject/editor.vue')
-      }
-    ]
-  },
+  // {
+  //   path: '/layout',
+  //   redirect: 'layout/dashbord',
+  //   name: 'layout',
+  //   component: () => import(/* webpackChunkName: "layout" */ '../views/layout/index.vue'),
+  //   children: [
+  //     {
+  //       path: 'dashbord',
+  //       name: 'dashbord',
+  //       component: () => import(/* webpackChunkName: "dashbord" */ '../views/dashbord/index.vue')
+  //     }
+  //   ]
+  // },
+  // {
+  //   path: '/layout',
+  //   redirect: 'layout/version/pro',
+  //   name: 'layout',
+  //   component: () => import(/* webpackChunkName: "layout" */ '../views/layout/index.vue'),
+  //   children: [
+  //     {
+  //       path: 'version/:project',
+  //       name: 'version',
+  //       component: () => import(/* webpackChunkName: "version" */ '../views/course/version/version.vue')
+  //     },
+  //     {
+  //       path: 'level/:id',
+  //       name: 'level',
+  //       component: () => import(/* webpackChunkName: "level" */ '../views/course/level/level.vue')
+  //     },
+  //     {
+  //       path: 'chapter/:id',
+  //       name: 'chapter',
+  //       component: () => import(/* webpackChunkName: "chapter" */ '../views/course/chapter/chapter.vue')
+  //     },
+  //     {
+  //       path: 'part/:id',
+  //       name: 'part',
+  //       component: () => import(/* webpackChunkName: "part" */ '../views/course/part/part.vue')
+  //     },
+  //     {
+  //       path: 'edit-project',
+  //       name: 'editProject',
+  //       component: () => import(/* webpackChunkName: "editProject" */ '../views/editProject/editor.vue')
+  //     }
+  //   ]
+  // },
   {
     path: '/course-content',
     name: 'courseContent',
@@ -63,30 +76,37 @@ const routes = [
     }),
     component: () => import(/* webpackChunkName: "course-content" */ '../views/course/content/content.vue')
   },
+  // {
+  //   path: '/lang',
+  //   redirect: 'lang/lang-courses',
+  //   name: 'lang',
+  //   component: () => import(/* webpackChunkName: "lang" */ '../views/languages/index.vue'),
+  //   children: [
+  //     {
+  //       path: 'lang-courses',
+  //       name: 'langCourses',
+  //       component: () => import(/* webpackChunkName: "langs" */ '../views/languages/langCourses.vue')
+  //     },
+  //     {
+  //       path: 'lang-setting',
+  //       name: 'langSetting',
+  //       component: () => import(/* webpackChunkName: "langSetting" */ '../views/languages/langSetting.vue')
+  //     }
+  //   ]
+  // },
   {
-    path: '/lang',
-    redirect: 'lang/lang-courses',
-    name: 'lang',
-    component: () => import(/* webpackChunkName: "lang" */ '../views/languages/index.vue'),
-    children: [
-      {
-        path: 'lang-courses',
-        name: 'langCourses',
-        component: () => import(/* webpackChunkName: "langs" */ '../views/languages/langCourses.vue')
-      },
-      {
-        path: 'lang-setting',
-        name: 'langSetting',
-        component: () => import(/* webpackChunkName: "langSetting" */ '../views/languages/langSetting.vue')
-      }
-    ]
+    path: '/404',
+    name: '404',
+    component: () => import(/* webpackChunkName: "404" */ '../views/error/index.vue')
   }
 ]
 
-const router = new VueRouter({
+const createRouter = () => new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
-  routes
+  routes: routes
 })
+
+const router = createRouter()
 
 export default router

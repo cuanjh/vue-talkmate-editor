@@ -3,19 +3,21 @@ import Vuex from 'vuex'
 import VuexPersistence from 'vuex-persist'
 
 import { user } from './module/user'
+import { router } from './module/router'
 import { course } from './module/course'
 
 Vue.use(Vuex)
 
 const vuexLocal = new VuexPersistence({
   storage: window.localStorage,
-  modules: ['user', 'course']
+  modules: ['user']
 })
 
 export const store = new Vuex.Store({
   modules: {
     user,
-    course
+    course,
+    router
   },
   plugins: [vuexLocal.plugin]
 })
