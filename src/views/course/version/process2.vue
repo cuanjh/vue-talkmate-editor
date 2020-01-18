@@ -131,6 +131,7 @@ export default {
       background: #F5F6FA;
       &:focus {
         border: 1px solid #007AFF;
+        color: #007AFF;
       }
     }
   }

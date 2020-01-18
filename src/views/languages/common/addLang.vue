@@ -149,6 +149,7 @@ export default {
       border:1px solid rgba(0,0,0,.1);
       margin-right: 10px;
       padding: 0 10px;
+      background: #F5F6FA;
     }
     .langIndex {
       input {
@@ -226,11 +227,5 @@ export default {
       }
     }
   }
-}
-.fade-enter-active, .fade-leave-active {
-  transition: opacity .5s;
-}
-.fade-enter, .fade-leave-to {
-  opacity: 0;
 }
 </style>

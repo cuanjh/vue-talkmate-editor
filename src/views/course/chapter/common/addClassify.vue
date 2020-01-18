@@ -8,28 +8,12 @@
       </div>
       <h1>选择合适的图标<br/>（图标仅为编辑器内示意，不与线上同步）</h1>
       <div class="img-lists">
-        <ul>
-          <li>
-            <label class="radio1">
-              <input type="radio" v-model="radioImg" value="1" checked='1' >
-            </label>
-          </li>
-          <li>
-            <label class="radio2">
-              <input type="radio" v-model="radioImg" value="2" checked='1'>
-            </label>
-          </li>
-          <li>
-            <label class="radio3">
-              <input type="radio" v-model="radioImg" value="3" checked='1'>
-            </label>
-          </li>
-          <li>
-            <label class="radio4">
-              <input type="radio" v-model="radioImg" value="4" checked='1'>
-            </label>
-          </li>
-        </ul>
+        <el-radio-group v-model="radioImg" @change="imgChange">
+          <el-radio class="radio1" :label="1"></el-radio>
+          <el-radio class="radio2" :label="2"></el-radio>
+          <el-radio class="radio3" :label="3"></el-radio>
+          <el-radio class="radio4" :label="4"></el-radio>
+        </el-radio-group>
       </div>
       <div class="number">
         <span class="title">确定单元数量与名称</span>
@@ -58,7 +42,7 @@
 export default {
   data () {
     return {
-      radioImg: '1',
+      radioImg: '',
       isShowAddClassify: false,
       numLists: [
         {
@@ -94,6 +78,9 @@ export default {
     },
     cancel () {
       this.isShowAddClassify = false
+    },
+    imgChange (val) {
+      console.log(val)
     }
   },
   beforeDestroy () {
@@ -146,44 +133,21 @@ export default {
     text-align: center;
   }
   .img-lists {
-    ul {
-    display: flex;
-    justify-content: space-between;
-      li {
-        label {
-          position: relative;
-          display: inline-block;
-          width:80px;
-          height:80px;
-          border-radius:11px;
-          text-align: right;
-        }
-        .radio1 {
-          background:rgba(255,179,114,1);
-        }
-        .radio2 {
-          background:rgba(114,121,255,1);
-        }
-        .radio3 {
-          background:rgba(169,114,255,1);
-        }
-        .radio4 {
-          background:rgba(255,125,114,1);
-        }
-      }
-      input {
-        width:20px;
-        height:20px;
-        background:rgba(26,219,31,1);
-        border-radius: 50%;
-        margin: 10px 10px 0 0;
-      }
+    .el-radio-group {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
     }
-    i {
+    label {
+      position: relative;
       display: inline-block;
       width:80px;
       height:80px;
       border-radius:11px;
+      text-align: right;
+      padding-top: 10px;
+      padding-right: 10px;
+      box-sizing: border-box;
     }
     .radio1 {
       background:rgba(255,179,114,1);
@@ -287,4 +251,27 @@ export default {
 .fade-enter, .fade-leave-to {
   opacity: 0;
 }
+</style>
+<style>
+.img-lists .el-radio__label {
+  display: none!important;
+}
+.img-lists .el-radio__inner {
+  width: 20px;
+  height: 20px;
+  background: #fff;
+  border: none;
+}
+.img-lists .el-radio__inner::after {
+  width: 20px;
+  height: 20px;
+  background: url('../../../../assets/images/icons/icon-checked.png');
+  background-size: cover;
+  border: none;
+}
+.img-lists .el-radio__input.is-checked .el-radio__inner {
+  border: none;
+  background: none;
+}
+
 </style>

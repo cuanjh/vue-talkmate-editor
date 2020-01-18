@@ -9,7 +9,7 @@
         </div>
       </div>
       <div class="copy-swiper">
-        <div class="swiper-container" id="copy-container">
+        <div class="swiper-container swiper-no-swiping" id="copy-container" >
           <div class="swiper-wrapper">
             <div class="swiper-slide">
               <div class="online-flag">
@@ -74,9 +74,12 @@ export default {
     this.initSwiper()
   },
   methods: {
+    showCopy () {
+      this.initSwiper()
+    },
     initSwiper () {
       /* eslint-disable */
-      // this.$nextTick(() => {
+      this.$nextTick(() => {
         let mySwiper = new Swiper ('#copy-container', {
           loop: false,
           autoplay: false,
@@ -88,7 +91,7 @@ export default {
           }
         })
         console.log(mySwiper)
-      // })
+      })
       /* eslint-enable */
     },
     cancel () {
