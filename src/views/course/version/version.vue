@@ -1,5 +1,23 @@
 <template>
   <div class="version-container">
+    <div class="top-bar">
+      <el-select v-model="selLang" filterable placeholder="请选择语种">
+        <el-option
+          v-for="item in langList"
+          :key="item.code"
+          :label="item.text"
+          :value="item.code">
+        </el-option>
+      </el-select>
+      <el-select v-model="selCourseType" filterable placeholder="请选择课程分类">
+        <el-option
+          v-for="item in courseTypes"
+          :key="item.code"
+          :label="item.text"
+          :value="item.code">
+        </el-option>
+      </el-select>
+    </div>
     <el-button plain size="small" @click="edit">编辑</el-button>
     <div class="version-wrap">
       <div class="version-item create" @click="addVersion">
@@ -61,6 +79,10 @@ import AddVersion from './add'
 export default {
   data () {
     return {
+      langList: [],
+      selLang: '',
+      courseTypes: [],
+      selCourseType: '',
       outerVisible: false,
       centerDialogVisible: true
     }
@@ -85,6 +107,9 @@ export default {
 <style lang="scss" scoped>
 .version-container {
   padding: 60px 0;
+  .top-bar{
+    margin-top: 20px;
+  }
   .version-wrap {
     display: flex;
     flex-direction: row;

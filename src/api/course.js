@@ -22,3 +22,14 @@ export const getLangList = (data) => {
     data
   })
 }
+
+// @Summary 获取课程分类
+// @Produce  application/json
+// @Param none
+// @Router /editor/course/types [get]
+export const getCourseTypes = () => {
+  return service({
+    url: '/editor/course/types',
+    method: 'get'
+  })
+}
