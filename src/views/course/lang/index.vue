@@ -3,7 +3,7 @@
     <div class="top-bar">
       <el-input v-model="searchKey" @input="search" clearable placeholder="请输入要查找的语言"></el-input>
       <div class="btn-area">
-        <el-button style="outline:none;" type="primary" class="btnAdd">添加</el-button>
+        <el-button style="outline:none;" type="primary" class="btnAdd" @click="addLang()">添加</el-button>
         <el-button style="outline:none;" type="primary" class="btnSort">预览排序</el-button>
       </div>
     </div>
@@ -12,6 +12,7 @@
       style="width: 100%;">
       <el-table-column
         label="序号"
+        width="60"
         type="index">
       </el-table-column>
       <el-table-column
@@ -71,7 +72,7 @@
           <el-tag type="dange" v-else>否</el-tag>
         </template>
       </el-table-column>
-      <el-table-column fixed="right" width="250" label="操作">
+      <el-table-column fixed="right" width="300" label="操作">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -89,9 +90,16 @@
             plain
             type="warning"
             @click="handleEdit(scope.$index, scope.row)">下线</el-button>
+          <el-button
+            size="mini"
+            type="danger"
+            plain
+            :disabled="scope.row.is_show"
+            @click="handleEdit(scope.$index, scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
+    <edit-comp ref="edit"/>
   </div>
 </template>
 
@@ -100,6 +108,8 @@ import { mapState, mapActions } from 'vuex'
 import {
   getLangList
 } from '@/api/course'
+import EditComp from './edit'
+
 export default {
   data () {
     return {
@@ -108,6 +118,9 @@ export default {
       assetsUrl: '',
       searchKey: ''
     }
+  },
+  components: {
+    EditComp
   },
   created () {
     this.getConfigInfo()
@@ -151,6 +164,9 @@ export default {
     },
     handleCurrentChange (val) {
       console.log(`当前页: ${val}`)
+    },
+    addLang () {
+      this.$refs.edit.show()
     }
   }
 }
