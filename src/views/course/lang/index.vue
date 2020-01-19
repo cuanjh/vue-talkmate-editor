@@ -10,12 +10,12 @@
     <el-table
       :data="langList"
       style="width: 100%;">
-      <!-- <el-table-column
-        label="序号"
-        type="index">
-      </el-table-column> -->
       <el-table-column
         label="序号"
+        type="index">
+      </el-table-column>
+      <el-table-column
+        label="排序号"
         width="80"
         prop="list_order">
       </el-table-column>
