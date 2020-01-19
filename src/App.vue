@@ -8,9 +8,8 @@
 
 <script>
 export default {
-  data () {
-    return {}
-  }
+  name: 'app',
+  components: {}
 }
 </script>
 

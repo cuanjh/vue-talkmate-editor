@@ -38,9 +38,9 @@ import { mapActions } from 'vuex'
 import { regist } from '@/api/user'
 export default {
   name: 'Regist',
-  data() {
+  data () {
     const ratioPassword = (rule, value, callback) => {
-      if (value != this.registForm.password) {
+      if (value !== this.registForm.password) {
         return callback(new Error('两次密码不同'))
       } else {
         callback()
@@ -77,7 +77,7 @@ export default {
   },
   methods: {
     ...mapActions('user', ['LoginIn']),
-    async submitForm() {
+    async submitForm () {
       this.$refs.registForm.validate(async v => {
         if (v) {
           const res = await regist(this.registForm)
@@ -99,7 +99,7 @@ export default {
         }
       })
     },
-    changeLock() {
+    changeLock () {
       this.lock === 'lock' ? (this.lock = 'unlock') : (this.lock = 'lock')
     }
   }
