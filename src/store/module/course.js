@@ -1,4 +1,4 @@
-import { getLangList } from '@/api/course'
+import { getConfigInfo } from '@/api/course'
 export const course = {
   namespaced: true,
   state: {
@@ -12,26 +12,26 @@ export const course = {
         text: 'English'
       }
     ],
-    langList: {},
-    langAssetsUrl: '',
     formTypes: {
       'autoSpeak': '自动读',
       'repeatSpeak': '跟读',
       'sentenceToImg': '听句子选图片'
-    }
+    },
+    assetsDomain: '',
+    langInfos: []
   },
   mutations: {
-    updateLangInfo (state, langInfo) {
-      state.langAssetsUrl = langInfo.assetsUrl
-      state.langList = langInfo.langs
+    updateConfigInfo (state, configInfo) {
+      state.langInfos = configInfo.langInfos
+      state.assetsDomain = configInfo.assetsDomain
     }
   },
   actions: {
-    async getLangList ({ commit }, data) {
-      const res = await getLangList(data)
-      console.log(res)
+    // 获取相关配置信息
+    async getConfigInfo ({ commit }, data) {
+      const res = await getConfigInfo(data)
       if (res.success) {
-        commit('updateLangInfo', res.data)
+        commit('updateConfigInfo', res.data)
       }
     }
   },
