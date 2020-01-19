@@ -1,5 +1,16 @@
 import service from '@/utils/request'
 
+// @Summary 获取配置信息
+// @Produce  application/json
+// @Param none
+// @Router /editor/info/config [get]
+export const getConfigInfo = () => {
+  return service({
+    url: '/editor/info/config',
+    method: 'get'
+  })
+}
+
 // @Summary 获取语种列表
 // @Produce  application/json
 // @Param { \"pageNo\": 0, \"pageSize\": 100}

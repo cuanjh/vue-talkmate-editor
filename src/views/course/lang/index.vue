@@ -29,13 +29,13 @@
         width="200"
         label="名称">
         <template slot-scope="scope">
-          <div v-for="l in interfaceLangs" :key="l.code">{{ l.text + ': ' +  scope.row.title['' + l.code + ''] + ' ' }}</div>
+          <div v-for="l in langInfos" :key="l.langKey">{{ l.name + ': ' +  scope.row.title['' + l.langKey + ''] + ' ' }}</div>
         </template>
       </el-table-column>
       <el-table-column
         label="描述">
         <template slot-scope="scope" v-if="Object.keys(scope.row.desc).length">
-          <div v-for="l in interfaceLangs" :key="l.code">{{ l.text + ': ' +  scope.row.desc['' + l.code + ''] + ' ' }}</div>
+          <div v-for="l in langInfos" :key="l.langKey">{{ l.name + ': ' +  scope.row.desc['' + l.langKey + ''] + ' ' }}</div>
         </template>
         <template v-else>
         </template>
@@ -104,7 +104,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 import {
   getLangList
 } from '@/api/course'
@@ -122,15 +122,22 @@ export default {
   components: {
     EditComp
   },
+  created () {
+    this.getConfigInfo()
+  },
   mounted () {
     this.initData()
   },
   computed: {
     ...mapState({
-      interfaceLangs: state => state.course.interfaceLangs
+      assetsDomain: state => state.course.assetsDomain,
+      langInfos: state => state.course.langInfos
     })
   },
   methods: {
+    ...mapActions({
+      getConfigInfo: 'course/getConfigInfo'
+    }),
     async initData () {
       let res = await getLangList({ 'pageNo': 0, 'pageSize': 999 })
       if (res.success) {
@@ -146,8 +153,8 @@ export default {
       console.log(this.searchKey)
       this.langList = this.allLangs.filter(item => {
         let flag = false
-        this.interfaceLangs.forEach(i => {
-          flag = flag || item.title['' + i.code + ''].indexOf(this.searchKey) > -1
+        this.langInfos.forEach(i => {
+          flag = flag || item.title['' + i.langKey + ''].indexOf(this.searchKey) > -1
         })
         return flag
       })
