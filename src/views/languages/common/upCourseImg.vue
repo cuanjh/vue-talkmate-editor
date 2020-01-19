@@ -55,7 +55,7 @@ export default {
     },
     // 上传图片前的过滤
     handleBeforeUpload (file) {
-      if (!(file.type === 'image/png' || file.type === 'image/jpg' || file.type === 'image/jpeg' || file.type === 'mp4')) {
+      if (!(file.type === 'image/png' || file.type === 'image/jpg' || file.type === 'image/jpeg')) {
         this.$alert(`请上传正确的图片格式`, '温馨提示!', {
           confirmButtonText: '确定',
           callback: action => {
