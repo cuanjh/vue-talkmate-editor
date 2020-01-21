@@ -33,3 +33,52 @@ export const getCourseTypes = () => {
     method: 'get'
   })
 }
+
+// @Summary 获取课程列表
+// @Produce  application/json
+// @Param
+// {
+//   "lan_code": "string",
+//   "pageNo": 0,
+//   "pageSize": 0
+// }
+// @Router /editor/course/list [post]
+export const getCourseList = (data) => {
+  return service({
+    url: '/editor/course/list',
+    method: 'post',
+    data
+  })
+}
+
+// @Summary 获取课程列表
+// @Produce  application/json
+// @Param
+// {
+//   "pageNo": 0,
+//   "pageSize": 0,
+//   "parent_uuid": "string"
+// }
+// @Router /editor/content/list [post]
+export const getCourseContentList = (data) => {
+  return service({
+    url: '/editor/content/version/list',
+    method: 'post',
+    data
+  })
+}
+
+// @Summary 获取目录列表
+// @Produce  application/json
+// @Param
+// {
+//   "parent_uuid": "2d28b65a-3eae-4030-93da-b70b453b4ceb"
+// }
+// @Router /editor/catalog/list [post]
+export const getCatalogList = (data) => {
+  return service({
+    url: '/editor/catalog/list',
+    method: 'post',
+    data
+  })
+}

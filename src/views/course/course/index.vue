@@ -1,12 +1,12 @@
 <template>
   <div class="course-manage">
     <div class="top-bar">
-      <el-select v-model="selLang" filterable placeholder="请选择语言">
+      <el-select v-model="selLang" filterable placeholder="请选择语种">
         <el-option
           v-for="item in langList"
-          :key="item.code"
-          :label="item.text"
-          :value="item.code">
+          :key="item['lan_code']"
+          :label="item.title[locale]"
+          :value="item['lan_code']">
         </el-option>
       </el-select>
       <el-button v-show="userInfo.authority.authorityId == '1' || userInfo.authority.authorityId == '2'" style="outline:none;" type="primary" class="btnAdd">添加</el-button>
@@ -19,10 +19,6 @@
         type="index">
       </el-table-column>
       <el-table-column
-        label="语言编码"
-        prop="langCode">
-      </el-table-column>
-      <el-table-column
         label="课程分类">
         <template slot-scope="scope">
           {{scope.row.courseType == 0 ? 'PRO' : 'KID'}}
@@ -30,12 +26,12 @@
       </el-table-column>
       <el-table-column
         label="课程编码"
-        prop="courseCode">
+        prop="code">
       </el-table-column>
       <el-table-column
         label="课程名称">
         <template slot-scope="scope">
-          <div v-for="l in interfaceLangs" :key="l.code">{{ l.text + ': ' +  scope.row.langObj[l.code] + ' ' }}</div>
+          <div v-for="l in langInfos" :key="l.langKey">{{ l.name + ': ' +  scope.row.title['' + l.langKey + ''] + ' ' }}</div>
         </template>
       </el-table-column>
       <el-table-column
@@ -43,7 +39,7 @@
         <template slot-scope="scope">
           <el-image
             class="course-flag"
-            :src="scope.row.flag"
+            :src="assetsDomain + scope.row.flag[0]"
             fit="fit">
           </el-image>
         </template>
@@ -53,7 +49,7 @@
         <template slot-scope="scope">
           <el-image
             class="course-cover"
-            :src="scope.row.cover"
+            :src="assetsDomain + scope.row.cover[0]"
             fit="fit">
           </el-image>
         </template>
@@ -61,7 +57,7 @@
       <el-table-column
         label="是否上线">
         <template slot-scope="scope">
-          {{scope.row.isShow ? '是' : '否'}}
+          {{scope.row.is_show ? '是' : '否'}}
         </template>
       </el-table-column>
       <el-table-column label="操作" width="250px">
@@ -80,57 +76,55 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions, mapState } from 'vuex'
+import {
+  getLangList,
+  getCourseList
+} from '@/api/course'
+
 export default {
   data () {
     return {
-      langList: [
-        {
-          code: 'ENG',
-          text: '英语'
-        },
-        {
-          code: 'KOR',
-          text: '韩语'
-        }
-      ],
+      langList: [],
       selLang: 'ENG',
-      courseList: [{
-        courseCode: 'ENG-Basic',
-        langCode: 'ENG',
-        courseType: 0,
-        flag: 'http://course-assets.talkmate.com/course/icons/ENG-3x.webp?v=4',
-        cover: 'https://course-assets1.talkmate.com/course/covers/ENG-Basic-2x.webp?v=123',
-        langObj: {
-          'zh-cn': 'Pro课程',
-          'en': 'Course Pro'
-        },
-        isShow: true
-      },
-      {
-        courseCode: 'KEN-Basic',
-        langCode: 'ENG',
-        courseType: 3,
-        flag: 'http://course-assets.talkmate.com/course/icons/KEN-3x.webp?v=4',
-        cover: 'http://dev-assets.talkmate.com/course/coversV2/KEN-Basic-2x.webp?v=123',
-        langObj: {
-          'zh-cn': 'Mini课程',
-          'en': 'Course Mini'
-        },
-        isShow: true
-      }],
+      courseList: [],
       isShow: false
     }
   },
   components: {
   },
+  created () {
+    this.getConfigInfo()
+    this.getCourseTypes()
+  },
   mounted () {
+    this.initData()
   },
   computed: {
-    ...mapGetters('course', ['interfaceLangs']),
-    ...mapGetters('user', ['userInfo'])
+    ...mapGetters('user', ['userInfo']),
+    ...mapState({
+      assetsDomain: state => state.course.assetsDomain,
+      langInfos: state => state.course.langInfos,
+      locale: state => state.course.locale,
+      courseTypes: state => state.course.courseTypes
+    })
   },
   methods: {
+    ...mapActions({
+      getConfigInfo: 'course/getConfigInfo',
+      getCourseTypes: 'course/getCourseTypes'
+    }),
+    async initData () {
+      let langInfo = await getLangList({ 'pageNo': 0, 'pageSize': 999 })
+      if (langInfo.success) {
+        this.langList = langInfo.data.langs
+      }
+
+      let courseListInfo = await getCourseList({ 'lan_code': this.selLang, 'pageNo': 0, 'pageSize': 0 })
+      if (courseListInfo.success) {
+        this.courseList = courseListInfo.data.courses
+      }
+    },
     handleEditContent (i, row) {
       console.log(i)
       console.log(row)

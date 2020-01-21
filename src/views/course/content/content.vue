@@ -1,84 +1,66 @@
 <template>
-  <el-container class="content-container">
+  <el-container class="content-container" v-show="isShow">
     <el-header height="70px">
       <div class="top-bar">
         <div class="left">
           <div class="icon-logo"></div>
           <el-select v-model="selLang" size="small" placeholder="请选择语言">
             <el-option
-              v-for="item in langs"
-              :key="item.code"
-              :label="item.text"
-              :value="item.code">
+              v-for="item in langList"
+              :key="item['lan_code']"
+              :label="item.title[locale]"
+              :value="item['lan_code']">
             </el-option>
           </el-select>
-          <el-select v-model="selProject" size="small" placeholder="请选择项目">
+          <el-select v-model="selCouresType" size="small" placeholder="请选择项目">
             <el-option
-              v-for="item in projects"
-              :key="item.code"
-              :label="item.text"
-              :value="item.code">
+              v-for="item in courseTypes"
+              :key="item.type"
+              :label="item.name"
+              :value="item.type">
             </el-option>
           </el-select>
           <el-select v-model="selVersion" size="small" placeholder="请选择版本">
             <el-option
-              v-for="item in versions"
-              :key="item.code"
-              :label="item.text"
-              :value="item.code">
+              v-for="item in contents"
+              :key="item.uuid"
+              :label="item.version"
+              :value="item.version">
             </el-option>
           </el-select>
         </div>
         <div class="right">
           <div class="back">
-            <span>返回主页</span>
+            <el-button type="text" @click="back">返回主页</el-button>
           </div>
         </div>
       </div>
     </el-header>
     <el-main>
       <div class="track-container">
-        <div class="track-wrap">
-          <div class="track-item">
-            <ul>
-              <folder class="active" :name="'初级A1'"/>
-              <folder :name="'初级A2'"/>
-              <folder :name="'中级B1'"/>
-              <folder :name="'中级B2'"/>
-              <folder :name="'高级C1'"/>
-              <folder :name="'高级C2'"/>
-            </ul>
-          </div>
-          <div class="track-item">
-            <ul>
-              <folder :name="'课程1'"/>
-              <folder :name="'课程2'"/>
-              <folder :name="'课程3'"/>
-              <folder :name="'课程4'"/>
-              <folder :name="'课程5'"/>
-              <folder :name="'课程6'"/>
-              <folder :name="'课程7'"/>
-              <folder :name="'课程8'"/>
-              <folder :name="'...'"/>
-              <folder :name="'课程24'"/>
-            </ul>
-          </div>
-          <div class="track-item">
-            <ul>
-              <folder :name="'PRO'"/>
-            </ul>
-          </div>
-          <div class="track-item">
-            <ul>
-              <folder :name="'核心1'"/>
-              <folder :name="'核心2'"/>
-              <folder :name="'...'"/>
-              <folder :name="'写作'"/>
-              <folder :name="'听说'"/>
-            </ul>
+        <div class="track-wrap" id="track-wrap">
+          <div class="track-item" v-for="(item,index) in tracks" :key="index">
+            <div class="list">
+              <folder
+                :ref="'folder-' + f.uuid"
+                v-for="f in item"
+                :key="f.uuid"
+                :folder="f"
+                :trackNum="index"
+                :name="f.name"
+                :class="{
+                  'active': path.indexOf(f.uuid) > -1,
+                  'cur-active': uuid == f.uuid,
+                  'right-active': rightUUID == f.uuid
+                }"
+                @clickFolder="clickFolder"
+                @contentMenu="contentMenu"
+              />
+            </div>
+            <div class="other" @contextmenu="otherContextMenu($event, item[0].parent_uuid)"></div>
           </div>
         </div>
-        <div class="track-content">
+        <div class="track-content" v-show="false">
           <div class="add-slide">新建Slide</div>
           <div class="slide-list" :style="{'height': slideHeight + 'px'}">
             <slide />
@@ -126,7 +108,10 @@
         </div>
       </div>
     </el-main>
-    <right-menu></right-menu>
+    <right-menu
+      ref="rightMenu"
+      @rename="rename"
+    />
   </el-container>
 </template>
 
@@ -134,36 +119,25 @@
 import Folder from './folder'
 import Slide from './slide'
 import RightMenu from './rightMenu'
+import { mapState } from 'vuex'
+import {
+  getCatalogList
+} from '@/api/course'
 export default {
+  props: ['langList', 'courseTypes', 'contents'],
   data () {
     return {
       isShow: false,
-      langs: [{
-        code: 'ENG',
-        text: '英语'
-      }, {
-        code: 'FRN',
-        text: '法语'
-      }],
       selLang: 'ENG',
-      projects: [{
-        code: 0,
-        text: 'PRO'
-      }, {
-        code: 3,
-        text: 'KID'
-      }],
-      selProject: 0,
-      versions: [{
-        code: 1,
-        text: 'V1'
-      }, {
-        code: 2,
-        text: 'V2'
-      }],
+      selCouresType: 0,
       selVersion: 1,
       selSlide: '1',
-      slideHeight: 0
+      slideHeight: 0,
+      uuid: '',
+      rightUUID: '',
+      tracks: [],
+      selFolder: '',
+      path: ''
     }
   },
   components: {
@@ -177,19 +151,95 @@ export default {
     document.oncontextmenu = (e) => {
       e.preventDefault()
     }
+    document.onclick = () => {
+      this.rightUUID = ''
+      this.$refs['rightMenu'].hide()
+    }
+  },
+  computed: {
+    ...mapState({
+      locale: state => state.course.locale
+    })
   },
   methods: {
     show (params) {
-      this.selLang = params.langCode
-      this.selProject = params.courseType
-      this.selVersion = 1
+      console.log(params)
+      this.selLang = params.lang
+      this.selCouresType = params.courseType
+      this.selVersion = params.version
+      this.uuid = params.uuid
+      this.initData(0)
       this.isShow = true
     },
-    hide () {
+    back () {
       this.isShow = false
     },
     switchSlide (num) {
       this.selSlide = num
+    },
+    async initData (num) {
+      if (num === 0) {
+        this.tracks = []
+      }
+      let res = await getCatalogList({ 'parent_uuid': this.uuid })
+      if (res.success) {
+        let catalogs = res.data.catalogs.sort((a, b) => {
+          return a.list_order - b.list_order
+        })
+        if (this.tracks[num]) {
+          this.tracks[num] = catalogs
+        } else {
+          this.tracks.push(catalogs)
+        }
+        setTimeout(() => {
+          var scrollDom = document.getElementById('track-wrap')
+          scrollDom.scrollLeft = scrollDom.scrollWidth
+        }, 100)
+      }
+    },
+    clickFolder (params) {
+      this.path = ''
+      this.uuid = params.folder.uuid
+      let copy = this.tracks.slice(0, params.trackNum + 1)
+      this.tracks = this.tracks.slice(0, params.trackNum + 1)
+      this.getPath(copy, this.uuid)
+      if (params.folder.type === 'catalog') {
+        this.initData(params.trackNum + 1)
+      }
+    },
+    getPath (tracks, uuid) {
+      let catalogs = tracks.pop()
+      let folder = catalogs.find(item => {
+        return item.uuid === uuid
+      })
+      let puuid = folder.parent_uuid
+      this.path = uuid + '/' + this.path
+      // console.log(this.path)
+      if (tracks.length > 0) {
+        this.getPath(tracks, puuid)
+      }
+    },
+    // 显示右键菜单
+    contentMenu (params) {
+      this.rightUUID = params.folder.uuid
+      params['type'] = 'folder'
+      this.$refs['rightMenu'].show(params)
+    },
+    // 任意位置右键菜单
+    otherContextMenu (ev, pUUID) {
+      let params = {}
+      params['event'] = ev
+      params['type'] = 'other'
+      params['pUUID'] = pUUID
+      this.$refs['rightMenu'].show(params)
+    },
+    contentMenuHide () {
+      this.$refs['rightMenu'].hide()
+    },
+    // 重命名
+    rename (uuid) {
+      this.$refs['rightMenu'].hide()
+      this.$refs['folder-' + uuid][0].dblclickFolder()
     }
   }
 }
@@ -259,7 +309,7 @@ export default {
   display: flex;
   flex-direction: row;
   .track-wrap {
-    width: 50%;
+    // max-width: 50%;
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -271,6 +321,14 @@ export default {
       box-shadow:1px 0px 0px 0px rgba(183,183,183,0.29);
       padding: 10px 0;
       flex:none;
+      display: flex;
+      flex-direction: column;
+      .list {
+        width: 100%;
+      }
+      .other {
+        flex: 1;
+      }
       ul {
         width: 100%;
         li {
@@ -305,7 +363,7 @@ export default {
     }
   }
   .track-content {
-    width: 50%;
+    width: auto;
     background: #F5F6FA;
     padding: 10px;
     .add-slide {
@@ -370,5 +428,13 @@ export default {
 
 .slide-list::-webkit-scrollbar-thumb {
   background: rgba($color: #000000, $alpha: 0.4);
+}
+.back {
+  .el-button {
+    color: rgba($color: #ffffff, $alpha: 0.6);
+    &:hover {
+      color: rgba($color: #409eff, $alpha: 1);
+    }
+  }
 }
 </style>

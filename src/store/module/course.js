@@ -1,4 +1,4 @@
-import { getConfigInfo } from '@/api/course'
+import { getConfigInfo, getCourseTypes } from '@/api/course'
 export const course = {
   namespaced: true,
   state: {
@@ -17,13 +17,27 @@ export const course = {
       'repeatSpeak': '跟读',
       'sentenceToImg': '听句子选图片'
     },
+    locale: 'zh-CN',
     assetsDomain: '',
-    langInfos: []
+    langInfos: [],
+    courseTypes: [],
+    version: {
+      selLang: '',
+      selCourseType: '',
+      selVersion: '',
+      uuid: ''
+    }
   },
   mutations: {
     updateConfigInfo (state, configInfo) {
       state.langInfos = configInfo.langInfos
-      state.assetsDomain = configInfo.assetsDomain
+      state.assetsDomain = configInfo.assetsDomain + '/'
+    },
+    updateVersion (state, { key, val }) {
+      state.version[key] = val
+    },
+    updateCourseTypes (state, courseTypes) {
+      state.courseTypes = courseTypes
     }
   },
   actions: {
@@ -32,6 +46,13 @@ export const course = {
       const res = await getConfigInfo(data)
       if (res.success) {
         commit('updateConfigInfo', res.data)
+      }
+    },
+    // 获取课程类型
+    async getCourseTypes ({ commit }) {
+      const res = await getCourseTypes()
+      if (res.success) {
+        commit('updateCourseTypes', res.data.types)
       }
     }
   },

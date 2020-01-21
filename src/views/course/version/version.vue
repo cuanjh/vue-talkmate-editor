@@ -1,44 +1,52 @@
 <template>
   <div class="version-container">
     <div class="top-bar">
-      <el-select v-model="selLang" filterable placeholder="请选择语种">
+      <el-select v-model="selLang" filterable placeholder="请选择语种" @change="initCourseContentList">
         <el-option
           v-for="item in langList"
-          :key="item.code"
-          :label="item.text"
-          :value="item.code">
+          :key="item['lan_code']"
+          :label="item.title[locale]"
+          :value="item['lan_code']">
         </el-option>
       </el-select>
-      <el-select v-model="selCourseType" filterable placeholder="请选择课程分类">
+      <el-select v-model="selCourseType" filterable placeholder="请选择课程分类"  @change="initCourseContentList">
         <el-option
           v-for="item in courseTypes"
-          :key="item.code"
-          :label="item.text"
-          :value="item.code">
+          :key="item.type"
+          :label="item.name"
+          :value="item.type">
         </el-option>
       </el-select>
     </div>
-    <el-button plain size="small" @click="edit">编辑</el-button>
     <div class="version-wrap">
       <div class="version-item create" @click="addVersion">
         <i class="el-icon-plus"></i>
         <span>创建新版本</span>
       </div>
-      <div class="version-item" @click="switchVersion('V2')">
-        <div class="online-flag">
+      <div class="version-item" v-for="item in contents" :key="item.uuid" @click="switchVersion(item)">
+        <div class="online-flag" v-show="item['is_show']">
           <span>线上</span>
         </div>
         <div class="content">
-          <div class="title">版本V2</div>
+          <div class="title" v-text="item.name"></div>
           <ul>
-            <li>创建时间：2018年6月1日</li>
-            <li>最后修改时间：2020年1月1日</li>
-            <li>Level：6</li>
-            <li>Chapter：24</li>
+            <!-- <li>创建时间：2018年6月1日</li> -->
+            <li>最后修改时间：{{ item.update_time | formatDate('YYYY年MM月DD日') }}</li>
           </ul>
         </div>
         <div class="operate">
-          <span>下架</span>
+          <el-tooltip class="item" effect="dark" content="编辑" placement="top">
+            <el-button type="primary" icon="el-icon-edit" circle @click="edit(item)"></el-button>
+          </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="上线" placement="top">
+            <el-button type="success" :disabled="item.is_show" icon="el-icon-check" circle></el-button>
+          </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="下线" placement="top">
+            <el-button type="warning" icon="el-icon-minus" circle></el-button>
+          </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="删除" placement="top">
+            <el-button type="danger" :disabled="item.is_show" icon="el-icon-delete" circle></el-button>
+          </el-tooltip>
         </div>
         <div class="operate-shade" v-show="false">
           <div class="desc">确定下架该版本吗？</div>
@@ -48,57 +56,92 @@
           </div>
         </div>
       </div>
-      <div class="version-item" @click="switchVersion('V1')">
-        <div class="content">
-          <div class="title">版本V1</div>
-          <ul>
-            <li>创建时间：2016年6月1日</li>
-            <li>最后修改时间：2019年10月1日</li>
-            <li>Level：6</li>
-            <li>Chapter：24</li>
-          </ul>
-        </div>
-        <div class="operate">
-          <span>发布上线</span>
-        </div>
-        <div class="operate-shade" v-show="false">
-          <div class="desc">确定发布该版本吗？</div>
-          <div class="btns">
-            <span class="cancel">取消</span>
-            <span class="ok">确定</span>
-          </div>
-        </div>
-      </div>
     </div>
     <add-version ref="addVersion"/>
+    <course-content :langList="langList" :courseTypes="courseTypes" :contents="contents" ref="content" />
   </div>
 </template>
 
 <script>
 import AddVersion from './add'
+import CourseContent from '../content/content'
+import {
+  getLangList,
+  getCourseTypes,
+  getCourseList,
+  getCourseContentList
+} from '@/api/course'
+import { mapState, mapActions } from 'vuex'
 export default {
   data () {
     return {
       langList: [],
-      selLang: '',
+      selLang: 'ENG',
       courseTypes: [],
       selCourseType: '',
-      outerVisible: false,
-      centerDialogVisible: true
+      selCourse: null,
+      contents: []
     }
   },
   components: {
-    AddVersion
+    AddVersion,
+    CourseContent
+  },
+  created () {
+    this.getConfigInfo()
+  },
+  mounted () {
+    this.initData()
+  },
+  computed: {
+    ...mapState({
+      locale: state => state.course.locale
+    })
   },
   methods: {
+    ...mapActions({
+      getConfigInfo: 'course/getConfigInfo'
+    }),
+    async initData () {
+      let langInfo = await getLangList({ 'pageNo': 0, 'pageSize': 999 })
+      if (langInfo.success) {
+        this.langList = langInfo.data.langs
+      }
+      let courseTypesInfo = await getCourseTypes()
+      if (courseTypesInfo.success) {
+        this.courseTypes = courseTypesInfo.data.types
+        this.selCourseType = 0
+      }
+      this.initCourseContentList()
+    },
+    async initCourseContentList () {
+      let courseListInfo = await getCourseList({ 'lan_code': this.selLang, 'pageNo': 0, 'pageSize': 0 })
+      if (courseListInfo.success) {
+        let courses = courseListInfo.data.courses
+        this.selCourse = courses.find(item => {
+          return item.course_type === this.selCourseType
+        })
+        console.log(this.selCourse)
+      }
+      if (this.selCourse) {
+        let uuid = this.selCourse.uuid
+        let courseContentInfo = await getCourseContentList({ 'pageNo': 0, 'pageSize': 0, 'parent_uuid': uuid })
+        this.contents = courseContentInfo.data.contents.sort((a, b) => {
+          return b['update_time'] - a['update_time']
+        })
+        console.log(this.contents)
+      } else {
+        this.contents = []
+      }
+    },
     switchVersion (version) {
-      this.$emit('switchVersion', version)
     },
     addVersion () {
       this.$refs['addVersion'].show()
     },
-    edit () {
-      this.$router.push({ path: '/course-content', query: { lang: 'ENG', project: 'pro', version: 1 } })
+    edit (item) {
+      // this.$router.push({ path: '/course-content', query: { lang: 'ENG', project: 'pro', version: 1 } })
+      this.$refs['content'].show({ lang: this.selLang, courseType: this.selCourseType, version: item.version, uuid: item.uuid })
     }
   }
 }
@@ -106,7 +149,6 @@ export default {
 
 <style lang="scss" scoped>
 .version-container {
-  padding: 60px 0;
   .top-bar{
     margin-top: 20px;
   }
@@ -114,6 +156,7 @@ export default {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
+    margin: 20px 0;
   }
   .version-item {
     position: relative;
@@ -121,18 +164,18 @@ export default {
     flex-direction: column;
     width: 280px;
     height: 240px;
-    background: #fff;
+    background: rgba($color: #000000, $alpha: 0.05);
     border-radius: 4px;
-    margin-left: 30px;
+    margin: 15px;
     overflow: hidden;
     transition: all .3s ease;
-    cursor: pointer;
-    &:hover {
-      box-shadow:0px 24px 24px 0px rgba(0,0,0,0.12);
-    }
-    &:active {
-      box-shadow: 0px 9px 24px 0px rgba(0,0,0,0.12);
-    }
+    // cursor: pointer;
+    // &:hover {
+    //   box-shadow:0px 24px 24px 0px rgba(0,0,0,0.12);
+    // }
+    // &:active {
+    //   box-shadow: 0px 9px 24px 0px rgba(0,0,0,0.12);
+    // }
   }
   .create {
     text-align: center;
@@ -166,7 +209,7 @@ export default {
     }
   }
   .content {
-    min-height: 199px;
+    min-height: 174px;
     border-bottom: 1px solid rgba($color: #000000, $alpha: 0.05);
     .title {
       padding-top: 16px;
@@ -194,23 +237,23 @@ export default {
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    transition: all .3s ease;
-    cursor: pointer;
-    &:hover {
-      background: rgba(0,122,255,.05);
-    }
-    &:active {
-      background: rgba(0,122,255,1);
-      span {
-        color: #fff;
-      }
-    }
-    span {
-      font-size: 14px;
-      font-weight: 400;
-      color: #007AFF;
-      line-height: 20px;
-    }
+    // transition: all .3s ease;
+    // cursor: pointer;
+    // &:hover {
+    //   background: rgba(0,122,255,.05);
+    // }
+    // &:active {
+    //   background: rgba(0,122,255,1);
+    //   span {
+    //     color: #fff;
+    //   }
+    // }
+    // span {
+    //   font-size: 14px;
+    //   font-weight: 400;
+    //   color: #007AFF;
+    //   line-height: 20px;
+    // }
   }
   .operate-shade {
     position: absolute;
@@ -256,5 +299,9 @@ export default {
       }
     }
   }
+}
+
+.el-select {
+  margin-right: 20px;
 }
 </style>

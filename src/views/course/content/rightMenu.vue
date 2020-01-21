@@ -1,6 +1,6 @@
 <template>
   <transition name="fade">
-    <div class="right-menu-container" :style="{'left': left + 'px', 'top': top + 'px'}">
+    <div class="right-menu-container" :style="{'left': left + 'px', 'top': top + 'px'}" v-show="isShow">
       <div class="menu">
         <div class="menu-group">
           <div class="menu-item">
@@ -10,7 +10,7 @@
         </div>
         <div class="menu-group">
           <div class="menu-item">
-            <div class="name">新建子目录</div>
+            <div class="name">{{ type == 'folder' ? '新建子目录' : '新建目录' }}</div>
           </div>
           <div class="menu-item">
             <div class="name">
@@ -20,7 +20,7 @@
           </div>
           <div class="line"></div>
         </div>
-        <div class="menu-group">
+        <div class="menu-group" v-show="type == 'folder'">
           <div class="menu-item">
             <div class="name">复制</div>
           </div>
@@ -28,14 +28,14 @@
             <div class="name">粘贴</div>
           </div>
           <div class="menu-item">
-            <div class="name">重命名</div>
+            <div class="name" @click="rename">重命名</div>
           </div>
           <div class="menu-item">
             <div class="name">删除</div>
           </div>
           <div class="line"></div>
         </div>
-        <div class="menu-group">
+        <div class="menu-group" v-show="type == 'folder'">
           <div class="menu-item">
             <div class="name">信息编辑</div>
           </div>
@@ -49,8 +49,29 @@
 export default {
   data () {
     return {
+      isShow: false,
       left: 0,
-      top: 0
+      top: 0,
+      folder: null,
+      type: ''
+    }
+  },
+  methods: {
+    show (params) {
+      let ev = params.event
+      this.left = ev.x + 20
+      this.top = ev.y
+      this.folder = params.folder
+      this.type = params.type
+      this.isShow = true
+      console.log(params)
+    },
+    hide () {
+      this.isShow = false
+    },
+    rename () {
+      let uuid = this.folder.uuid
+      this.$emit('rename', uuid)
     }
   }
 }
@@ -70,6 +91,10 @@ export default {
     width: 110px;
     .menu-item {
       padding: 3px 0;
+      &:hover {
+        background: #007AFF;
+        color: #fff;
+      }
       .name {
         padding-left: 10px;
       }
