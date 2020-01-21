@@ -4,7 +4,7 @@
       <el-input v-model="searchKey" @input="search" clearable placeholder="请输入要查找的语言"></el-input>
       <div class="btn-area">
         <el-button style="outline:none;" type="primary" class="btnAdd" @click="addLang()">添加</el-button>
-        <el-button style="outline:none;" type="primary" class="btnSort">预览排序</el-button>
+        <el-button style="outline:none;" type="primary" class="btnSort" @click="previewSort()">预览排序</el-button>
       </div>
     </div>
     <el-table
@@ -29,13 +29,13 @@
         width="200"
         label="名称">
         <template slot-scope="scope">
-          <div v-for="l in langInfos" :key="l.langKey">{{ l.name + ': ' +  scope.row.title['' + l.langKey + ''] + ' ' }}</div>
+          <div v-for="l in langInfos" :key="l.langKey">{{ l.name + ': ' +  (scope.row.title['' + l.langKey + ''] ? scope.row.title['' + l.langKey + ''] : '') + ' ' }}</div>
         </template>
       </el-table-column>
       <el-table-column
         label="描述">
         <template slot-scope="scope" v-if="Object.keys(scope.row.desc).length">
-          <div v-for="l in langInfos" :key="l.langKey">{{ l.name + ': ' +  scope.row.desc['' + l.langKey + ''] + ' ' }}</div>
+          <div v-for="l in langInfos" :key="l.langKey">{{ l.name + ': ' +  (scope.row.desc['' + l.langKey + ''] ? scope.row.desc['' + l.langKey + ''] : '') + ' ' }}</div>
         </template>
         <template v-else>
         </template>
@@ -78,7 +78,7 @@
             size="mini"
             plain
             :disabled="scope.row.is_show"
-            @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+            @click="editLang(scope.row)">编辑</el-button>
           <el-button
             size="mini"
             plain
@@ -95,20 +95,21 @@
             type="danger"
             plain
             :disabled="scope.row.is_show"
-            @click="handleEdit(scope.$index, scope.row)">删除</el-button>
+            @click="deleteLang(scope.row.lan_code)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
-    <edit-comp ref="edit"/>
+    <edit-comp ref="edit" @addNewLang="updateNewLang" :langInfos="langInfos"/>
+    <sort-course-comp ref="sorLang" :allLangs="allLangs" :assetsUrl="assetsUrl" @sortCourse="updateNewLang"/>
   </div>
 </template>
 
 <script>
 import { mapState, mapActions } from 'vuex'
-import {
-  getLangList
-} from '@/api/course'
+import { getLangList } from '@/api/course'
+import { delLang } from '@/api/api'
 import EditComp from './edit'
+import SortCourseComp from './sortCourse'
 
 export default {
   data () {
@@ -120,7 +121,8 @@ export default {
     }
   },
   components: {
-    EditComp
+    EditComp,
+    SortCourseComp
   },
   created () {
     this.getConfigInfo()
@@ -138,6 +140,10 @@ export default {
     ...mapActions({
       getConfigInfo: 'course/getConfigInfo'
     }),
+    // 添加新课程
+    updateNewLang () {
+      this.initData()
+    },
     async initData () {
       let res = await getLangList({ 'pageNo': 0, 'pageSize': 999 })
       if (res.success) {
@@ -165,8 +171,42 @@ export default {
     handleCurrentChange (val) {
       console.log(`当前页: ${val}`)
     },
+    // 编辑
+    editLang (lang) {
+      console.log(lang)
+      this.$refs.edit.show('edit', lang)
+    },
+    // 添加
     addLang () {
-      this.$refs.edit.show()
+      this.$refs.edit.show('add')
+    },
+    // 删除
+    deleteLang (code) {
+      console.log(code)
+      this.$confirm('此操作将永久删除该课程, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
+        })
+        delLang({ lan_code: code }).then(res => {
+          if (res.success) {
+            this.initData()
+          }
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
+    },
+    // 预览排序
+    previewSort () {
+      this.$refs.sorLang.show()
     }
   }
 }

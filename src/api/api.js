@@ -113,3 +113,93 @@ export const deleteApi = (data) => {
     data
   })
 }
+
+// @Tags Api
+// @Summary 添加语种
+// @Security ApiKeyAuth
+// @accept application/json
+// @Produce application/json
+// @Param
+// {
+//   "desc": {
+//     "additionalProp1": "string",
+//     "additionalProp2": "string",
+//     "additionalProp3": "string"
+//   },
+//   "flag": [
+//     "string"
+//   ],
+//   "is_hot": true,
+//   "is_show": true,
+//   "lan_code": "string",
+//   "list_order": 0,
+//   "title": {
+//     "additionalProp1": "string",
+//     "additionalProp2": "string",
+//     "additionalProp3": "string"
+//   },
+//   "word_direction": "string"
+// }
+// @Success 200 {string} json "{"success":true,"data":{},"msg":"添加成功"}"
+// @Router /editor/lang/add [post]
+export const addLang = (data) => {
+  return service({
+    url: '/editor/lang/add',
+    method: 'post',
+    data
+  })
+}
+
+// @Tags Api
+// @Summary 删除语种
+// @Security ApiKeyAuth
+// @accept application/json
+// @Produce application/json
+// @Param lan_code: 'string'
+// @Success 200 {string} json "{"success":true,"data":{},"msg":"删除成功"}"
+// @Router /editor/lang/del [post]
+export const delLang = (data) => {
+  return service({
+    url: '/editor/lang/del',
+    method: 'post',
+    data
+  })
+}
+
+// @Tags Api
+// @Summary 编辑语种
+// @Security ApiKeyAuth
+// @accept application/json
+// @Produce application/json
+// @Param
+// {
+//   "lan_code": "string",
+//   "lang_info": {
+//     "desc": {
+//       "additionalProp1": "string",
+//       "additionalProp2": "string",
+//       "additionalProp3": "string"
+//     },
+//     "flag": [
+//       "string"
+//     ],
+//     "is_hot": true,
+//     "is_show": true,
+//     "list_order": 0,
+//     "title": {
+//       "additionalProp1": "string",
+//       "additionalProp2": "string",
+//       "additionalProp3": "string"
+//     },
+//     "word_direction": "string"
+//   }
+// }
+// @Success 200 {string} json "{"success":true,"data":{},"msg":"编辑成功"}"
+// @Router /editor/lang/del [post]
+export const editLang = (data) => {
+  return service({
+    url: '/editor/lang/edit',
+    method: 'post',
+    data
+  })
+}
