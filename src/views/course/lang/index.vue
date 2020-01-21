@@ -106,8 +106,7 @@
 
 <script>
 import { mapState, mapActions } from 'vuex'
-import { getLangList } from '@/api/course'
-import { delLang } from '@/api/api'
+import { getLangList, delLang } from '@/api/course'
 import EditComp from './edit'
 import SortCourseComp from './sortCourse'
 

@@ -153,7 +153,9 @@ export default {
     }
     document.onclick = () => {
       this.rightUUID = ''
-      this.$refs['rightMenu'].hide()
+      if (this.$refs['rightMenu']) {
+        this.$refs['rightMenu'].hide()
+      }
     }
   },
   computed: {

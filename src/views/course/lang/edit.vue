@@ -77,8 +77,7 @@
 </template>
 
 <script>
-import { getLangList } from '@/api/course'
-import { addLang, editLang } from '@/api/api'
+import { getLangList, addLang, editLang } from '@/api/course'
 import InputComp from './input'
 import { mapState } from 'vuex'
 

@@ -24,7 +24,6 @@
 
 <script>
 import Sortable from 'sortablejs'
-// import { editLang } from '@/api/api'
 
 export default {
   props: ['allLangs', 'assetsUrl'],
