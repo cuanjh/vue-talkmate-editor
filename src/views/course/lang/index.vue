@@ -47,7 +47,7 @@
           <el-image
             class="lang-img"
             :src="assetsUrl + scope.row.flag[0]"
-            fit="fit">
+            fit="cover">
           </el-image>
         </template>
       </el-table-column>

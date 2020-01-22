@@ -60,7 +60,7 @@
             <div class="other" @contextmenu="otherContextMenu($event, item[0])"></div>
           </div>
         </div>
-        <div class="track-content" v-show="false">
+        <!-- <div class="track-content" v-show="false">
           <div class="add-slide">新建Slide</div>
           <div class="slide-list" :style="{'height': slideHeight + 'px'}">
             <slide />
@@ -105,7 +105,7 @@
               <div class="voice"></div>
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
     </el-main>
     <el-dialog
@@ -124,17 +124,20 @@
       @editCatalog="editCatalog"
     />
     <edit-catalog ref="editCatalog"/>
+    <edit-form ref="editForm"/>
   </el-container>
 </template>
 
 <script>
 import Folder from './folder'
-import Slide from './slide'
+// import Slide from './slide'
 import RightMenu from './rightMenu'
 import EditCatalog from './editCatalog'
+import EditForm from './editForm'
 import { mapState, mapActions, mapMutations } from 'vuex'
 import {
-  getCatalogList
+  getCatalogList,
+  getContent
 } from '@/api/course'
 export default {
   data () {
@@ -155,9 +158,14 @@ export default {
   },
   components: {
     Folder,
-    Slide,
+    // Slide,
     RightMenu,
-    EditCatalog
+    EditCatalog,
+    EditForm
+  },
+  created () {
+    this.getModelList({ pageNo: 0, pageSize: 0 })
+    this.getContentTypes()
   },
   mounted () {
     if (this.version) {
@@ -185,7 +193,9 @@ export default {
       locale: state => state.course.locale,
       langList: state => state.course.langList,
       courseTypes: state => state.course.courseTypes,
-      version: state => state.course.version
+      version: state => state.course.version,
+      modelList: state => state.course.modelList,
+      contentTypes: state => state.course.contentTypes
     })
   },
   methods: {
@@ -193,7 +203,9 @@ export default {
       updateVersion: 'course/updateVersion'
     }),
     ...mapActions({
-      getCourseList: 'course/getCourseList'
+      getCourseList: 'course/getCourseList',
+      getModelList: 'course/getModelList',
+      getContentTypes: 'course/getContentTypes'
     }),
     initCourseVersionList (flag) {
       this.updateVersion({ key: 'selLang', val: this.selLang })
@@ -271,6 +283,16 @@ export default {
       this.getPath(copy, this.uuid)
       if (params.folder.type === 'catalog') {
         this.initData(params.trackNum + 1)
+      } else {
+        let model = this.modelList.find(item => {
+          return item.model_key === params.folder.content_model
+        })
+        console.log(model)
+        getContent({ 'content_model': params.folder.content_model, 'parent_uuid': params.folder.uuid }).then(res => {
+          console.log(res)
+          let contents = res.data.contents
+          this.$refs['editForm'].show({ contents: contents, model: model, folder: params.folder })
+        })
       }
     },
     getPath (tracks, uuid) {

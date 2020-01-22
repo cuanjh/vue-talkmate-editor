@@ -3,7 +3,9 @@ import {
   getCourseTypes,
   getLangList,
   getCourseList,
-  getCourseVersionList
+  getCourseVersionList,
+  getModelList,
+  getContentTypes
 } from '@/api/course'
 export const course = {
   namespaced: true,
@@ -26,7 +28,9 @@ export const course = {
       selVersion: '',
       versions: [],
       uuid: ''
-    }
+    },
+    modelList: [], // 内容模型列表
+    contentTypes: [] // 内容分类列表
   },
   mutations: {
     updateConfigInfo (state, configInfo) {
@@ -41,6 +45,12 @@ export const course = {
     },
     updateCourseTypes (state, courseTypes) {
       state.courseTypes = courseTypes
+    },
+    updataModelList (state, models) {
+      state.modelList = models
+    },
+    updateContentTypes (state, showTypes) {
+      state.contentTypes = showTypes
     }
   },
   actions: {
@@ -97,6 +107,22 @@ export const course = {
           return b['update_time'] - a['update_time']
         })
         commit('updateVersion', { key: 'versions', val: versions })
+      }
+    },
+    // 获取内容模型列表
+    async getModelList ({ commit }, data) {
+      const res = await getModelList(data)
+      if (res.success) {
+        let models = res.data.models
+        commit('updataModelList', models)
+      }
+    },
+    // 获取内容类型列表
+    async getContentTypes ({ commit }) {
+      const res = await getContentTypes()
+      if (res.success) {
+        let showTypes = res.data.showTypes
+        commit('updateContentTypes', showTypes)
       }
     }
   },

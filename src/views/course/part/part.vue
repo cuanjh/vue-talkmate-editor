@@ -28,7 +28,7 @@
             <td class="selfTableCell" style="width: 200px"><input type="text" value="What are you doing?"></td>
             <td class="selfTableCell" style="width: 200px"><input type="text" value="What/How/Where"></td>
             <td class="selfTableCell">
-              <el-image  @click="clickChangeImg" class="cover" src="http://course-assets.talkmate.com/kidCourseRes/combg/9.webp?v=qoiuoiewurpooo" fit="fit"></el-image>
+              <el-image  @click="clickChangeImg" class="cover" src="http://course-assets.talkmate.com/kidCourseRes/combg/9.webp?v=qoiuoiewurpooo" fit="cover"></el-image>
             </td>
             <td class="selfTableCell" @click="clickChangVoice"><div class="voice"><i></i></div></td>
             <td class="selfTableCell"><i class="el-icon-close"></i></td>
@@ -64,7 +64,7 @@
             <td class="selfTableCell">填空</td>
             <td class="selfTableCell" style="width: 200px"><input type="text" value="What are you doing?"></td>
             <td class="selfTableCell" style="width: 200px"><input type="text" value="What/How/Where"></td>
-            <td class="selfTableCell"><el-image class="cover" src="http://course-assets.talkmate.com/kidCourseRes/combg/9.webp?v=qoiuoiewurpooo" fit="fit"></el-image></td>
+            <td class="selfTableCell"><el-image class="cover" src="http://course-assets.talkmate.com/kidCourseRes/combg/9.webp?v=qoiuoiewurpooo" fit="cover"></el-image></td>
             <td class="selfTableCell"><div class="voice"><i></i></div></td>
             <td class="selfTableCell"><i class="el-icon-close"></i></td>
           </tr>
@@ -99,7 +99,7 @@
             <td class="selfTableCell">填空</td>
             <td class="selfTableCell" style="width: 200px"><input type="text" value="What are you doing?"></td>
             <td class="selfTableCell" style="width: 200px"><input type="text" value="What/How/Where"></td>
-            <td class="selfTableCell"><el-image class="cover" src="http://course-assets.talkmate.com/kidCourseRes/combg/9.webp?v=qoiuoiewurpooo" fit="fit"></el-image></td>
+            <td class="selfTableCell"><el-image class="cover" src="http://course-assets.talkmate.com/kidCourseRes/combg/9.webp?v=qoiuoiewurpooo" fit="cover"></el-image></td>
             <td class="selfTableCell"><div class="voice"><i></i></div></td>
             <td class="selfTableCell"><i class="el-icon-close"></i></td>
           </tr>
@@ -134,7 +134,7 @@
             <td class="selfTableCell">填空</td>
             <td class="selfTableCell" style="width: 200px"><input type="text" value="What are you doing?"></td>
             <td class="selfTableCell" style="width: 200px"><input type="text" value="What/How/Where"></td>
-            <td class="selfTableCell"><el-image class="cover" src="http://course-assets.talkmate.com/kidCourseRes/combg/9.webp?v=qoiuoiewurpooo" fit="fit"></el-image></td>
+            <td class="selfTableCell"><el-image class="cover" src="http://course-assets.talkmate.com/kidCourseRes/combg/9.webp?v=qoiuoiewurpooo" fit="cover"></el-image></td>
             <td class="selfTableCell"><div class="voice"><i></i></div></td>
             <td class="selfTableCell"><i class="el-icon-close"></i></td>
           </tr>
@@ -169,7 +169,7 @@
             <td class="selfTableCell">填空</td>
             <td class="selfTableCell" style="width: 200px"><input type="text" value="What are you doing?"></td>
             <td class="selfTableCell" style="width: 200px"><input type="text" value="What/How/Where"></td>
-            <td class="selfTableCell"><el-image class="cover" src="http://course-assets.talkmate.com/kidCourseRes/combg/9.webp?v=qoiuoiewurpooo" fit="fit"></el-image></td>
+            <td class="selfTableCell"><el-image class="cover" src="http://course-assets.talkmate.com/kidCourseRes/combg/9.webp?v=qoiuoiewurpooo" fit="cover"></el-image></td>
             <td class="selfTableCell"><div class="voice"><i></i></div></td>
             <td class="selfTableCell"><i class="el-icon-close"></i></td>
           </tr>

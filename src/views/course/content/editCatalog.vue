@@ -31,7 +31,7 @@
         <el-form-item label="图标">
           <div class="flag">
             <div class="flag-image">
-              <el-image v-if="form.flag && form.flag[0]" :src="assetsDomain + form.flag[0]" fit="fit"></el-image>
+              <el-image v-if="form.flag && form.flag[0]" :src="assetsDomain + form.flag[0]" fit="cover"></el-image>
             </div>
             <el-button icon="el-icon-plus" circle></el-button>
           </div>
@@ -39,7 +39,7 @@
         <el-form-item label="封面">
           <div class="cover">
             <div class="cover-image">
-              <el-image v-if="form.cover && form.cover[0]" :src="assetsDomain + form.cover[0]" fit="fit"></el-image>
+              <el-image v-if="form.cover && form.cover[0]" :src="assetsDomain + form.cover[0]" fit="cover"></el-image>
             </div>
             <el-button icon="el-icon-plus" circle></el-button>
           </div>

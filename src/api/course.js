@@ -250,3 +250,52 @@ export const getCatalogList = (data) => {
     data
   })
 }
+
+/**
+ * @Summary 获取内容列表
+ * @Produce  application/json
+ * @Param
+ * {
+ *    "content_model": "string",
+ *    "parent_uuid": "string"
+ *  }
+ * @Router /editor/content [post]
+ */
+export const getContent = (data) => {
+  return service({
+    url: '/editor/content',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 获取模型列表
+ * @Produce  application/json
+ * @param {*} data
+ * {
+ *   "pageNo": 0,
+ *   "pageSize": 0
+ * }
+ * @Router /editor/model/list [post]
+ */
+export const getModelList = (data) => {
+  return service({
+    url: '/editor/model/list',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 获取内容类型列表
+ * @param {*} data
+ * @Router /editor/content/showTypes [get]
+ */
+export const getContentTypes = (data) => {
+  return service({
+    url: '/editor/content/showTypes',
+    method: 'get',
+    data
+  })
+}

@@ -48,7 +48,7 @@
           <el-image
             class="course-flag"
             :src="assetsDomain + scope.row.flag[0]"
-            fit="fit">
+            fit="cover">
           </el-image>
         </template>
       </el-table-column>
@@ -58,7 +58,7 @@
           <el-image
             class="course-cover"
             :src="assetsDomain + scope.row.cover[0]"
-            fit="fit">
+            fit="cover">
           </el-image>
         </template>
       </el-table-column>
