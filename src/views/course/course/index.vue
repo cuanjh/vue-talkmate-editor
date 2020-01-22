@@ -1,7 +1,9 @@
 <template>
   <div class="course-manage">
     <div class="top-bar">
-      <el-select v-model="selLang" filterable placeholder="请选择语种">
+      <el-select v-model="selLang"
+        filterable placeholder="请选择语种"
+        @change="curCourse">
         <el-option
           v-for="item in langList"
           :key="item['lan_code']"
@@ -9,9 +11,15 @@
           :value="item['lan_code']">
         </el-option>
       </el-select>
-      <el-button v-show="userInfo.authority.authorityId == '1' || userInfo.authority.authorityId == '2'" style="outline:none;" type="primary" class="btnAdd">添加</el-button>
+      <el-button v-show="userInfo.authority.authorityId == '1' || userInfo.authority.authorityId == '2'"
+        style="outline:none;"
+        type="primary"
+        class="btnAdd"
+        :disabled="courseList && courseList.length == 2"
+        @click="addCourse">添加</el-button>
     </div>
     <el-table
+      class="course-table"
       :data="courseList"
       style="width: 100%;">
       <el-table-column
@@ -21,7 +29,7 @@
       <el-table-column
         label="课程分类">
         <template slot-scope="scope">
-          {{scope.row.courseType == 0 ? 'PRO' : 'KID'}}
+          {{scope.row.course_type == 0 ? 'PRO' : 'KID'}}
         </template>
       </el-table-column>
       <el-table-column
@@ -55,7 +63,7 @@
         </template>
       </el-table-column>
       <el-table-column
-        label="是否上线">
+        label="是否显示">
         <template slot-scope="scope">
           {{scope.row.is_show ? '是' : '否'}}
         </template>
@@ -65,13 +73,16 @@
           <el-button
             v-show="userInfo.authority.authorityId == '1' || userInfo.authority.authorityId == '2'"
             size="mini"
-            @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+            @click="handleEdit(scope.row)">编辑</el-button>
           <el-button
             size="mini"
             @click="handleEditContent(scope.$index, scope.row)">编辑课程内容</el-button>
         </template>
       </el-table-column>
     </el-table>
+    <edit-comp ref="edit"
+      :courseTypes="courseTypes"
+      @addNewCourse="addNewCourse"/>
   </div>
 </template>
 
@@ -81,6 +92,7 @@ import {
   getLangList,
   getCourseList
 } from '@/api/course'
+import EditComp from './edit'
 
 export default {
   data () {
@@ -92,6 +104,7 @@ export default {
     }
   },
   components: {
+    EditComp
   },
   created () {
     this.getConfigInfo()
@@ -114,6 +127,9 @@ export default {
       getConfigInfo: 'course/getConfigInfo',
       getCourseTypes: 'course/getCourseTypes'
     }),
+    addNewCourse () {
+      this.initData()
+    },
     async initData () {
       let langInfo = await getLangList({ 'pageNo': 0, 'pageSize': 999 })
       if (langInfo.success) {
@@ -125,10 +141,31 @@ export default {
         this.courseList = courseListInfo.data.courses
       }
     },
+    handleEdit (row) {
+      console.log(this.courseList)
+      let obj = {
+        type: 'edit',
+        selLang: this.selLang,
+        form: row
+      }
+      this.$refs.edit.show(obj)
+    },
     handleEditContent (i, row) {
       console.log(i)
       console.log(row)
       this.$refs['content'].show(row)
+    },
+    addCourse () {
+      console.log(this.courseList)
+      let obj = {
+        type: 'add',
+        selLang: this.selLang
+      }
+      this.$refs.edit.show(obj)
+    },
+    curCourse () {
+      console.log(this.selLang)
+      this.initData()
     }
   }
 }
@@ -146,7 +183,6 @@ export default {
     float: right;
     width: 100px;
   }
-
   .course-list {
     display: flex;
     flex-direction: row;
@@ -164,4 +200,9 @@ export default {
     height: 66px;
     border-radius: 4px;
   }
+</style>
+<style>
+.course-table.el-table th>.cell {
+  width: 100px!important;
+}
 </style>

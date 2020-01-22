@@ -23,10 +23,7 @@ export const getLangList = (data) => {
   })
 }
 
-// @Tags Api
 // @Summary 添加语种
-// @Security ApiKeyAuth
-// @accept application/json
 // @Produce application/json
 // @Param
 // {
@@ -49,7 +46,6 @@ export const getLangList = (data) => {
 //   },
 //   "word_direction": "string"
 // }
-// @Success 200 {string} json "{"success":true,"data":{},"msg":"添加成功"}"
 // @Router /editor/lang/add [post]
 export const addLang = (data) => {
   return service({
@@ -59,13 +55,9 @@ export const addLang = (data) => {
   })
 }
 
-// @Tags Api
 // @Summary 删除语种
-// @Security ApiKeyAuth
-// @accept application/json
 // @Produce application/json
 // @Param lan_code: 'string'
-// @Success 200 {string} json "{"success":true,"data":{},"msg":"删除成功"}"
 // @Router /editor/lang/del [post]
 export const delLang = (data) => {
   return service({
@@ -75,10 +67,7 @@ export const delLang = (data) => {
   })
 }
 
-// @Tags Api
 // @Summary 编辑语种
-// @Security ApiKeyAuth
-// @accept application/json
 // @Produce application/json
 // @Param
 // {
@@ -103,7 +92,6 @@ export const delLang = (data) => {
 //     "word_direction": "string"
 //   }
 // }
-// @Success 200 {string} json "{"success":true,"data":{},"msg":"编辑成功"}"
 // @Router /editor/lang/del [post]
 export const editLang = (data) => {
   return service({
@@ -136,6 +124,82 @@ export const getCourseTypes = () => {
 export const getCourseList = (data) => {
   return service({
     url: '/editor/course/list',
+    method: 'post',
+    data
+  })
+}
+
+// @Summary 添加课程
+// @Produce  application/json
+// @Param
+// {
+//   "code": "string",
+//   "course_type": 0,
+//   "cover": [
+//     "string"
+//   ],
+//   "desc": {
+//     "additionalProp1": "string",
+//     "additionalProp2": "string",
+//     "additionalProp3": "string"
+//   },
+//   "flag": [
+//     "string"
+//   ],
+//   "is_show": true,
+//   "lan_code": "string",
+//   "tags": [
+//     "string"
+//   ],
+//   "title": {
+//     "additionalProp1": "string",
+//     "additionalProp2": "string",
+//     "additionalProp3": "string"
+//   },
+//   "uuid": "string"
+// }
+// @Router /editor/course/add [post]
+export const addCourse = (data) => {
+  return service({
+    url: '/editor/course/add',
+    method: 'post',
+    data
+  })
+}
+
+// @Summary 修改课程
+// @Produce  application/json
+// @Param
+// {
+//   "code": "string",
+//   "course_type": 0,
+//   "cover": [
+//     "string"
+//   ],
+//   "desc": {
+//     "additionalProp1": "string",
+//     "additionalProp2": "string",
+//     "additionalProp3": "string"
+//   },
+//   "flag": [
+//     "string"
+//   ],
+//   "is_show": true,
+//   "lan_code": "string",
+//   "tags": [
+//     "string"
+//   ],
+//   "title": {
+//     "additionalProp1": "string",
+//     "additionalProp2": "string",
+//     "additionalProp3": "string"
+//   },
+//   "uuid": "string"
+// }
+// @Router /editor/course/edit [post]
+export const courseEdit = (data) => {
+  return service({
+    url: '/editor/course/edit',
     method: 'post',
     data
   })

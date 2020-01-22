@@ -66,7 +66,7 @@
       </el-table-column>
       <el-table-column
         width="100"
-        label="是否已上线">
+        label="是否显示">
         <template slot-scope="scope">
           <el-tag type="success" v-if="scope.row.is_show">是</el-tag>
           <el-tag type="dange" v-else>否</el-tag>
@@ -99,7 +99,7 @@
         </template>
       </el-table-column>
     </el-table>
-    <edit-comp ref="edit" @addNewLang="updateNewLang" :langInfos="langInfos"/>
+    <edit-comp ref="edit" @addNewLang="updateNewLang" :langInfos="langInfos" :langList="langList"/>
     <sort-course-comp ref="sorLang" :allLangs="allLangs" :assetsUrl="assetsUrl" @sortCourse="updateNewLang"/>
   </div>
 </template>
