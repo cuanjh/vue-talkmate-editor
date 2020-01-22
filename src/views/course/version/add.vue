@@ -60,7 +60,8 @@ export default {
     CopyVersion
   },
   methods: {
-    show () {
+    show (params) {
+      this.version = params.version
       this.isShow = true
     },
     close () {

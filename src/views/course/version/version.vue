@@ -1,7 +1,7 @@
 <template>
   <div class="version-container">
     <div class="top-bar">
-      <el-select v-model="selLang" filterable placeholder="请选择语种" @change="initCourseContentList">
+      <el-select v-model="selLang" filterable placeholder="请选择语种" @change="initCourseVersionList">
         <el-option
           v-for="item in langList"
           :key="item['lan_code']"
@@ -9,7 +9,7 @@
           :value="item['lan_code']">
         </el-option>
       </el-select>
-      <el-select v-model="selCourseType" filterable placeholder="请选择课程分类"  @change="initCourseContentList">
+      <el-select v-model="selCourseType" filterable placeholder="请选择课程分类"  @change="initCourseVersionList">
         <el-option
           v-for="item in courseTypes"
           :key="item.type"
@@ -23,7 +23,7 @@
         <i class="el-icon-plus"></i>
         <span>创建新版本</span>
       </div>
-      <div class="version-item" v-for="item in contents" :key="item.uuid" @click="switchVersion(item)">
+      <div class="version-item" v-for="item in version.versions" :key="item.uuid" @click="switchVersion(item)">
         <div class="online-flag" v-show="item['is_show']">
           <span>线上</span>
         </div>
@@ -58,90 +58,90 @@
       </div>
     </div>
     <add-version ref="addVersion"/>
-    <course-content :langList="langList" :courseTypes="courseTypes" :contents="contents" ref="content" />
+    <!-- <course-content :langList="langList" :courseTypes="courseTypes" :contents="contents" ref="content" /> -->
   </div>
 </template>
 
 <script>
 import AddVersion from './add'
-import CourseContent from '../content/content'
-import {
-  getLangList,
-  getCourseTypes,
-  getCourseList,
-  getCourseContentList
-} from '@/api/course'
-import { mapState, mapActions } from 'vuex'
+// import CourseContent from '../content/content'
+import { mapState, mapActions, mapMutations } from 'vuex'
+import { addCourseVersion } from '@/api/course'
 export default {
   data () {
     return {
-      langList: [],
-      selLang: 'ENG',
-      courseTypes: [],
+      selLang: '',
       selCourseType: '',
-      selCourse: null,
       contents: []
     }
   },
   components: {
-    AddVersion,
-    CourseContent
+    AddVersion
+    // CourseContent
   },
   created () {
     this.getConfigInfo()
+    if (!this.langList.length) {
+      this.getLangList({ 'pageNo': 0, 'pageSize': 999 })
+    }
+    if (!this.courseTypes.length) {
+      this.getCourseTypes()
+    }
   },
   mounted () {
-    this.initData()
+    if (this.version) {
+      this.selLang = this.version.selLang
+    }
+    if (this.version) {
+      this.selCourseType = this.version.selCourseType
+    }
+    this.initCourseVersionList()
   },
   computed: {
     ...mapState({
-      locale: state => state.course.locale
+      locale: state => state.course.locale,
+      langList: state => state.course.langList,
+      courseTypes: state => state.course.courseTypes,
+      version: state => state.course.version
     })
   },
   methods: {
-    ...mapActions({
-      getConfigInfo: 'course/getConfigInfo'
+    ...mapMutations({
+      updateVersion: 'course/updateVersion'
     }),
-    async initData () {
-      let langInfo = await getLangList({ 'pageNo': 0, 'pageSize': 999 })
-      if (langInfo.success) {
-        this.langList = langInfo.data.langs
-      }
-      let courseTypesInfo = await getCourseTypes()
-      if (courseTypesInfo.success) {
-        this.courseTypes = courseTypesInfo.data.types
-        this.selCourseType = 0
-      }
-      this.initCourseContentList()
-    },
-    async initCourseContentList () {
-      let courseListInfo = await getCourseList({ 'lan_code': this.selLang, 'pageNo': 0, 'pageSize': 0 })
-      if (courseListInfo.success) {
-        let courses = courseListInfo.data.courses
-        this.selCourse = courses.find(item => {
-          return item.course_type === this.selCourseType
-        })
-        console.log(this.selCourse)
-      }
-      if (this.selCourse) {
-        let uuid = this.selCourse.uuid
-        let courseContentInfo = await getCourseContentList({ 'pageNo': 0, 'pageSize': 0, 'parent_uuid': uuid })
-        this.contents = courseContentInfo.data.contents.sort((a, b) => {
-          return b['update_time'] - a['update_time']
-        })
-        console.log(this.contents)
-      } else {
-        this.contents = []
-      }
+    ...mapActions({
+      getConfigInfo: 'course/getConfigInfo',
+      getLangList: 'course/getLangList',
+      getCourseTypes: 'course/getCourseTypes',
+      getCourseList: 'course/getCourseList'
+    }),
+    initCourseVersionList () {
+      this.updateVersion({ key: 'selLang', val: this.selLang })
+      this.updateVersion({ key: 'selCourseType', val: this.selCourseType })
+      this.getCourseList({ 'lan_code': this.selLang, 'pageNo': 0, 'pageSize': 0 })
     },
     switchVersion (version) {
     },
-    addVersion () {
-      this.$refs['addVersion'].show()
+    async addVersion () {
+      let version = 'V' + (this.version.versions.length + 1)
+      let pUUID = ''
+      if (this.version.selCourse) {
+        pUUID = this.version.selCourse.uuid
+      }
+      let obj = {
+        'name': version,
+        'parent_uuid': pUUID
+      }
+      console.log(obj)
+      await addCourseVersion(obj)
+      this.initCourseVersionList()
+      this.$refs['addVersion'].show({ version: version })
     },
     edit (item) {
-      // this.$router.push({ path: '/course-content', query: { lang: 'ENG', project: 'pro', version: 1 } })
-      this.$refs['content'].show({ lang: this.selLang, courseType: this.selCourseType, version: item.version, uuid: item.uuid })
+      this.updateVersion({ key: 'selVersion', val: item.version })
+      this.updateVersion({ key: 'uuid', val: item.uuid })
+      this.$router.push({ path: '/course-content' })
+      // this.$refs['content'].show({ lang: this.selLang, courseType: this.selCourseType, version: item.version, uuid: item.uuid })
     }
   }
 }

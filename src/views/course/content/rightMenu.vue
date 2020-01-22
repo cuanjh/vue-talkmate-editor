@@ -10,12 +10,11 @@
         </div>
         <div class="menu-group">
           <div class="menu-item">
-            <div class="name">{{ type == 'folder' ? '新建子目录' : '新建目录' }}</div>
+            <div class="name" @click="addFolder">{{ type == 'folder' ? '新建子目录' : '新建目录' }}</div>
           </div>
           <div class="menu-item">
-            <div class="name">
+            <div class="name" @click="addDocument">
               <span>新建文件</span>
-              <i class="el-icon-caret-right"></i>
             </div>
           </div>
           <div class="line"></div>
@@ -37,7 +36,7 @@
         </div>
         <div class="menu-group" v-show="type == 'folder'">
           <div class="menu-item">
-            <div class="name">信息编辑</div>
+            <div class="name" @click="editCatalog">信息编辑</div>
           </div>
         </div>
       </div>
@@ -53,6 +52,7 @@ export default {
       left: 0,
       top: 0,
       folder: null,
+      pUUID: '',
       type: ''
     }
   },
@@ -61,10 +61,13 @@ export default {
       let ev = params.event
       this.left = ev.x + 20
       this.top = ev.y
-      this.folder = params.folder
+      if (params.type === 'other') {
+        this.pUUID = params.pUUID
+      } else {
+        this.folder = params.folder
+      }
       this.type = params.type
       this.isShow = true
-      console.log(params)
     },
     hide () {
       this.isShow = false
@@ -72,6 +75,28 @@ export default {
     rename () {
       let uuid = this.folder.uuid
       this.$emit('rename', uuid)
+    },
+    addFolder () {
+      let uuid
+      if (this.type === 'other') {
+        uuid = this.pUUID
+      } else {
+        uuid = this.folder.uuid
+      }
+      this.$emit('editCatalog', { handler: 'add', type: 'catalog', uuid: uuid })
+    },
+    addDocument () {
+      let uuid
+      if (this.type === 'other') {
+        uuid = this.pUUID
+      } else {
+        uuid = this.folder.uuid
+      }
+      this.$emit('editCatalog', { handler: 'add', type: 'content', uuid: uuid })
+    },
+    editCatalog () {
+      let uuid = this.folder.uuid
+      this.$emit('editCatalog', { handler: 'edit', type: this.folder.type, uuid: uuid, folder: this.folder })
     }
   }
 }

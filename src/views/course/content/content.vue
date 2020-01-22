@@ -4,7 +4,7 @@
       <div class="top-bar">
         <div class="left">
           <div class="icon-logo"></div>
-          <el-select v-model="selLang" size="small" placeholder="请选择语言">
+          <el-select v-model="selLang" size="small" placeholder="请选择语言" @change="initCourseVersionList">
             <el-option
               v-for="item in langList"
               :key="item['lan_code']"
@@ -12,7 +12,7 @@
               :value="item['lan_code']">
             </el-option>
           </el-select>
-          <el-select v-model="selCouresType" size="small" placeholder="请选择项目">
+          <el-select v-model="selCourseType" size="small" placeholder="请选择项目" @change="initCourseVersionList">
             <el-option
               v-for="item in courseTypes"
               :key="item.type"
@@ -20,9 +20,9 @@
               :value="item.type">
             </el-option>
           </el-select>
-          <el-select v-model="selVersion" size="small" placeholder="请选择版本">
+          <el-select v-model="selVersion" size="small" placeholder="请选择版本" @change="initCourseVersionList(3)">
             <el-option
-              v-for="item in contents"
+              v-for="item in version.versions"
               :key="item.uuid"
               :label="item.version"
               :value="item.version">
@@ -57,7 +57,7 @@
                 @contentMenu="contentMenu"
               />
             </div>
-            <div class="other" @contextmenu="otherContextMenu($event, item[0].parent_uuid)"></div>
+            <div class="other" @contextmenu="otherContextMenu($event, item[0])"></div>
           </div>
         </div>
         <div class="track-content" v-show="false">
@@ -108,10 +108,22 @@
         </div>
       </div>
     </el-main>
+    <el-dialog
+      title="提示"
+      :visible.sync="dialogVisible"
+      width="30%">
+      <span>请先创建课程版本</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="$router.back()">确 定</el-button>
+      </span>
+    </el-dialog>
     <right-menu
       ref="rightMenu"
       @rename="rename"
+      @editCatalog="editCatalog"
     />
+    <edit-catalog ref="editCatalog"/>
   </el-container>
 </template>
 
@@ -119,17 +131,17 @@
 import Folder from './folder'
 import Slide from './slide'
 import RightMenu from './rightMenu'
-import { mapState } from 'vuex'
+import EditCatalog from './editCatalog'
+import { mapState, mapActions, mapMutations } from 'vuex'
 import {
   getCatalogList
 } from '@/api/course'
 export default {
-  props: ['langList', 'courseTypes', 'contents'],
   data () {
     return {
-      isShow: false,
+      isShow: true,
       selLang: 'ENG',
-      selCouresType: 0,
+      selCourseType: 0,
       selVersion: 1,
       selSlide: '1',
       slideHeight: 0,
@@ -137,15 +149,24 @@ export default {
       rightUUID: '',
       tracks: [],
       selFolder: '',
-      path: ''
+      path: '',
+      dialogVisible: false
     }
   },
   components: {
     Folder,
     Slide,
-    RightMenu
+    RightMenu,
+    EditCatalog
   },
   mounted () {
+    if (this.version) {
+      console.log(this.version)
+      this.selLang = this.version.selLang
+      this.selCourseType = this.version.selCourseType
+      this.selVersion = this.version.selVersion
+      this.uuid = this.version.uuid
+    }
     let h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
     this.slideHeight = h - 130
     document.oncontextmenu = (e) => {
@@ -157,13 +178,55 @@ export default {
         this.$refs['rightMenu'].hide()
       }
     }
+    this.initData(0)
   },
   computed: {
     ...mapState({
-      locale: state => state.course.locale
+      locale: state => state.course.locale,
+      langList: state => state.course.langList,
+      courseTypes: state => state.course.courseTypes,
+      version: state => state.course.version
     })
   },
   methods: {
+    ...mapMutations({
+      updateVersion: 'course/updateVersion'
+    }),
+    ...mapActions({
+      getCourseList: 'course/getCourseList'
+    }),
+    initCourseVersionList (flag) {
+      this.updateVersion({ key: 'selLang', val: this.selLang })
+      this.updateVersion({ key: 'selCourseType', val: this.selCourseType })
+      this.getCourseList({ 'lan_code': this.selLang, 'pageNo': 0, 'pageSize': 0 })
+      setTimeout(() => {
+        if (this.version.versions.length) {
+          this.updateVersion({ key: 'versions', val: this.version.versions })
+          if (flag !== 3) {
+            let item = this.version.versions[0]
+            this.selVersion = item.version
+            this.updateVersion({ key: 'selVersion', val: item.version })
+            this.updateVersion({ key: 'uuid', val: item.uuid })
+            this.uuid = item.uuid
+          } else {
+            let curVersion = this.version.versions.find(v => {
+              return v.version === this.selVersion
+            })
+            this.updateVersion({ key: 'selVersion', val: this.selVersion })
+            this.updateVersion({ key: 'uuid', val: curVersion.uuid })
+            this.uuid = curVersion.uuid
+          }
+          this.initData(0)
+        } else {
+          this.updateVersion({ key: 'versions', val: [] })
+          this.updateVersion({ key: 'selVersion', val: '' })
+          this.updateVersion({ key: 'uuid', val: '' })
+          this.versions = []
+          this.uuid = ''
+          this.dialogVisible = true
+        }
+      }, 300)
+    },
     show (params) {
       console.log(params)
       this.selLang = params.lang
@@ -174,7 +237,8 @@ export default {
       this.isShow = true
     },
     back () {
-      this.isShow = false
+      // this.isShow = false
+      this.$router.back()
     },
     switchSlide (num) {
       this.selSlide = num
@@ -228,11 +292,15 @@ export default {
       this.$refs['rightMenu'].show(params)
     },
     // 任意位置右键菜单
-    otherContextMenu (ev, pUUID) {
+    otherContextMenu (ev, item) {
       let params = {}
       params['event'] = ev
       params['type'] = 'other'
-      params['pUUID'] = pUUID
+      if (item && item.parent_uuid) {
+        params['pUUID'] = item.parent_uuid
+      } else {
+        params['pUUID'] = this.version.uuid
+      }
       this.$refs['rightMenu'].show(params)
     },
     contentMenuHide () {
@@ -242,6 +310,10 @@ export default {
     rename (uuid) {
       this.$refs['rightMenu'].hide()
       this.$refs['folder-' + uuid][0].dblclickFolder()
+    },
+    // 编辑目录
+    editCatalog (params) {
+      this.$refs['editCatalog'].show(params)
     }
   }
 }
@@ -249,13 +321,15 @@ export default {
 
 <style lang="scss" scoped>
 .content-container {
-  position: fixed;
-  left: 0;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  background: #fff;
-  z-index: 999;
+  // position: fixed;
+  // left: 0;
+  // top: 0;
+  // right: 0;
+  // bottom: 0;
+  // background: #fff;
+  // z-index: 999;
+  width: 100%;
+  height: 100%;
 }
 .top-bar {
   width: 100%;

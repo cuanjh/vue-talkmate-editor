@@ -150,9 +150,23 @@ export const getCourseList = (data) => {
 //   "parent_uuid": "string"
 // }
 // @Router /editor/content/list [post]
-export const getCourseContentList = (data) => {
+export const getCourseVersionList = (data) => {
   return service({
     url: '/editor/content/version/list',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 添加课程版本
+ * @Produce  application/json
+ * @param {*} data
+ * @Router /editor/content/version/add [post]
+ */
+export const addCourseVersion = (data) => {
+  return service({
+    url: '/editor/content/version/add',
     method: 'post',
     data
   })
