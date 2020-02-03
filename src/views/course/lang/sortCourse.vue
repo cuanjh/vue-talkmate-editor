@@ -36,7 +36,7 @@ export default {
   },
   mounted () {
     this.initData()
-    console.log(this.allLangs)
+    console.log(this.allLangs, this.assetsUrl)
     let $chapterList = document.getElementById('langs-lists')
     let sortable = new Sortable($chapterList, {
       swapThreshold: 1,
