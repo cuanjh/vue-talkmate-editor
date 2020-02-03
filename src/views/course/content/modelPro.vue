@@ -5,12 +5,14 @@
       <el-button type="text">预览</el-button>
     </div>
     <div class="forms">
-      <form-comp
-        :class="{'active': curForm.uuid == content.uuid}"
-        v-for="content in contents"
-        :key="content.uuid"
-        :form="content"
-        @switchForm="switchForm"/>
+      <div class="list">
+        <form-comp
+          :class="{'active': curForm.uuid == content.uuid}"
+          v-for="content in contents"
+          :key="content.uuid"
+          :form="content"
+          @switchForm="switchForm"/>
+      </div>
     </div>
     <el-form ref="form" :model="curForm" label-width="80px">
       <el-form-item v-for="f in feilds" :key="f.feild" :label="f.name">
@@ -115,15 +117,20 @@ export default {
 }
 .forms {
   background: #E5E6E5;
-  // width: 100%;
-  flex: 1;
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  flex-wrap: wrap;
-  padding: 30px;
-  // width: 200px;
+  width: 100%;
+  // flex: 1;
+  // display: flex;
+  // flex-direction: row;
+  // justify-content: flex-start;
+  // flex-wrap: wrap;
+  // padding: 30px;
+  // width: 400px;
   // overflow-x: auto;
+  .list {
+    width: 400px;
+    overflow-x: auto;
+    background: red;
+  }
 }
 .el-form {
   padding: 20px;

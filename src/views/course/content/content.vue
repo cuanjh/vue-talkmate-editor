@@ -1,5 +1,5 @@
 <template>
-  <el-container class="content-container" v-show="isShow">
+  <el-container id="content-container" class="content-container" v-show="isShow">
     <el-header height="70px">
       <div class="top-bar">
         <div class="left">
@@ -40,7 +40,7 @@
       <div class="track-container">
         <div class="track-wrap" id="track-wrap">
           <div class="track-item" v-for="(item,index) in tracks" :key="index">
-            <div class="list">
+            <div class="list" :id="'track-item-' + index">
               <folder
                 :ref="'folder-' + f.uuid"
                 v-for="f in item"
@@ -57,7 +57,7 @@
                 @contentMenu="contentMenu"
               />
             </div>
-            <div class="other" @contextmenu="otherContextMenu($event, item[0])"></div>
+            <div v-show="false" class="other" @contextmenu="otherContextMenu($event, item[0])"></div>
           </div>
         </div>
         <!-- <div class="track-content" v-show="false">
@@ -108,6 +108,14 @@
         </div> -->
       </div>
     </el-main>
+    <!-- <div id="example1" class="list-group col">
+      <div class="list-group-item">Item 1</div>
+      <div class="list-group-item">Item 2</div>
+      <div class="list-group-item">Item 3</div>
+      <div class="list-group-item">Item 4</div>
+      <div class="list-group-item">Item 5</div>
+      <div class="list-group-item">Item 6</div>
+    </div> -->
     <el-dialog
       title="提示"
       :visible.sync="dialogVisible"
@@ -129,6 +137,7 @@
 </template>
 
 <script>
+import Sortable from 'sortablejs'
 import Folder from './folder'
 // import Slide from './slide'
 import RightMenu from './rightMenu'
@@ -177,10 +186,11 @@ export default {
     }
     let h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
     this.slideHeight = h - 130
-    document.oncontextmenu = (e) => {
+    let contentEl = document.getElementById('content-container')
+    contentEl.oncontextmenu = (e) => {
       e.preventDefault()
     }
-    document.onclick = () => {
+    contentEl.onclick = () => {
       this.rightUUID = ''
       if (this.$refs['rightMenu']) {
         this.$refs['rightMenu'].hide()
@@ -272,7 +282,21 @@ export default {
         setTimeout(() => {
           var scrollDom = document.getElementById('track-wrap')
           scrollDom.scrollLeft = scrollDom.scrollWidth
-        }, 100)
+          if (this.tracks.length) {
+            this.setTrackSortable()
+          }
+        }, 1000)
+      }
+    },
+    setTrackSortable () {
+      for (let i = 0; i < this.tracks.length; i++) {
+        let $trackItem = document.getElementById('track-item-' + i)
+        /* eslint-disable */
+        new Sortable($trackItem, {
+          group: 'shared',
+          animation: 150
+        })
+        /* eslint-enable */
       }
     },
     clickFolder (params) {

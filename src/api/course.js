@@ -11,6 +11,17 @@ export const getConfigInfo = () => {
   })
 }
 
+// @Summary 获取上传课程资料的七牛Token
+// @Produce  application/json
+// @Param none
+// @Router /editor/info/token [get]
+export const getInfoToken = () => {
+  return service({
+    url: '/editor/info/token',
+    method: 'get'
+  })
+}
+
 // @Summary 获取语种列表
 // @Produce  application/json
 // @Param { \"pageNo\": 0, \"pageSize\": 100}
