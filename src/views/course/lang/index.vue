@@ -77,24 +77,22 @@
           <el-button
             size="mini"
             plain
-            :disabled="scope.row.is_show"
             @click="editLang(scope.row)">编辑</el-button>
           <el-button
             size="mini"
             plain
             type="success"
             :disabled="scope.row.is_show"
-            @click="handleEdit(scope.$index, scope.row)">上线</el-button>
+            @click="handleEdit(scope.$index, scope.row)">显示</el-button>
           <el-button
             size="mini"
             plain
             type="warning"
-            @click="handleEdit(scope.$index, scope.row)">下线</el-button>
+            @click="handleEdit(scope.$index, scope.row)">隐藏</el-button>
           <el-button
             size="mini"
             type="danger"
             plain
-            :disabled="scope.row.is_show"
             @click="deleteLang(scope.row.lan_code)">删除</el-button>
         </template>
       </el-table-column>
