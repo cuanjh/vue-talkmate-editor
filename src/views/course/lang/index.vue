@@ -100,7 +100,7 @@
       </el-table-column>
     </el-table>
     <edit-comp ref="edit" @addNewLang="updateNewLang" :langInfos="langInfos" :langList="langList"/>
-    <sort-course-comp ref="sorLang" :allLangs="allLangs" :assetsUrl="assetsUrl" @sortLang="updateNewLang"/>
+    <sort-course-comp ref="sorLang" @sortLang="updateNewLang"/>
   </div>
 </template>
 

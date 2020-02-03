@@ -27,7 +27,6 @@ import { getLangList, editLang } from '@/api/course'
 import Sortable from 'sortablejs'
 
 export default {
-  // props: ['allLangs', 'assetsUrl'],
   data () {
     return {
       showSortLang: false,
