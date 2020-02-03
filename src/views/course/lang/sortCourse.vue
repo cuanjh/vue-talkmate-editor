@@ -10,10 +10,10 @@
         <div class="lang-item" v-for="item in allLangs" :key="item.lan_code">
           <a href="javascript:;">
             <div class="img-box">
-              <img :src="assetsUrl + item.flag[0]" alt="">
+              <img :src="item.flag ? assetsUrl + item.flag[0] : ''" alt="">
               <p class="list-order">{{item.list_order}}</p>
             </div>
-            <p class="title">{{item.title['zh-CN']}}</p>
+            <p class="title">{{item.title ? item.title['zh-CN'] : ''}}</p>
           </a>
         </div>
       </div>
@@ -23,16 +23,20 @@
 </template>
 
 <script>
+import { getLangList, editLang } from '@/api/course'
 import Sortable from 'sortablejs'
 
 export default {
-  props: ['allLangs', 'assetsUrl'],
   data () {
     return {
-      showSortLang: false
+      showSortLang: false,
+      allLangs: [],
+      assetsUrl: ''
     }
   },
   mounted () {
+    this.initData()
+    console.log(this.allLangs, this.assetsUrl)
     let $chapterList = document.getElementById('langs-lists')
     let sortable = new Sortable($chapterList, {
       swapThreshold: 1,
@@ -41,27 +45,56 @@ export default {
         console.log(evt)
         console.log(this.allLangs)
         console.log('evt.newIndex - 1', this.allLangs[evt.newIndex - 1])
+        console.log('evt.newIndex', this.allLangs[evt.newIndex])
         console.log('evt.oldIndex', this.allLangs[evt.oldIndex])
-        let obj = this.allLangs[evt.oldIndex]
-        obj['list_order'] = this.allLangs[evt.newIndex - 1].list_order + 1
+        let lang = this.allLangs[evt.oldIndex]
+        let order = 0
+        if (this.allLangs[evt.newIndex].list_order > this.allLangs[evt.oldIndex].list_order) {
+          order = this.allLangs[evt.newIndex].list_order + 1
+        } else {
+          order = this.allLangs[evt.newIndex].list_order >= 1 ? this.allLangs[evt.newIndex].list_order - 1 : 0
+        }
+        let obj = {
+          'lang_info': {}
+        }
+        obj['lan_code'] = lang.lan_code
+        obj.lang_info['desc'] = lang.desc ? lang.desc : {}
+        obj.lang_info['flag'] = lang.flag ? lang.flag : []
+        obj.lang_info['is_hot'] = lang.is_hot
+        obj.lang_info['is_show'] = lang.is_show
+        obj.lang_info['list_order'] = order
+        obj.lang_info['title'] = lang.title ? lang.title : {}
+        obj.lang_info['word_direction'] = lang.word_direction
         console.log(obj)
-        this.$emit('sortCourse')
-        // editLang(obj).then(res => {
-        //   console.log(res)
-        //   if (res.success) {
-        //     this.showEdit = false
-        //   }
-        // })
+        editLang(obj).then(res => {
+          if (res.success) {
+            console.log(res)
+            // this.$emit('sortLang')
+            this.initData()
+          }
+        })
       }
     })
     console.log(sortable)
   },
   methods: {
+    async initData () {
+      let res = await getLangList({ 'pageNo': 0, 'pageSize': 999 })
+      if (res.success) {
+        let sortLangs = res.data.langs.sort((a, b) => {
+          return a.list_order - b.list_order
+        })
+        this.allLangs = sortLangs
+        this.assetsUrl = res.data.assetsUrl
+        console.log(this.allLangs)
+      }
+    },
     show () {
       this.showSortLang = true
     },
     close () {
       this.showSortLang = false
+      this.$emit('sortLang')
     }
   }
 }
