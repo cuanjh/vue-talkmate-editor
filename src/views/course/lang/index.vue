@@ -46,7 +46,7 @@
         <template slot-scope="scope">
           <el-image
             class="lang-img"
-            :src="assetsUrl + scope.row.flag[0]"
+            :src="scope.row.flag ? assetsUrl + scope.row.flag[0] : ''"
             fit="cover">
           </el-image>
         </template>
@@ -100,7 +100,7 @@
       </el-table-column>
     </el-table>
     <edit-comp ref="edit" @addNewLang="updateNewLang" :langInfos="langInfos" :langList="langList"/>
-    <sort-course-comp ref="sorLang" :allLangs="allLangs" :assetsUrl="assetsUrl" @sortCourse="updateNewLang"/>
+    <sort-course-comp ref="sorLang" :allLangs="allLangs" :assetsUrl="assetsUrl" @sortLang="updateNewLang"/>
   </div>
 </template>
 

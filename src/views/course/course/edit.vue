@@ -38,7 +38,7 @@
           <el-form-item label="大图：">
             <div class="img-box big-img-box">
               <div class="img">
-                <img :src="bigImgUrl" alt="">
+                <img :src="form.cover ? assetsDomain + form.cover[0] : ''" alt="">
               </div>
               <el-upload
                 action="#"
@@ -57,7 +57,7 @@
           <el-form-item label="小图：">
             <div class="img-box small-img-box">
               <div class="img">
-                <img :src="smlImgUrl" alt="">
+                <img :src="form.flag ? assetsDomain + form.flag[0] : ''" alt="">
               </div>
               <el-upload
                 action="#"
@@ -147,7 +147,8 @@ export default {
     },
     bigFileChange (file, fileList) {
       console.log(file)
-      this.bigImgUrl = URL.createObjectURL(file.raw)
+      // this.bigImgUrl = URL.createObjectURL(file.raw)
+      this.form.cover.unshift(URL.createObjectURL(file.raw))
       console.log(this.bigImgUrl)
       this.bigFileRaw = file
     },
@@ -157,7 +158,8 @@ export default {
     },
     smlFileChange (file, fileList) {
       console.log(file)
-      this.smlImgUrl = URL.createObjectURL(file.raw)
+      // this.smlImgUrl = URL.createObjectURL(file.raw)
+      this.form.flag.unshift(URL.createObjectURL(file.raw))
       console.log(this.smlImgUrl)
       this.smlFileRaw = file
     },
