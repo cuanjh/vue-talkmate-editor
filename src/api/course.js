@@ -247,6 +247,34 @@ export const addCourseVersion = (data) => {
   })
 }
 
+/**
+ * @Summary 删除课程版本
+ * @Produce  application/json
+ * @param {*} data
+ * @Router /editor/content/version/del [post]
+ */
+export const delCourseVersion = (data) => {
+  return service({
+    url: '/editor/content/version/del',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 编辑课程版本
+ * @Produce  application/json
+ * @param {*} data
+ * @Router /editor/content/version/edit [post]
+ */
+export const editCourseVersion = (data) => {
+  return service({
+    url: '/editor/content/version/edit',
+    method: 'post',
+    data
+  })
+}
+
 // @Summary 获取目录列表
 // @Produce  application/json
 // @Param
