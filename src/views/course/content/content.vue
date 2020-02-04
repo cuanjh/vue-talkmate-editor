@@ -57,7 +57,7 @@
                 @contentMenu="contentMenu"
               />
             </div>
-            <div v-show="false" class="other" @contextmenu="otherContextMenu($event, item[0])"></div>
+            <div class="other" @contextmenu="otherContextMenu($event, item[0], index)"></div>
           </div>
         </div>
         <!-- <div class="track-content" v-show="false">
@@ -162,6 +162,7 @@ export default {
       tracks: [],
       selFolder: '',
       path: '',
+      pathDesc: '',
       dialogVisible: false
     }
   },
@@ -301,10 +302,13 @@ export default {
     },
     clickFolder (params) {
       this.path = ''
+      this.pathDesc = ''
       this.uuid = params.folder.uuid
       let copy = this.tracks.slice(0, params.trackNum + 1)
       this.tracks = this.tracks.slice(0, params.trackNum + 1)
       this.getPath(copy, this.uuid)
+      let copy2 = this.tracks.slice(0, params.trackNum + 1)
+      this.getPathDesc(copy2, this.uuid)
       if (params.folder.type === 'catalog') {
         this.initData(params.trackNum + 1)
       } else {
@@ -331,6 +335,18 @@ export default {
         this.getPath(tracks, puuid)
       }
     },
+    getPathDesc (tracks, uuid) {
+      let catalogs = tracks.pop()
+      let folder = catalogs.find(item => {
+        return item.uuid === uuid
+      })
+      let puuid = folder.parent_uuid
+      this.pathDesc = folder.name + ' > ' + this.pathDesc
+      console.log(this.pathDesc)
+      if (tracks.length > 0) {
+        this.getPathDesc(tracks, puuid)
+      }
+    },
     // 显示右键菜单
     contentMenu (params) {
       this.rightUUID = params.folder.uuid
@@ -338,7 +354,9 @@ export default {
       this.$refs['rightMenu'].show(params)
     },
     // 任意位置右键菜单
-    otherContextMenu (ev, item) {
+    otherContextMenu (ev, item, index) {
+      console.log(index)
+      this.uuid = ''
       let params = {}
       params['event'] = ev
       params['type'] = 'other'
@@ -347,6 +365,10 @@ export default {
       } else {
         params['pUUID'] = this.version.uuid
       }
+      this.pathDesc = ''
+      let copy = this.tracks.slice(0, index)
+      this.getPathDesc(copy, params['pUUID'])
+      params['pathDesc'] = this.pathDesc
       this.$refs['rightMenu'].show(params)
     },
     contentMenuHide () {
@@ -359,6 +381,8 @@ export default {
     },
     // 编辑目录
     editCatalog (params) {
+      let obj = params
+      obj['pathDesc'] = this.pathDesc
       this.$refs['editCatalog'].show(params)
     }
   }

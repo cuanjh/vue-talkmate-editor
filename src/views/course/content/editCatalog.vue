@@ -5,9 +5,10 @@
     size="50%"
     direction="rtl">
     <div class="edit-catalog-container" :style="{height: height + 'px'}">
+      <div class="path">{{ '路径: ' + pathDesc }}</div>
       <div class="title" v-text="title"></div>
       <el-form ref="form" :rules="rules" :model="form" label-width="80px">
-        <el-form-item label="目录名称" prop="name">
+        <el-form-item label="名称" prop="name">
           <el-input v-model="form.name"></el-input>
         </el-form-item>
         <el-form-item label="标题">
@@ -21,12 +22,6 @@
             <el-input type="textarea" v-model="form.desc[l.langKey]"></el-input>
             <div class="text" v-text="'(' + l.name + ')'"></div>
           </div>
-        </el-form-item>
-        <el-form-item label="是否展示">
-          <el-radio-group v-model="form.is_show">
-            <el-radio :label="true">是</el-radio>
-            <el-radio :label="false">否</el-radio>
-          </el-radio-group>
         </el-form-item>
         <el-form-item label="图标">
           <div class="flag">
@@ -43,6 +38,12 @@
             </div>
             <el-button icon="el-icon-plus" circle></el-button>
           </div>
+        </el-form-item>
+        <el-form-item label="是否展示">
+          <el-radio-group v-model="form.is_show">
+            <el-radio :label="true">是</el-radio>
+            <el-radio :label="false">否</el-radio>
+          </el-radio-group>
         </el-form-item>
         <el-form-item>
           <div class="handler">
@@ -63,6 +64,7 @@ export default {
       height: 0,
       title: '',
       drawer: false,
+      pathDesc: '',
       form: {
         parent_uuid: '',
         uuid: '',
@@ -82,7 +84,7 @@ export default {
       },
       rules: {
         name: [
-          { required: true, message: '请输入目录名称', trigger: 'blur' }
+          { required: true, message: '请输入名称', trigger: 'blur' }
         ]
       }
     }
@@ -96,6 +98,7 @@ export default {
   methods: {
     show (params) {
       this.resetFormData()
+      this.pathDesc = params.pathDesc
       console.log(params)
       if (params.handler === 'add' && params.type === 'catalog') {
         this.title = '添加目录'
@@ -128,6 +131,7 @@ export default {
     resetFormData () {
       let h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
       this.height = h - 2
+      this.pathDesc = ''
       this.form = {
         parent_uuid: '',
         uuid: '',

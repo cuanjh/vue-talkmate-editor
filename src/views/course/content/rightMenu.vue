@@ -2,13 +2,13 @@
   <transition name="fade">
     <div class="right-menu-container" :style="{'left': left + 'px', 'top': top + 'px'}" v-show="isShow">
       <div class="menu">
-        <div class="menu-group">
+        <div class="menu-group" v-show="type == 'folder'">
           <div class="menu-item">
             <div class="name">预览</div>
           </div>
           <div class="line"></div>
         </div>
-        <div class="menu-group">
+        <div class="menu-group" v-show="folder.type == 'catalog'">
           <div class="menu-item">
             <div class="name" @click="addFolder">{{ type == 'folder' ? '新建子目录' : '新建目录' }}</div>
           </div>
@@ -17,10 +17,10 @@
               <span>新建文件</span>
             </div>
           </div>
-          <div class="line"></div>
         </div>
         <div class="menu-group" v-show="type == 'folder'">
           <div class="menu-item">
+            <div class="line"></div>
             <div class="name">复制</div>
           </div>
           <div class="menu-item">
@@ -66,6 +66,7 @@ export default {
       } else {
         this.folder = params.folder
       }
+      console.log(params.folder)
       this.type = params.type
       this.isShow = true
     },
