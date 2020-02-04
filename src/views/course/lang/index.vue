@@ -78,17 +78,22 @@
             size="mini"
             plain
             @click="editLang(scope.row)">编辑</el-button>
-          <el-button
+          <!-- <el-button
             size="mini"
             plain
             type="success"
             :disabled="scope.row.is_show"
-            @click="handleEdit(scope.$index, scope.row)">显示</el-button>
+            @click="handleEdit(scope.row)">显示</el-button>
           <el-button
             size="mini"
             plain
             type="warning"
-            @click="handleEdit(scope.$index, scope.row)">隐藏</el-button>
+            @click="handleEdit(scope.row)">隐藏</el-button> -->
+          <el-button
+            size="mini"
+            plain
+            type="warning"
+            @click="handleEdit(scope.row)">{{scope.row.is_show ? '隐藏' : '显示'}}</el-button>
           <el-button
             size="mini"
             type="danger"
@@ -104,7 +109,7 @@
 
 <script>
 import { mapState, mapActions } from 'vuex'
-import { getLangList, delLang } from '@/api/course'
+import { getLangList, delLang, editLang } from '@/api/course'
 import EditComp from './edit'
 import SortCourseComp from './sortCourse'
 
@@ -199,6 +204,27 @@ export default {
           type: 'info',
           message: '已取消删除'
         })
+      })
+    },
+    handleEdit (row) {
+      console.log(row)
+      let obj = {
+        'lang_info': {}
+      }
+      obj['lan_code'] = row.lan_code
+      obj.lang_info['desc'] = row.desc ? row.desc : {}
+      obj.lang_info['flag'] = row.flag ? row.flag : []
+      obj.lang_info['is_hot'] = row.is_hot
+      obj.lang_info['is_show'] = !row.is_show
+      obj.lang_info['list_order'] = row.list_order
+      obj.lang_info['title'] = row.title ? row.title : {}
+      obj.lang_info['word_direction'] = row.word_direction
+      console.log(obj)
+      editLang(obj).then(res => {
+        console.log(res)
+        if (res.success) {
+          this.initData()
+        }
       })
     },
     // 预览排序

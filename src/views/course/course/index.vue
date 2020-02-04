@@ -68,12 +68,15 @@
           {{scope.row.is_show ? '是' : '否'}}
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="250px">
+      <el-table-column label="操作" width="300px">
         <template slot-scope="scope">
           <el-button
             v-show="userInfo.authority.authorityId == '1' || userInfo.authority.authorityId == '2'"
             size="mini"
-            @click="handleEdit(scope.row)">编辑</el-button>
+            @click="editCourse(scope.row)">编辑</el-button>
+          <el-button
+            size="mini"
+            @click="handleEdit(scope.row)">{{scope.row.is_show ? '隐藏' : '显示'}}</el-button>
           <el-button
             size="mini"
             @click="handleEditContent(scope.$index, scope.row)">编辑课程内容</el-button>
@@ -90,7 +93,8 @@
 import { mapGetters, mapActions, mapState } from 'vuex'
 import {
   getLangList,
-  getCourseList
+  getCourseList,
+  courseEdit
 } from '@/api/course'
 import EditComp from './edit'
 
@@ -141,7 +145,7 @@ export default {
         this.courseList = courseListInfo.data.courses
       }
     },
-    handleEdit (row) {
+    editCourse (row) {
       console.log(this.courseList)
       let obj = {
         type: 'edit',
@@ -150,10 +154,32 @@ export default {
       }
       this.$refs.edit.show(obj)
     },
+    handleEdit (row) {
+      console.log(row)
+      let obj = {
+        editInfo: {
+          course_type: row.course_type,
+          cover: row.cover,
+          desc: row.desc ? row.desc : '',
+          flag: row.flag ? row.flag : '',
+          is_show: !row.is_show,
+          tags: [],
+          title: row.title ? row.title : ''
+        },
+        uuid: row.uuid
+      }
+      console.log(obj)
+      courseEdit(obj).then(res => {
+        console.log(res)
+        if (res.success) {
+          this.initData()
+        }
+      })
+    },
     handleEditContent (i, row) {
       console.log(i)
       console.log(row)
-      this.$refs['content'].show(row)
+      // this.$refs['content'].show(row)
     },
     addCourse () {
       console.log(this.courseList)

@@ -38,10 +38,11 @@
           <el-form-item label="大图：">
             <div class="img-box big-img-box">
               <div class="img">
-                <img :src="form.cover ? assetsDomain + form.cover[0] : ''" alt="">
+                <img :src="bigImgUrl" alt="">
               </div>
               <el-upload
                 action="#"
+                :http-request="uploadBig"
                 accept="image/png,image/jpg,image/jpeg"
                 :on-change="bigFileChange"
                 :on-success="handleBigSuccess"
@@ -57,10 +58,11 @@
           <el-form-item label="小图：">
             <div class="img-box small-img-box">
               <div class="img">
-                <img :src="form.flag ? assetsDomain + form.flag[0] : ''" alt="">
+                <img :src="smlImgUrl" alt="">
               </div>
               <el-upload
                 action="#"
+                :http-request="uploadSml"
                 accept="image/png,image/jpg,image/jpeg"
                 :on-change="smlFileChange"
                 :on-success="handleSmlSuccess"
@@ -85,8 +87,9 @@
 </template>
 
 <script>
-import { addCourse, courseEdit } from '@/api/course'
+import { addCourse, courseEdit, getInfoToken } from '@/api/course'
 import { mapState } from 'vuex'
+import { uploadQiniu } from '@/utils/uploadQiniu'
 
 export default {
   props: ['courseTypes'],
@@ -96,9 +99,9 @@ export default {
       form: {
         code: '',
         course_type: '', // 课程分类
-        cover: ['course/icons/SUN-3x.webp?v=4'], // 大图标
+        cover: [], // 大图标
         desc: {}, // 描述
-        flag: ['course/icons/SUN-3x.webp?v=4'], // 小图标
+        flag: [], // 小图标
         is_show: false, // 是否上线
         lan_code: '', // 语种的编码
         tags: [],
@@ -130,25 +133,44 @@ export default {
       if (this.type === 'add') {
         this.form.code = ''
         this.form.course_type = ''
-        this.form.cover = ['course/icons/SUN-3x.webp?v=4']
+        this.form.cover = []
         this.form.desc = {}
-        this.form.flag = ['course/icons/SUN-3x.webp?v=4']
+        this.form.flag = []
         this.form.is_show = false
         this.form.lan_code = params.selLang
         this.form.tags = []
         this.form.title = {}
       } else if (this.type === 'edit') {
         this.form = params.form
+        this.bigImgUrl = this.assetsDomain + '/' + params.form.cover[0]
+        this.smlImgUrl = this.assetsDomain + '/' + params.form.flag[0]
       }
       this.showEdit = true
     },
     close () {
       this.showEdit = false
     },
+    async uploadBig () {
+      if (Object.keys(this.bigFileRaw).length === 0) {
+        return false // 如果为空,返回false
+      }
+      console.log(this.bigFileRaw)
+      let res1 = await getInfoToken()
+      let token = res1.data.token
+      let url = 'course/coversV2/' + this.bigFileRaw.name
+      console.log(token, url, this.bigFileRaw.raw)
+      let res2 = await uploadQiniu(this.bigFileRaw.raw, token, url)
+      console.log(res1, url, res2)
+      if (this.type === 'add') {
+        this.form.cover.push(res2.key)
+      } else {
+        this.form.cover.unshift(res2.key)
+      }
+    },
     bigFileChange (file, fileList) {
       console.log(file)
-      // this.bigImgUrl = URL.createObjectURL(file.raw)
-      this.form.cover.unshift(URL.createObjectURL(file.raw))
+      this.bigImgUrl = URL.createObjectURL(file.raw)
+      // this.form.cover.unshift(URL.createObjectURL(file.raw))
       console.log(this.bigImgUrl)
       this.bigFileRaw = file
     },
@@ -156,10 +178,26 @@ export default {
       console.log(res, file)
       this.bigImgUrl = URL.createObjectURL(file.raw)
     },
+    async uploadSml () {
+      if (Object.keys(this.smlFileRaw).length === 0) {
+        return false // 如果为空,返回false
+      }
+      let res1 = await getInfoToken()
+      let token = res1.data.token
+      let url = 'course/icons/' + this.smlFileRaw.name
+      console.log(token, url, this.smlFileRaw.raw)
+      let res2 = await uploadQiniu(this.smlFileRaw.raw, token, url)
+      console.log(res1, url, res2)
+      if (this.type === 'add') {
+        this.form.flag.push(res2.key)
+      } else {
+        this.form.flag.unshift(res2.key)
+      }
+    },
     smlFileChange (file, fileList) {
       console.log(file)
-      // this.smlImgUrl = URL.createObjectURL(file.raw)
-      this.form.flag.unshift(URL.createObjectURL(file.raw))
+      this.smlImgUrl = URL.createObjectURL(file.raw)
+      // this.form.flag.unshift(URL.createObjectURL(file.raw))
       console.log(this.smlImgUrl)
       this.smlFileRaw = file
     },
@@ -183,11 +221,13 @@ export default {
       }
     },
     // 添加
-    determine () {
+    async determine () {
+      await this.uploadBig()
+      await this.uploadSml()
       console.log(this.form)
       if (this.type === 'add') {
         this.form.code = this.form.code + '-Basic'
-        addCourse(this.form).then(res => {
+        await addCourse(this.form).then(res => {
           console.log(res)
           if (res.success) {
             this.showEdit = false
@@ -207,7 +247,7 @@ export default {
           uuid: this.form.uuid
         }
         console.log(obj)
-        courseEdit(obj).then(res => {
+        await courseEdit(obj).then(res => {
           console.log(res)
           if (res.success) {
             this.showEdit = false

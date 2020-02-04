@@ -29,6 +29,7 @@
               </div>
               <el-upload
                 action="#"
+                :http-request="upload"
                 accept="image/png,image/jpg,image/jpeg"
                 :on-change="fileChange"
                 :on-success="handleAvatarSuccess"
@@ -65,7 +66,12 @@
 </template>
 
 <script>
-import { addLang, editLang } from '@/api/course'
+import {
+  addLang,
+  editLang,
+  getInfoToken
+} from '@/api/course'
+import { uploadQiniu } from '@/utils/uploadQiniu'
 import { mapState } from 'vuex'
 
 export default {
@@ -75,7 +81,7 @@ export default {
       showEdit: false,
       form: {
         desc: {}, // 描述
-        flag: ['course/icons/SUN-3x.webp?v=4'], // 小图标
+        flag: [], // 小图标
         is_hot: false, // 是否热门
         is_show: false, // 是否上线
         lan_code: '', // 语种的编码
@@ -109,7 +115,7 @@ export default {
         this.imageUrl = this.assetsDomain + '/' + params.flag[0]
       } else if (type === 'add') {
         this.form.desc = {}
-        this.form.flag = ['course/icons/SUN-3x.webp?v=4']
+        this.form.flag = []
         this.form.is_hot = false
         this.form.is_show = false
         this.form.lan_code = ''
@@ -122,6 +128,22 @@ export default {
     close () {
       this.showEdit = false
       this.$emit('addNewLang')
+    },
+    async upload () {
+      if (Object.keys(this.fileRaw).length === 0) {
+        return false // 如果为空,返回false
+      }
+      let res1 = await getInfoToken()
+      let token = res1.data.token
+      let url = 'course/icons/' + this.fileRaw.name
+      console.log(token, url, this.fileRaw.raw)
+      let res2 = await uploadQiniu(this.fileRaw.raw, token, url)
+      console.log(res1, url, res2)
+      if (this.type === 'add') {
+        this.form.flag.push(res2.key)
+      } else {
+        this.form.flag.unshift(res2.key)
+      }
     },
     fileChange (file, fileList) {
       console.log(file)
@@ -149,7 +171,8 @@ export default {
       }
     },
     // 添加
-    determine () {
+    async determine () {
+      await this.upload()
       console.log(this.form)
       if (this.type === 'edit') {
         let obj = {
@@ -164,14 +187,14 @@ export default {
         obj.lang_info['title'] = this.form.title
         obj.lang_info['word_direction'] = this.form.word_direction
         console.log(obj)
-        editLang(obj).then(res => {
+        await editLang(obj).then(res => {
           console.log(res)
           if (res.success) {
             this.showEdit = false
           }
         })
       } else if (this.type === 'add') {
-        addLang(this.form).then(res => {
+        await addLang(this.form).then(res => {
           console.log(res)
           if (res.success) {
             this.showEdit = false
