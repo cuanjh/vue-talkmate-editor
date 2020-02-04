@@ -302,13 +302,10 @@ export default {
     },
     clickFolder (params) {
       this.path = ''
-      this.pathDesc = ''
       this.uuid = params.folder.uuid
       let copy = this.tracks.slice(0, params.trackNum + 1)
       this.tracks = this.tracks.slice(0, params.trackNum + 1)
       this.getPath(copy, this.uuid)
-      let copy2 = this.tracks.slice(0, params.trackNum + 1)
-      this.getPathDesc(copy2, this.uuid)
       if (params.folder.type === 'catalog') {
         this.initData(params.trackNum + 1)
       } else {
@@ -365,10 +362,7 @@ export default {
       } else {
         params['pUUID'] = this.version.uuid
       }
-      this.pathDesc = ''
-      let copy = this.tracks.slice(0, index)
-      this.getPathDesc(copy, params['pUUID'])
-      params['pathDesc'] = this.pathDesc
+      params['trackNum'] = index - 1
       this.$refs['rightMenu'].show(params)
     },
     contentMenuHide () {
@@ -381,8 +375,14 @@ export default {
     },
     // 编辑目录
     editCatalog (params) {
-      let obj = params
-      obj['pathDesc'] = this.pathDesc
+      console.log(params)
+      this.pathDesc = ''
+      let copy = this.tracks.slice(0, params.trackNum + 1)
+      if (copy.length) {
+        this.getPathDesc(copy, params['uuid'])
+      }
+      params['pathDesc'] = this.pathDesc
+
       this.$refs['editCatalog'].show(params)
     }
   }

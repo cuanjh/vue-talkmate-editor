@@ -8,7 +8,7 @@
           </div>
           <div class="line"></div>
         </div>
-        <div class="menu-group" v-show="folder && folder.type == 'catalog'">
+        <div class="menu-group" v-show="folder && folder.type == 'catalog' || type == 'other'">
           <div class="menu-item">
             <div class="name" @click="addFolder">{{ type == 'folder' ? '新建子目录' : '新建目录' }}</div>
           </div>
@@ -53,7 +53,8 @@ export default {
       top: 0,
       folder: null,
       pUUID: '',
-      type: ''
+      type: '',
+      trackNum: 0
     }
   },
   methods: {
@@ -68,6 +69,7 @@ export default {
       }
       console.log(params.folder)
       this.type = params.type
+      this.trackNum = params.trackNum
       this.isShow = true
     },
     hide () {
@@ -84,7 +86,7 @@ export default {
       } else {
         uuid = this.folder.uuid
       }
-      this.$emit('editCatalog', { handler: 'add', type: 'catalog', uuid: uuid })
+      this.$emit('editCatalog', { handler: 'add', type: 'catalog', uuid: uuid, trackNum: this.trackNum })
     },
     addDocument () {
       let uuid
@@ -93,11 +95,11 @@ export default {
       } else {
         uuid = this.folder.uuid
       }
-      this.$emit('editCatalog', { handler: 'add', type: 'content', uuid: uuid })
+      this.$emit('editCatalog', { handler: 'add', type: 'content', uuid: uuid, trackNum: this.trackNum })
     },
     editCatalog () {
       let uuid = this.folder.uuid
-      this.$emit('editCatalog', { handler: 'edit', type: this.folder.type, uuid: uuid, folder: this.folder })
+      this.$emit('editCatalog', { handler: 'edit', type: this.folder.type, uuid: uuid, folder: this.folder, trackNum: this.trackNum })
     }
   }
 }

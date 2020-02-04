@@ -60,7 +60,7 @@ export default {
       this.isShow = true
     },
     contentmenu (ev) {
-      this.$emit('contentMenu', { event: ev, folder: this.folder })
+      this.$emit('contentMenu', { event: ev, folder: this.folder, trackNum: this.trackNum })
     }
   }
 }
