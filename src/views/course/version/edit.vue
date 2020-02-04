@@ -7,45 +7,23 @@
       </div>
       <div class="course-content">
         <el-form ref="form" :model="form">
-          <el-form-item label="编码：">
-            <el-input v-model="form.code" :disabled="type == 'edit'">
-            </el-input>
+          <el-form-item label="名称：">
+            <el-input v-model="form.name"></el-input>
           </el-form-item>
-          <el-form-item label="分类：">
-            <el-select v-model="form.course_type"
-              placeholder="请选择课程分类"
-              @change="changeType">
-              <el-option
-                v-for="item in courseTypes"
-                :key="item.name"
-                :label="item.name"
-                :value="item.type">
-              </el-option>
-            </el-select>
+          <el-form-item label="版本号：">
+            <el-input v-model="form.version"></el-input>
           </el-form-item>
-          <el-form-item label="名称：" class="name">
-            <div class="input-box" v-for="l in langInfos" :key="'title' + l.langKey">
-              <el-input v-model="form.title[l.langKey]"></el-input>
-              <span>{{'(' + l.name + ')'}}</span>
-            </div>
-          </el-form-item>
-          <el-form-item label="描述：" class="desc">
-            <div class="input-box" v-for="l in langInfos" :key="'desc' + l.langKey">
-              <el-input type="textarea" v-model="form.desc[l.langKey]"></el-input>
-              <span>{{'(' + l.name + ')'}}</span>
-            </div>
-          </el-form-item>
-          <el-form-item label="大图：">
-            <div class="img-box big-img-box">
+          <el-form-item label="背景：">
+            <div class="img-box">
               <div class="img">
-                <img :src="bigImgUrl" alt="">
+                <img :src="imgUrl ? imgUrl : ''" alt="">
               </div>
               <el-upload
                 action="#"
-                :http-request="uploadBig"
+                :http-request="upload"
                 accept="image/png,image/jpg,image/jpeg"
-                :on-change="bigFileChange"
-                :on-success="handleBigSuccess"
+                :on-change="fileChange"
+                :on-success="handleSuccess"
                 :before-upload="handleBeforeUpload"
                 :show-file-list="false"
                 :auto-upload="false">
@@ -55,27 +33,7 @@
               </el-upload>
             </div>
           </el-form-item>
-          <el-form-item label="小图：">
-            <div class="img-box small-img-box">
-              <div class="img">
-                <img :src="smlImgUrl" alt="">
-              </div>
-              <el-upload
-                action="#"
-                :http-request="uploadSml"
-                accept="image/png,image/jpg,image/jpeg"
-                :on-change="smlFileChange"
-                :on-success="handleSmlSuccess"
-                :before-upload="handleBeforeUpload"
-                :show-file-list="false"
-                :auto-upload="false">
-                <div id="upload-btn">
-                  <i class="el-icon-plus avatar-uploader-icon"></i>
-                </div>
-              </el-upload>
-            </div>
-          </el-form-item>
-          <el-form-item label="是否显示" class="flex-class">
+          <el-form-item label="是否上线：" class="flex-class">
             <el-radio-group v-model="form.is_show">
               <el-radio :label="true">是</el-radio>
               <el-radio :label="false">否</el-radio>
@@ -93,7 +51,7 @@
 </template>
 
 <script>
-import { addCourse, courseEdit, getInfoToken } from '@/api/course'
+import { addCourseVersion, editCourseVersion, getInfoToken } from '@/api/course'
 import { mapState } from 'vuex'
 import { uploadQiniu } from '@/utils/uploadQiniu'
 
@@ -103,20 +61,22 @@ export default {
     return {
       showEdit: false,
       form: {
-        code: '',
-        course_type: '', // 课程分类
-        cover: [], // 大图标
-        desc: {}, // 描述
-        flag: [], // 小图标
-        is_show: false, // 是否上线
-        lan_code: '', // 语种的编码
+        cover: [],
+        desc: {},
+        flag: [],
+        has_changed: true,
+        has_del: true,
+        is_show: true,
+        name: '',
+        parent_uuid: '',
         tags: [],
-        title: {} // 名称
+        title: {},
+        update_time: 0,
+        uuid: '',
+        version: ''
       },
-      bigImgUrl: '',
-      bigFileRaw: {},
-      smlImgUrl: '',
-      smlFileRaw: {},
+      imgUrl: '',
+      fileRaw: {},
       type: ''
     }
   },
@@ -137,37 +97,41 @@ export default {
       console.log(params)
       this.type = params.type
       if (this.type === 'add') {
-        this.form.code = ''
-        this.form.course_type = ''
-        this.form.cover = []
+        this.form.name = params.obj.name
+        this.form.parent_uuid = params.obj.parent_uuid
+        this.form.version = params.obj.name
+        this.cover = []
         this.form.desc = {}
         this.form.flag = []
-        this.form.is_show = false
-        this.form.lan_code = params.selLang
+        this.form.has_changed = true
+        this.form.has_del = true
+        this.form.is_show = true
         this.form.tags = []
         this.form.title = {}
-        this.bigImgUrl = ''
-        this.smlImgUrl = ''
+        this.form.update_time = 0
+        this.form.uuid = ''
+        this.imgUrl = ''
       } else if (this.type === 'edit') {
-        this.form = params.form
-        this.bigImgUrl = this.assetsDomain + '/' + params.form.cover[0]
-        this.smlImgUrl = this.assetsDomain + '/' + params.form.flag[0]
+        this.form = params.obj
+        console.log(this.form)
+        this.imgUrl = params.obj.cover[0] ? this.assetsDomain + '/' + params.obj.cover[0] : ''
       }
       this.showEdit = true
     },
     close () {
       this.showEdit = false
+      this.$emit('newEditVersion')
     },
-    async uploadBig () {
-      if (Object.keys(this.bigFileRaw).length === 0) {
+    async upload () {
+      if (Object.keys(this.fileRaw).length === 0) {
         return false // 如果为空,返回false
       }
-      console.log(this.bigFileRaw)
+      console.log(this.fileRaw)
       let res1 = await getInfoToken()
       let token = res1.data.token
-      let url = 'course/coversV2/' + this.bigFileRaw.name
-      console.log(token, url, this.bigFileRaw.raw)
-      let res2 = await uploadQiniu(this.bigFileRaw.raw, token, url)
+      let url = 'course/coversV2/' + this.fileRaw.name
+      console.log(token, url, this.fileRaw.raw)
+      let res2 = await uploadQiniu(this.fileRaw.raw, token, url)
       console.log(res1, url, res2)
       if (this.type === 'add') {
         this.form.cover.push(res2.key)
@@ -175,43 +139,15 @@ export default {
         this.form.cover.unshift(res2.key)
       }
     },
-    bigFileChange (file, fileList) {
+    fileChange (file, fileList) {
       console.log(file)
-      this.bigImgUrl = URL.createObjectURL(file.raw)
-      // this.form.cover.unshift(URL.createObjectURL(file.raw))
+      this.imgUrl = URL.createObjectURL(file.raw)
       console.log(this.bigImgUrl)
-      this.bigFileRaw = file
+      this.fileRaw = file
     },
-    handleBigSuccess (res, file) {
+    handleSuccess (res, file) {
       console.log(res, file)
-      this.bigImgUrl = URL.createObjectURL(file.raw)
-    },
-    async uploadSml () {
-      if (Object.keys(this.smlFileRaw).length === 0) {
-        return false // 如果为空,返回false
-      }
-      let res1 = await getInfoToken()
-      let token = res1.data.token
-      let url = 'course/icons/' + this.smlFileRaw.name
-      console.log(token, url, this.smlFileRaw.raw)
-      let res2 = await uploadQiniu(this.smlFileRaw.raw, token, url)
-      console.log(res1, url, res2)
-      if (this.type === 'add') {
-        this.form.flag.push(res2.key)
-      } else {
-        this.form.flag.unshift(res2.key)
-      }
-    },
-    smlFileChange (file, fileList) {
-      console.log(file)
-      this.smlImgUrl = URL.createObjectURL(file.raw)
-      // this.form.flag.unshift(URL.createObjectURL(file.raw))
-      console.log(this.smlImgUrl)
-      this.smlFileRaw = file
-    },
-    handleSmlSuccess (res, file) {
-      console.log(res, file)
-      this.smlImgUrl = URL.createObjectURL(file.raw)
+      this.imgUrl = URL.createObjectURL(file.raw)
     },
     // 上传图片前的过滤
     handleBeforeUpload (file) {
@@ -230,39 +166,39 @@ export default {
     },
     // 添加
     async determine () {
-      await this.uploadBig()
-      await this.uploadSml()
       console.log(this.form)
+      await this.upload()
       if (this.type === 'add') {
-        this.form.code = this.form.code + '-Basic'
-        await addCourse(this.form).then(res => {
+        await addCourseVersion(this.form).then(res => {
           console.log(res)
           if (res.success) {
             this.showEdit = false
           }
         })
       } else {
+        console.log(this.form)
         let obj = {
-          editInfo: {
-            course_type: this.form.course_type,
-            cover: this.form.cover,
-            desc: this.form.desc,
-            flag: this.form.flag,
+          uuid: this.form.uuid,
+          content_info: {
+            cover: this.form.cover ? this.form.cover : [],
+            desc: this.form.desc ? this.form.desc : {},
+            flag: this.form.flag ? this.form.flag : [],
+            has_changed: this.form.has_changed ? this.form.has_changed : true,
             is_show: this.form.is_show,
+            name: this.form.name ? this.form.name : '',
             tags: [],
-            title: this.form.title
-          },
-          uuid: this.form.uuid
+            title: this.form.title ? this.form.title : {},
+            update_time: this.form.update_time ? this.form.update_time : 0
+          }
         }
-        console.log(obj)
-        await courseEdit(obj).then(res => {
+        editCourseVersion(obj).then(res => {
           console.log(res)
           if (res.success) {
             this.showEdit = false
           }
         })
       }
-      this.$emit('addNewCourse')
+      this.$emit('newEditVersion')
     },
     changeType () {
       console.log(this.form)
@@ -321,21 +257,9 @@ export default {
       }
     }
   }
-  .big-img-box .img {
-    width:400px;
-    height:120px;
-    background:rgba(239,239,239,1);
-    border-radius:4px;
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      margin-bottom: 20px;
-    }
-  }
-  .small-img-box .img {
-    width:120px;
-    height:120px;
+  .img {
+    width:280px;
+    height:240px;
     background:rgba(239,239,239,1);
     border-radius:4px;
     img {

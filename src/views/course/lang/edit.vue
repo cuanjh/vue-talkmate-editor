@@ -54,6 +54,12 @@
               <el-radio :label="true">是</el-radio>
             </el-radio-group>
           </el-form-item>
+          <el-form-item label="是否显示" class="flex-class">
+            <el-radio-group v-model="form.is_show">
+              <el-radio :label="true">是</el-radio>
+              <el-radio :label="false">否</el-radio>
+            </el-radio-group>
+          </el-form-item>
         </el-form>
         <div class="btns">
           <a class="cancel" @click="close()">取消</a>

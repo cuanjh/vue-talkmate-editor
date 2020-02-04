@@ -35,38 +35,37 @@
           </ul>
         </div>
         <div class="operate">
-          <el-tooltip class="item" effect="dark" content="编辑" placement="top">
-            <el-button type="primary" icon="el-icon-edit" circle @click="edit(item)"></el-button>
+          <el-tooltip class="item" effect="dark" content="设置" placement="top">
+            <el-button type="primary" icon="el-icon-setting" :disabled="item.is_show" circle @click="courseContent(item)"></el-button>
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="上线" placement="top">
-            <el-button type="success" :disabled="item.is_show" icon="el-icon-check" circle></el-button>
+            <el-button type="success" :disabled="item.is_show" icon="el-icon-check" circle @click="editShow(item)"></el-button>
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="下线" placement="top">
-            <el-button type="warning" icon="el-icon-minus" circle></el-button>
+            <el-button type="warning" icon="el-icon-minus" circle :disabled="!item.is_show" @click="editShow(item)"></el-button>
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="删除" placement="top">
-            <el-button type="danger" :disabled="item.is_show" icon="el-icon-delete" circle></el-button>
+            <el-button type="danger" :disabled="item.is_show" icon="el-icon-delete" circle @click="delVerdion(item)"></el-button>
           </el-tooltip>
-        </div>
-        <div class="operate-shade" v-show="false">
-          <div class="desc">确定下架该版本吗？</div>
-          <div class="btns">
-            <span class="cancel">取消</span>
-            <span class="ok">确定</span>
-          </div>
+          <el-tooltip class="item" effect="dark" content="编辑" placement="top">
+            <el-button type="primary" :disabled="!item.has_changed" icon="el-icon-edit" circle @click="editVersion(item)"></el-button>
+          </el-tooltip>
         </div>
       </div>
     </div>
-    <add-version ref="addVersion"/>
+    <edit-comp ref="edit" @newEditVersion="initCourseVersionList"/>
+    <!-- <add-version ref="addVersion"/> -->
     <!-- <course-content :langList="langList" :courseTypes="courseTypes" :contents="contents" ref="content" /> -->
   </div>
 </template>
 
 <script>
-import AddVersion from './add'
+// import AddVersion from './add'
 // import CourseContent from '../content/content'
+import editComp from './edit'
 import { mapState, mapActions, mapMutations } from 'vuex'
-import { addCourseVersion } from '@/api/course'
+// import { addCourseVersion, delCourseVersion, editCourseVersion } from '@/api/course'
+import { delCourseVersion, editCourseVersion } from '@/api/course'
 export default {
   data () {
     return {
@@ -76,8 +75,9 @@ export default {
     }
   },
   components: {
-    AddVersion
+    // AddVersion
     // CourseContent
+    editComp
   },
   created () {
     this.getConfigInfo()
@@ -99,6 +99,7 @@ export default {
   },
   computed: {
     ...mapState({
+      assetsDomain: state => state.course.assetsDomain,
       locale: state => state.course.locale,
       langList: state => state.course.langList,
       courseTypes: state => state.course.courseTypes,
@@ -121,8 +122,10 @@ export default {
       this.getCourseList({ 'lan_code': this.selLang, 'pageNo': 0, 'pageSize': 0 })
     },
     switchVersion (version) {
+      console.log(version)
     },
-    async addVersion () {
+    // 添加版本
+    addVersion () {
       let version = 'V' + (this.version.versions.length + 1)
       let pUUID = ''
       if (this.version.selCourse) {
@@ -132,12 +135,83 @@ export default {
         'name': version,
         'parent_uuid': pUUID
       }
-      console.log(obj)
-      await addCourseVersion(obj)
-      this.initCourseVersionList()
-      this.$refs['addVersion'].show({ version: version })
+      let params = {
+        obj: obj,
+        type: 'add'
+      }
+      console.log(obj, version)
+      this.$refs.edit.show(params)
+      // let version = 'V' + (this.version.versions.length + 1)
+      // let pUUID = ''
+      // if (this.version.selCourse) {
+      //   pUUID = this.version.selCourse.uuid
+      // }
+      // let obj = {
+      //   'name': version,
+      //   'parent_uuid': pUUID
+      // }
+      // console.log(obj)
+      // await addCourseVersion(obj)
+      // this.initCourseVersionList()
+      // this.$refs['addVersion'].show({ version: version })
     },
-    edit (item) {
+    // 编辑版本
+    editVersion (item) {
+      console.log(item)
+      let params = {
+        obj: item,
+        type: 'edit'
+      }
+      this.$refs.edit.show(params)
+    },
+    // 下线上线
+    editShow (item) {
+      console.log(item)
+      let obj = {
+        uuid: item.uuid,
+        content_info: {
+          cover: item.cover ? item.cover : [],
+          desc: item.desc ? item.desc : {},
+          flag: item.flag ? item.flag : [],
+          has_changed: item.has_changed ? item.has_changed : true,
+          is_show: !item.is_show,
+          name: item.name ? item.name : '',
+          tags: [],
+          title: item.title ? item.title : {},
+          update_time: item.update_time ? item.update_time : 0
+        }
+      }
+      editCourseVersion(obj).then(res => {
+        this.initCourseVersionList()
+      })
+    },
+    // 删除版本
+    delVerdion (item) {
+      let uid = item.uuid
+      console.log(item, uid)
+      this.$confirm('此操作将永久删除该版本, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
+        })
+        delCourseVersion({ uuid: uid }).then(res => {
+          if (res.success) {
+            this.initCourseVersionList()
+          }
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
+    },
+    // 课程内容
+    courseContent (item) {
       this.updateVersion({ key: 'selVersion', val: item.version })
       this.updateVersion({ key: 'uuid', val: item.uuid })
       this.$router.push({ path: '/course-content' })
@@ -209,6 +283,8 @@ export default {
     }
   }
   .content {
+    cursor: pointer;
+    position: relative;
     min-height: 174px;
     border-bottom: 1px solid rgba($color: #000000, $alpha: 0.05);
     .title {

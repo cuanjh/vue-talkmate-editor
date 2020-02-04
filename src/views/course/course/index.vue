@@ -77,9 +77,6 @@
           <el-button
             size="mini"
             @click="handleEdit(scope.row)">{{scope.row.is_show ? '隐藏' : '显示'}}</el-button>
-          <el-button
-            size="mini"
-            @click="handleEditContent(scope.$index, scope.row)">编辑课程内容</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -175,11 +172,6 @@ export default {
           this.initData()
         }
       })
-    },
-    handleEditContent (i, row) {
-      console.log(i)
-      console.log(row)
-      // this.$refs['content'].show(row)
     },
     addCourse () {
       console.log(this.courseList)
