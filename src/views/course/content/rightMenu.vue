@@ -8,7 +8,7 @@
           </div>
           <div class="line"></div>
         </div>
-        <div class="menu-group" v-show="folder.type == 'catalog'">
+        <div class="menu-group" v-show="folder && folder.type == 'catalog'">
           <div class="menu-item">
             <div class="name" @click="addFolder">{{ type == 'folder' ? '新建子目录' : '新建目录' }}</div>
           </div>
