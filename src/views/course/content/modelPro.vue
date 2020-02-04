@@ -15,59 +15,48 @@
       </div>
     </div>
     <el-form ref="form" :model="curForm" label-width="80px">
-      <el-form-item v-for="f in feilds" :key="f.feild" :label="f.name">
-        <el-input v-if="f.type != 'array' && f.data_from == ''" v-model="curForm['' + f.feild + '']" :disabled="f.feild == 'list_order' || f.type == 'template'"></el-input>
-        <el-select v-if="f.data_from == 'content_types'" v-model="curForm['' + f.feild + '']" placeholder="请选择">
-          <el-option
-            v-for="item in contentTypes"
-            :key="item.type"
-            :label="item.name"
-            :value="item.type">
-          </el-option>
-        </el-select>
-        <div class="form-sound" v-if="f.feild == 'sound' || f.feild == 'image'">
-          <el-input v-model="curForm['' + f.feild + '']" disabled></el-input>
-          <el-button type="text">查找</el-button>
-          <el-button type="text">本地上传</el-button>
-        </div>
-      </el-form-item>
-      <!-- <el-form-item label="活动区域">
-        <el-select v-model="form.region" placeholder="请选择活动区域">
-          <el-option label="区域一" value="shanghai"></el-option>
-          <el-option label="区域二" value="beijing"></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="活动时间">
-        <el-col :span="11">
-          <el-date-picker type="date" placeholder="选择日期" v-model="form.date1" style="width: 100%;"></el-date-picker>
-        </el-col>
-        <el-col class="line" :span="2">-</el-col>
-        <el-col :span="11">
-          <el-time-picker placeholder="选择时间" v-model="form.date2" style="width: 100%;"></el-time-picker>
-        </el-col>
-      </el-form-item>
-      <el-form-item label="即时配送">
-        <el-switch v-model="form.delivery"></el-switch>
-      </el-form-item>
-      <el-form-item label="活动性质">
-        <el-checkbox-group v-model="form.type">
-          <el-checkbox label="美食/餐厅线上活动" name="type"></el-checkbox>
-          <el-checkbox label="地推活动" name="type"></el-checkbox>
-          <el-checkbox label="线下主题活动" name="type"></el-checkbox>
-          <el-checkbox label="单纯品牌曝光" name="type"></el-checkbox>
-        </el-checkbox-group>
-      </el-form-item>
-      <el-form-item label="特殊资源">
-        <el-radio-group v-model="form.resource">
-          <el-radio label="线上品牌商赞助"></el-radio>
-          <el-radio label="线下场地免费"></el-radio>
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item label="活动形式">
-        <el-input type="textarea" v-model="form.desc"></el-input>
-      </el-form-item> -->
-      <el-form-item>
-        <el-button type="primary" @click="onSubmit">立即创建</el-button>
+      <div class="item" v-for="f in feilds" :key="f.feild">
+        <el-form-item :label="f.name" v-show="(f.feild !== 'list_order' && f.feild !== 'options' && f.type !== 'template' && f.type !== 'templateArray' && f.feild !== 'sentence_phoneticize' && f.feild !== 'options_phoneticize') || ((f.type == 'template' || f.type == 'templateArray') && curForm['' + f.feild + '']) || (version['selLang'] == 'JPN' && (f.feild == 'sentence_phoneticize' || f.feild == 'options_phoneticize')) || (f.feild === 'options' && (curForm['type'] == 'makeSentence' || curForm['type'] == 'fillGap'))">
+          <el-input v-if="f.type != 'array' && f.data_from == '' && f.type !== 'templateArray'" v-model="curForm['' + f.feild + '']" :disabled="f.feild == 'list_order' || f.type == 'template'"></el-input>
+          <el-select v-if="f.data_from == 'content_types'" v-model="curForm['' + f.feild + '']" placeholder="请选择">
+            <el-option
+              v-for="item in contentTypes"
+              :key="item.type"
+              :label="item.name"
+              :value="item.type">
+            </el-option>
+          </el-select>
+          <div class="template-options" v-show="f.type == 'templateArray'">
+            <el-tag
+              v-for="(item, index) in curForm['' + f.feild + '']"
+              :key="'templateArray' + index"
+              type="info"
+              effect="plain">
+              {{ item }}
+            </el-tag>
+          </div>
+          <div class="options" v-if="f.feild === 'options' && (curForm['type'] == 'makeSentence' || curForm['type'] == 'fillGap')">
+            <div class="option-list">
+              <div class="option-item" v-for="(item, index) in curForm['' + f.feild + '']" :key="index">
+                <input type="text" :value="item">
+                <i class="el-icon-circle-close"></i>
+              </div>
+            </div>
+            <div class="add-option">
+              <i class="el-icon-plus"></i>
+            </div>
+          </div>
+          <div class="form-sound" v-if="f.feild == 'sound' || f.feild == 'image'">
+            <el-input v-model="curForm['' + f.feild + '']" disabled></el-input>
+            <el-button type="text">内容查找</el-button>
+            <el-button v-show="f.feild == 'image'" type="text">图库查找</el-button>
+            <el-button type="text">本地上传</el-button>
+            <look-image v-show="f.feild == 'image'"/>
+          </div>
+        </el-form-item>
+      </div>
+      <el-form-item class="btn-handler">
+        <el-button type="primary" @click="onSubmit">保存</el-button>
         <el-button>取消</el-button>
       </el-form-item>
     </el-form>
@@ -76,7 +65,9 @@
 
 <script>
 import FormComp from './form'
+import LookImage from './lookImage'
 import { mapState } from 'vuex'
+
 export default {
   props: ['contents', 'feilds'],
   data () {
@@ -86,12 +77,14 @@ export default {
     }
   },
   components: {
-    FormComp
+    FormComp,
+    LookImage
   },
   computed: {
     ...mapState({
       contentTypes: state => state.course.contentTypes,
-      assetsDomain: state => state.course.assetsDomain
+      assetsDomain: state => state.course.assetsDomain,
+      version: state => state.course.version
     })
   },
   methods: {
@@ -118,19 +111,19 @@ export default {
 .forms {
   background: #E5E6E5;
   width: 100%;
-  // flex: 1;
-  // display: flex;
-  // flex-direction: row;
-  // justify-content: flex-start;
-  // flex-wrap: wrap;
-  // padding: 30px;
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  padding: 30px;
   // width: 400px;
   // overflow-x: auto;
-  .list {
-    width: 400px;
-    overflow-x: auto;
-    background: red;
-  }
+  // .list {
+  //   width: 400px;
+  //   overflow-x: auto;
+  //   background: red;
+  // }
 }
 .el-form {
   padding: 20px;
@@ -141,5 +134,56 @@ export default {
     border-radius: 4px;
     margin-right: 10px;
   }
+}
+.options {
+  display: flex;
+  flex-direction: row;
+  .option-list {
+    display: flex;
+    flex-direction: row;
+    .option-item {
+      margin-right: 10px;
+      position: relative;
+      input {
+        padding: 3px;
+        text-align: center;
+        width: 100px;
+        border: 0;
+        border-bottom: 1px solid #DCDFE6;
+      }
+      i {
+        position: absolute;
+        top: 6px;
+        right: 0;
+        cursor: pointer;
+      }
+    }
+  }
+  .add-option {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #DCDFE6;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin-left: 20px;
+    cursor: pointer;
+    i {
+      color: #DCDFE6;
+      font-size: 20px;
+    }
+  }
+}
+
+.template-options {
+  .el-tag {
+    margin-right: 10px;
+  }
+}
+
+.btn-handler {
+  text-align: center;
 }
 </style>

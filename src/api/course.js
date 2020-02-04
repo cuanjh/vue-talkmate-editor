@@ -310,3 +310,16 @@ export const getContentTypes = (data) => {
     data
   })
 }
+
+/**
+ * @Summary 搜索图片库
+ * @param {*} data
+ * @Router /editor/image/search [post]
+ */
+export const searchImages = (data) => {
+  return service({
+    url: '/editor/image/search',
+    method: 'post',
+    data
+  })
+}
