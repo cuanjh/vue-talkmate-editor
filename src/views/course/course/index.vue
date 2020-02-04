@@ -53,7 +53,8 @@
         </template>
       </el-table-column>
       <el-table-column
-        label="封面">
+        label="封面"
+        width="150px">
         <template slot-scope="scope">
           <el-image
             class="course-cover"
