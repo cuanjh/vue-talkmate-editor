@@ -129,9 +129,12 @@
     <right-menu
       ref="rightMenu"
       @rename="rename"
+      @copy="copy"
+      @paste="paste"
+      @del="del"
       @editCatalog="editCatalog"
     />
-    <edit-catalog ref="editCatalog"/>
+    <edit-catalog ref="editCatalog" @resetTrackData="resetTrackData"/>
     <edit-form ref="editForm"/>
   </el-container>
 </template>
@@ -146,7 +149,9 @@ import EditForm from './editForm'
 import { mapState, mapActions, mapMutations } from 'vuex'
 import {
   getCatalogList,
-  getContent
+  getContent,
+  copyCatalog,
+  delCatalog
 } from '@/api/course'
 export default {
   data () {
@@ -159,6 +164,7 @@ export default {
       slideHeight: 0,
       uuid: '',
       rightUUID: '',
+      copyUUID: '',
       tracks: [],
       selFolder: '',
       path: '',
@@ -339,7 +345,6 @@ export default {
       })
       let puuid = folder.parent_uuid
       this.pathDesc = folder.name + ' > ' + this.pathDesc
-      console.log(this.pathDesc)
       if (tracks.length > 0) {
         this.getPathDesc(tracks, puuid)
       }
@@ -373,17 +378,94 @@ export default {
       this.$refs['rightMenu'].hide()
       this.$refs['folder-' + uuid][0].dblclickFolder()
     },
+    // 复制
+    copy (uuid) {
+      this.copyUUID = uuid
+    },
+    // 粘贴
+    async paste (params) {
+      console.log(params)
+      let track = this.tracks[params.trackNum]
+      let pUUID = track[0].parent_uuid
+      let obj = {
+        same_lang: true,
+        to_uuid: pUUID,
+        uuids: [
+          this.copyUUID
+        ]
+      }
+      console.log(obj)
+      let res = await copyCatalog(obj)
+      if (res.success) {
+        let res2 = await getCatalogList({ parent_uuid: pUUID })
+        if (res2.success) {
+          let catalogs = res2.data.catalogs
+          this.resetTrackData({ trackNum: params.trackNum, catalogs: catalogs })
+        }
+      }
+      this.copyUUID = ''
+    },
+    // 删除目录(文件)
+    del (params) {
+      console.log(params)
+      this.$confirm('确认要删除吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        delCatalog({ uuid: params.folder.uuid }).then(res => {
+          if (res.success) {
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            })
+            getCatalogList({ parent_uuid: params.folder.parent_uuid }).then(res2 => {
+              if (res2.success) {
+                let catalogs = res2.data.catalogs
+                this.resetTrackData({ trackNum: params.trackNum, catalogs: catalogs })
+              }
+            })
+          }
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
+    },
     // 编辑目录
     editCatalog (params) {
       console.log(params)
+      let tracks = this.tracks
       this.pathDesc = ''
-      let copy = this.tracks.slice(0, params.trackNum + 1)
+      // 获取当前轨道内所有文件的最大顺序号
+      params['maxOrder'] = 0
+      let num = params.trackNum + 1
+      let curTrack = tracks[num]
+      if (curTrack && curTrack.length) {
+        let arr = []
+        arr = curTrack.sort((a, b) => {
+          return a.list_order - b.list_order
+        })
+        let last = arr[arr.length - 1]
+        params['maxOrder'] = last.list_order
+      }
+
+      let copy = tracks.slice(0, params.trackNum + 1)
       if (copy.length) {
         this.getPathDesc(copy, params['uuid'])
       }
       params['pathDesc'] = this.pathDesc
 
       this.$refs['editCatalog'].show(params)
+    },
+    // 编辑目录完成后重置当前轨道的数据
+    resetTrackData (params) {
+      console.log(this.tracks)
+      this.$set(this.tracks, params.trackNum, params.catalogs)
+      this.$forceUpdate()
+      console.log(this.tracks)
     }
   }
 }

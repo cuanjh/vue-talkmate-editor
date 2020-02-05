@@ -7,8 +7,8 @@
     <div class="name">
       <div class="icon">
         <el-image
-          v-show="folder.flag && folder.flag.length > 0"
-          :src="assetsDomain + folder.flag[0]"
+          v-show="folderFlagUrl"
+          :src="folderFlagUrl"
           lazy
           fit="cover"></el-image>
         <i class="el-icon-document" v-show="folder.type == 'content'"></i>
@@ -26,6 +26,9 @@
 
 <script>
 import { mapState } from 'vuex'
+import {
+  editCatalog
+} from '@/api/course'
 let timer = null
 export default {
   props: ['folder', 'trackNum', 'name'],
@@ -36,10 +39,22 @@ export default {
       timer: null
     }
   },
+  watch: {
+    name (newVal, oldVal) {
+      this.title = newVal
+    }
+  },
   computed: {
     ...mapState({
       assetsDomain: state => state.course.assetsDomain
-    })
+    }),
+    folderFlagUrl () {
+      let url = ''
+      if (this.folder && this.folder.flag && this.folder.flag.length) {
+        url = this.assetsDomain + this.folder.flag[0]
+      }
+      return url
+    }
   },
   methods: {
     clickFolder () {
@@ -57,6 +72,20 @@ export default {
       }, 0)
     },
     blurFolder () {
+      let obj = {
+        catalog_info: {
+          cover: this.folder.cover,
+          desc: this.folder.desc,
+          flag: this.folder.flag,
+          has_changed: true,
+          list_order: this.folder.list_order,
+          name: this.title,
+          tags: this.folder.tags,
+          title: this.folder.title
+        },
+        uuid: this.folder.uuid
+      }
+      editCatalog(obj)
       this.isShow = true
     },
     contentmenu (ev) {

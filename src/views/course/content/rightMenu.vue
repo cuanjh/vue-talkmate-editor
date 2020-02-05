@@ -18,19 +18,19 @@
             </div>
           </div>
         </div>
-        <div class="menu-group" v-show="type == 'folder'">
-          <div class="menu-item">
+        <div class="menu-group">
+          <div class="menu-item" v-show="type == 'folder'">
             <div class="line"></div>
-            <div class="name">复制</div>
+            <div class="name" @click="copy">复制</div>
           </div>
           <div class="menu-item">
-            <div class="name">粘贴</div>
+            <div class="name" @click="paste">粘贴</div>
           </div>
-          <div class="menu-item">
+          <div class="menu-item" v-show="type == 'folder'">
             <div class="name" @click="rename">重命名</div>
           </div>
-          <div class="menu-item">
-            <div class="name">删除</div>
+          <div class="menu-item" v-show="type == 'folder'">
+            <div class="name" @click="del">删除</div>
           </div>
           <div class="line"></div>
         </div>
@@ -79,6 +79,21 @@ export default {
       let uuid = this.folder.uuid
       this.$emit('rename', uuid)
     },
+    copy () {
+      let uuid = this.folder.uuid
+      this.$emit('copy', uuid)
+    },
+    paste () {
+      let num = this.trackNum
+      if (this.type === 'other') {
+        num = num + 1
+      }
+      this.$emit('paste', { trackNum: num })
+    },
+    del () {
+      let num = this.trackNum
+      this.$emit('del', { trackNum: num, folder: this.folder })
+    },
     addFolder () {
       let uuid
       if (this.type === 'other') {
@@ -86,7 +101,7 @@ export default {
       } else {
         uuid = this.folder.uuid
       }
-      this.$emit('editCatalog', { handler: 'add', type: 'catalog', uuid: uuid, trackNum: this.trackNum })
+      this.$emit('editCatalog', { handler: 'add', type: 'catalog', uuid: uuid, trackNum: this.trackNum, clickType: this.type })
     },
     addDocument () {
       let uuid
@@ -95,11 +110,11 @@ export default {
       } else {
         uuid = this.folder.uuid
       }
-      this.$emit('editCatalog', { handler: 'add', type: 'content', uuid: uuid, trackNum: this.trackNum })
+      this.$emit('editCatalog', { handler: 'add', type: 'content', uuid: uuid, trackNum: this.trackNum, clickType: this.type })
     },
     editCatalog () {
       let uuid = this.folder.uuid
-      this.$emit('editCatalog', { handler: 'edit', type: this.folder.type, uuid: uuid, folder: this.folder, trackNum: this.trackNum })
+      this.$emit('editCatalog', { handler: 'edit', type: this.folder.type, uuid: uuid, folder: this.folder, trackNum: this.trackNum, clickType: this.type })
     }
   }
 }

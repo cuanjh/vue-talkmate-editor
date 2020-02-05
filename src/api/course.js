@@ -291,6 +291,71 @@ export const getCatalogList = (data) => {
 }
 
 /**
+ * @Summary 添加目录（文件）
+ * @param {*} data
+ * @Router /editor/catalog/add [post]
+ */
+export const addCatalog = (data) => {
+  return service({
+    url: '/editor/catalog/add',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 修改目录（文件）
+ * @param {*} data
+ * @Router /editor/catalog/edit [post]
+ */
+export const editCatalog = (data) => {
+  return service({
+    url: '/editor/catalog/edit',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 删除目录（文件）
+ * @param {*} data
+ * @Router /editor/catalog/del [post]
+ */
+export const delCatalog = (data) => {
+  return service({
+    url: '/editor/catalog/del',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 移动目录（文件）
+ * @param {*} data
+ * @Router /editor/catalog/move [post]
+ */
+export const moveCatalog = (data) => {
+  return service({
+    url: '/editor/catalog/move',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 复制目录（文件）
+ * @param {*} data
+ * @Router /editor/catalog/copy [post]
+ */
+export const copyCatalog = (data) => {
+  return service({
+    url: '/editor/catalog/copy',
+    method: 'post',
+    data
+  })
+}
+
+/**
  * @Summary 获取内容列表
  * @Produce  application/json
  * @Param
