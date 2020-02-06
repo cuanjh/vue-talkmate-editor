@@ -416,3 +416,16 @@ export const searchImages = (data) => {
     data
   })
 }
+
+/**
+ * @Summary 搜索内容
+ * @param {*} data
+ * @Router /editor/content/search [post]
+ */
+export const searchContent = (data) => {
+  return service({
+    url: '/editor/content/search',
+    method: 'post',
+    data
+  })
+}
