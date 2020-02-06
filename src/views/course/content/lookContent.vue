@@ -1,15 +1,17 @@
 <template>
-  <div class="look-image-container">
+  <div class="look-content-container">
     <div class="search">
-      <input type="text" v-model="words" @input="search" clearable placeholder="请输入图库...">
+      <input type="text" v-model="words" @input="search" clearable placeholder="请输入内容...">
       <span>搜索</span>
     </div>
     <div class="result">
       <div class="list">
-        <look-image-item
+        <look-content-item
           v-for="(item, index) in searchResult"
           :key="index"
           :item="item"
+          :activeFeild="activeFeild"
+          @userSound="userSound"
           @userImg="userImg"/>
       </div>
     </div>
@@ -17,9 +19,10 @@
 </template>
 
 <script>
-import LookImageItem from './lookImageItem'
-import { searchImages } from '@/api/course'
+import LookContentItem from './lookContentItem'
+import { searchContent } from '@/api/course'
 export default {
+  props: ['contentModel', 'activeFeild'],
   data () {
     return {
       words: '',
@@ -27,13 +30,18 @@ export default {
     }
   },
   components: {
-    LookImageItem
+    LookContentItem
   },
   methods: {
     async search () {
-      let res = await searchImages({ words: this.words })
-      this.searchResult = res.data.images
+      let res = await searchContent({ content_model: this.contentModel, words: this.words })
       console.log(res)
+      this.searchResult = res.data.contents
+    },
+    // 使用声音
+    userSound (sound) {
+      console.log(sound)
+      this.$emit('userSound', sound)
     },
     // 使用图片
     userImg (img) {

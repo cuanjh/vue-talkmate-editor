@@ -4,7 +4,7 @@
     :with-header="false"
     size="80%"
     direction="rtl">
-    <model-pro :style="{height: height + 'px'}" :contents="contents" :feilds="feilds" v-if="contentModel == 'content_model_pro_sound'" />
+    <model-pro :style="{height: height + 'px'}" :contents="contents" :feilds="feilds" :contentModel="contentModel" v-if="contentModel == 'content_model_pro_sound'" />
     <model-video v-if="contentModel == 'content_model_video'" />
     <model-kid v-if="contentModel == 'content_model_kid_sound'" />
   </el-drawer>

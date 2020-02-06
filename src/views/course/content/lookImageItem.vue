@@ -8,7 +8,7 @@
     <div class="desc" v-html="item['desc'].replace(new RegExp(/\./, 'g'), '.<br/>').replace(new RegExp(/\?/, 'g'), '?<br/>')">
     </div>
     <div class="handler" v-show="isShow">
-      <span>使用图片</span>
+      <span @click="userImg">使用图片</span>
     </div>
   </div>
 </template>
@@ -26,6 +26,12 @@ export default {
     ...mapState({
       assetsDomain: state => state.course.assetsDomain
     })
+  },
+  methods: {
+    userImg () {
+      console.log(this.item.image_url)
+      this.$emit('userImg', this.item.image_url)
+    }
   }
 }
 </script>
@@ -66,6 +72,9 @@ export default {
       text-align: center;
       cursor: pointer;
       span {
+        display: block;
+        height: 40px;
+        width: 100%;
         color: #fff;
         font-size: 14px;
         font-weight: 400;

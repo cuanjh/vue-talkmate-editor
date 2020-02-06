@@ -17,7 +17,10 @@
     <el-form ref="form" :model="curForm" label-width="80px">
       <div class="item" v-for="f in feilds" :key="f.feild">
         <el-form-item :label="f.name" v-show="(f.feild !== 'list_order' && f.feild !== 'options' && f.type !== 'template' && f.type !== 'templateArray' && f.feild !== 'sentence_phoneticize' && f.feild !== 'options_phoneticize') || ((f.type == 'template' || f.type == 'templateArray') && curForm['' + f.feild + '']) || (version['selLang'] == 'JPN' && (f.feild == 'sentence_phoneticize' || f.feild == 'options_phoneticize')) || (f.feild === 'options' && (curForm['type'] == 'makeSentence' || curForm['type'] == 'fillGap'))">
-          <el-input v-if="f.type != 'array' && f.data_from == '' && f.type !== 'templateArray'" v-model="curForm['' + f.feild + '']" :disabled="f.feild == 'list_order' || f.type == 'template'"></el-input>
+          <el-input
+            v-if="f.type != 'array' && f.data_from == '' && f.type !== 'templateArray'"
+            v-model="curForm['' + f.feild + '']"
+            :disabled="f.feild == 'list_order' || f.type == 'template'"></el-input>
           <el-select v-if="f.data_from == 'content_types'" v-model="curForm['' + f.feild + '']" placeholder="请选择">
             <el-option
               v-for="item in contentTypes"
@@ -48,10 +51,18 @@
           </div>
           <div class="form-sound" v-if="f.feild == 'sound' || f.feild == 'image'">
             <el-input v-model="curForm['' + f.feild + '']" disabled></el-input>
-            <el-button type="text">内容查找</el-button>
-            <el-button v-show="f.feild == 'image'" type="text">图库查找</el-button>
+            <el-button type="text" @click="searchContent(f.feild)">内容查找</el-button>
+            <el-button v-show="f.feild == 'image'" type="text" @click="searchImg('images')">图库查找</el-button>
             <el-button type="text">本地上传</el-button>
-            <look-image v-show="f.feild == 'image'"/>
+            <look-image
+              v-show="f.feild == 'image' && activeFeild == 'images'"
+              @userImg="userImg"/>
+            <look-content
+              :contentModel="contentModel"
+              :activeFeild="activeFeild"
+              v-show="f.feild == activeFeild"
+              @userSound="userSound"
+              @userImg="userImg"/>
           </div>
         </el-form-item>
       </div>
@@ -66,19 +77,22 @@
 <script>
 import FormComp from './form'
 import LookImage from './lookImage'
+import LookContent from './lookContent'
 import { mapState } from 'vuex'
 
 export default {
-  props: ['contents', 'feilds'],
+  props: ['contents', 'feilds', 'contentModel'],
   data () {
     return {
       curForm: this.contents[0],
-      form: {}
+      form: {},
+      activeFeild: ''
     }
   },
   components: {
     FormComp,
-    LookImage
+    LookImage,
+    LookContent
   },
   computed: {
     ...mapState({
@@ -87,12 +101,37 @@ export default {
       version: state => state.course.version
     })
   },
+  mounted () {
+    console.log(this.curForm, this.feilds, this.contentModel)
+  },
   methods: {
     switchForm (content) {
+      console.log('content', content, this.curForm.uuid)
       this.curForm = content
     },
     onSubmit () {
       console.log('submit!')
+    },
+    // 内容查找
+    searchContent (feild) {
+      this.activeFeild = feild
+      console.log(this.activeFeild)
+    },
+    // 图库查找
+    searchImg (feild) {
+      this.activeFeild = feild
+    },
+    // 使用声音
+    userSound (sound) {
+      console.log('modelProSound', sound)
+      console.log('this.curForm', this.curForm)
+      this.curForm.sound = sound
+    },
+    // 使用图片
+    userImg (img) {
+      console.log('modelProImg', img)
+      console.log('this.curForm', this.curForm)
+      this.curForm.image = img
     }
   }
 }
