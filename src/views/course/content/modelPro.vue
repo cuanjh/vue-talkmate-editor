@@ -1,7 +1,7 @@
 <template>
   <div class="model-pro-container">
     <div class="top-bar">
-      <el-button type="text">新增</el-button>
+      <el-button type="text" @click="addForm">新增</el-button>
       <el-button type="text">预览</el-button>
     </div>
     <div class="forms">
@@ -11,6 +11,7 @@
           v-for="content in contents"
           :key="content.uuid"
           :form="content"
+          @delForm="delForm"
           @switchForm="switchForm"/>
       </div>
     </div>
@@ -93,6 +94,11 @@ export default {
     },
     onSubmit () {
       console.log('submit!')
+    },
+    addForm () {
+    },
+    delForm (params) {
+      console.log(params)
     }
   }
 }

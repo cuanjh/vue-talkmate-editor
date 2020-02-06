@@ -132,7 +132,7 @@
       @copy="copy"
       @paste="paste"
       @del="del"
-      @editCatalog="editCatalog"
+      @editCatalog="editCatalogFn"
     />
     <edit-catalog ref="editCatalog" @resetTrackData="resetTrackData"/>
     <edit-form ref="editForm"/>
@@ -150,8 +150,10 @@ import { mapState, mapActions, mapMutations } from 'vuex'
 import {
   getCatalogList,
   getContent,
+  editCatalog,
   copyCatalog,
-  delCatalog
+  delCatalog,
+  moveCatalog
 } from '@/api/course'
 export default {
   data () {
@@ -301,7 +303,69 @@ export default {
         /* eslint-disable */
         new Sortable($trackItem, {
           group: 'shared',
-          animation: 150
+          animation: 150,
+          onAdd: (evt) => {
+            console.log(evt)
+            let fromId = evt.from.id
+            let toId = evt.to.id
+
+            // 左右拖拽
+            let fromTrackNum = parseInt(fromId.split('-').pop())
+            let toTrackNum = parseInt(toId.split('-').pop())
+            let fromTrack = this.tracks[fromTrackNum][evt.oldIndex]
+            let toTrack = this.tracks[toTrackNum]
+            let toPUUID = toTrack[0].parent_uuid
+            let moveObj = {
+              from_uuid: fromTrack.parent_uuid,
+              to_uuid: toPUUID,
+              uuid: fromTrack.uuid
+            }
+            moveCatalog(moveObj).then(r => {
+              getCatalogList({ parent_uuid: fromTrack.parent_uuid }).then(r1 => {
+                this.resetTrackData({ trackNum: fromTrackNum, catalogs: r1.data.catalogs})
+              })
+              getCatalogList({ parent_uuid: toPUUID }).then(r2 => {
+                this.resetTrackData({ trackNum: toTrackNum, catalogs: r2.data.catalogs})
+              })
+            })
+          },
+          onUpdate: (evt) => {
+            let fromId = evt.from.id
+            let toId = evt.to.id
+            // 上下拖拽
+            let trackNum = parseInt(toId.split('-').pop())
+            let track = this.tracks[trackNum]
+            let dragObj = track[evt.oldIndex]
+            let newOrder = dragObj.list_order
+            let pUUID = track[0]['parent_uuid']
+            let listOrder = track[evt.newIndex].list_order
+            if (evt.newIndex < evt.oldIndex) {
+              // 向上拖拽
+              newOrder = listOrder - 1
+            } else {
+              // 向下拖拽
+              newOrder = listOrder + 1
+            }
+            let obj = {
+              catalog_info: {
+                cover: dragObj.cover,
+                desc: dragObj.desc,
+                flag: dragObj.flag,
+                has_changed: true,
+                list_order: newOrder,
+                name: dragObj.name,
+                tags: dragObj.tags,
+                title: dragObj.title
+              },
+              uuid: dragObj.uuid
+            }
+            editCatalog(obj).then(res => {
+              getCatalogList({ parent_uuid: pUUID }).then(res =>{
+                let catalogs = res.data.catalogs
+                this.resetTrackData({ trackNum: trackNum, catalogs: catalogs})
+              })
+            })
+          }
         })
         /* eslint-enable */
       }
@@ -343,8 +407,11 @@ export default {
       let folder = catalogs.find(item => {
         return item.uuid === uuid
       })
-      let puuid = folder.parent_uuid
-      this.pathDesc = folder.name + ' > ' + this.pathDesc
+      let puuid = uuid
+      if (folder) {
+        puuid = folder.parent_uuid
+        this.pathDesc = folder.name + ' > ' + this.pathDesc
+      }
       if (tracks.length > 0) {
         this.getPathDesc(tracks, puuid)
       }
@@ -365,7 +432,13 @@ export default {
       if (item && item.parent_uuid) {
         params['pUUID'] = item.parent_uuid
       } else {
-        params['pUUID'] = this.version.uuid
+        if (this.tracks[index - 1].length) {
+          let uuidArr = this.path.split('/')
+          this.uuid = uuidArr[uuidArr.length - 2]
+          params['pUUID'] = this.uuid
+        } else {
+          params['pUUID'] = this.version.uuid
+        }
       }
       params['trackNum'] = index - 1
       this.$refs['rightMenu'].show(params)
@@ -435,7 +508,7 @@ export default {
       })
     },
     // 编辑目录
-    editCatalog (params) {
+    editCatalogFn (params) {
       console.log(params)
       let tracks = this.tracks
       this.pathDesc = ''
@@ -462,10 +535,7 @@ export default {
     },
     // 编辑目录完成后重置当前轨道的数据
     resetTrackData (params) {
-      console.log(this.tracks)
       this.$set(this.tracks, params.trackNum, params.catalogs)
-      this.$forceUpdate()
-      console.log(this.tracks)
     }
   }
 }

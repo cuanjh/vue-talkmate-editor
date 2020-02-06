@@ -73,7 +73,7 @@
         <el-form-item>
           <div class="handler">
             <el-button type="primary" @click="onSubmit">保存</el-button>
-            <el-button>取消</el-button>
+            <el-button @click="close">取消</el-button>
           </div>
         </el-form-item>
       </el-form>
@@ -193,6 +193,7 @@ export default {
     },
     async onSubmit () {
       console.log('submit!', this.form)
+      let res
       if (this.handler === 'add') {
         let obj1 = {
           content_model: this.form.content_model,
@@ -208,8 +209,8 @@ export default {
           title: this.form.title,
           type: this.form.type
         }
-        let res = await addCatalog(obj1)
-        console.log(res)
+        res = await addCatalog(obj1)
+        this.trackNum += 1
       } else {
         let obj2 = {
           catalog_info: {
@@ -226,20 +227,19 @@ export default {
           uuid: this.form.uuid
         }
         console.log(obj2)
-        let res2 = await editCatalog(obj2)
-        console.log(res2)
-        if (res2.success) {
-          this.$message({
-            type: 'success',
-            message: res2.msg
-          })
-          let res3 = await getCatalogList({ parent_uuid: this.form.parent_uuid })
-          console.log(res3)
-          if (res3.success) {
-            let catalogs = res3.data.catalogs
-            this.$emit('resetTrackData', { trackNum: this.trackNum, catalogs: catalogs })
-            this.drawer = false
-          }
+        res = await editCatalog(obj2)
+      }
+      if (res.success) {
+        this.$message({
+          type: 'success',
+          message: res.msg
+        })
+        let res3 = await getCatalogList({ parent_uuid: this.form.parent_uuid })
+        console.log(res3)
+        if (res3.success) {
+          let catalogs = res3.data.catalogs
+          this.$emit('resetTrackData', { trackNum: this.trackNum, catalogs: catalogs })
+          this.drawer = false
         }
       }
     },
@@ -274,6 +274,9 @@ export default {
       let url = 'course/content/catalog/cover/' + file.raw.name
       let res = await uploadQiniu(file.raw, this.token, url)
       this.form.cover.push(res.key)
+    },
+    close () {
+      this.drawer = false
     }
   }
 }

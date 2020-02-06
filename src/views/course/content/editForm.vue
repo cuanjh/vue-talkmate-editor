@@ -24,7 +24,8 @@ export default {
       drawer: false,
       contentModel: '',
       contents: [],
-      feilds: []
+      feilds: [],
+      baseFormData: {}
     }
   },
   components: {
@@ -36,8 +37,23 @@ export default {
     show (params) {
       console.log(params)
       this.contentModel = params.folder.content_model
-      this.contents = params.contents
       this.feilds = params.model.feilds
+      this.feilds.forEach(item => {
+        let val
+        if (item.type === 'int') {
+          val = 0
+        } else if (item.type === 'string' || item.type === 'template') {
+          val = ''
+        } else if (item.type === 'templateArray' || item.type === 'array') {
+          val = []
+        }
+        this.baseFormData[item.feild] = val
+      })
+      if (params.contents && params.contents.length) {
+        this.contents = params.contents
+      } else {
+        this.contents.push(this.baseFormData)
+      }
       let h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
       this.height = h - 2
       // this.initData(folder)

@@ -2,12 +2,14 @@
   <div class="form-container" @click="switchForm">
     <div class="form-type">
       <span>{{ typeName }}</span>
-      <i class="el-icon-delete"></i>
+      <i v-show="form.uuid" class="el-icon-delete" @click="delForm"></i>
     </div>
-    <el-image :src="assetsDomain + form.image" fit="cover"></el-image>
+    <div class="form-img">
+      <el-image v-show="imgUrl" :src="imgUrl" fit="cover"></el-image>
+    </div>
     <div class="text">
       <span v-text="form.sentence"></span>
-      <i></i>
+      <i v-show="form.sound" @click="play"></i>
     </div>
   </div>
 </template>
@@ -17,7 +19,9 @@ import { mapState } from 'vuex'
 export default {
   props: ['form'],
   data () {
-    return {}
+    return {
+      myAudio: new Audio()
+    }
   },
   computed: {
     ...mapState({
@@ -28,12 +32,30 @@ export default {
       let obj = this.contentTypes.find(item => {
         return item.type === this.form.type
       })
-      return obj.name
+      let name = ''
+      if (obj) {
+        name = obj.name
+      }
+      return name
+    },
+    imgUrl () {
+      let url = ''
+      if (this.form && this.form.image) {
+        url = this.assetsDomain + this.form.image
+      }
+      return url
     }
   },
   methods: {
     switchForm () {
       this.$emit('switchForm', this.form)
+    },
+    play () {
+      this.myAudio.src = this.assetsDomain + this.form.sound
+      this.myAudio.play()
+    },
+    delForm () {
+      this.$emit('delForm', this.form)
     }
   }
 }
@@ -61,11 +83,17 @@ export default {
     i {
     }
   }
-  .el-image {
-    margin-top: 10px;
-    border-radius: 4px;
+  .form-img {
+    background: #F5F6FA;
     width: 100%;
     height: 120px;
+    margin-top: 10px;
+    border-radius: 4px;
+    overflow: hidden;
+    .el-image {
+      width: 100%;
+      height: 100%;
+    }
   }
   .text {
     margin-top: 10px;
@@ -82,6 +110,7 @@ export default {
       background-image: url('../../../assets/images/course/icon-voice.png');
       background-repeat: no-repeat;
       background-size: cover;
+      cursor: pointer;
     }
   }
 }
