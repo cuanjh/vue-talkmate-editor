@@ -2,18 +2,16 @@
   <el-drawer
     :visible.sync="drawer"
     :with-header="false"
+    @closed="closed"
     size="80%"
     direction="rtl">
-    <model-pro :style="{height: height + 'px'}" :contents="contents" :feilds="feilds" :contentModel="contentModel" v-if="contentModel == 'content_model_pro_sound'" />
+    <model-pro ref="modelPro" :style="{height: height + 'px'}" :contents="contents" :feilds="feilds" :contentModel="contentModel" v-if="contentModel == 'content_model_pro_sound'" />
     <model-video v-if="contentModel == 'content_model_video'" />
     <model-kid v-if="contentModel == 'content_model_kid_sound'" />
   </el-drawer>
 </template>
 
 <script>
-// import {
-//   getContent
-// } from '@api/course'
 import ModelPro from './modelPro'
 import ModelVideo from './modelVideo'
 import ModelKid from './modelKid'
@@ -36,6 +34,7 @@ export default {
   methods: {
     show (params) {
       console.log(params)
+      this.resetData()
       this.contentModel = params.folder.content_model
       this.feilds = params.model.feilds
       this.feilds.forEach(item => {
@@ -45,10 +44,11 @@ export default {
         } else if (item.type === 'string' || item.type === 'template') {
           val = ''
         } else if (item.type === 'templateArray' || item.type === 'array') {
-          val = []
+          val = null
         }
         this.baseFormData[item.feild] = val
       })
+      this.baseFormData['uuid'] = ''
       if (params.contents && params.contents.length) {
         this.contents = params.contents
       } else {
@@ -56,13 +56,24 @@ export default {
       }
       let h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
       this.height = h - 2
-      // this.initData(folder)
       this.drawer = true
+      setTimeout(() => {
+        if (this.contentModel === 'content_model_pro_sound') {
+          this.$refs['modelPro'].initData({ contents: this.contents, feilds: this.feilds, contentModel: this.contentModel, baseFormData: this.baseFormData })
+        }
+      }, 0)
+    },
+    closed () {
+      if (this.contentModel === 'content_model_pro_sound') {
+        this.$refs['modelPro'].resetData()
+      }
+    },
+    resetData () {
+      this.contentModel = ''
+      this.contents = []
+      this.feilds = []
+      this.baseFormData = {}
     }
-    // async initData (folder) {
-    //   let content = await getContent({ 'content_model': folder.content_model, 'parent_uuid': folder.uuid })
-    //   console.log(content)
-    // }
   }
 }
 </script>

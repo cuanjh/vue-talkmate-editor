@@ -82,10 +82,12 @@ import LookContent from './lookContent'
 import { mapState } from 'vuex'
 
 export default {
-  props: ['contents', 'feilds', 'contentModel'],
   data () {
     return {
-      curForm: this.contents[0],
+      contents: [],
+      curForm: {},
+      feilds: [],
+      contentModel: '',
       form: {},
       activeFeild: ''
     }
@@ -102,10 +104,22 @@ export default {
       version: state => state.course.version
     })
   },
-  mounted () {
-    console.log(this.curForm, this.feilds, this.contentModel)
-  },
   methods: {
+    initData (params) {
+      console.log(params)
+      this.contents = params.contents
+      this.curForm = this.contents[0]
+      this.feilds = params.feilds
+      this.contentModel = params.contentModel
+    },
+    resetData () {
+      this.contents = []
+      this.curForm = {}
+      this.feilds = []
+      this.contentModel = ''
+      this.form = {}
+      this.activeFeild = ''
+    },
     switchForm (content) {
       console.log('content', content, this.curForm.uuid)
       this.curForm = content
@@ -155,7 +169,6 @@ export default {
 }
 .forms {
   background: #E5E6E5;
-  width: 100%;
   flex: 1;
   display: flex;
   flex-direction: row;
