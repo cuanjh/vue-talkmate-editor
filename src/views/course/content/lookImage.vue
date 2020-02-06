@@ -1,7 +1,7 @@
 <template>
   <div class="look-image-container">
     <div class="search">
-      <input type="text" v-model="words" @input="search" clearable placeholder="请输入图库...">
+      <input type="text" v-model="words" @input="search" clearable placeholder="请输入...">
       <span>搜索</span>
     </div>
     <div class="result">
