@@ -374,6 +374,45 @@ export const getContent = (data) => {
 }
 
 /**
+ * @Summary 编辑内容
+ * @Produce  application/json
+ * @Param
+ * {
+ *    "content_model": "string",
+ *    "contents": "string" // form数组
+ *    "parent_uuid": "string"
+ *  }
+ * @Router /editor/content/edit [post]
+ */
+export const editContent = (data) => {
+  return service({
+    url: '/editor/content/edit',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 删除内容
+ * @Produce  application/json
+ * @Param
+ * {
+ *   "content_model": "string",
+ *   "del_uuids": [
+ *     "string"
+ *   ]
+ * }
+ * @Router /editor/content/del [post]
+ */
+export const delContent = (data) => {
+  return service({
+    url: '/editor/content/del',
+    method: 'post',
+    data
+  })
+}
+
+/**
  * @Summary 获取模型列表
  * @Produce  application/json
  * @param {*} data

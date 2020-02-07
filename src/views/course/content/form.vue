@@ -17,7 +17,7 @@
 <script>
 import { mapState } from 'vuex'
 export default {
-  props: ['form'],
+  props: ['form', 'formIndex'],
   data () {
     return {
       myAudio: new Audio()
@@ -48,7 +48,7 @@ export default {
   },
   methods: {
     switchForm () {
-      this.$emit('switchForm', this.form)
+      this.$emit('switchForm', { content: this.form, formIndex: this.formIndex })
     },
     play () {
       this.myAudio.src = this.assetsDomain + this.form.sound
@@ -72,6 +72,7 @@ export default {
   padding: 10px 16px;
   border: 1px solid #fff;
   .form-type {
+    height: 16px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;

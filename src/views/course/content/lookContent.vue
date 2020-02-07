@@ -3,6 +3,7 @@
     <div class="search">
       <input type="text" v-model="words" @input="search" clearable placeholder="请输入...">
       <span>搜索</span>
+      <i class="el-icon-close" @click="close"></i>
     </div>
     <div class="result">
       <div class="list">
@@ -10,9 +11,7 @@
           v-for="(item, index) in searchResult"
           :key="index"
           :item="item"
-          :activeFeild="activeFeild"
-          @useSound="useSound"
-          @useImg="useImg"/>
+          @use="use"/>
       </div>
     </div>
   </div>
@@ -22,7 +21,7 @@
 import LookContentItem from './lookContentItem'
 import { searchContent } from '@/api/course'
 export default {
-  props: ['contentModel', 'activeFeild'],
+  props: ['contentModel'],
   data () {
     return {
       words: '',
@@ -38,15 +37,12 @@ export default {
       console.log(res)
       this.searchResult = res.data.contents
     },
-    // 使用声音
-    useSound (sound) {
-      console.log(sound)
-      this.$emit('useSound', sound)
+    // 使用图片（声音）
+    use (params) {
+      this.$emit('use', params)
     },
-    // 使用图片
-    useImg (img) {
-      console.log(img)
-      this.$emit('useImg', img)
+    close () {
+      this.$emit('close')
     }
   }
 }
@@ -66,6 +62,12 @@ export default {
     margin-right: 15px;
   }
   span {
+  }
+  i {
+    float: right;
+    font-size: 20px;
+    margin-top: 12px;
+    cursor: pointer;
   }
 }
 .result {
