@@ -1,8 +1,8 @@
 <template>
   <div class="look-content-container">
     <div class="search">
-      <input type="text" v-model="words" @input="search" clearable placeholder="请输入...">
-      <span>搜索</span>
+      <input type="text" v-model="words" clearable placeholder="请输入...">
+      <span @click="search">搜索</span>
       <i class="el-icon-close" @click="close"></i>
     </div>
     <div class="result">
@@ -62,6 +62,7 @@ export default {
     margin-right: 15px;
   }
   span {
+    cursor: pointer;
   }
   i {
     float: right;

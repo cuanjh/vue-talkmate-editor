@@ -1,10 +1,15 @@
 <template>
   <div class="model-pro-container" v-show="isShow">
     <div class="top-bar">
-      <el-button type="text" @click="addForm">新增</el-button>
-      <el-button type="text" @click="lookPreview">预览</el-button>
+      <div class="left">
+        路径：{{ pathDesc }}
+      </div>
+      <div class="right">
+        <el-button type="text" @click="addForm">新增</el-button>
+        <el-button type="text" @click="lookPreview">预览</el-button>
+      </div>
     </div>
-    <div class="forms">
+    <div id="forms" @contextmenu="contentmenu" class="forms">
       <div class="list" id="sort-form">
         <form-comp
           :data-id="index"
@@ -35,16 +40,16 @@
           <div class="options" v-if="f.feild === 'options' && (contents[activeFormIndex]['type'] == 'makeSentence' || contents[activeFormIndex]['type'] == 'fillGap')">
             <div class="option-list">
               <div class="option-item" v-for="(item, index) in contents[activeFormIndex]['' + f.feild + '']" :key="index">
-                <input type="text" :value="item">
-                <i class="el-icon-circle-close"></i>
+                <input type="text" v-model="contents[activeFormIndex]['' + f.feild + ''][index]">
+                <i class="el-icon-circle-close" @click="delOption(f, index)"></i>
               </div>
             </div>
-            <div class="add-option">
+            <div class="add-option" @click="addOption(f)">
               <i class="el-icon-plus"></i>
             </div>
           </div>
           <div class="form-sound" v-if="f.feild == 'sound' || f.feild == 'image'">
-            <el-input v-model="contents[activeFormIndex]['' + f.feild + '']" disabled>
+            <el-input v-model="contents[activeFormIndex]['' + f.feild + '']">
               <el-button slot="append" @click="clear(f.feild)">清除</el-button>
             </el-input>
             <el-button v-show="f.feild == 'image'" type="text" @click="searchContent(f.feild)">内容查找</el-button>
@@ -79,6 +84,10 @@
       </el-form-item>
     </el-form>
     <preview-comp ref="preview"/>
+    <right-menu-form
+      ref="rightMenuForm"
+      @paste="paste"
+    />
   </div>
 </template>
 
@@ -87,6 +96,7 @@ import FormComp from './form'
 import LookImage from './lookImage'
 import LookContent from './lookContent'
 import PreviewComp from '../preview/pro/index'
+import RightMenuForm from './rightMenuForm'
 import { mapState } from 'vuex'
 import {
   editContent,
@@ -97,6 +107,7 @@ import Sortable from 'sortablejs'
 export default {
   data () {
     return {
+      pathDesc: '',
       pUUID: '',
       isShow: false,
       contents: [],
@@ -112,7 +123,19 @@ export default {
     FormComp,
     LookImage,
     LookContent,
-    PreviewComp
+    PreviewComp,
+    RightMenuForm
+  },
+  mounted () {
+    let formsEl = document.getElementById('forms')
+    formsEl.oncontextmenu = (e) => {
+      e.preventDefault()
+    }
+    formsEl.onclick = () => {
+      if (this.$refs['rightMenuForm']) {
+        this.$refs['rightMenuForm'].hide()
+      }
+    }
   },
   computed: {
     ...mapState({
@@ -125,6 +148,7 @@ export default {
     initData (params) {
       console.log(params)
       this.activeFormIndex = 0
+      this.pathDesc = params.pathDesc
       this.$set(this.$data, 'pUUID', params.pUUID)
       this.$set(this.$data, 'contents', params.contents)
       this.baseFormDataSelf = params.baseFormData
@@ -268,6 +292,30 @@ export default {
     // 清除图片（声音）地址
     clear (type) {
       this.$set(this.contents[this.activeFormIndex], type, '')
+    },
+    // 添加一个选项
+    addOption (f) {
+      console.log(f)
+      if (!this.contents[this.activeFormIndex]['' + f.feild + '']) {
+        this.contents[this.activeFormIndex]['' + f.feild + ''] = []
+      }
+      this.contents[this.activeFormIndex]['' + f.feild + ''].push('')
+    },
+    // 删除一个选项
+    delOption (f, index) {
+      this.contents[this.activeFormIndex]['' + f.feild + ''].splice(index, 1)
+    },
+    // form区域右键菜单
+    contentmenu (ev) {
+      this.$refs['rightMenuForm'].show(ev)
+    },
+    paste () {
+      let obj = JSON.parse(this.version.copyForm)
+      obj['uuid'] = ''
+      this.contents.push(obj)
+      this.activeFormIndex = this.contents.length - 1
+      this.resetSortable()
+      this.$refs['rightMenuForm'].hide()
     }
   }
 }
@@ -278,10 +326,16 @@ export default {
   overflow: auto;
 }
 .top-bar {
-  text-align: right;
   padding-right: 20px;
   height: 40px;
   background: #fff;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  .left {
+    padding-left: 20px;
+  }
 }
 .forms {
   background: #E5E6E5;
