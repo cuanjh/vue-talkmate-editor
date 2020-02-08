@@ -1,28 +1,30 @@
 <template>
-  <div class="model-pro-container">
+  <div class="model-pro-container" v-show="isShow">
     <div class="top-bar">
       <el-button type="text" @click="addForm">新增</el-button>
       <el-button type="text" @click="lookPreview">预览</el-button>
     </div>
     <div class="forms">
-      <div class="list">
+      <div class="list" id="sort-form">
         <form-comp
-          :class="{'active': curForm.uuid == content.uuid}"
-          v-for="content in contents"
-          :key="content.uuid"
+          :data-id="index"
+          :class="{'active': activeFormIndex == index}"
+          v-for="(content, index) in contents"
+          :key="index"
           :form="content"
+          :formIndex="index"
           @delForm="delForm"
           @switchForm="switchForm"/>
       </div>
     </div>
-    <el-form ref="form" :model="curForm" label-width="80px">
+    <el-form ref="form" :model="contents[activeFormIndex]" label-width="80px">
       <div class="item" v-for="f in feilds" :key="f.feild">
-        <el-form-item :label="f.name" v-show="(f.feild !== 'list_order' && f.feild !== 'options' && f.type !== 'template' && f.type !== 'templateArray' && f.feild !== 'sentence_phoneticize' && f.feild !== 'options_phoneticize') || ((f.type == 'template' || f.type == 'templateArray') && curForm['' + f.feild + '']) || (version['selLang'] == 'JPN' && (f.feild == 'sentence_phoneticize' || f.feild == 'options_phoneticize')) || (f.feild === 'options' && (curForm['type'] == 'makeSentence' || curForm['type'] == 'fillGap'))">
+        <el-form-item :label="f.name" v-show="(f.feild !== 'list_order' && f.feild !== 'options' && f.type !== 'template' && f.type !== 'templateArray' && f.feild !== 'sentence_phoneticize' && f.feild !== 'options_phoneticize') || (f.type == 'template' && contents[activeFormIndex]['' + f.feild + '']) || (version['selLang'] == 'JPN' && (f.feild == 'sentence_phoneticize' || f.feild == 'options_phoneticize')) || (f.feild === 'options' && (contents[activeFormIndex]['type'] == 'makeSentence' || contents[activeFormIndex]['type'] == 'fillGap'))">
           <el-input
             v-if="f.type != 'array' && f.data_from == '' && f.type !== 'templateArray'"
-            v-model="curForm['' + f.feild + '']"
+            v-model="contents[activeFormIndex]['' + f.feild + '']"
             :disabled="f.feild == 'list_order' || f.type == 'template'"></el-input>
-          <el-select v-if="f.data_from == 'content_types'" v-model="curForm['' + f.feild + '']" placeholder="请选择">
+          <el-select v-if="f.data_from == 'content_types'" v-model="contents[activeFormIndex]['' + f.feild + '']" placeholder="请选择">
             <el-option
               v-for="item in contentTypes"
               :key="item.type"
@@ -30,18 +32,9 @@
               :value="item.type">
             </el-option>
           </el-select>
-          <div class="template-options" v-show="f.type == 'templateArray'">
-            <el-tag
-              v-for="(item, index) in curForm['' + f.feild + '']"
-              :key="'templateArray' + index"
-              type="info"
-              effect="plain">
-              {{ item }}
-            </el-tag>
-          </div>
-          <div class="options" v-if="f.feild === 'options' && (curForm['type'] == 'makeSentence' || curForm['type'] == 'fillGap')">
+          <div class="options" v-if="f.feild === 'options' && (contents[activeFormIndex]['type'] == 'makeSentence' || contents[activeFormIndex]['type'] == 'fillGap')">
             <div class="option-list">
-              <div class="option-item" v-for="(item, index) in curForm['' + f.feild + '']" :key="index">
+              <div class="option-item" v-for="(item, index) in contents[activeFormIndex]['' + f.feild + '']" :key="index">
                 <input type="text" :value="item">
                 <i class="el-icon-circle-close"></i>
               </div>
@@ -51,25 +44,38 @@
             </div>
           </div>
           <div class="form-sound" v-if="f.feild == 'sound' || f.feild == 'image'">
-            <el-input v-model="curForm['' + f.feild + '']" disabled></el-input>
-            <el-button type="text" @click="searchContent(f.feild)">内容查找</el-button>
+            <el-input v-model="contents[activeFormIndex]['' + f.feild + '']" disabled>
+              <el-button slot="append" @click="clear(f.feild)">清除</el-button>
+            </el-input>
+            <el-button v-show="f.feild == 'image'" type="text" @click="searchContent(f.feild)">内容查找</el-button>
             <el-button v-show="f.feild == 'image'" type="text" @click="searchImg('images')">图库查找</el-button>
             <el-button type="text">本地上传</el-button>
             <look-image
               v-show="f.feild == 'image' && activeFeild == 'images'"
-              @useImg="useImg"/>
+              @close="closeLook"
+              @use="use"/>
             <look-content
               :contentModel="contentModel"
               :activeFeild="activeFeild"
               v-show="f.feild == activeFeild"
-              @useSound="useSound"
-              @useImg="useImg"/>
+              @close="closeLook"
+              @use="use"/>
+          </div>
+        </el-form-item>
+        <el-form-item :label="f.name" v-show="(f.type == 'templateArray' && contents[activeFormIndex]['' + f.feild + ''] && contents[activeFormIndex]['' + f.feild + ''].length)">
+          <div class="template-options">
+            <el-tag
+              v-for="(item, index) in contents[activeFormIndex]['' + f.feild + '']"
+              :key="'templateArray' + index"
+              type="info"
+              effect="plain">
+              {{ item }}
+            </el-tag>
           </div>
         </el-form-item>
       </div>
       <el-form-item class="btn-handler">
         <el-button type="primary" @click="onSubmit">保存</el-button>
-        <el-button>取消</el-button>
       </el-form-item>
     </el-form>
     <preview-comp ref="preview"/>
@@ -82,16 +88,24 @@ import LookImage from './lookImage'
 import LookContent from './lookContent'
 import PreviewComp from '../preview/pro/index'
 import { mapState } from 'vuex'
+import {
+  editContent,
+  delContent
+} from '@/api/course'
+import Sortable from 'sortablejs'
 
 export default {
   data () {
     return {
+      pUUID: '',
+      isShow: false,
       contents: [],
-      curForm: {},
       feilds: [],
       contentModel: '',
       form: {},
-      activeFeild: ''
+      activeFormIndex: 0,
+      activeFeild: '',
+      baseFormDataSelf: ''
     }
   },
   components: {
@@ -110,30 +124,115 @@ export default {
   methods: {
     initData (params) {
       console.log(params)
-      this.contents = params.contents
-      this.curForm = this.contents[0]
-      this.feilds = params.feilds
-      this.contentModel = params.contentModel
+      this.activeFormIndex = 0
+      this.$set(this.$data, 'pUUID', params.pUUID)
+      this.$set(this.$data, 'contents', params.contents)
+      this.baseFormDataSelf = params.baseFormData
+      this.$set(this.$data, 'feilds', params.feilds)
+      this.$set(this.$data, 'contentModel', params.contentModel)
+      this.resetSortable()
+      this.isShow = true
+    },
+    resetSortable () {
+      /* eslint-disable */
+      let el = document.getElementById('sort-form')
+      let sortable = new Sortable(el, {
+        animation: 150,
+        onEnd: (evt) => {
+          let newContents = []
+          let copyContents = this.contents
+          let indexArr = sortable.toArray()
+          indexArr.forEach((item, index) => {
+            let obj = copyContents[parseInt(item)]
+            obj['list_order'] = (index + 1) * 10
+            newContents.push(obj)
+          })
+          this.$set(this.$data, 'contents', newContents)
+          this.activeFormIndex = evt.newIndex
+          let obj = {
+            content_model: this.contentModel,
+            contents: this.contents,
+            parent_uuid: this.pUUID
+          }
+          editContent(obj)
+        }
+      })
+      /* eslint-enable */
     },
     resetData () {
+      this.pUUID = ''
       this.contents = []
-      this.curForm = {}
       this.feilds = []
       this.contentModel = ''
       this.form = {}
+      this.activeFormIndex = 0
       this.activeFeild = ''
+      this.isShow = false
     },
-    switchForm (content) {
-      console.log('content', content, this.curForm.uuid)
-      this.curForm = content
+    switchForm (params) {
+      this.activeFormIndex = params.formIndex
+      this.$set(this.contents, this.activeFormIndex, params.content)
     },
-    onSubmit () {
-      console.log('submit!')
+    async onSubmit () {
+      let arr = []
+      this.contents.forEach((item, index) => {
+        let obj = item
+        obj['list_order'] = (index + 1) * 10
+        arr.push(obj)
+      })
+      this.$set(this.$data, 'contents', arr)
+      let obj = {
+        content_model: this.contentModel,
+        contents: this.contents,
+        parent_uuid: this.pUUID
+      }
+      let res = await editContent(obj)
+      if (res.success) {
+        this.$message({
+          type: 'success',
+          message: res.msg
+        })
+        this.$set(this.$data, 'contents', res.data.contents)
+      }
     },
     addForm () {
+      let obj = JSON.parse(this.baseFormDataSelf)
+      this.contents.push(obj)
+      this.activeFormIndex = this.contents.length - 1
+      this.resetSortable()
     },
     delForm (params) {
       console.log(params)
+      this.$confirm('确认要删除吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        let obj = {
+          content_model: this.contentModel,
+          del_uuids: [
+            params.uuid
+          ]
+        }
+        delContent(obj).then(res => {
+          if (res.success) {
+            this.activeFormIndex = 0
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            })
+            let delIndex = this.contents.findIndex(item => {
+              return item.uuid === params.uuid
+            })
+            this.contents.splice(delIndex, 1)
+          }
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
     },
     // 内容查找
     searchContent (feild) {
@@ -144,11 +243,13 @@ export default {
     searchImg (feild) {
       this.activeFeild = feild
     },
-    // 使用声音
-    useSound (sound) {
-      console.log('modelProSound', sound)
-      console.log('this.curForm', this.curForm)
-      this.curForm.sound = sound
+    // 使用图片（声音）
+    use (params) {
+      let url = ''
+      if (params.flag) {
+        url = params.url
+      }
+      this.$set(this.contents[this.activeFormIndex], params.type, url)
     },
     // 使用图片
     useImg (img) {
@@ -159,6 +260,14 @@ export default {
     // 预览
     lookPreview () {
       this.$refs.preview.show(this.contents)
+    },
+    // 取消图库查找
+    closeLook () {
+      this.activeFeild = ''
+    },
+    // 清除图片（声音）地址
+    clear (type) {
+      this.$set(this.contents[this.activeFormIndex], type, '')
     }
   }
 }
@@ -177,18 +286,16 @@ export default {
 .forms {
   background: #E5E6E5;
   flex: 1;
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  flex-wrap: wrap;
   padding: 30px;
   // width: 400px;
   // overflow-x: auto;
-  // .list {
-  //   width: 400px;
-  //   overflow-x: auto;
-  //   background: red;
-  // }
+  .list {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
 }
 .el-form {
   padding: 20px;

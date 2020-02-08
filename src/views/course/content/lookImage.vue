@@ -3,6 +3,7 @@
     <div class="search">
       <input type="text" v-model="words" @input="search" clearable placeholder="请输入...">
       <span>搜索</span>
+      <i class="el-icon-close" @click="close"></i>
     </div>
     <div class="result">
       <div class="list">
@@ -38,7 +39,10 @@ export default {
     // 使用图片
     useImg (img) {
       console.log(img)
-      this.$emit('useImg', img)
+      this.$emit('use', { type: 'image', flag: true, url: img })
+    },
+    close () {
+      this.$emit('close')
     }
   }
 }
@@ -59,10 +63,17 @@ export default {
   }
   span {
   }
+  i {
+    float: right;
+    font-size: 20px;
+    margin-top: 12px;
+    cursor: pointer;
+  }
 }
 .result {
   background: #F5F6FA;
   .list {
+    margin-top: 10px;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;

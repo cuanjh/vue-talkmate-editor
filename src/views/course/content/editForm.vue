@@ -5,13 +5,9 @@
     @closed="closed"
     size="80%"
     direction="rtl">
-    <model-pro
-      ref="modelPro"
+    <model-pro ref="modelPro"
       :style="{height: height + 'px'}"
-      :contents="contents"
-      :feilds="feilds"
-      :contentModel="contentModel"
-      v-if="contentModel == 'content_model_pro_sound'"/>
+      v-if="contentModel == 'content_model_pro_sound'" />
     <model-video v-if="contentModel == 'content_model_video'" />
     <model-kid v-if="contentModel == 'content_model_kid_sound'" />
   </el-drawer>
@@ -29,8 +25,7 @@ export default {
       drawer: false,
       contentModel: '',
       contents: [],
-      feilds: [],
-      baseFormData: {}
+      feilds: []
     }
   },
   components: {
@@ -44,6 +39,7 @@ export default {
       this.resetData()
       this.contentModel = params.folder.content_model
       this.feilds = params.model.feilds
+      let baseFormData = {}
       this.feilds.forEach(item => {
         let val
         if (item.type === 'int') {
@@ -53,20 +49,20 @@ export default {
         } else if (item.type === 'templateArray' || item.type === 'array') {
           val = null
         }
-        this.baseFormData[item.feild] = val
+        baseFormData[item.feild] = val
       })
-      this.baseFormData['uuid'] = ''
+      baseFormData['uuid'] = ''
       if (params.contents && params.contents.length) {
         this.contents = params.contents
       } else {
-        this.contents.push(this.baseFormData)
+        this.contents.push(baseFormData)
       }
       let h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
       this.height = h - 2
       this.drawer = true
       setTimeout(() => {
         if (this.contentModel === 'content_model_pro_sound') {
-          this.$refs['modelPro'].initData({ contents: this.contents, feilds: this.feilds, contentModel: this.contentModel, baseFormData: this.baseFormData })
+          this.$refs['modelPro'].initData({ pUUID: params.folder.uuid, contents: this.contents, feilds: this.feilds, contentModel: this.contentModel, baseFormData: JSON.stringify(baseFormData) })
         }
       }, 0)
     },
