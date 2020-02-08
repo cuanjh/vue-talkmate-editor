@@ -2,7 +2,7 @@
   <div class="model-pro-container">
     <div class="top-bar">
       <el-button type="text" @click="addForm">新增</el-button>
-      <el-button type="text">预览</el-button>
+      <el-button type="text" @click="lookPreview">预览</el-button>
     </div>
     <div class="forms">
       <div class="list">
@@ -72,6 +72,7 @@
         <el-button>取消</el-button>
       </el-form-item>
     </el-form>
+    <preview-comp ref="preview"/>
   </div>
 </template>
 
@@ -79,6 +80,7 @@
 import FormComp from './form'
 import LookImage from './lookImage'
 import LookContent from './lookContent'
+import PreviewComp from '../preview/pro/index'
 import { mapState } from 'vuex'
 
 export default {
@@ -95,7 +97,8 @@ export default {
   components: {
     FormComp,
     LookImage,
-    LookContent
+    LookContent,
+    PreviewComp
   },
   computed: {
     ...mapState({
@@ -152,6 +155,10 @@ export default {
       console.log('modelProImg', img)
       console.log('this.curForm', this.curForm)
       this.curForm.image = img
+    },
+    // 预览
+    lookPreview () {
+      this.$refs.preview.show(this.contents)
     }
   }
 }

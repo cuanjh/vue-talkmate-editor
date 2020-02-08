@@ -5,7 +5,13 @@
     @closed="closed"
     size="80%"
     direction="rtl">
-    <model-pro ref="modelPro" :style="{height: height + 'px'}" :contents="contents" :feilds="feilds" :contentModel="contentModel" v-if="contentModel == 'content_model_pro_sound'" />
+    <model-pro
+      ref="modelPro"
+      :style="{height: height + 'px'}"
+      :contents="contents"
+      :feilds="feilds"
+      :contentModel="contentModel"
+      v-if="contentModel == 'content_model_pro_sound'"/>
     <model-video v-if="contentModel == 'content_model_video'" />
     <model-kid v-if="contentModel == 'content_model_kid_sound'" />
   </el-drawer>
@@ -15,6 +21,7 @@
 import ModelPro from './modelPro'
 import ModelVideo from './modelVideo'
 import ModelKid from './modelKid'
+
 export default {
   data () {
     return {

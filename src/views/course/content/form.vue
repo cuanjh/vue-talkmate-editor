@@ -29,6 +29,7 @@ export default {
       assetsDomain: state => state.course.assetsDomain
     }),
     typeName () {
+      console.log(this.contentTypes)
       let obj = this.contentTypes.find(item => {
         return item.type === this.form.type
       })
