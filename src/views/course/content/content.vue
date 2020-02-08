@@ -37,7 +37,7 @@
       </div>
     </el-header>
     <el-main>
-      <div class="track-container">
+      <div id="track-container" class="track-container">
         <div class="track-wrap" id="track-wrap">
           <div class="track-item" v-for="(item,index) in tracks" :key="index">
             <div class="list" :id="'track-item-' + index">
@@ -195,7 +195,7 @@ export default {
     }
     let h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
     this.slideHeight = h - 130
-    let contentEl = document.getElementById('content-container')
+    let contentEl = document.getElementById('track-container')
     contentEl.oncontextmenu = (e) => {
       e.preventDefault()
     }
@@ -385,8 +385,13 @@ export default {
         console.log(model)
         getContent({ 'content_model': params.folder.content_model, 'parent_uuid': params.folder.uuid }).then(res => {
           console.log(res)
+          this.pathDesc = ''
+          let copy = this.tracks.slice(0, params.trackNum + 1)
+          if (copy.length) {
+            this.getPathDesc(copy, this.uuid)
+          }
           let contents = res.data.contents
-          this.$refs['editForm'].show({ contents: contents, model: model, folder: params.folder })
+          this.$refs['editForm'].show({ contents: contents, model: model, folder: params.folder, pathDesc: this.pathDesc })
         })
       }
     },

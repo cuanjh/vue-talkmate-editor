@@ -2,7 +2,14 @@
   <div class="form-container" @click="switchForm">
     <div class="form-type">
       <span>{{ typeName }}</span>
-      <i v-show="form.uuid" class="el-icon-delete" @click="delForm"></i>
+      <div class="icons">
+        <el-tooltip effect="dark" content="复制" placement="top">
+          <i class="el-icon-document-copy" @click="copyForm"></i>
+        </el-tooltip>
+        <el-tooltip effect="dark" content="删除" placement="top">
+          <i v-show="form.uuid" class="el-icon-delete" @click="delForm"></i>
+        </el-tooltip>
+      </div>
     </div>
     <div class="form-img">
       <el-image v-show="imgUrl" :src="imgUrl" fit="cover"></el-image>
@@ -15,7 +22,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapMutations } from 'vuex'
 export default {
   props: ['form', 'formIndex'],
   data () {
@@ -47,6 +54,9 @@ export default {
     }
   },
   methods: {
+    ...mapMutations({
+      updateVersion: 'course/updateVersion'
+    }),
     switchForm () {
       this.$emit('switchForm', { content: this.form, formIndex: this.formIndex })
     },
@@ -56,6 +66,16 @@ export default {
     },
     delForm () {
       this.$emit('delForm', this.form)
+    },
+    copyForm () {
+      let obj = this.form
+      let copyFormStr = JSON.stringify(obj)
+      this.updateVersion({ key: 'copyForm', val: copyFormStr })
+      this.$message({
+        type: 'success',
+        message: '复制成功',
+        showClose: true
+      })
     }
   }
 }
@@ -81,7 +101,11 @@ export default {
       font-weight: 400;
       color: rgba($color: #000000, $alpha: 0.4)
     }
-    i {
+    .icons {
+      i {
+        margin-left: 15px;
+        cursor: pointer;
+      }
     }
   }
   .form-img {

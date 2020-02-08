@@ -5,7 +5,7 @@
         <el-option
           v-for="item in langList"
           :key="item['lan_code']"
-          :label="item.title[locale]"
+          :label="item.title['' + locale + '']"
           :value="item['lan_code']">
         </el-option>
       </el-select>

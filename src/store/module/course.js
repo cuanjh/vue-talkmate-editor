@@ -27,7 +27,8 @@ export const course = {
       selCourse: null,
       selVersion: '',
       versions: [],
-      uuid: ''
+      uuid: '',
+      copyForm: ''
     },
     modelList: [], // 内容模型列表
     contentTypes: [] // 内容分类列表

@@ -61,7 +61,7 @@ export default {
       this.drawer = true
       setTimeout(() => {
         if (this.contentModel === 'content_model_pro_sound') {
-          this.$refs['modelPro'].initData({ pUUID: params.folder.uuid, contents: this.contents, feilds: this.feilds, contentModel: this.contentModel, baseFormData: JSON.stringify(baseFormData) })
+          this.$refs['modelPro'].initData({ pUUID: params.folder.uuid, contents: this.contents, feilds: this.feilds, contentModel: this.contentModel, baseFormData: JSON.stringify(baseFormData), pathDesc: params.pathDesc })
         }
       }, 0)
     },
