@@ -47,14 +47,34 @@
             <div class="add-option" @click="addOption(f)">
               <i class="el-icon-plus"></i>
             </div>
+            <el-tag type="warning" v-show="contents[activeFormIndex]['type'] == 'fillGap'">注：第一个输入项为正确选项，其他为错误选项。</el-tag>
           </div>
           <div class="form-sound" v-if="f.feild == 'sound' || f.feild == 'image'">
             <el-input v-model="contents[activeFormIndex]['' + f.feild + '']">
               <el-button slot="append" @click="clear(f.feild)">清除</el-button>
             </el-input>
-            <el-button v-show="f.feild == 'image'" type="text" @click="searchContent(f.feild)">内容查找</el-button>
-            <el-button v-show="f.feild == 'image'" type="text" @click="searchImg('images')">图库查找</el-button>
-            <el-button type="text">本地上传</el-button>
+            <div class="upload-area">
+              <el-button v-show="f.feild == 'image'" type="text" @click="searchContent(f.feild)">内容查找</el-button>
+              <el-button v-show="f.feild == 'image'" type="text" @click="searchImg('images')">图库查找</el-button>
+              <el-upload
+                v-if="f.feild == 'sound'"
+                action="#"
+                accept="audio/mp3"
+                :on-change="uploadSoundOnchange"
+                :show-file-list="false"
+                :auto-upload="false">
+                <el-button type="text">本地上传</el-button>
+              </el-upload>
+              <el-upload
+                v-if="f.feild == 'image'"
+                action="#"
+                accept="image/png,image/jpg,image/jpeg"
+                :on-change="uploadImageOnchange"
+                :show-file-list="false"
+                :auto-upload="false">
+                <el-button type="text">本地上传</el-button>
+              </el-upload>
+            </div>
             <look-image
               v-show="f.feild == 'image' && activeFeild == 'images'"
               @close="closeLook"
@@ -100,9 +120,14 @@ import RightMenuForm from './rightMenuForm'
 import { mapState } from 'vuex'
 import {
   editContent,
-  delContent
+  delContent,
+  getInfoToken
 } from '@/api/course'
+import {
+  uploadQiniu
+} from '@/utils/uploadQiniu'
 import Sortable from 'sortablejs'
+import moment from 'moment'
 
 export default {
   data () {
@@ -147,6 +172,9 @@ export default {
   methods: {
     initData (params) {
       console.log(params)
+      getInfoToken().then(res => {
+        this.token = res.data.token
+      })
       this.activeFormIndex = 0
       this.pathDesc = params.pathDesc
       this.$set(this.$data, 'pUUID', params.pUUID)
@@ -316,6 +344,24 @@ export default {
       this.activeFormIndex = this.contents.length - 1
       this.resetSortable()
       this.$refs['rightMenuForm'].hide()
+    },
+    async uploadSoundOnchange (file) {
+      console.log(file)
+      let date = moment(new Date()).format('YYYY/MM/DD')
+      let ext = file.name.split('.')[1]
+      let url = 'course/sounds/' + this.version.selLang.toLowerCase() + '/' + date + '/' + file.uid + '.' + ext
+      console.log(url)
+      let res = await uploadQiniu(file.raw, this.token, url)
+      this.$set(this.contents[this.activeFormIndex], 'sound', res.key)
+    },
+    async uploadImageOnchange (file) {
+      console.log(file)
+      let date = moment(new Date()).format('YYYY/MM/DD')
+      let ext = file.name.split('.')[1]
+      let url = 'course/images/common/' + this.version.selLang.toLowerCase() + '/' + date + '/' + file.uid + '.' + ext
+      console.log(url)
+      let res = await uploadQiniu(file.raw, this.token, url)
+      this.$set(this.contents[this.activeFormIndex], 'image', res.key)
     }
   }
 }
@@ -395,6 +441,7 @@ export default {
     justify-content: center;
     align-items: center;
     margin-left: 20px;
+    margin-right: 20px;
     cursor: pointer;
     i {
       color: #DCDFE6;
@@ -411,5 +458,13 @@ export default {
 
 .btn-handler {
   text-align: center;
+}
+
+.upload-area {
+  display: flex;
+  flex-direction: row;
+  .el-button {
+    margin-right: 20px;
+  }
 }
 </style>

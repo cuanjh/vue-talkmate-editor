@@ -184,6 +184,7 @@ export default {
   created () {
     this.getModelList({ pageNo: 0, pageSize: 0 })
     this.getContentTypes()
+    this.getContentTags({ pageNo: 0, pageSize: 0 })
   },
   mounted () {
     if (this.version) {
@@ -213,8 +214,7 @@ export default {
       langList: state => state.course.langList,
       courseTypes: state => state.course.courseTypes,
       version: state => state.course.version,
-      modelList: state => state.course.modelList,
-      contentTypes: state => state.course.contentTypes
+      modelList: state => state.course.modelList
     })
   },
   methods: {
@@ -224,7 +224,8 @@ export default {
     ...mapActions({
       getCourseList: 'course/getCourseList',
       getModelList: 'course/getModelList',
-      getContentTypes: 'course/getContentTypes'
+      getContentTypes: 'course/getContentTypes',
+      getContentTags: 'course/getContentTags'
     }),
     initCourseVersionList (flag) {
       this.updateVersion({ key: 'selLang', val: this.selLang })

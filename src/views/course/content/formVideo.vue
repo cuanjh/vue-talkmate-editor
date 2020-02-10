@@ -1,22 +1,18 @@
 <template>
   <div class="form-container" @click="switchForm">
-    <div class="form-type">
-      <span>{{ typeName }}</span>
-      <div class="icons">
-        <el-tooltip effect="dark" content="复制" placement="top">
-          <i class="el-icon-document-copy" @click="copyForm"></i>
-        </el-tooltip>
-        <el-tooltip effect="dark" content="删除" placement="top">
-          <i v-show="form.uuid" class="el-icon-delete" @click="delForm"></i>
-        </el-tooltip>
-      </div>
+    <div class="form-handler">
+      <el-tooltip effect="dark" content="复制" placement="top">
+        <i class="el-icon-document-copy" @click="copyForm"></i>
+      </el-tooltip>
+      <el-tooltip effect="dark" content="删除" placement="top">
+        <i v-show="form.uuid" class="el-icon-delete" @click="delForm"></i>
+      </el-tooltip>
     </div>
-    <div class="form-img">
-      <el-image v-show="imgUrl" :src="imgUrl" fit="cover"></el-image>
+    <div class="form">
+      <video :id="'form-video-' + formIndex" :src="videoUrl" controls :poster="coverUrl"></video>
     </div>
-    <div class="text">
-      <span v-text="form.type == 'fillGap' ? form.sentence.replace(form.options[0], '______') : form.sentence"></span>
-      <i v-show="form.sound" @click="play"></i>
+    <div class="text" v-show="form.content">
+      <span v-text="form.content"></span>
     </div>
   </div>
 </template>
@@ -27,29 +23,26 @@ export default {
   props: ['form', 'formIndex'],
   data () {
     return {
-      myAudio: new Audio()
+      myVideo: null
     }
   },
   computed: {
     ...mapState({
       contentTypes: state => state.course.contentTypes,
-      assetsDomain: state => state.course.assetsDomain
+      assetsDomain: state => state.course.assetsDomain,
+      version: state => state.course.version
     }),
-    typeName () {
-      console.log(this.contentTypes)
-      let obj = this.contentTypes.find(item => {
-        return item.type === this.form.type
-      })
-      let name = ''
-      if (obj) {
-        name = obj.name
-      }
-      return name
-    },
-    imgUrl () {
+    coverUrl () {
       let url = ''
-      if (this.form && this.form.image) {
-        url = this.assetsDomain + this.form.image
+      if (this.form && this.form.cover) {
+        url = this.assetsDomain + this.form.cover
+      }
+      return url
+    },
+    videoUrl () {
+      let url = ''
+      if (this.form && this.form.video) {
+        url = this.assetsDomain + this.form.video
       }
       return url
     }
@@ -60,10 +53,6 @@ export default {
     }),
     switchForm () {
       this.$emit('switchForm', { content: this.form, formIndex: this.formIndex })
-    },
-    play () {
-      this.myAudio.src = this.assetsDomain + this.form.sound
-      this.myAudio.play()
     },
     delForm () {
       this.$emit('delForm', this.form)
@@ -84,44 +73,44 @@ export default {
 
 <style lang="scss" scoped>
 .form-container {
-  display: inline-block;
+  display: flex;
+  flex-direction: column;
   background: #FFFFFF;
   width: 208px;
-  height: 220px;
   border-radius: 15px;
   margin: 9px;
-  padding: 10px 16px;
+  padding: 10px 16px 16px;
   border: 1px solid #fff;
-  .form-type {
+  .form-handler {
     height: 16px;
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: flex-end;
     span {
       font-size: 14px;
       font-weight: 400;
       color: rgba($color: #000000, $alpha: 0.4)
     }
-    .icons {
-      i {
-        margin-left: 15px;
-        cursor: pointer;
-      }
+    i {
+      margin-left: 15px;
+      cursor: pointer;
     }
   }
-  .form-img {
+  .form {
+    flex: 1;
     background: #F5F6FA;
     width: 100%;
-    height: 120px;
     margin-top: 10px;
     border-radius: 4px;
     overflow: hidden;
-    .el-image {
+    video {
       width: 100%;
       height: 100%;
+      object-fit: cover;
     }
   }
   .text {
+    height: 70px;
     margin-top: 10px;
     line-height: 20px;
     min-height: 40px;
