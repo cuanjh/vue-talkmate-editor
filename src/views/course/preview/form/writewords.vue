@@ -4,7 +4,6 @@
       <img :src="assetsDomain + form.image" alt="" @click="playVoice">
     </div>
     <div class="content">
-      <span class="text"></span>
       <input type="text"
         v-model="input"/>
     </div>
@@ -12,7 +11,7 @@
 </template>
 
 <script>
-// import $ from 'jquery'
+import $ from 'jquery'
 import { mapState } from 'vuex'
 
 export default {
@@ -26,6 +25,8 @@ export default {
   created () {
     this.$on('init', () => {
       console.log('writeWords init')
+      this.input = ''
+      this.focus()
     })
 
     this.$on('break', () => {
@@ -37,6 +38,11 @@ export default {
     })
   },
   methods: {
+    focus () {
+      setTimeout(() => {
+        $(this.$el).find('input').focus()
+      }, 100)
+    },
     playVoice () {
       let audio = new Audio()
       if (!this.isPlay) {
