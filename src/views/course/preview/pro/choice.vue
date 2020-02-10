@@ -11,13 +11,14 @@
     <div class="choice-list">
       <div class="choice-item"
         :id="'form' + form.uuid"
-        v-for="(form, index) in slideForms"
+        v-for="(form, index) in forms"
         :key="index"
         >
         <keep-alive>
           <component
             :ref="'comp-' + index" :is="'form-' + form.type"
-            :form='form' />
+            :form="form"
+            :index="index" />
         </keep-alive>
       </div>
     </div>
@@ -25,6 +26,8 @@
 </template>
 
 <script>
+import _ from 'lodash'
+import $ from 'jquery'
 import { mapState } from 'vuex'
 import SentenceToImg from '../form/sentenceToImg'
 
@@ -33,23 +36,45 @@ export default {
   data () {
     return {
       curForm: this.slideForms[0],
+      forms: [],
+      choiceForm: {},
       isPlay: false,
-      addClass: false
+      curIndex: 0
     }
   },
   created () {
     this.$on('init', () => {
-      console.log(this.slideForms)
       this.curForm = this.slideForms[0]
+      this.forms = this.getForms()
+      console.log(this.slideForms, this.curForm)
     })
-    this.$on('check', (form) => {
-      console.log(form)
-      let formObj = document.getElementById('form' + form.uuid)
-      console.log(formObj)
-      if (this.curForm.uuid === form.uuid) {
-        formObj.className = 'active'
-        // this.addClass = true
+    this.$on('check', (obj) => {
+      console.log(obj)
+      let formObj = $('#form' + obj.form.uuid)
+      if (this.curForm.uuid !== obj.form.uuid) {
+        formObj.addClass('wrong')
+        setTimeout(() => {
+          formObj.removeClass('wrong')
+        }, 500)
+        console.log(this.curIndex, this.curForm)
+        return false
+      } else {
+        if (this.curIndex === this.slideForms.length - 1) {
+          this.curIndex = obj.index
+        } else {
+          this.curIndex++
+        }
+        formObj.addClass('correct')
+        setTimeout(() => {
+          formObj.removeClass('correct')
+        }, 500)
+        if (obj.form.uuid === this.slideForms[this.slideForms.length - 1].uuid) {
+          return false
+        }
+        this.curForm = this.slideForms[this.curIndex]
+        this.forms = this.getForms()
       }
+      console.log(this.curIndex, this.slideForms.length)
     })
   },
   components: {
@@ -77,6 +102,19 @@ export default {
         audio.pause()
         this.isPlay = false
       }
+    },
+    // 从数组中随机一个
+    getForms () {
+      let answer = this.curForm
+      let arr = [answer]
+      let options = this.slideForms.filter((val) => {
+        return val.sentence !== answer.sentence
+      })
+      console.log('options', options)
+      arr = arr.concat(_.sampleSize(options, 1))
+      arr = _.shuffle(arr)
+      console.log('arr', arr)
+      return arr
     }
   }
 }
@@ -131,11 +169,13 @@ export default {
 .choice-list {
   .choice-item {
     margin-bottom: 20px;
-  }
-  .active {
-    border: 2px solid #7ED321 !important;
     border-radius: 16px;
-    margin-bottom: 20px;
+  }
+  .correct {
+    border: 2px solid #7ED321 !important;
+  }
+  .wrong {
+    border: 2px solid #DD2B2B !important;
   }
 }
 </style>

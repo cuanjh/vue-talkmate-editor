@@ -1,6 +1,6 @@
 <template>
   <div class="item-form">
-    <div class="img-box" @click="playVoice(form)">
+    <div class="img-box" @click="playVoice">
       <img :src="assetsDomain + form.image" alt="">
     </div>
     <span class="sentence">{{form.sentence}}</span>
@@ -28,10 +28,10 @@ export default {
     })
   },
   methods: {
-    playVoice (form) {
+    playVoice () {
       let audio = new Audio()
       if (!this.isPlay) {
-        audio.src = this.assetsDomain + form.sound
+        audio.src = this.assetsDomain + this.form.sound
         audio.oncanplay = () => {
           audio.play()
           this.isPlay = true
@@ -73,8 +73,8 @@ export default {
   height: 207px;
   &:hover {
     cursor: pointer;
-    transform: scale(1.02);
-    transition: all 0.5s;
+    transform: scale(1.01);
+    transition: all 0.3s;
   }
   img {
     width: 100%;

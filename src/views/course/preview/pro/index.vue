@@ -1,7 +1,7 @@
 <template>
 <transition name="fade">
-  <div class="preview" v-show="showPreview" @click="showPreview=false">
-    <div class="preview-container" id="preview-container" @click.stop="showPreview=true">
+  <div class="preview" v-if="showPreview" @click="hideModel">
+    <div class="preview-container" id="preview-container" @click.stop="showModel">
       <div class="preview-content">
         <div class="preview-warp">
           <component
@@ -38,6 +38,12 @@ export default {
   computed: {
   },
   methods: {
+    hideModel () {
+      this.showPreview = false
+    },
+    showModel () {
+      this.showPreview = true
+    },
     show (forms) {
       console.log(forms)
       this.slideForms = forms
