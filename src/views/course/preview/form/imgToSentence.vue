@@ -1,0 +1,166 @@
+<template>
+  <div :class="['form', form.type]">
+    <div class="img-box">
+      <a @click="playVoice">
+        <img :src="assetsDomain + form.image" alt="">
+      </a>
+    </div>
+    <div class="content">
+      <div class="sentences"
+        :id="'sentences' + index"
+        v-for="(item, index) in sentences"
+        :key="item.uuid + index">
+        <a @click="playSentence(item)"><i></i></a>
+        <span class="line"></span>
+        <span class="sentence">{{ item.sentence }}</span>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import _ from 'lodash'
+import { mapState } from 'vuex'
+
+export default {
+  props: ['form', 'slideForms'],
+  data () {
+    return {
+      isPlay: false,
+      sentences: []
+    }
+  },
+  computed: {
+    ...mapState({
+      assetsDomain: state => state.course.assetsDomain
+    })
+  },
+  created () {
+    this.$on('init', () => {
+      // let that = this
+      console.log('imgToSentence init')
+      console.log(this.form, this.slideForms)
+      this.sentences = this.getSentences()
+    })
+  },
+  mounted () {
+    console.log(this.form, this.slideForms)
+  },
+  methods: {
+    playVoice () {
+      let audio = new Audio()
+      if (!this.isPlay) {
+        audio.src = this.assetsDomain + this.form.sound
+        audio.oncanplay = () => {
+          audio.play()
+          this.isPlay = true
+        }
+        audio.onended = () => {
+          this.isPlay = false
+        }
+      } else {
+        audio.pause()
+        this.isPlay = false
+      }
+    },
+    // 播放句子
+    playSentence (item) {
+      let audio = new Audio()
+      if (!this.isPlay) {
+        audio.src = this.assetsDomain + item.sound
+        audio.oncanplay = () => {
+          audio.play()
+          this.isPlay = true
+        }
+        audio.onended = () => {
+          this.isPlay = false
+        }
+      } else {
+        audio.pause()
+        this.isPlay = false
+      }
+    },
+    // 从句子数组中随机抽出3个句子进行选择（包含正确的句子）
+    getSentences () {
+      let answer = this.form
+      let arr = [answer]
+      let options = this.slideForms.filter((val) => {
+        return val.sentence !== answer.sentence
+      })
+      console.log('options', options)
+      arr = arr.concat(_.sampleSize(options, 2))
+      arr = _.shuffle(arr)
+      console.log('arr', arr)
+      return arr
+    }
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+.img-box {
+  width: 100%;
+  height: 207px;
+  a {
+    width: 100%;
+    height: 100%;
+    display: inline-block;
+  }
+  &:hover {
+    cursor: pointer;
+    transform: scale(1.01);
+    transition: all 0.3s;
+  }
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius:16px;
+  }
+}
+.content {
+  width: 100%;
+  padding-top: 74px;
+  .sentences {
+    cursor: pointer;
+    width: 100%;
+    height: 60px;
+    display: inline-block;
+    background:rgba(255,255,255,1);
+    box-shadow:0px 11px 51px -13px rgba(0,0,0,0.14);
+    border-radius:8px;
+    margin-bottom: 16px;
+    padding: 0 30px 0 20px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    &:last-child {
+      margin-bottom: 0;
+    }
+    a {
+      display: inline-block;
+      width:17px;
+      height:15px;
+      i {
+        display: inline-block;
+        width:17px;
+        height:15px;
+        background: url('../../../../assets/images/course/icon-voice.png') no-repeat center;
+        background-size: cover;
+      }
+    }
+    .line {
+      display: inline-block;
+      width:1px;
+      height:23px;
+      background: #979797;
+      margin: 0 50px 0 16px;
+    }
+    .sentence {
+      font-size:15px;
+      font-weight:400;
+      color:rgba(0,0,0,1);
+    }
+  }
+}
+</style>

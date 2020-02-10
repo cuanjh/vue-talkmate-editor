@@ -1,12 +1,16 @@
 <template>
-  <div class="swiper-container" id="preview-swiper">
+  <div :class="['swiper-container', getFormsTypes]" id="preview-swiper">
     <div class="swiper-wrapper">
       <div class="swiper-slide"
         v-for="(form, index) in slideForms"
         :key="form.code">
         <h2>{{typeName(form.type)}}</h2>
         <keep-alive>
-          <component :ref="'comp-' + index" :is="'form-' + form.type" :form='form' />
+          <component
+            :ref="'comp-' + index"
+            :is="'form-' + form.type"
+            :form='form'
+            :slideForms="slideForms" />
         </keep-alive>
       </div>
     </div>
@@ -14,12 +18,17 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import Swiper from 'swiper'
 import 'swiper/css/swiper.css'
 import { mapState } from 'vuex'
 
 import AutoSpeak from '../form/autoSpeak'
 import RepeatSpeak from '../form/repeatSpeak'
+import ImgToSentence from '../form/imgToSentence'
+import MakeSentence from '../form/makeSentence'
+import FillGap from '../form/fillGap'
+import WriteWords from '../form/writewords'
 
 export default {
   props: ['slideForms'],
@@ -40,11 +49,26 @@ export default {
     ...mapState({
       contentTypes: state => state.course.contentTypes,
       assetsDomain: state => state.course.assetsDomain
-    })
+    }),
+    getFormsTypes () {
+      var type = ''
+      _.map(this.slideForms, (val) => {
+        if (_.isArray(val)) {
+          type = val[0].type.toLowerCase()
+        } else {
+          type = val.type.toLowerCase()
+        }
+      })
+      return type
+    }
   },
   components: {
     'form-autoSpeak': AutoSpeak, // 自动读
-    'form-repeatSpeak': RepeatSpeak // 跟读
+    'form-repeatSpeak': RepeatSpeak, // 跟读
+    'form-imgToSentence': ImgToSentence, // 由图片选句子
+    'form-makeSentence': MakeSentence, // 组句子
+    'form-fillGap': FillGap, // 选词填空
+    'form-writeWords': WriteWords // 写单词
   },
   methods: {
     initSwiper () {
@@ -99,7 +123,7 @@ export default {
   width: 100%;
   height: 100%;
   padding-left: 20px;
-  padding-top: 30px;
+  padding-top: 50px;
   box-sizing: border-box;
   h1 {
     text-align: center;
@@ -114,10 +138,18 @@ export default {
     text-align: center;
   }
   .swiper-slide {
+    cursor: default;
     width: 320px;
     height: 100%;
-    padding: 0 10px 0 0;
+    padding: 0 20px 0 0;
     box-sizing: border-box;
+  }
+}
+.imgtosentence {
+  padding-left: 0px;
+  .swiper-slide {
+    width: 100%;
+    padding: 0 20px;
   }
 }
 </style>

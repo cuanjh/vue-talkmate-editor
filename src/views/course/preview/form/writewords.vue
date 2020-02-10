@@ -1,23 +1,35 @@
 <template>
-  <div class="item-form">
-    <div class="img-box" @click="playVoice">
-      <img :src="assetsDomain + form.image" alt="">
+  <div :class="['form', form.type]">
+    <div class="img-box">
+      <img :src="assetsDomain + form.image" alt="" @click="playVoice">
     </div>
-    <span class="sentence">{{form.sentence}}</span>
+    <div class="content">
+      <span class="text"></span>
+      <input type="text"
+        v-model="input"/>
+    </div>
   </div>
 </template>
 
 <script>
+// import $ from 'jquery'
 import { mapState } from 'vuex'
 
 export default {
   props: ['form'],
   data () {
     return {
-      isPlay: false
+      isPlay: false,
+      input: ''
     }
   },
   created () {
+    this.$on('init', () => {
+      console.log('writeWords init')
+    })
+
+    this.$on('break', () => {
+    })
   },
   computed: {
     ...mapState({
@@ -46,14 +58,14 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.item-form {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
 .img-box {
   width: 100%;
   height: 207px;
+  a {
+    width: 100%;
+    height: 100%;
+    display: inline-block;
+  }
   &:hover {
     cursor: pointer;
     transform: scale(1.01);
@@ -66,16 +78,20 @@ export default {
     border-radius:16px;
   }
 }
-.sentence {
-  display: block;
-  max-width: 100%;
-  margin: 0 auto;
-  font-size:20px;
-  font-weight: 400;
-  color:rgba(0,0,0,1);
-  line-height:28px;
-  padding-top: 18px;
-  padding-left: 16px;
+.content {
+  padding: 0 20px;
 }
-
+input {
+  background: none;
+  border: 0;
+  border-bottom: 1px solid #c8d4db;
+  width: 90%;
+  padding: 0 8px;
+  padding-bottom: 3px;
+  padding-top: 18px;
+  font-size:17px;
+  font-weight:400;
+  color:rgba(0,0,0,1);
+  line-height:24px;
+}
 </style>

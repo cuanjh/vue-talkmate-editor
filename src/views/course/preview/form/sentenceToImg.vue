@@ -10,7 +10,7 @@
 import { mapState } from 'vuex'
 
 export default {
-  props: ['form'],
+  props: ['form', 'index'],
   computed: {
     ...mapState({
       assetsDomain: state => state.course.assetsDomain
@@ -18,7 +18,11 @@ export default {
   },
   methods: {
     check () {
-      this.$parent.$emit('check', this.form)
+      let obj = {
+        form: this.form,
+        index: this.index
+      }
+      this.$parent.$emit('check', obj)
     }
   }
 }

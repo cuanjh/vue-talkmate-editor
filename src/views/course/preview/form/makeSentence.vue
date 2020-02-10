@@ -1,0 +1,169 @@
+<template>
+  <div :class="['form', form.type]">
+    <div class="img-box">
+      <img :src="assetsDomain + form.image" alt="" @click="playVoice">
+    </div>
+    <div class="content">
+      <div class="make-sentence">
+        <span class="sentence">
+          <i v-for="(itm, index) in options"
+            :key="index"
+            v-text="itm"
+            @click="reset(index)">
+          </i>
+        </span>
+        <div class="words">
+          <a v-for="(word, index) in words"
+            :key="'word' + index"
+            @click="makeSentence(index)">
+            <span v-text="word"></span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import _ from 'lodash'
+// import $ from 'jquery'
+import { mapState } from 'vuex'
+
+export default {
+  props: ['form'],
+  data () {
+    return {
+      isPlay: false,
+      options: [],
+      words: []
+    }
+  },
+  created () {
+    this.$on('init', () => {
+      console.log('makeSentence init')
+      this.resetAll()
+    })
+    this.$on('break', () => {
+      console.log('makeSentence break')
+      this.resetAll()
+    })
+  },
+  computed: {
+    ...mapState({
+      assetsDomain: state => state.course.assetsDomain
+    })
+  },
+  methods: {
+    playVoice () {
+      let audio = new Audio()
+      if (!this.isPlay) {
+        audio.src = this.assetsDomain + this.form.sound
+        audio.oncanplay = () => {
+          audio.play()
+          this.isPlay = true
+        }
+        audio.onended = () => {
+          this.isPlay = false
+        }
+      } else {
+        audio.pause()
+        this.isPlay = false
+      }
+    },
+    makeSentence (index) {
+      let word = this.words[index]
+      this.words.splice(index, 1)
+      let i = _.findIndex(this.options, (o) => {
+        return o === ''
+      })
+      this.options[i] = word
+      console.log(this.form.options, this.words, this.options)
+    },
+    reset (index) {
+      var word = this.options[index]
+      this.options[index] = ''
+      this.words.push(word)
+    },
+    resetAll () {
+      let allWords = this.form.sentence.split(' ')
+      console.log(allWords)
+      this.words = allWords
+      this.options = []
+      this.words.forEach(item => {
+        this.options.push('')
+      })
+      console.log(this.words, this.options)
+    }
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+.img-box {
+  width: 100%;
+  height: 207px;
+  a {
+    width: 100%;
+    height: 100%;
+    display: inline-block;
+  }
+  &:hover {
+    cursor: pointer;
+    transform: scale(1.01);
+    transition: all 0.3s;
+  }
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius:16px;
+  }
+}
+.make-sentence {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.sentence {
+  margin-top: 30px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  i {
+    font-style:normal;
+    min-width: 58px;
+    border-bottom: 1px solid #D8D8D8;
+    font-size:17px;
+    font-weight:400;
+    color:rgba(0,0,0,1);
+    height: 26px;
+    line-height: 25px;
+    margin-right: 10px;
+    text-align: center;
+    cursor: pointer;
+  }
+}
+.words {
+  margin-top: 40px;
+  min-height: 50px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  a {
+    cursor: pointer;
+    padding: 10px 20px;
+    margin-right: 16px;
+    margin-bottom: 6px;
+    border-radius: 4px;
+    background:rgba(255,255,255,1);
+    box-shadow:0px 11px 51px -13px rgba(0,0,0,0.4);
+    border-radius:5px;
+    span {
+      font-size:16px;
+      font-weight:400;
+      color:rgba(68,68,68,1);
+    }
+  }
+}
+</style>
