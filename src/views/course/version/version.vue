@@ -35,7 +35,7 @@
           </ul>
         </div>
         <div class="operate">
-          <el-tooltip class="item" effect="dark" content="设置" placement="top">
+          <el-tooltip class="item" effect="dark" content="编辑课程内容" placement="top">
             <el-button type="primary" icon="el-icon-setting" :disabled="item.is_show" circle @click="courseContent(item)"></el-button>
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="上线" placement="top">

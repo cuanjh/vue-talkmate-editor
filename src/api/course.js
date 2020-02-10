@@ -444,6 +444,19 @@ export const getContentTypes = (data) => {
 }
 
 /**
+ * @Summary 获取内容标签列表
+ * @param {*} data
+ * @Router /editor/tag/list [post]
+ */
+export const getContentTags = (data) => {
+  return service({
+    url: '/editor/tag/list',
+    method: 'post',
+    data
+  })
+}
+
+/**
  * @Summary 搜索图片库
  * @param {*} data
  * @Router /editor/image/search [post]

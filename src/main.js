@@ -11,6 +11,11 @@ import { formatDate } from '@/utils/formatDate'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 
+// 引入video.js
+// import Videojs from 'video.js'
+// import 'video.js/dist/video-js.css'
+// Vue.prototype.$video = Videojs
+
 Vue.use(ElementUI)
 Vue.use(Bus)
 Vue.filter('formatDate', formatDate)

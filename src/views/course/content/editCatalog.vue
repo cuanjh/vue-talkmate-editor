@@ -35,7 +35,6 @@
             </div>
             <el-upload
               action="#"
-              :http-request="uploadHttpRequest"
               accept="image/png,image/jpg,image/jpeg"
               :on-change="uploadFlagOnchange"
               :show-file-list="false"
@@ -53,7 +52,6 @@
             </div>
             <el-upload
               action="#"
-              :http-request="uploadHttpRequest"
               accept="image/png,image/jpg,image/jpeg"
               :on-change="uploadCoverOnchange"
               :show-file-list="false"
@@ -259,9 +257,6 @@ export default {
         list_order: 0,
         content_model: ''
       }
-    },
-    uploadHttpRequest () {
-      console.log('uploadHttpRequest')
     },
     async uploadFlagOnchange (file, fileList) {
       this.form.flag = []
