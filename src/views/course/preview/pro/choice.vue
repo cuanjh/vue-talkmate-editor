@@ -13,6 +13,7 @@
         :id="'form' + form.uuid"
         v-for="(form, index) in forms"
         :key="index"
+        :class="[{'correct': current == index && form.sentence == curForm.sentence && addCorrect}, {'wrong': current == index && form.sentence !== curForm.sentence && addWrong}]"
         >
         <keep-alive>
           <component
@@ -27,9 +28,9 @@
 
 <script>
 import _ from 'lodash'
-import $ from 'jquery'
 import { mapState } from 'vuex'
 import SentenceToImg from '../form/sentenceToImg'
+import SpeakToImg from '../form/speakToImg'
 
 export default {
   props: ['slideForms'],
@@ -37,24 +38,27 @@ export default {
     return {
       curForm: this.slideForms[0],
       forms: [],
-      choiceForm: {},
       isPlay: false,
-      curIndex: 0
+      curIndex: 0,
+      addCorrect: false,
+      addWrong: false,
+      current: 0
     }
   },
   created () {
     this.$on('init', () => {
       this.curForm = this.slideForms[0]
       this.forms = this.getForms()
+      this.$emit('curFormPlay')
       console.log(this.slideForms, this.curForm)
     })
     this.$on('check', (obj) => {
       console.log(obj)
-      let formObj = $('#form' + obj.form.uuid)
+      this.current = obj.index
       if (this.curForm.uuid !== obj.form.uuid) {
-        formObj.addClass('wrong')
+        this.addWrong = true
         setTimeout(() => {
-          formObj.removeClass('wrong')
+          this.addWrong = false
         }, 500)
         console.log(this.curIndex, this.curForm)
         return false
@@ -64,21 +68,26 @@ export default {
         } else {
           this.curIndex++
         }
-        formObj.addClass('correct')
+        this.addCorrect = true
         setTimeout(() => {
-          formObj.removeClass('correct')
+          this.addCorrect = false
         }, 500)
         if (obj.form.uuid === this.slideForms[this.slideForms.length - 1].uuid) {
           return false
         }
         this.curForm = this.slideForms[this.curIndex]
         this.forms = this.getForms()
+        this.$emit('curFormPlay')
       }
       console.log(this.curIndex, this.slideForms.length)
     })
+    this.$on('curFormPlay', () => {
+      this.playVoice()
+    })
   },
   components: {
-    'form-sentenceToImg': SentenceToImg
+    'form-sentenceToImg': SentenceToImg,
+    'form-speakToImg': SpeakToImg
   },
   computed: {
     ...mapState({

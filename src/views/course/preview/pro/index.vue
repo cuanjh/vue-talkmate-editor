@@ -20,6 +20,7 @@ import _ from 'lodash'
 // import { mapState } from 'vuex'
 import SwiperComp from './swiper'
 import ChoiceComp from './choice'
+import imgAutoComp from './imgAuto'
 
 export default {
   data () {
@@ -33,7 +34,8 @@ export default {
   },
   components: {
     'swiper': SwiperComp, // 轮播
-    'choice': ChoiceComp // 由句子选图片
+    'choice': ChoiceComp, // 由句子选图片
+    'imgAuto': imgAutoComp // 由图片跟读
   },
   computed: {
   },
@@ -52,9 +54,15 @@ export default {
     changeView (thunk) {
       let that = this
       let formTypes = this.getFormsTypes(this.slideForms)
-      console.log(formTypes)
-      if (formTypes.length === 1 && (formTypes.indexOf('sentencetoimg') > -1 || formTypes.indexOf('speaktoimg') > -1)) {
+      // if (formTypes.length === 1 && (formTypes.indexOf('sentencetoimg') > -1 || formTypes.indexOf('speaktoimg') > -1)) {
+      //   this.view = 'choice'
+      // } else {
+      //   this.view = 'swiper'
+      // }
+      if (formTypes.length === 1 && (formTypes.indexOf('sentencetoimg') > -1 || formTypes.indexOf('imgtosentencew') > -1)) {
         this.view = 'choice'
+      } else if (formTypes.length === 1 && formTypes.indexOf('speaktoimg') > -1) {
+        this.view = 'imgAuto'
       } else {
         this.view = 'swiper'
       }
@@ -72,6 +80,7 @@ export default {
           arr.push(val.type.toLowerCase())
         }
       })
+      console.log(_.uniq(arr))
       return _.uniq(arr)
     }
   }

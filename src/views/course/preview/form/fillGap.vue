@@ -41,6 +41,7 @@ export default {
     this.$on('init', () => {
       console.log('fillGap init')
       this.resetAll()
+      this.playVoice()
     })
     this.$on('break', () => {
       console.log('fillGap break')

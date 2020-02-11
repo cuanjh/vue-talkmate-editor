@@ -9,10 +9,11 @@
       <div class="sentences"
         :id="'sentences' + index"
         v-for="(item, index) in sentences"
-        :key="item.uuid + index">
+        :key="item.uuid + index"
+        :class="[{'correct': current == index && item.sentence == form.sentence && addCorrect}, {'wrong': current == index && item.sentence !== form.sentence && addWrong}]">
         <a @click="playSentence(item)"><i></i></a>
         <span class="line"></span>
-        <span class="sentence">{{ item.sentence }}</span>
+        <span class="sentence" @click="check(item, index)">{{ item.sentence }}</span>
       </div>
     </div>
   </div>
@@ -27,7 +28,10 @@ export default {
   data () {
     return {
       isPlay: false,
-      sentences: []
+      sentences: [],
+      current: 0,
+      addCorrect: false,
+      addWrong: false
     }
   },
   computed: {
@@ -37,16 +41,33 @@ export default {
   },
   created () {
     this.$on('init', () => {
-      // let that = this
       console.log('imgToSentence init')
       console.log(this.form, this.slideForms)
       this.sentences = this.getSentences()
+      this.playVoice()
     })
   },
   mounted () {
     console.log(this.form, this.slideForms)
   },
   methods: {
+    // 选择答案
+    check  (item, index) {
+      console.log(item, index)
+      this.current = index
+      if (item.sentence === this.form.sentence) {
+        this.addCorrect = true
+        setTimeout(() => {
+          this.addCorrect = false
+        }, 500)
+        this.$parent.$emit('nextForm')
+      } else {
+        this.addWrong = true
+        setTimeout(() => {
+          this.addWrong = false
+        }, 1000)
+      }
+    },
     playVoice () {
       let audio = new Audio()
       if (!this.isPlay) {
@@ -157,9 +178,20 @@ export default {
       margin: 0 50px 0 16px;
     }
     .sentence {
+      cursor: pointer;
       font-size:15px;
       font-weight:400;
       color:rgba(0,0,0,1);
+      height: 100%;
+      display: flex;
+      flex: 1;
+      align-items: center;
+    }
+    &.correct {
+      border: 2px solid #7ED321 !important;
+    }
+    &.wrong {
+      border: 2px solid #DD2B2B !important;
     }
   }
 }
