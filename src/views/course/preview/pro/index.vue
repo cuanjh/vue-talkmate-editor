@@ -71,7 +71,7 @@ export default {
       // } else {
       //   this.view = 'swiper'
       // }
-      if (formTypes.length === 1 && (formTypes.indexOf('sentencetoimg') > -1 || formTypes.indexOf('imgtosentencew') > -1)) {
+      if (formTypes.length === 1 && (formTypes.indexOf('sentencetoimg') > -1 || formTypes.indexOf('countdown') > -1)) {
         this.view = 'choice'
       } else if (formTypes.length === 1 && formTypes.indexOf('speaktoimg') > -1) {
         this.view = 'imgAuto'

@@ -18,10 +18,10 @@
           <div class="swiper-slide">
             <div class="sentence-box" @click="playVoice">
               <a class="text-box" >
-                <span >{{ curForm.sentence }}</span>
                 <div class="trumpet">
                   <i></i>
                 </div>
+                <span >{{ curForm.sentence }}</span>
               </a>
             </div>
             <div class="speak-item"
@@ -233,46 +233,9 @@ export default {
     box-sizing: border-box;
   }
 }
-.sentence-box {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  padding-bottom: 30px;
-  .text-box {
-    cursor: pointer;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    position: relative;
-    // width: 500px;
-    // height: 90px;
-    padding: 12px 22px;
-    background: #2A9FE4;
-    border-radius: 5px;
-    box-shadow:0px 3px 10px 0px rgba(0,0,0,0.1);
-    span {
-      font-size: 16px;
-      font-weight: 600;
-      color: #fff;
-      line-height: 22px;
-      margin-right: 20px;
-    }
-    .trumpet {
-      display: flex;
-      i {
-        background: url('../../../../assets/images/course/icon-voice.png') no-repeat center;
-        background-size: cover;
-        width: 22px;
-        height: 20px;
-        // float: right;
-        // position: absolute;
-        top: 34px;
-        right: 34px;
-      }
-    }
+.imgAuto-container .trumpet {
+  i {
+    background-image: url('../../../../assets/images/course/icon-voice.png');
   }
 }
 .imgAuto-container {
