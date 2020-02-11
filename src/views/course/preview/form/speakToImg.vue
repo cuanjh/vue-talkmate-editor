@@ -1,6 +1,6 @@
 <template>
   <div :class="['form', form.type]">
-    <a>
+    <a class="img-box">
       <img :src="assetsDomain + form.image" alt="">
     </a>
   </div>
@@ -52,20 +52,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.sentenceToImg {
-  width: 100%;
-  height: 207px;
-}
-a {
-  cursor: pointer;
-  display: inline-block;
-  width: 100%;
-  height: 100%;
-  img {
-    width: 100%;
-    height: 207px;
-    object-fit: cover;
-    border-radius:16px;
-  }
-}
+
 </style>

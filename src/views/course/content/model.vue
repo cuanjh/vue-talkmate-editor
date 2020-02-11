@@ -354,7 +354,12 @@ export default {
     },
     // 预览
     lookPreview () {
-      this.$refs.preview.show(this.contents)
+      console.log(this.contentModel)
+      let obj = {
+        contents: this.contents,
+        contentModel: this.contentModel
+      }
+      this.$refs.preview.show(obj)
     },
     // 取消图库查找
     closeLook () {

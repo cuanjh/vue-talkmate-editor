@@ -99,26 +99,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.img-box {
-  width: 100%;
-  height: 207px;
-  a {
-    width: 100%;
-    height: 100%;
-    display: inline-block;
-  }
-  &:hover {
-    cursor: pointer;
-    transform: scale(1.01);
-    transition: all 0.3s;
-  }
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius:16px;
-  }
-}
 .make-sentence {
   width: 100%;
   display: flex;

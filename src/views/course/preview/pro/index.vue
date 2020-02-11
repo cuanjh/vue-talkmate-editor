@@ -21,10 +21,12 @@ import _ from 'lodash'
 import SwiperComp from './swiper'
 import ChoiceComp from './choice'
 import imgAutoComp from './imgAuto'
+import modelVideoComp from './modelVideo'
 
 export default {
   data () {
     return {
+      contentModel: '',
       view: 'swiper',
       showPreview: false,
       slideForms: []
@@ -35,7 +37,8 @@ export default {
   components: {
     'swiper': SwiperComp, // 轮播
     'choice': ChoiceComp, // 由句子选图片
-    'imgAuto': imgAutoComp // 由图片跟读
+    'imgAuto': imgAutoComp, // 由图片跟读
+    'modelVideo': modelVideoComp // 视频课程
   },
   computed: {
   },
@@ -46,10 +49,11 @@ export default {
     showModel () {
       this.showPreview = true
     },
-    show (forms) {
-      console.log(forms)
-      this.slideForms = forms
-      this.changeView(forms)
+    show (params) {
+      this.slideForms = params.contents
+      this.contentModel = params.contentModel
+      console.log(params, this.slideForms, this.contentModel)
+      this.changeView(params.contents)
     },
     changeView (thunk) {
       let that = this
@@ -86,7 +90,8 @@ export default {
   }
 }
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
+@import '../../../../assets/scss/preview.scss';
 .preview {
   position: fixed;
   top: 0;
@@ -101,15 +106,15 @@ export default {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  width: 436px;
+  height: 750px;
   // width:375px;
   // height:667px;
-  width: 500px;
-  height: 856px;
   border-radius:4px;
   box-sizing: border-box;
   background: url('../../../../assets/images/preview/pic-preview.png') no-repeat center;
   background-size: cover;
-  padding: 89px 77px 142px 69px;
+  padding: 76px 66px 126px 60px;
   .preview-content {
     width: 100%;
     height: 100%;

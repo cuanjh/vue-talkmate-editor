@@ -86,8 +86,8 @@ export default {
         autoplay: false,
         speed: 500,
         slidesPerView: 'auto',
-        slidesOffsetAfter: 10,
-        slidesOffsetBefore: 0,
+        // slidesOffsetAfter: 10,
+        // slidesOffsetBefore: 10,
         slideToClickedSlide: true,
         centeredSlides: true,
         grabCursor: true,
@@ -127,7 +127,7 @@ export default {
 .swiper-container {
   width: 100%;
   height: 100%;
-  padding-left: 20px;
+  padding-left: 10px;
   padding-top: 50px;
   box-sizing: border-box;
   h1 {
@@ -144,17 +144,19 @@ export default {
   }
   .swiper-slide {
     cursor: default;
-    width: 320px;
+    // width: 320px;
+    width: 96%;
     height: 100%;
-    padding: 0 20px 0 0;
+    padding: 0 10px 0 0;
     box-sizing: border-box;
   }
 }
 .imgtosentence {
   padding-left: 0px;
+  padding-top: 30px;
   .swiper-slide {
     width: 100%;
-    padding: 0 20px;
+    padding: 0 10px;
   }
 }
 </style>

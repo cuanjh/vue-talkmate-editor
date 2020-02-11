@@ -61,29 +61,16 @@ export default {
     position: absolute;
     bottom: 86px;
     min-height: 70px;
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     i {
       display: inline-block;
-      width: 53px;
-      height: 52px;
+      width: 57px;
+      height: 57px;
       background: url('../../../../assets/images/preview/pic-bofang.png') no-repeat center;
       background-size: cover;
     }
-  }
-}
-.img-box {
-  width: 100%;
-  height: 207px;
-  &:hover {
-    cursor: pointer;
-    transform: scale(1.01);
-    transition: all 0.3s;
-  }
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius:16px;
   }
 }
 .sentence {
