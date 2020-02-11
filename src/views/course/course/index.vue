@@ -54,7 +54,7 @@
       </el-table-column>
       <el-table-column
         label="封面"
-        width="150px">
+        width="170px">
         <template slot-scope="scope">
           <el-image
             class="course-cover"
@@ -69,7 +69,7 @@
           {{scope.row.is_show ? '是' : '否'}}
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="300px">
+      <el-table-column label="操作" width="250px">
         <template slot-scope="scope">
           <el-button
             v-show="userInfo.authority.authorityId == '1' || userInfo.authority.authorityId == '2'"

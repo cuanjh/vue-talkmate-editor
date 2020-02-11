@@ -33,12 +33,12 @@
               </el-upload>
             </div>
           </el-form-item>
-          <el-form-item label="是否上线：" class="flex-class">
+          <!-- <el-form-item label="是否上线：" class="flex-class">
             <el-radio-group v-model="form.is_show">
               <el-radio :label="true">是</el-radio>
               <el-radio :label="false">否</el-radio>
             </el-radio-group>
-          </el-form-item>
+          </el-form-item> -->
         </el-form>
         <div class="btns">
           <a class="cancel" @click="close()">取消</a>
@@ -66,7 +66,7 @@ export default {
         flag: [],
         has_changed: true,
         has_del: true,
-        is_show: true,
+        is_show: false,
         name: '',
         parent_uuid: '',
         tags: [],
@@ -105,7 +105,7 @@ export default {
         this.form.flag = []
         this.form.has_changed = true
         this.form.has_del = true
-        this.form.is_show = true
+        this.form.is_show = false
         this.form.tags = []
         this.form.title = {}
         this.form.update_time = 0

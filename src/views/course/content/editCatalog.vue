@@ -11,6 +11,11 @@
         <el-form-item label="名称" prop="name">
           <el-input v-model="form.name"></el-input>
         </el-form-item>
+        <el-form-item label="模型" v-show="form.type === 'content'">
+          <el-radio-group v-model="form.content_model">
+            <el-radio v-for="item in modelList" :key="item.model_key" :label="item.model_key">{{ item.name }}</el-radio>
+          </el-radio-group>
+        </el-form-item>
         <el-form-item label="标题">
           <div class="lang-input" v-for="l in langInfos" :key="l.langKey">
             <el-input v-model="form.title[l.langKey]"></el-input>
@@ -22,11 +27,6 @@
             <el-input type="textarea" v-model="form.desc[l.langKey]"></el-input>
             <div class="text" v-text="'(' + l.name + ')'"></div>
           </div>
-        </el-form-item>
-        <el-form-item label="模型" v-show="form.type === 'content'">
-          <el-radio-group v-model="form.content_model">
-            <el-radio v-for="item in modelList" :key="item.model_key" :label="item.model_key">{{ item.name }}</el-radio>
-          </el-radio-group>
         </el-form-item>
         <el-form-item label="图标">
           <div class="img-box small-img-box">

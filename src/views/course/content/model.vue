@@ -298,36 +298,41 @@ export default {
     },
     delForm (params) {
       console.log(params)
-      this.$confirm('确认要删除吗?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        let obj = {
-          content_model: this.contentModel,
-          del_uuids: [
-            params.uuid
-          ]
-        }
-        delContent(obj).then(res => {
-          if (res.success) {
-            this.activeFormIndex = 0
-            this.$message({
-              type: 'success',
-              message: '删除成功!'
-            })
-            let delIndex = this.contents.findIndex(item => {
-              return item.uuid === params.uuid
-            })
-            this.contents.splice(delIndex, 1)
+      if (params.form.uuid) {
+        this.$confirm('确认要删除吗?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          let obj = {
+            content_model: this.contentModel,
+            del_uuids: [
+              params.form.uuid
+            ]
           }
+          delContent(obj).then(res => {
+            if (res.success) {
+              this.activeFormIndex = 0
+              this.$message({
+                type: 'success',
+                message: '删除成功!'
+              })
+              let delIndex = this.contents.findIndex(item => {
+                return item.uuid === params.form.uuid
+              })
+              this.contents.splice(delIndex, 1)
+            }
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
         })
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消删除'
-        })
-      })
+      } else {
+        this.activeFormIndex = 0
+        this.contents.splice(params.formIndex, 1)
+      }
     },
     // 内容查找
     searchContent (feild) {

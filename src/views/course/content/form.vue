@@ -7,7 +7,7 @@
           <i class="el-icon-document-copy" @click="copyForm"></i>
         </el-tooltip>
         <el-tooltip effect="dark" content="删除" placement="top">
-          <i v-show="form.uuid" class="el-icon-delete" @click="delForm"></i>
+          <i class="el-icon-delete" @click="delForm"></i>
         </el-tooltip>
       </div>
     </div>
@@ -66,7 +66,7 @@ export default {
       this.myAudio.play()
     },
     delForm () {
-      this.$emit('delForm', this.form)
+      this.$emit('delForm', { form: this.form, formIndex: this.formIndex })
     },
     copyForm () {
       let obj = this.form

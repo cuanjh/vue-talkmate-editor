@@ -35,8 +35,8 @@
           </ul>
         </div>
         <div class="operate">
-          <el-tooltip class="item" effect="dark" content="编辑课程内容" placement="top">
-            <el-button type="primary" icon="el-icon-setting" :disabled="item.is_show" circle @click="courseContent(item)"></el-button>
+          <el-tooltip class="item" effect="dark" content="编辑" placement="top">
+            <el-button type="primary" :disabled="!item.has_changed" icon="el-icon-setting" circle @click="editVersion(item)"></el-button>
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="上线" placement="top">
             <el-button type="success" :disabled="item.is_show" icon="el-icon-check" circle @click="editShow(item)"></el-button>
@@ -47,8 +47,8 @@
           <el-tooltip class="item" effect="dark" content="删除" placement="top">
             <el-button type="danger" :disabled="item.is_show" icon="el-icon-delete" circle @click="delVerdion(item)"></el-button>
           </el-tooltip>
-          <el-tooltip class="item" effect="dark" content="编辑" placement="top">
-            <el-button type="primary" :disabled="!item.has_changed" icon="el-icon-edit" circle @click="editVersion(item)"></el-button>
+          <el-tooltip class="item" effect="dark" content="编辑课程内容" placement="top">
+            <el-button type="primary" icon="el-icon-edit" :disabled="item.is_show" circle @click="courseContent(item)"></el-button>
           </el-tooltip>
         </div>
       </div>
@@ -69,7 +69,7 @@ import { delCourseVersion, editCourseVersion } from '@/api/course'
 export default {
   data () {
     return {
-      selLang: '',
+      selLang: 'ENG',
       selCourseType: '',
       contents: []
     }

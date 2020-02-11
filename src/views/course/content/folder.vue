@@ -1,6 +1,8 @@
 <template>
   <div
     :class="['folder', {'cur-active': !isShow}]"
+    @mouseenter="offline = false"
+    @mouseleave="offline = baseOffline"
     @contextmenu="contentmenu"
     @dblclick="dblclickFolder"
     @click="clickFolder">
@@ -13,12 +15,13 @@
           fit="cover"></el-image>
         <i class="el-icon-document" v-show="folder.type == 'content'"></i>
       </div>
-      <div :class="['title', {'danger': !folder.is_show}, {'warning': folder.has_changed}]">
+      <div :class="['title', {'warning': folder.has_changed}]">
         <span v-show="isShow">{{ title }}</span>
         <input ref="input" type="text" v-show="!isShow" v-model="title" @blur="blurFolder">
       </div>
     </div>
     <div class="arror">
+      <i class="icon-offline" v-show="!offline" @click="updateOffline"></i>
       <i class="el-icon-caret-right" v-show="folder.type == 'catalog'"></i>
     </div>
   </div>
@@ -35,6 +38,8 @@ export default {
   data () {
     return {
       isShow: true,
+      offline: this.folder.is_show,
+      baseOffline: this.folder.is_show,
       title: this.name,
       timer: null
     }
@@ -90,6 +95,26 @@ export default {
     },
     contentmenu (ev) {
       this.$emit('contentMenu', { event: ev, folder: this.folder, trackNum: this.trackNum })
+    },
+    updateOffline () {
+      let flag = !this.folder.is_show
+      this.offline = flag
+      this.baseOffline = flag
+      let obj = {
+        catalog_info: {
+          cover: this.folder.cover,
+          desc: this.folder.desc,
+          flag: this.folder.flag,
+          is_show: flag,
+          has_changed: true,
+          list_order: this.folder.list_order,
+          name: this.title,
+          tags: this.folder.tags,
+          title: this.folder.title
+        },
+        uuid: this.folder.uuid
+      }
+      editCatalog(obj)
     }
   }
 }
@@ -142,6 +167,16 @@ export default {
   }
   .arror {
     margin-right: 18px;
+    .icon-offline {
+      display: inline-block;
+      width: 12px;
+      height: 9px;
+      background-image: url('../../../assets/images/course/icon-offline.png');
+      background-size: cover;
+      background-repeat: no-repeat;
+      margin-right: 10px;
+      cursor: pointer;
+    }
     i {}
   }
 }
