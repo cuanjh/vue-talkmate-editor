@@ -26,7 +26,6 @@
 
 <script>
 import _ from 'lodash'
-// import $ from 'jquery'
 import { mapState } from 'vuex'
 
 export default {
@@ -42,6 +41,7 @@ export default {
     this.$on('init', () => {
       console.log('makeSentence init')
       this.resetAll()
+      this.playVoice()
     })
     this.$on('break', () => {
       console.log('makeSentence break')

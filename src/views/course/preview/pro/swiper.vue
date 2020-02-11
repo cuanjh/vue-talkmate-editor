@@ -10,6 +10,7 @@
             :ref="'comp-' + index"
             :is="'form-' + form.type"
             :form='form'
+            :index="index"
             :slideForms="slideForms" />
         </keep-alive>
       </div>
@@ -29,6 +30,7 @@ import ImgToSentence from '../form/imgToSentence'
 import MakeSentence from '../form/makeSentence'
 import FillGap from '../form/fillGap'
 import WriteWords from '../form/writewords'
+// import SpeakToImg from '../form/speakToImg'
 
 export default {
   props: ['slideForms'],
@@ -43,6 +45,10 @@ export default {
       setTimeout(() => {
         this.mySwiper.init()
       }, 500)
+    })
+    this.$on('nextForm', () => {
+      console.log('nextForm', this.mySwiper.activeIndex, this.mySwiper.realIndex, this.mySwiper.previousIndex)
+      this.mySwiper.slideTo(this.mySwiper.activeIndex + 1)
     })
   },
   computed: {
@@ -69,6 +75,7 @@ export default {
     'form-makeSentence': MakeSentence, // 组句子
     'form-fillGap': FillGap, // 选词填空
     'form-writeWords': WriteWords // 写单词
+    // 'form-speakToImg': SpeakToImg // 图片跟读
   },
   methods: {
     initSwiper () {
@@ -88,7 +95,6 @@ export default {
         mousewheel: true,
         on: {
           init: () => {
-            this.isShow = true
             console.log('swiper initialized', this.mySwiper.activeIndex, this.mySwiper.realIndex, this.mySwiper.previousIndex)
             console.log(that.$refs)
             that.$refs['comp-' + that.mySwiper.activeIndex][0].$emit('init')
@@ -104,7 +110,6 @@ export default {
       })
     },
     typeName (type) {
-      console.log(this.contentTypes)
       let obj = this.contentTypes.find(item => {
         return item.type === type
       })

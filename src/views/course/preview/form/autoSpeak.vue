@@ -18,6 +18,9 @@ export default {
     }
   },
   created () {
+    this.$on('init', () => {
+      this.playVoice()
+    })
   },
   computed: {
     ...mapState({
@@ -35,10 +38,12 @@ export default {
         }
         audio.onended = () => {
           this.isPlay = false
+          this.$parent.$emit('nextForm')
         }
       } else {
         audio.pause()
         this.isPlay = false
+        this.$parent.$emit('nextForm')
       }
     }
   }

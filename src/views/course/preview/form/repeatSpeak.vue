@@ -21,6 +21,9 @@ export default {
     }
   },
   created () {
+    this.$on('init', () => {
+      this.playVoice()
+    })
   },
   computed: {
     ...mapState({
@@ -61,8 +64,8 @@ export default {
     text-align: center;
     i {
       display: inline-block;
-      width: 54px;
-      height: 53px;
+      width: 53px;
+      height: 52px;
       background: url('../../../../assets/images/preview/pic-bofang.png') no-repeat center;
       background-size: cover;
     }

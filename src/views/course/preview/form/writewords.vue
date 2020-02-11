@@ -5,17 +5,17 @@
     </div>
     <div class="content">
       <input type="text"
+        :ref="'form' + index"
         v-model="input"/>
     </div>
   </div>
 </template>
 
 <script>
-import $ from 'jquery'
 import { mapState } from 'vuex'
 
 export default {
-  props: ['form'],
+  props: ['form', 'index'],
   data () {
     return {
       isPlay: false,
@@ -27,6 +27,7 @@ export default {
       console.log('writeWords init')
       this.input = ''
       this.focus()
+      this.playVoice()
     })
 
     this.$on('break', () => {
@@ -40,7 +41,7 @@ export default {
   methods: {
     focus () {
       setTimeout(() => {
-        $(this.$el).find('input').focus()
+        this.$refs['form' + this.index].focus()
       }, 100)
     },
     playVoice () {

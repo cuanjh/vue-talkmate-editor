@@ -11,15 +11,15 @@ import { mapState } from 'vuex'
 
 export default {
   props: ['form', 'index'],
-  created () {
-    this.$on('init', () => {
-      console.log('speakToImg init')
-      this.$parent.$emit('curFormPlay')
-    })
-  },
   computed: {
     ...mapState({
       assetsDomain: state => state.course.assetsDomain
+    })
+  },
+  created () {
+    this.$on('init', () => {
+      console.log('speakToImgBox init')
+      this.$parent.$emit('curFormPlay')
     })
   },
   methods: {
