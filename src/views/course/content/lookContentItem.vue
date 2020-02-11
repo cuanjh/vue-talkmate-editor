@@ -1,16 +1,21 @@
 <template>
   <div class="item" @mouseleave="isShow = false" @mouseenter="isShow = true">
     <div class="form-type">
-      <span></span>
       <i @click="playVoice"></i>
+      <el-button size="small" type="text" @click="save">确定</el-button>
     </div>
     <el-image
       class="form-img"
       :src="assetsDomain + item['image']"
       fit="cover">
     </el-image>
-    <div class="desc" v-html="item['sentence'].replace(new RegExp(/\./, 'g'), '.<br/>').replace(new RegExp(/\?/, 'g'), '?<br/>')">
-    </div>
+    <el-tooltip
+      effect="dark"
+      placement="top"
+      :content="item['sentence']">
+      <div class="desc" v-html="item['sentence']">
+      </div>
+    </el-tooltip>
     <div class="handler" v-show="isShow">
       <el-checkbox :text-color="'#FFFFFF'" v-model="checkedImg" @change="use('image')">使用图片</el-checkbox>
       <el-checkbox v-model="checkedSound" @change="use('sound')">使用声音</el-checkbox>
@@ -43,6 +48,14 @@ export default {
         flag: type === 'image' ? this.checkedImg : this.checkedSound,
         url: type === 'image' ? this.item.image : this.item.sound
       })
+    },
+    save () {
+      if (this.checkedImg) {
+        this.use('image')
+      }
+      if (this.checkedSound) {
+        this.use('sound')
+      }
     },
     playVoice () {
       let audio = new Audio()
@@ -105,7 +118,9 @@ export default {
       height: 75px;
       margin-top: 10px;
       line-height: 18px;
-      overflow: hidden;
+      overflow: hidden;/*超出部分隐藏*/
+      white-space: nowrap;/*不换行*/
+      text-overflow:ellipsis;/*超出部分文字以...显示*/
     }
     .handler {
       position: absolute;

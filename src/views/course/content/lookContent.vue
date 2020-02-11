@@ -1,7 +1,7 @@
 <template>
   <div class="look-content-container">
     <div class="search">
-      <input type="text" v-model="words" clearable placeholder="请输入...">
+      <input type="text" v-model="words" clearable @keyup.enter="search" placeholder="请输入...">
       <span @click="search">搜索</span>
       <i class="el-icon-close" @click="close"></i>
     </div>
