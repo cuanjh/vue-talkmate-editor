@@ -57,6 +57,14 @@ export default {
     },
     changeView (thunk) {
       let that = this
+      if (this.contentModel === 'content_model_video') {
+        this.view = 'modelVideo'
+        this.showPreview = true
+        setTimeout(() => {
+          that.$refs[this.view].$emit('init')
+        }, 200)
+        return false
+      }
       let formTypes = this.getFormsTypes(this.slideForms)
       // if (formTypes.length === 1 && (formTypes.indexOf('sentencetoimg') > -1 || formTypes.indexOf('speaktoimg') > -1)) {
       //   this.view = 'choice'
