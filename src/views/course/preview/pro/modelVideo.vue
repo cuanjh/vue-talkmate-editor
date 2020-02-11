@@ -1,7 +1,7 @@
 <template>
   <div class="model-video">
     <div class="model-content">
-      <form-video v-for="(form, index) in slideForms" :key="index" :form="form"/>
+      <form-video v-for="(form, index) in slideForms" :key="index" :form="form" :index="index"/>
     </div>
   </div>
 </template>
@@ -28,18 +28,9 @@ export default {
 .model-video {
   width: 100%;
   height: 100%;
-  background: pink;
   .model-content {
     width: 100%;
     height: 100%;
-  }
-  .video-box {
-    width: 100%;
-    height: 100%;
-    video {
-      width: 100%;
-      height: 100%;
-    }
   }
 }
 </style>
