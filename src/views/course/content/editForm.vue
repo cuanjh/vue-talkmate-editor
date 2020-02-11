@@ -5,16 +5,12 @@
     @closed="closed"
     size="80%"
     direction="rtl">
-    <model-pro ref="modelPro" :style="{height: height + 'px'}" v-if="contentModel == 'content_model_pro_sound'" />
-    <model-video ref="modelVideo" :style="{height: height + 'px'}" v-if="contentModel == 'content_model_video'" />
-    <model-kid v-if="contentModel == 'content_model_kid_sound'" />
+    <model-comp ref="model" :style="{height: height + 'px'}" />
   </el-drawer>
 </template>
 
 <script>
-import ModelPro from './modelPro'
-import ModelVideo from './modelVideo'
-import ModelKid from './modelKid'
+import ModelComp from './model'
 
 export default {
   data () {
@@ -27,9 +23,7 @@ export default {
     }
   },
   components: {
-    ModelPro,
-    ModelVideo,
-    ModelKid
+    ModelComp
   },
   methods: {
     show (params) {
@@ -59,17 +53,11 @@ export default {
       this.height = h - 2
       this.drawer = true
       setTimeout(() => {
-        if (this.contentModel === 'content_model_pro_sound') {
-          this.$refs['modelPro'].initData({ pUUID: params.folder.uuid, contents: this.contents, feilds: this.feilds, contentModel: this.contentModel, baseFormData: JSON.stringify(baseFormData), pathDesc: params.pathDesc })
-        } else if (this.contentModel === 'content_model_video') {
-          this.$refs['modelVideo'].initData({ pUUID: params.folder.uuid, contents: this.contents, feilds: this.feilds, contentModel: this.contentModel, baseFormData: JSON.stringify(baseFormData), pathDesc: params.pathDesc })
-        }
+        this.$refs['model'].initData({ pUUID: params.folder.uuid, contents: this.contents, feilds: this.feilds, contentModel: this.contentModel, baseFormData: JSON.stringify(baseFormData), pathDesc: params.pathDesc })
       }, 0)
     },
     closed () {
-      if (this.contentModel === 'content_model_pro_sound') {
-        this.$refs['modelPro'].resetData()
-      }
+      this.$refs['model'].resetData()
     },
     resetData () {
       this.contentModel = ''

@@ -13,7 +13,7 @@
           fit="cover"></el-image>
         <i class="el-icon-document" v-show="folder.type == 'content'"></i>
       </div>
-      <div class="title">
+      <div :class="['title', {'danger': !folder.is_show}, {'warning': folder.has_changed}]">
         <span v-show="isShow">{{ title }}</span>
         <input ref="input" type="text" v-show="!isShow" v-model="title" @blur="blurFolder">
       </div>
@@ -132,6 +132,12 @@ export default {
     }
     .el-image {
       border-radius: 50%;
+    }
+    .danger {
+      color: #F56C6C;
+    }
+    .warning {
+      color: #E6A23C;
     }
   }
   .arror {

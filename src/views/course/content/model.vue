@@ -10,7 +10,19 @@
       </div>
     </div>
     <div id="forms" @contextmenu="contentmenu" class="forms">
-      <div class="list" id="sort-form">
+      <div class="list" id="sort-form" v-if="contentModel == 'content_model_video'">
+        <form-video
+          :style="{ height: formHeight + 'px' }"
+          :data-id="index"
+          :class="{'active': activeFormIndex == index}"
+          v-for="(content, index) in contents"
+          :key="index"
+          :form="content"
+          :formIndex="index"
+          @delForm="delForm"
+          @switchForm="switchForm"/>
+      </div>
+      <div class="list" id="sort-form" v-else>
         <form-comp
           :data-id="index"
           :class="{'active': activeFormIndex == index}"
@@ -24,7 +36,7 @@
     </div>
     <el-form ref="form" :model="contents[activeFormIndex]" label-width="80px">
       <div class="item" v-for="f in feilds" :key="f.feild">
-        <el-form-item :label="f.name" v-show="(f.feild !== 'list_order' && f.feild !== 'options' && f.type !== 'template' && f.type !== 'templateArray' && f.feild !== 'sentence_phoneticize' && f.feild !== 'options_phoneticize') || (f.type == 'template' && contents[activeFormIndex]['' + f.feild + '']) || (version['selLang'] == 'JPN' && (f.feild == 'sentence_phoneticize' || f.feild == 'options_phoneticize')) || (f.feild === 'options' && (contents[activeFormIndex]['type'] == 'makeSentence' || contents[activeFormIndex]['type'] == 'fillGap'))">
+        <el-form-item label-width="140px" :label="f.name" v-if="(f.feild !== 'list_order' && f.feild !== 'options' && f.type !== 'template' && f.type !== 'templateArray' && f.feild !== 'sentence_phoneticize' && f.feild !== 'options_phoneticize') || (f.type == 'template' && contents[activeFormIndex]['' + f.feild + '']) || (version['selLang'] == 'JPN' && (f.feild == 'sentence_phoneticize' || f.feild == 'options_phoneticize')) || (f.feild === 'options' && (contents[activeFormIndex]['type'] == 'makeSentence' || contents[activeFormIndex]['type'] == 'fillGap'))">
           <el-input
             v-if="f.type != 'array' && f.data_from == '' && f.type !== 'templateArray'"
             v-model="contents[activeFormIndex]['' + f.feild + '']"
@@ -37,6 +49,9 @@
               :value="item.type">
             </el-option>
           </el-select>
+          <el-checkbox-group v-if="f.data_from == 'content_tags'" v-model="contents[activeFormIndex]['' + f.feild + '']">
+            <el-checkbox v-for="item in contentTags" :key="item.key" :label="item.key">{{ item.name }}</el-checkbox>
+          </el-checkbox-group>
           <div class="options" v-if="f.feild === 'options' && (contents[activeFormIndex]['type'] == 'makeSentence' || contents[activeFormIndex]['type'] == 'fillGap')">
             <div class="option-list">
               <div class="option-item" v-for="(item, index) in contents[activeFormIndex]['' + f.feild + '']" :key="index">
@@ -49,18 +64,28 @@
             </div>
             <el-tag type="warning" v-show="contents[activeFormIndex]['type'] == 'fillGap'">注：第一个输入项为正确选项，其他为错误选项。</el-tag>
           </div>
-          <div class="form-sound" v-if="f.feild == 'sound' || f.feild == 'image'">
+          <!-- 图片声音 start-->
+          <div class="form-sound" v-if="f.feild == 'sound' || f.feild == 'image' || f.feild == 'cover' || f.feild == 'video'">
             <el-input v-model="contents[activeFormIndex]['' + f.feild + '']">
               <el-button slot="append" @click="clear(f.feild)">清除</el-button>
             </el-input>
             <div class="upload-area">
-              <el-button v-show="f.feild == 'image'" type="text" @click="searchContent(f.feild)">内容查找</el-button>
-              <el-button v-show="f.feild == 'image'" type="text" @click="searchImg('images')">图库查找</el-button>
+              <el-button v-if="contentModel == 'content_model_pro_sound' && f.feild == 'image'" type="text" @click="searchContent(f.feild)">内容查找</el-button>
+              <el-button v-if="contentModel == 'content_model_pro_sound' && f.feild == 'image'" type="text" @click="searchImg('images')">图库查找</el-button>
               <el-upload
                 v-if="f.feild == 'sound'"
                 action="#"
                 accept="audio/mp3"
                 :on-change="uploadSoundOnchange"
+                :show-file-list="false"
+                :auto-upload="false">
+                <el-button type="text">本地上传</el-button>
+              </el-upload>
+              <el-upload
+                v-if="f.feild == 'video'"
+                action="#"
+                accept="video/mp4"
+                :on-change="uploadVideoOnchange"
                 :show-file-list="false"
                 :auto-upload="false">
                 <el-button type="text">本地上传</el-button>
@@ -74,20 +99,30 @@
                 :auto-upload="false">
                 <el-button type="text">本地上传</el-button>
               </el-upload>
+              <el-upload
+                v-if="f.feild == 'cover'"
+                action="#"
+                accept="image/png,image/jpg,image/jpeg"
+                :on-change="uploadCoverOnchange"
+                :show-file-list="false"
+                :auto-upload="false">
+                <el-button type="text">本地上传</el-button>
+              </el-upload>
             </div>
             <look-image
-              v-show="f.feild == 'image' && activeFeild == 'images'"
+              v-if="contentModel == 'content_model_pro_sound' && f.feild == 'image' && activeFeild == 'images'"
               @close="closeLook"
               @use="use"/>
             <look-content
               :contentModel="contentModel"
               :activeFeild="activeFeild"
-              v-show="f.feild == activeFeild"
+              v-if="contentModel == 'content_model_pro_sound' && f.feild == activeFeild"
               @close="closeLook"
               @use="use"/>
           </div>
+          <!-- 图片声音 end-->
         </el-form-item>
-        <el-form-item :label="f.name" v-show="(f.type == 'templateArray' && contents[activeFormIndex]['' + f.feild + ''] && contents[activeFormIndex]['' + f.feild + ''].length)">
+        <el-form-item :label="f.name" v-if="(f.type == 'templateArray' && contents[activeFormIndex]['' + f.feild + ''] && contents[activeFormIndex]['' + f.feild + ''].length)">
           <div class="template-options">
             <el-tag
               v-for="(item, index) in contents[activeFormIndex]['' + f.feild + '']"
@@ -113,6 +148,7 @@
 
 <script>
 import FormComp from './form'
+import FormVideo from './formVideo'
 import LookImage from './lookImage'
 import LookContent from './lookContent'
 import PreviewComp from '../preview/pro/index'
@@ -132,6 +168,7 @@ import moment from 'moment'
 export default {
   data () {
     return {
+      formHeight: 0,
       pathDesc: '',
       pUUID: '',
       isShow: false,
@@ -146,6 +183,7 @@ export default {
   },
   components: {
     FormComp,
+    FormVideo,
     LookImage,
     LookContent,
     PreviewComp,
@@ -165,6 +203,7 @@ export default {
   computed: {
     ...mapState({
       contentTypes: state => state.course.contentTypes,
+      contentTags: state => state.course.contentTags,
       assetsDomain: state => state.course.assetsDomain,
       version: state => state.course.version
     })
@@ -182,6 +221,10 @@ export default {
       this.baseFormDataSelf = params.baseFormData
       this.$set(this.$data, 'feilds', params.feilds)
       this.$set(this.$data, 'contentModel', params.contentModel)
+      this.formHeight = 220
+      if (this.version.selCourseType === 0) {
+        this.formHeight = 385
+      }
       this.resetSortable()
       this.isShow = true
     },
@@ -345,6 +388,7 @@ export default {
       this.resetSortable()
       this.$refs['rightMenuForm'].hide()
     },
+    // 上传声音
     async uploadSoundOnchange (file) {
       console.log(file)
       let date = moment(new Date()).format('YYYY/MM/DD')
@@ -353,7 +397,16 @@ export default {
       console.log(url)
       let res = await uploadQiniu(file.raw, this.token, url)
       this.$set(this.contents[this.activeFormIndex], 'sound', res.key)
+      // 计算声音时长
+      if (typeof this.contents[this.activeFormIndex]['sound_time'] !== 'undefined') {
+        let mySound = new Audio()
+        mySound.src = this.assetsDomain + res.key
+        mySound.oncanplay = () => {
+          this.$set(this.contents[this.activeFormIndex], 'sound_time', mySound.duration)
+        }
+      }
     },
+    // 上传图片
     async uploadImageOnchange (file) {
       console.log(file)
       let date = moment(new Date()).format('YYYY/MM/DD')
@@ -362,6 +415,32 @@ export default {
       console.log(url)
       let res = await uploadQiniu(file.raw, this.token, url)
       this.$set(this.contents[this.activeFormIndex], 'image', res.key)
+    },
+    // 上传视频
+    async uploadVideoOnchange (file) {
+      console.log(file)
+      let date = moment(new Date()).format('YYYY/MM/DD')
+      let ext = file.name.split('.')[1]
+      let url = 'course/videos/' + this.version.selLang.toLowerCase() + '/' + date + '/' + file.uid + '.' + ext
+      console.log(url)
+      let res = await uploadQiniu(file.raw, this.token, url)
+      this.$set(this.contents[this.activeFormIndex], 'video', res.key)
+      let myVideo = document.getElementById('form-video-' + this.activeFormIndex)
+      setTimeout(() => {
+        myVideo.oncanplay = () => {
+          this.$set(this.contents[this.activeFormIndex], 'video_time', myVideo.duration)
+        }
+      }, 0)
+    },
+    // 上传封面
+    async uploadCoverOnchange (file) {
+      console.log(file)
+      let date = moment(new Date()).format('YYYY/MM/DD')
+      let ext = file.name.split('.')[1]
+      let url = 'course/images/' + this.version.selLang.toLowerCase() + '/' + date + '/' + file.uid + '.' + ext
+      console.log(url)
+      let res = await uploadQiniu(file.raw, this.token, url)
+      this.$set(this.contents[this.activeFormIndex], 'cover', res.key)
     }
   }
 }
@@ -398,7 +477,7 @@ export default {
   }
 }
 .el-form {
-  padding: 20px;
+  padding: 20px 40px 20px 20px;
 }
 .form-image {
   .el-image {

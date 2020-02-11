@@ -131,6 +131,8 @@ export default {
     span {}
     i {
       width: 15px;
+      min-width: 15px;
+      margin-left: 10px;
       height: 15px;
       display: inline-block;
       background-image: url('../../../assets/images/course/icon-voice.png');
