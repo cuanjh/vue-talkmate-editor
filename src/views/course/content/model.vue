@@ -66,7 +66,7 @@
           </div>
           <!-- 图片声音 start-->
           <div class="form-sound" v-if="f.feild == 'sound' || f.feild == 'image' || f.feild == 'cover' || f.feild == 'video'">
-            <el-input v-model="contents[activeFormIndex]['' + f.feild + '']">
+            <el-input v-model="contents[activeFormIndex]['' + f.feild + '']" :placeholder="f.feild == 'sound' ? '请上传mp3格式的音频' : ''">
               <el-button slot="append" @click="clear(f.feild)">清除</el-button>
             </el-input>
             <div class="upload-area">
