@@ -56,21 +56,6 @@ export default {
   width: 100%;
   height: 100%;
 }
-.img-box {
-  width: 100%;
-  height: 207px;
-  &:hover {
-    cursor: pointer;
-    transform: scale(1.01);
-    transition: all 0.3s;
-  }
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius:16px;
-  }
-}
 .sentence {
   display: block;
   max-width: 100%;
