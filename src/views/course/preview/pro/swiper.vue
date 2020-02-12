@@ -30,7 +30,7 @@ import ImgToSentence from '../form/imgToSentence'
 import MakeSentence from '../form/makeSentence'
 import FillGap from '../form/fillGap'
 import WriteWords from '../form/writewords'
-// import SpeakToImg from '../form/speakToImg'
+import SentenceToImgBox from '../form/sentenceToImgBox'
 
 export default {
   props: ['slideForms'],
@@ -48,7 +48,16 @@ export default {
     })
     this.$on('nextForm', () => {
       console.log('nextForm', this.mySwiper.activeIndex, this.mySwiper.realIndex, this.mySwiper.previousIndex)
-      this.mySwiper.slideTo(this.mySwiper.activeIndex + 1)
+      setTimeout(() => {
+        this.mySwiper.slideTo(this.mySwiper.activeIndex + 1)
+      }, 500)
+    })
+    this.$on('setSwiperMousewheel', (flag) => {
+      if (flag) {
+        this.mySwiper.mousewheel.enable()
+      } else {
+        this.mySwiper.mousewheel.disable()
+      }
     })
   },
   computed: {
@@ -72,10 +81,10 @@ export default {
     'form-autoSpeak': AutoSpeak, // 自动读
     'form-repeatSpeak': RepeatSpeak, // 跟读
     'form-imgToSentence': ImgToSentence, // 由图片选句子
+    'form-sentenceToImgBox': SentenceToImgBox, // 写单词
+    'form-writeWords': WriteWords, // 写单词
     'form-makeSentence': MakeSentence, // 组句子
-    'form-fillGap': FillGap, // 选词填空
-    'form-writeWords': WriteWords // 写单词
-    // 'form-speakToImg': SpeakToImg // 图片跟读
+    'form-fillGap': FillGap // 选词填空
   },
   methods: {
     initSwiper () {

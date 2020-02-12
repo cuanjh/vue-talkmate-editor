@@ -457,6 +457,32 @@ export const getContentTags = (data) => {
 }
 
 /**
+ * @Summary 添加标签
+ * @param {*} data
+ * @Router /editor/tag/add [post]
+ */
+export const addTags = (data) => {
+  return service({
+    url: '/editor/tag/add',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 删除标签
+ * @param {*} data
+ * @Router /editor/tag/del [post]
+ */
+export const delTags = (data) => {
+  return service({
+    url: '/editor/tag/del',
+    method: 'post',
+    data
+  })
+}
+
+/**
  * @Summary 搜索图片库
  * @param {*} data
  * @Router /editor/image/search [post]

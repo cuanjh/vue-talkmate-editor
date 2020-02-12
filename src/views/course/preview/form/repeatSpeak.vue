@@ -66,10 +66,11 @@ export default {
     justify-content: center;
     i {
       display: inline-block;
-      width: 57px;
-      height: 57px;
+      width: 56px;
+      height: 56px;
       background: url('../../../../assets/images/preview/pic-bofang.png') no-repeat center;
       background-size: cover;
+      padding: 2px;
     }
   }
 }

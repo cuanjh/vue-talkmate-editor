@@ -24,16 +24,17 @@
                 <span >{{ curForm.sentence }}</span>
               </a>
             </div>
-            <div class="speak-item"
+            <div class="choice-item speak-item"
               :id="'form' + form.uuid"
               v-for="(form, index) in forms"
               :key="index"
               :class="[{'correct': current == index && form.sentence == curForm.sentence && addCorrect}, {'wrong': current == index && form.sentence !== curForm.sentence && addWrong}]"
               >
-              <sentence-toImg-box
+              <sentence-toImg
                 :ref="'comp-' + slideForms.length"
                 :form="form"
-                :index="index"/>
+                :index="index"
+                />
             </div>
           </div>
         </div>
@@ -48,7 +49,7 @@ import Swiper from 'swiper'
 import 'swiper/css/swiper.css'
 import { mapState } from 'vuex'
 import SpeakToImg from '../form/speakToImg'
-import SentenceToImgBox from '../form/sentenceToImgBox'
+import SentenceToImg from '../form/sentenceToImg'
 
 export default {
   props: ['slideForms'],
@@ -67,7 +68,7 @@ export default {
   },
   components: {
     'form-speakToImg': SpeakToImg, // 图片跟读
-    SentenceToImgBox
+    SentenceToImg
   },
   created () {
     this.$on('init', () => {
@@ -109,7 +110,9 @@ export default {
     })
     this.$on('nextForm', () => {
       console.log('nextForm', this.mySwiper.activeIndex, this.mySwiper.realIndex, this.mySwiper.previousIndex)
-      this.mySwiper.slideTo(this.mySwiper.activeIndex + 1)
+      setTimeout(() => {
+        this.mySwiper.slideTo(this.mySwiper.activeIndex + 1)
+      }, 500)
     })
     this.$on('curFormPlay', () => {
       this.playVoice()
@@ -240,17 +243,5 @@ export default {
 }
 .imgAuto-container {
   padding: 50px 0 0;
-}
-.speak-swiper {
-  .speak-item {
-    margin-bottom: 20px;
-    border-radius: 16px;
-  }
-  .correct {
-    border: 2px solid #7ED321 !important;
-  }
-  .wrong {
-    border: 2px solid #DD2B2B !important;
-  }
 }
 </style>

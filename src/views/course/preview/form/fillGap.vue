@@ -7,16 +7,14 @@
       <div class="fill-gap">
         <div class="sentence">
           <span>{{ sentence }}</span>
-          <!-- <span class="text"
-            v-for="(item, index) in sentence" :key="index">
-            <i v-show="item">{{ item }}</i>
-          </span> -->
         </div>
         <div class="words">
           <a v-for="(word, index) in words"
+            class="choice-item"
             :id="'word' + index"
             :key="'word' + index"
-            @click="fillWords(word, index)">
+            @click="fillWords(word, index)"
+            :class="{'wrong': current == index && word !== form.options[0] && addWrong}">
             <span v-text="word"></span>
           </a>
         </div>
@@ -33,14 +31,16 @@ export default {
   data () {
     return {
       isPlay: false,
-      sentence: [],
-      words: []
+      sentence: '',
+      words: [],
+      addWrong: false,
+      current: 0
     }
   },
   created () {
     this.$on('init', () => {
       console.log('fillGap init')
-      this.resetAll()
+      this.initAll()
       this.playVoice()
     })
     this.$on('break', () => {
@@ -71,14 +71,21 @@ export default {
     },
     fillWords (word, index) {
       console.log(word, index)
-      this.sentence = this.sentence.replace(/_+/g, word)
+      this.current = index
+      if (word === this.words[0]) {
+        this.sentence = this.sentence.replace(/_+/g, word)
+        this.$parent.$emit('nextForm')
+      } else {
+        this.addWrong = true
+        setTimeout(() => {
+          this.addWrong = false
+        }, 500)
+      }
     },
-    resetAll () {
+    initAll () {
       this.words = this.form.options
       let word = this.words[0]
-      let showSentence = this.form.sentence.replace(word, ' ______ ')
-      console.log(this.words[0], showSentence)
-      this.sentence = showSentence
+      this.sentence = this.form.sentence.replace(word, ' ______ ')
     }
   }
 }

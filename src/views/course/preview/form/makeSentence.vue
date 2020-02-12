@@ -71,13 +71,20 @@ export default {
       }
     },
     makeSentence (index) {
+      this.$parent.$emit('setSwiperMousewheel', false)
       let word = this.words[index]
       this.words.splice(index, 1)
       let i = _.findIndex(this.options, (o) => {
         return o === ''
       })
       this.options[i] = word
-      console.log(this.form.options, this.words, this.options)
+      let sentence = this.options.join(' ')
+      console.log(sentence, this.form.sentence)
+      if (sentence === this.form.sentence) {
+        this.$parent.$emit('setSwiperMousewheel', true)
+        this.$parent.$emit('nextForm')
+      }
+      console.log('this.options', this.options)
     },
     reset (index) {
       var word = this.options[index]

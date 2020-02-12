@@ -76,6 +76,20 @@ export default {
       } else if (formTypes.length === 1 && formTypes.indexOf('speaktoimg') > -1) {
         this.view = 'imgAuto'
       } else {
+        let arr = []
+        if (formTypes.indexOf('sentencetoimg') > -1) {
+          arr = that.slideForms.filter(item => {
+            return !(item.type === 'sentenceToImg')
+          })
+          arr.push({
+            type: 'sentenceToImgBox',
+            data: _.groupBy(this.slideForms, 'type').sentenceToImg
+          })
+          that.slideForms = []
+          console.log(arr)
+          // this.$set(this, 'slideForms', arr)
+          that.slideForms = arr
+        }
         this.view = 'swiper'
       }
       this.showPreview = true

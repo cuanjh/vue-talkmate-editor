@@ -6,7 +6,7 @@
       </a>
     </div>
     <div class="content">
-      <div class="sentences"
+      <div class="choice-item sentences"
         :id="'sentences' + index"
         v-for="(item, index) in sentences"
         :key="item.uuid + index"
@@ -166,12 +166,6 @@ export default {
       display: flex;
       flex: 1;
       align-items: center;
-    }
-    &.correct {
-      border: 2px solid #7ED321 !important;
-    }
-    &.wrong {
-      border: 2px solid #DD2B2B !important;
     }
   }
 }

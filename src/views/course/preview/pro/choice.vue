@@ -140,16 +140,4 @@ export default {
     }
   }
 }
-.choice-list {
-  .choice-item {
-    margin-bottom: 20px;
-    border-radius: 16px;
-  }
-  .correct {
-    border: 2px solid #7ED321 !important;
-  }
-  .wrong {
-    border: 2px solid #DD2B2B !important;
-  }
-}
 </style>
