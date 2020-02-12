@@ -128,11 +128,13 @@
     </el-dialog>
     <right-menu
       ref="rightMenu"
+      :editors="editors"
       @rename="rename"
       @copy="copy"
       @paste="paste"
       @del="del"
       @editCatalog="editCatalogFn"
+      @resetTrackData="resetTrackData"
     />
     <edit-catalog ref="editCatalog" @resetTrackData="resetTrackData"/>
     <edit-form ref="editForm"/>
@@ -147,6 +149,9 @@ import RightMenu from './rightMenu'
 import EditCatalog from './editCatalog'
 import EditForm from './editForm'
 import { mapState, mapActions, mapMutations } from 'vuex'
+import {
+  getUserList
+} from '@/api/user'
 import {
   getCatalogList,
   getContent,
@@ -171,7 +176,8 @@ export default {
       selFolder: '',
       path: '',
       pathDesc: '',
-      dialogVisible: false
+      dialogVisible: false,
+      editors: []
     }
   },
   components: {
@@ -185,6 +191,12 @@ export default {
     this.getModelList({ pageNo: 0, pageSize: 0 })
     this.getContentTypes()
     this.getContentTags({ pageNo: 0, pageSize: 0 })
+    getUserList({ pageNo: 0, pageSize: 100 }).then(res => {
+      this.editors = res.data.userList.filter(item => {
+        return item.authorityId === '3'
+      })
+      console.log(this.editors)
+    })
   },
   mounted () {
     if (this.version) {
@@ -322,12 +334,8 @@ export default {
               uuid: fromTrack.uuid
             }
             moveCatalog(moveObj).then(r => {
-              getCatalogList({ parent_uuid: fromTrack.parent_uuid }).then(r1 => {
-                this.resetTrackData({ trackNum: fromTrackNum, catalogs: r1.data.catalogs})
-              })
-              getCatalogList({ parent_uuid: toPUUID }).then(r2 => {
-                this.resetTrackData({ trackNum: toTrackNum, catalogs: r2.data.catalogs})
-              })
+              this.resetTrackData({ pUUID: fromTrack.parent_uuid, trackNum: fromTrackNum })
+              this.resetTrackData({ pUUID: toPUUID, trackNum: toTrackNum })
             })
           },
           onUpdate: (evt) => {
@@ -361,10 +369,7 @@ export default {
               uuid: dragObj.uuid
             }
             editCatalog(obj).then(res => {
-              getCatalogList({ parent_uuid: pUUID }).then(res =>{
-                let catalogs = res.data.catalogs
-                this.resetTrackData({ trackNum: trackNum, catalogs: catalogs})
-              })
+              this.resetTrackData({ pUUID: pUUID, trackNum: trackNum })
             })
           }
         })
@@ -476,11 +481,7 @@ export default {
       console.log(obj)
       let res = await copyCatalog(obj)
       if (res.success) {
-        let res2 = await getCatalogList({ parent_uuid: pUUID })
-        if (res2.success) {
-          let catalogs = res2.data.catalogs
-          this.resetTrackData({ trackNum: params.trackNum, catalogs: catalogs })
-        }
+        this.resetTrackData({ pUUID: pUUID, trackNum: params.trackNum })
       }
       this.copyUUID = ''
     },
@@ -498,12 +499,7 @@ export default {
               type: 'success',
               message: '删除成功!'
             })
-            getCatalogList({ parent_uuid: params.folder.parent_uuid }).then(res2 => {
-              if (res2.success) {
-                let catalogs = res2.data.catalogs
-                this.resetTrackData({ trackNum: params.trackNum, catalogs: catalogs })
-              }
-            })
+            this.resetTrackData({ pUUID: params.folder.parent_uuid, trackNum: params.trackNum })
           }
         })
       }).catch(() => {
@@ -539,9 +535,14 @@ export default {
 
       this.$refs['editCatalog'].show(params)
     },
-    // 编辑目录完成后重置当前轨道的数据
+    // 编辑目录完成后拉取数据重置当前轨道的数据
     resetTrackData (params) {
-      this.$set(this.tracks, params.trackNum, params.catalogs)
+      getCatalogList({ parent_uuid: params.pUUID }).then(res => {
+        if (res.success) {
+          let catalogs = res.data.catalogs
+          this.$set(this.tracks, params.trackNum, catalogs)
+        }
+      })
     }
   }
 }

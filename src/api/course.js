@@ -481,3 +481,16 @@ export const searchContent = (data) => {
     data
   })
 }
+
+/**
+ * @Summary 设置目录权限
+ * @param {*} data
+ * @Router /editor/authority/set [post]
+ */
+export const setCatalogAuthority = (data) => {
+  return service({
+    url: '/editor/authority/set',
+    method: 'post',
+    data
+  })
+}

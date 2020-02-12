@@ -81,7 +81,6 @@
 
 <script>
 import {
-  getCatalogList,
   addCatalog,
   editCatalog,
   getInfoToken
@@ -232,13 +231,8 @@ export default {
           type: 'success',
           message: res.msg
         })
-        let res3 = await getCatalogList({ parent_uuid: this.form.parent_uuid })
-        console.log(res3)
-        if (res3.success) {
-          let catalogs = res3.data.catalogs
-          this.$emit('resetTrackData', { trackNum: this.trackNum, catalogs: catalogs })
-          this.drawer = false
-        }
+        this.$emit('resetTrackData', { pUUID: this.form.parent_uuid, trackNum: this.trackNum })
+        this.drawer = false
       }
     },
     resetFormData () {

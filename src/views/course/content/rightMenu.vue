@@ -39,16 +39,47 @@
             <div class="name" @click="editCatalog">信息编辑</div>
           </div>
         </div>
+        <div class="menu-group" v-show="type == 'folder'">
+          <div class="line"></div>
+          <div class="menu-item" @mouseenter="isShowAuthority = true" @mouseleave="isShowAuthority = false">
+            <div class="name">
+              权限设置
+              <i class="el-icon-caret-right"></i>
+            </div>
+            <transition name="fade">
+              <div class="authority-container" v-show="isShowAuthority">
+                <div class="authority-wrap" v-if="authorities.length">
+                  <div class="user-item" v-for="item in editors" :key="item.uuid">
+                    <div class="name">{{ item.nickName }}</div>
+                    <el-radio-group v-model="authorities.find(a => { return a['user_uuid'] == item.uuid })['authority']">
+                      <el-radio label="r">只读</el-radio>
+                      <el-radio label="rw">可读可编辑</el-radio>
+                    </el-radio-group>
+                  </div>
+                  <div class="handler">
+                    <el-button size="small" type="primary" @click="authoritySetFn">保存</el-button>
+                  </div>
+                </div>
+              </div>
+            </transition>
+          </div>
+        </div>
       </div>
     </div>
   </transition>
 </template>
 
 <script>
+import {
+  setCatalogAuthority
+} from '@/api/course'
 export default {
+  props: ['editors'],
   data () {
     return {
       isShow: false,
+      isShowAuthority: false,
+      authorities: [],
       left: 0,
       top: 0,
       folder: null,
@@ -66,6 +97,25 @@ export default {
         this.pUUID = params.pUUID
       } else {
         this.folder = params.folder
+        this.authorities = []
+        if (this.editors && this.editors.length) {
+          this.editors.forEach(item => {
+            let authorities = this.folder.authorities
+            let auth = ''
+            if (authorities && authorities.length) {
+              let authority = authorities.find(a => {
+                return a.user_uuid === item.uuid
+              })
+              if (authority) {
+                auth = authority['auth']
+              }
+            }
+            let obj = {}
+            obj['user_uuid'] = item.uuid
+            obj['authority'] = auth
+            this.authorities.push(obj)
+          })
+        }
       }
       console.log(params.folder)
       this.type = params.type
@@ -115,6 +165,24 @@ export default {
     editCatalog () {
       let uuid = this.folder.uuid
       this.$emit('editCatalog', { handler: 'edit', type: this.folder.type, uuid: uuid, folder: this.folder, trackNum: this.trackNum, clickType: this.type })
+    },
+    authoritySetFn () {
+      console.log(this.authorities)
+      let arr = this.authorities.filter(item => {
+        return item.authority
+      })
+      let obj = {
+        authorities: arr,
+        catalog_uuid: this.folder.uuid
+      }
+      console.log(obj)
+      setCatalogAuthority(obj).then(res => {
+        this.$message({
+          type: 'success',
+          message: res.msg
+        })
+        this.$emit('resetTrackData', { pUUID: this.folder.parent_uuid, trackNum: this.trackNum })
+      })
     }
   }
 }
@@ -133,6 +201,7 @@ export default {
   .menu {
     width: 110px;
     .menu-item {
+      position: relative;
       padding: 3px 0;
       &:hover {
         background: #007AFF;
@@ -140,6 +209,10 @@ export default {
       }
       .name {
         padding-left: 10px;
+        i {
+          float: right;
+          margin-right: 6px;
+        }
       }
     }
     .line {
@@ -147,6 +220,33 @@ export default {
       height: 1px;
       margin: 2px 0;
       background: rgba($color: #000000, $alpha: 0.05)
+    }
+  }
+}
+.authority-container {
+  position: absolute;
+  background: #F5F6FA;
+  box-shadow:0px 24px 24px 0px rgba(0,0,0,0.12);
+  margin-left: 110px;
+  margin-top: -22px;
+  border-radius: 4px;
+  .authority-wrap {
+    padding: 5px;
+    .user-item {
+      width: 300px;
+      display: flex;
+      flex-direction: row;
+      margin: 10px 0;
+      .name {
+        width: 100px;
+        color: #000;
+      }
+    }
+    .handler {
+      text-align: center;
+      .el-button {
+        margin: 10px 0;
+      }
     }
   }
 }
