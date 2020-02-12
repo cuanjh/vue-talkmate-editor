@@ -18,22 +18,23 @@
           <div class="swiper-slide">
             <div class="sentence-box" @click="playVoice">
               <a class="text-box" >
-                <span >{{ curForm.sentence }}</span>
                 <div class="trumpet">
                   <i></i>
                 </div>
+                <span >{{ curForm.sentence }}</span>
               </a>
             </div>
-            <div class="speak-item"
+            <div class="choice-item speak-item"
               :id="'form' + form.uuid"
               v-for="(form, index) in forms"
               :key="index"
               :class="[{'correct': current == index && form.sentence == curForm.sentence && addCorrect}, {'wrong': current == index && form.sentence !== curForm.sentence && addWrong}]"
               >
-              <sentence-toImg-box
+              <sentence-toImg
                 :ref="'comp-' + slideForms.length"
                 :form="form"
-                :index="index"/>
+                :index="index"
+                />
             </div>
           </div>
         </div>
@@ -48,7 +49,7 @@ import Swiper from 'swiper'
 import 'swiper/css/swiper.css'
 import { mapState } from 'vuex'
 import SpeakToImg from '../form/speakToImg'
-import SentenceToImgBox from '../form/sentenceToImgBox'
+import SentenceToImg from '../form/sentenceToImg'
 
 export default {
   props: ['slideForms'],
@@ -67,7 +68,7 @@ export default {
   },
   components: {
     'form-speakToImg': SpeakToImg, // 图片跟读
-    SentenceToImgBox
+    SentenceToImg
   },
   created () {
     this.$on('init', () => {
@@ -109,7 +110,9 @@ export default {
     })
     this.$on('nextForm', () => {
       console.log('nextForm', this.mySwiper.activeIndex, this.mySwiper.realIndex, this.mySwiper.previousIndex)
-      this.mySwiper.slideTo(this.mySwiper.activeIndex + 1)
+      setTimeout(() => {
+        this.mySwiper.slideTo(this.mySwiper.activeIndex + 1)
+      }, 500)
     })
     this.$on('curFormPlay', () => {
       this.playVoice()
@@ -233,61 +236,12 @@ export default {
     box-sizing: border-box;
   }
 }
-.sentence-box {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  padding-bottom: 30px;
-  .text-box {
-    cursor: pointer;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    position: relative;
-    // width: 500px;
-    // height: 90px;
-    padding: 12px 22px;
-    background: #2A9FE4;
-    border-radius: 5px;
-    box-shadow:0px 3px 10px 0px rgba(0,0,0,0.1);
-    span {
-      font-size: 16px;
-      font-weight: 600;
-      color: #fff;
-      line-height: 22px;
-      margin-right: 20px;
-    }
-    .trumpet {
-      display: flex;
-      i {
-        background: url('../../../../assets/images/course/icon-voice.png') no-repeat center;
-        background-size: cover;
-        width: 22px;
-        height: 20px;
-        // float: right;
-        // position: absolute;
-        top: 34px;
-        right: 34px;
-      }
-    }
+.imgAuto-container .trumpet {
+  i {
+    background-image: url('../../../../assets/images/course/icon-voice.png');
   }
 }
 .imgAuto-container {
   padding: 50px 0 0;
-}
-.speak-swiper {
-  .speak-item {
-    margin-bottom: 20px;
-    border-radius: 16px;
-  }
-  .correct {
-    border: 2px solid #7ED321 !important;
-  }
-  .wrong {
-    border: 2px solid #DD2B2B !important;
-  }
 }
 </style>

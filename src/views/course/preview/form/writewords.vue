@@ -6,7 +6,8 @@
     <div class="content">
       <input type="text"
         :ref="'form' + index"
-        v-model="input"/>
+        v-model="input"
+        @input="check()"/>
     </div>
   </div>
 </template>
@@ -43,6 +44,12 @@ export default {
       setTimeout(() => {
         this.$refs['form' + this.index].focus()
       }, 100)
+    },
+    check () {
+      console.log(this.input)
+      if (this.input === this.form.sentence) {
+        this.$parent.$emit('nextForm')
+      }
     },
     playVoice () {
       let audio = new Audio()

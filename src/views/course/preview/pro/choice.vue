@@ -2,10 +2,10 @@
   <div class="choice-container">
     <div class="sentence-box">
       <a class="text-box" @click="playVoice">
-        <span >{{ curForm.sentence }}</span>
         <div class="trumpet">
           <i></i>
         </div>
+        <span >{{ curForm.sentence }}</span>
       </a>
     </div>
     <div class="choice-list">
@@ -17,7 +17,8 @@
         >
         <keep-alive>
           <component
-            :ref="'comp-' + index" :is="'form-' + form.type"
+            :ref="'comp-' + index"
+            :is="'form-' + form.type"
             :form="form"
             :index="index" />
         </keep-alive>
@@ -87,6 +88,7 @@ export default {
   },
   components: {
     'form-sentenceToImg': SentenceToImg,
+    'form-countDown': SentenceToImg,
     'form-speakToImg': SpeakToImg
   },
   computed: {
@@ -132,59 +134,10 @@ export default {
 <style lang="scss" scoped>
 .choice-container {
   padding: 50px 20px 0;
-}
-.sentence-box {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  padding-bottom: 30px;
-  .text-box {
-    cursor: pointer;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    position: relative;
-    // width: 500px;
-    // height: 90px;
-    padding: 12px 22px;
-    background: #2A9FE4;
-    border-radius: 5px;
-    box-shadow:0px 3px 10px 0px rgba(0,0,0,0.1);
-    span {
-      font-size: 16px;
-      font-weight: 600;
-      color: #fff;
-      line-height: 22px;
-      margin-right: 20px;
+  .trumpet {
+    i {
+      background-image: url('../../../../assets/images/course/icon-voice.png');
     }
-    .trumpet {
-      display: flex;
-      i {
-        background: url('../../../../assets/images/course/icon-voice.png') no-repeat center;
-        background-size: cover;
-        width: 22px;
-        height: 20px;
-        // float: right;
-        // position: absolute;
-        top: 34px;
-        right: 34px;
-      }
-    }
-  }
-}
-.choice-list {
-  .choice-item {
-    margin-bottom: 20px;
-    border-radius: 16px;
-  }
-  .correct {
-    border: 2px solid #7ED321 !important;
-  }
-  .wrong {
-    border: 2px solid #DD2B2B !important;
   }
 }
 </style>
