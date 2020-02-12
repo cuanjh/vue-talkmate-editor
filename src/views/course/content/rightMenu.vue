@@ -39,7 +39,7 @@
             <div class="name" @click="editCatalog">信息编辑</div>
           </div>
         </div>
-        <div class="menu-group" v-show="type == 'folder'">
+        <div class="menu-group" v-show="type == 'folder' && userInfo.authorityId == '2'">
           <div class="line"></div>
           <div class="menu-item" @mouseenter="isShowAuthority = true" @mouseleave="isShowAuthority = false">
             <div class="name">
@@ -73,6 +73,7 @@
 import {
   setCatalogAuthority
 } from '@/api/course'
+import { mapState } from 'vuex'
 export default {
   props: ['editors'],
   data () {
@@ -87,6 +88,11 @@ export default {
       type: '',
       trackNum: 0
     }
+  },
+  computed: {
+    ...mapState({
+      userInfo: state => state.user.userInfo
+    })
   },
   methods: {
     show (params) {
