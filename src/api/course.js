@@ -520,3 +520,16 @@ export const setCatalogAuthority = (data) => {
     data
   })
 }
+
+/**
+ * @Summary 提交审核
+ * @param {*} data
+ * @Router /editor/examin/submit [post]
+ */
+export const submitExamin = (data) => {
+  return service({
+    url: '/editor/examin/submit',
+    method: 'post',
+    data
+  })
+}

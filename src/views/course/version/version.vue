@@ -103,7 +103,8 @@ export default {
       locale: state => state.course.locale,
       langList: state => state.course.langList,
       courseTypes: state => state.course.courseTypes,
-      version: state => state.course.version
+      version: state => state.course.version,
+      userInfo: state => state.user.userInfo
     })
   },
   methods: {

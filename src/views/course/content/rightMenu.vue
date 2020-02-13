@@ -39,9 +39,9 @@
             <div class="name" @click="editCatalog">信息编辑</div>
           </div>
         </div>
-        <div class="menu-group" v-show="type == 'folder' && userInfo.authorityId == '2'">
+        <div class="menu-group" v-show="type == 'folder'">
           <div class="line"></div>
-          <div class="menu-item" @mouseenter="isShowAuthority = true" @mouseleave="isShowAuthority = false">
+          <div class="menu-item" v-show="userInfo.authorityId == '2'" @mouseenter="isShowAuthority = true" @mouseleave="isShowAuthority = false">
             <div class="name">
               权限设置
               <i class="el-icon-caret-right"></i>
@@ -63,6 +63,24 @@
               </div>
             </transition>
           </div>
+          <div class="menu-item" v-show="userInfo.authorityId == '3'" @mouseenter="isShowAuthority1 = true" @mouseleave="isShowAuthority1 = false">
+            <div class="name">
+              提交审核
+              <i class="el-icon-caret-right"></i>
+            </div>
+            <transition name="fade">
+              <div class="authority-container" v-show="isShowAuthority1">
+                <div class="authority-wrap" v-if="authorities.length">
+                  <div class="chief-user-item" v-for="item in chiefEditors" :key="item.uuid">
+                    <el-radio v-model="auth_uuid" :label="item.uuid">{{ item.nickName }}</el-radio>
+                  </div>
+                  <div class="handler">
+                    <el-button size="small" type="primary" @click="submitAuthority">确定</el-button>
+                  </div>
+                </div>
+              </div>
+            </transition>
+          </div>
         </div>
       </div>
     </div>
@@ -71,15 +89,20 @@
 
 <script>
 import {
-  setCatalogAuthority
+  setCatalogAuthority,
+  submitExamin
 } from '@/api/course'
 import { mapState } from 'vuex'
 export default {
-  props: ['editors'],
+  props: ['userList'],
   data () {
     return {
       isShow: false,
       isShowAuthority: false,
+      isShowAuthority1: false,
+      editors: [],
+      chiefEditors: [],
+      auth_uuid: '',
       authorities: [],
       left: 0,
       top: 0,
@@ -99,6 +122,13 @@ export default {
       let ev = params.event
       this.left = ev.x + 20
       this.top = ev.y
+      this.editors = this.userList.filter(item => {
+        return item.authorityId === '3'
+      })
+      this.auth_uuid = ''
+      this.chiefEditors = this.userList.filter(item => {
+        return item.authorityId === '2'
+      })
       if (params.type === 'other') {
         this.pUUID = params.pUUID
       } else {
@@ -172,6 +202,7 @@ export default {
       let uuid = this.folder.uuid
       this.$emit('editCatalog', { handler: 'edit', type: this.folder.type, uuid: uuid, folder: this.folder, trackNum: this.trackNum, clickType: this.type })
     },
+    // 权限设置
     authoritySetFn () {
       console.log(this.authorities)
       let arr = this.authorities.filter(item => {
@@ -179,10 +210,32 @@ export default {
       })
       let obj = {
         authorities: arr,
-        catalog_uuid: this.folder.uuid
+        type: 'catalog',
+        uuid: this.folder.uuid
       }
       console.log(obj)
       setCatalogAuthority(obj).then(res => {
+        this.$message({
+          type: 'success',
+          message: res.msg
+        })
+        this.$emit('resetTrackData', { pUUID: this.folder.parent_uuid, trackNum: this.trackNum })
+      })
+    },
+    // 提交审核
+    submitAuthority () {
+      if (!this.auth_uuid) {
+        this.$message({
+          type: 'warning',
+          message: '请选择审核人'
+        })
+        return false
+      }
+      let obj = {
+        auth_uuid: this.auth_uuid,
+        catalog_uuid: this.folder.uuid
+      }
+      submitExamin(obj).then(res => {
         this.$message({
           type: 'success',
           message: res.msg
@@ -247,6 +300,10 @@ export default {
         width: 100px;
         color: #000;
       }
+    }
+    .chief-user-item {
+      width: 200px;
+      margin: 20px;
     }
     .handler {
       text-align: center;

@@ -128,7 +128,7 @@
     </el-dialog>
     <right-menu
       ref="rightMenu"
-      :editors="editors"
+      :userList="userList"
       @rename="rename"
       @copy="copy"
       @paste="paste"
@@ -177,7 +177,7 @@ export default {
       path: '',
       pathDesc: '',
       dialogVisible: false,
-      editors: []
+      userList: []
     }
   },
   components: {
@@ -192,10 +192,7 @@ export default {
     this.getContentTypes()
     this.getContentTags({ pageNo: 0, pageSize: 0 })
     getUserList({ pageNo: 0, pageSize: 100 }).then(res => {
-      this.editors = res.data.userList.filter(item => {
-        return item.authorityId === '3'
-      })
-      console.log(this.editors)
+      this.userList = res.data.userList
     })
   },
   mounted () {
@@ -226,7 +223,8 @@ export default {
       langList: state => state.course.langList,
       courseTypes: state => state.course.courseTypes,
       version: state => state.course.version,
-      modelList: state => state.course.modelList
+      modelList: state => state.course.modelList,
+      userInfo: state => state.user.userInfo
     })
   },
   methods: {
@@ -296,6 +294,22 @@ export default {
         let catalogs = res.data.catalogs.sort((a, b) => {
           return a.list_order - b.list_order
         })
+        if (num > 0) {
+          let copyCatalogs = []
+          let authorities = this.getParentAuthorities(catalogs[0].parent_uuid, num - 1)
+          catalogs.forEach(c => {
+            let obj = c
+            obj['authorities'] = authorities
+            copyCatalogs.push(obj)
+          })
+          catalogs = copyCatalogs
+        }
+
+        if (this.userInfo.authorityId === '3') {
+          catalogs = catalogs.filter(item => {
+            return item.authorities
+          })
+        }
         if (this.tracks[num]) {
           this.tracks[num] = catalogs
         } else {
@@ -429,9 +443,25 @@ export default {
     },
     // 显示右键菜单
     contentMenu (params) {
+      console.log(params)
       this.rightUUID = params.folder.uuid
       params['type'] = 'folder'
-      this.$refs['rightMenu'].show(params)
+      let authorities = params.folder.authorities
+      if (!authorities || !authorities.length) {
+        authorities = this.getParentAuthorities(params.folder.parent_uuid, params.trackNum - 1)
+      }
+      let auth = ''
+      if (authorities && authorities.length) {
+        let obj = authorities.find(item => {
+          return item.user_uuid === this.userInfo.uuid
+        })
+        if (obj) {
+          auth = obj['auth']
+        }
+      }
+      if (this.userInfo.authorityId === '2' || auth === 'rw') {
+        this.$refs['rightMenu'].show(params)
+      }
     },
     // 任意位置右键菜单
     otherContextMenu (ev, item, index) {
@@ -543,6 +573,20 @@ export default {
           this.$set(this.tracks, params.trackNum, catalogs)
         }
       })
+    },
+    getParentAuthorities (pUUID, trackNum) {
+      if (trackNum === -1) {
+        return null
+      }
+      let folder = this.tracks[trackNum].find(item => {
+        return item.uuid === pUUID
+      })
+      let authorities = folder.authorities
+      if (authorities && authorities.length) {
+        return authorities
+      } else {
+        return this.getParentAuthorities(folder.parent_uuid, trackNum - 1)
+      }
     }
   }
 }

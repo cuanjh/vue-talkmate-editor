@@ -121,7 +121,8 @@ export default {
     ...mapState({
       langInfos: state => state.course.langInfos,
       assetsDomain: state => state.course.assetsDomain,
-      modelList: state => state.course.modelList
+      modelList: state => state.course.modelList,
+      userInfo: state => state.user.userInfo
     }),
     flagUrl () {
       let url = ''
@@ -193,6 +194,7 @@ export default {
       let res
       if (this.handler === 'add') {
         let obj1 = {
+          authorities: [{ authority: 'rw', user_uuid: this.userInfo.uuid }],
           content_model: this.form.content_model,
           cover: this.form.cover,
           desc: this.form.desc,
