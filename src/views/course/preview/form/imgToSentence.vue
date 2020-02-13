@@ -2,7 +2,7 @@
   <div :class="['form', form.type]">
     <div class="img-box">
       <a @click="playVoice">
-        <img :src="assetsDomain + form.image" alt="">
+        <img :src="(assetsDomain + form.image) | urlFix('imageView2/1/format/jpg')" alt="">
       </a>
     </div>
     <div class="content">

@@ -12,7 +12,7 @@
       </div>
     </div>
     <div class="form-img">
-      <el-image v-show="imgUrl" :src="imgUrl" fit="cover"></el-image>
+      <el-image v-show="imgUrl" :src="imgUrl | urlFix('imageView2/1/format/jpg')" fit="cover"></el-image>
     </div>
     <div class="text">
       <span v-text="form.type == 'fillGap' ? form.sentence.replace(form.options[0], '______') : form.sentence"></span>

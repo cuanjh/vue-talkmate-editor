@@ -431,6 +431,60 @@ export const getModelList = (data) => {
 }
 
 /**
+ * @Summary 添加模型
+ * @Produce  application/json
+ * @param {*} data
+ * {
+ *   "pageNo": 0,
+ *   "pageSize": 0
+ * }
+ * @Router /editor/model/add [post]
+ */
+export const addModel = (data) => {
+  return service({
+    url: '/editor/model/add',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 删除模型
+ * @Produce  application/json
+ * @param {*} data
+ * {
+ *   "pageNo": 0,
+ *   "pageSize": 0
+ * }
+ * @Router /editor/model/del [post]
+ */
+export const delModel = (data) => {
+  return service({
+    url: '/editor/model/del',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 编辑模型
+ * @Produce  application/json
+ * @param {*} data
+ * {
+ *   "pageNo": 0,
+ *   "pageSize": 0
+ * }
+ * @Router //editor/model/edit [post]
+ */
+export const editorModel = (data) => {
+  return service({
+    url: '/editor/model/edit',
+    method: 'post',
+    data
+  })
+}
+
+/**
  * @Summary 获取内容类型列表
  * @param {*} data
  * @Router /editor/content/showTypes [get]

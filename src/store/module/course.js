@@ -120,6 +120,7 @@ export const course = {
       const res = await getModelList(data)
       if (res.success) {
         let models = res.data.models
+        console.log(models)
         commit('updataModelList', models)
       }
     },
