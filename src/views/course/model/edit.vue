@@ -6,7 +6,7 @@
         <i class="el-icon-close"></i>
       </div>
       <div class="content">
-        <el-form inline="true" label-width="95px" ref="form" :model="form">
+        <el-form :inline="true" label-width="95px" ref="form" :model="form">
           <el-form-item label="model_key: ">
             <el-input v-model="form.model_key" :disabled="type == 'edit'"></el-input>
           </el-form-item>
