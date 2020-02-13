@@ -100,7 +100,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .top-bar {
-  padding: 0 100px;
+  padding: 20px 100px 0;
   text-align: right;
 }
 

@@ -1,7 +1,7 @@
 <template>
   <div :class="['form', form.type]">
     <a class="img-box">
-      <img :src="assetsDomain + form.image" alt="">
+      <img :src="(assetsDomain + form.image) | urlFix('imageView2/1/format/jpg')" alt="">
     </a>
   </div>
 </template>

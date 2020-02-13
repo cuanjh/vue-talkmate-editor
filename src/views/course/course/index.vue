@@ -47,7 +47,7 @@
         <template slot-scope="scope">
           <el-image
             class="course-flag"
-            :src="assetsDomain + scope.row.flag[0]"
+            :src="imageUrl(scope.row.flag[0]) | urlFix('imageView2/1/format/jpg')"
             fit="cover">
           </el-image>
         </template>
@@ -58,7 +58,7 @@
         <template slot-scope="scope">
           <el-image
             class="course-cover"
-            :src="assetsDomain + scope.row.cover[0]"
+            :src="imageUrl(scope.row.cover[0]) | urlFix('imageView2/1/format/jpg')"
             fit="cover">
           </el-image>
         </template>
@@ -185,6 +185,10 @@ export default {
     curCourse () {
       console.log(this.selLang)
       this.initData()
+    },
+    imageUrl (image) {
+      let url = this.assetsDomain + image
+      return url
     }
   }
 }
@@ -212,12 +216,17 @@ export default {
     width: 50px;
     height: 50px;
     border-radius: 4px;
+    object-fit: cover;
   }
-
+  img {
+    width: 100%;
+    height: 100%;
+  }
   .course-cover {
     width: 132px;
     height: 66px;
     border-radius: 4px;
+    object-fit: cover;
   }
 </style>
 <style>

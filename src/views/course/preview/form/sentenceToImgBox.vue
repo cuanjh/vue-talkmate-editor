@@ -15,7 +15,7 @@
         :key="index"
         :class="[{'correct': current == index && form.sentence == curForm.sentence && addCorrect}, {'wrong': current == index && form.sentence !== curForm.sentence && addWrong}]">
         <img
-          :src="assetsDomain + item.image"
+          :src="(assetsDomain + item.image) | urlFix('imageView2/1/format/jpg')"
           @click="check(item, index)"
           alt="">
       </div>

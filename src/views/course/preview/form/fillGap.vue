@@ -1,7 +1,7 @@
 <template>
   <div :class="['form', form.type]">
     <div class="img-box" @click="playVoice">
-      <img :src="assetsDomain + form.image" alt="">
+      <img :src="(assetsDomain + form.image) | urlFix('imageView2/1/format/jpg')" alt="">
     </div>
     <div class="content">
       <div class="fill-gap">

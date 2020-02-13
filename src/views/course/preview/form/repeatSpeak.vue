@@ -1,7 +1,7 @@
 <template>
   <div class="item-form">
     <div class="img-box" @click="playVoice">
-      <img :src="assetsDomain + form.image" alt="">
+      <img :src="(assetsDomain + form.image) | urlFix('imageView2/1/format/jpg')" alt="">
     </div>
     <span class="sentence">{{form.sentence}}</span>
     <div class="record">

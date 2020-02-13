@@ -6,6 +6,7 @@ import { store } from './store'
 import '@/permission'
 import Bus from '@/bus'
 import { formatDate } from '@/utils/formatDate'
+import { urlfix } from '@/utils/filter'
 
 // 引入element
 import ElementUI from 'element-ui'
@@ -19,6 +20,7 @@ import 'element-ui/lib/theme-chalk/index.css'
 Vue.use(ElementUI)
 Vue.use(Bus)
 Vue.filter('formatDate', formatDate)
+Vue.filter('urlFix', urlfix)
 
 Vue.config.productionTip = false
 
