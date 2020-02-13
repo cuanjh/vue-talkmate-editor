@@ -19,7 +19,7 @@
       </el-select>
     </div>
     <div class="version-wrap">
-      <div class="version-item create" @click="addVersion">
+      <div class="version-item create" v-show="userInfo.authorityId == '2' || userInfo.authorityId == '1'" @click="addVersion">
         <i class="el-icon-plus"></i>
         <span>创建新版本</span>
       </div>
