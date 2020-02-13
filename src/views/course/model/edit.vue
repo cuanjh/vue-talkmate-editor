@@ -25,6 +25,7 @@
             </div>
           </el-form-item>
           <div class="feilds" v-for="(feild, index) in form.feilds" :key="index">
+            <div class="del" @click="delFeild(feild, index)"><i class="el-icon-circle-close"></i></div>
             <el-form-item label="data_from: ">
               <el-input v-model="feild.data_from" ></el-input>
             </el-form-item>
@@ -60,6 +61,7 @@ import {
   addModel,
   editorModel
 } from '@/api/course'
+
 export default {
   data () {
     return {
@@ -77,14 +79,10 @@ export default {
           }
         ]
       },
-      feild: {
-        data_from: '',
-        feild: '',
-        name: '',
-        type: ''
-      },
       type: ''
     }
+  },
+  components: {
   },
   computed: {
     isDetermine () {
@@ -102,7 +100,13 @@ export default {
     },
     // 加
     add () {
-      this.form.feilds.push(this.feild)
+      let feild = {
+        data_from: '',
+        feild: '',
+        name: '',
+        type: ''
+      }
+      this.form.feilds.push(feild)
     },
     // 减
     reduce () {
@@ -110,6 +114,14 @@ export default {
         return false
       }
       this.form.feilds.pop()
+    },
+    delFeild (item, index) {
+      console.log(item, index)
+      if (this.form.feilds.length === 1) {
+        return false
+      }
+      this.form.feilds.splice(index, 1)
+      console.log(this.form.feilds)
     },
     close () {
       this.form.model_key = ''
@@ -240,10 +252,25 @@ export default {
     }
   }
   .feilds {
+    position: relative;
     background: #fff;
     padding: 12px;
     margin-bottom: 10px;
     border-radius: 4px;
+    .del {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 99;
+      i {
+        font-size: 20px;
+        color: #a0cfff;
+        &:hover {
+          cursor: pointer;
+          color: #007AFF;
+        }
+      }
+    }
   }
 }
 form {
