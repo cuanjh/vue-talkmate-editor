@@ -6,7 +6,7 @@
         <i class="el-icon-close"></i>
       </div>
       <div class="content">
-        <el-form ref="form" :model="form">
+        <el-form inline="true" label-width="95px" ref="form" :model="form">
           <el-form-item label="model_key: ">
             <el-input v-model="form.model_key" :disabled="type == 'edit'"></el-input>
           </el-form-item>
@@ -16,14 +16,14 @@
           <el-form-item label="描述: ">
             <el-input v-model="form.desc" ></el-input>
           </el-form-item>
-          <el-form-item class="num-content">
+          <div class="num-content">
             <h1>feilds列表</h1>
             <div class="number">
               <span class="button" @click="reduce()">－</span>
               <span class="num">{{form.feilds.length}}</span>
               <span class="button" @click="add()">＋</span>
             </div>
-          </el-form-item>
+          </div>
           <div class="feilds" v-for="(feild, index) in form.feilds" :key="index">
             <div class="del" @click="delFeild(feild, index)"><i class="el-icon-circle-close"></i></div>
             <el-form-item label="data_from: ">
@@ -185,13 +185,18 @@ export default {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width:500px;
+  width:800px;
+  max-height: 630px;
   background:rgba(245,246,250,1);
   border-radius:4px;
   padding: 50px 30px 40px;
   box-sizing: border-box;
   .num-content {
     position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 20px 0;
     .number {
       position: absolute;
       right: 0;
@@ -209,9 +214,6 @@ export default {
         padding: 0 10px;
       }
     }
-  }
-  h1 {
-    margin: 0 auto;
   }
   .close {
     position: absolute;
@@ -254,13 +256,13 @@ export default {
   .feilds {
     position: relative;
     background: #fff;
-    padding: 12px;
+    padding: 32px 12px 10px;
     margin-bottom: 10px;
     border-radius: 4px;
     .del {
       position: absolute;
-      top: 0;
-      left: 0;
+      top: 10px;
+      right: 10px;
       z-index: 99;
       i {
         font-size: 20px;
@@ -299,12 +301,20 @@ form::-webkit-scrollbar-track {/*滚动条里面轨道*/
   border-radius:1px;
   opacity:0.1;
 }
+.el-form {
+  .el-form-item {
+    width: 48%;
+  }
+  .el-input {
+    width: 230px;
+  }
+}
 </style>
 <style >
 .edit-container .el-form-item__content {
-  display: flex;
+  /* display: flex; */
 }
 .edit-container .el-form-item__label {
-  width: 100px;
+  /* width: 100px; */
 }
 </style>
