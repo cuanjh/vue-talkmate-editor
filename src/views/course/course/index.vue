@@ -33,10 +33,12 @@
         </template>
       </el-table-column>
       <el-table-column
+        width="120"
         label="课程编码"
         prop="code">
       </el-table-column>
       <el-table-column
+        width="150"
         label="课程名称">
         <template slot-scope="scope">
           <div v-for="l in langInfos" :key="l.langKey">{{ l.name + ': ' +  scope.row.title['' + l.langKey + ''] + ' ' }}</div>

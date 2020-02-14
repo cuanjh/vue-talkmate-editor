@@ -26,13 +26,14 @@
         prop="lan_code">
       </el-table-column>
       <el-table-column
-        width="200"
+        width="150"
         label="名称">
         <template slot-scope="scope">
           <div v-for="l in langInfos" :key="l.langKey">{{ l.name + ': ' +  (scope.row.title['' + l.langKey + ''] ? scope.row.title['' + l.langKey + ''] : '') + ' ' }}</div>
         </template>
       </el-table-column>
       <el-table-column
+        width="200"
         label="描述">
         <template slot-scope="scope" v-if="Object.keys(scope.row.desc).length">
           <div v-for="l in langInfos" :key="l.langKey">{{ l.name + ': ' +  (scope.row.desc['' + l.langKey + ''] ? scope.row.desc['' + l.langKey + ''] : '') + ' ' }}</div>
