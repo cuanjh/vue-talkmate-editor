@@ -38,7 +38,7 @@
     </el-header>
     <el-main>
       <div id="track-container" class="track-container">
-        <div class="track-wrap" id="track-wrap">
+        <div :class="['track-wrap', {'track-wrap-width': isShowEditFile}]" :style="{width: isShowEditFile ? '401px' : 'auto' }" id="track-wrap">
           <div class="track-item" v-for="(item,index) in tracks" :key="index">
             <div class="list" :id="'track-item-' + index">
               <folder
@@ -60,6 +60,9 @@
             <div class="other" @contextmenu="otherContextMenu($event, item[0], index)"></div>
           </div>
         </div>
+        <transition name="fade" mode="out-in">
+          <edit-file ref="editFile" v-show="isShowEditFile"/>
+        </transition>
       </div>
     </el-main>
     <el-dialog
@@ -94,6 +97,7 @@ import Folder from './folder'
 import RightMenu from './rightMenu'
 import EditCatalog from './editCatalog'
 import EditForm from './editForm'
+import EditFile from './editFile'
 import { mapState, mapActions, mapMutations } from 'vuex'
 import {
   getUserList
@@ -111,6 +115,7 @@ export default {
   data () {
     return {
       isShow: true,
+      isShowEditFile: false,
       selLang: 'ENG',
       selCourseType: 0,
       selVersion: 1,
@@ -134,7 +139,8 @@ export default {
     // Slide,
     RightMenu,
     EditCatalog,
-    EditForm
+    EditForm,
+    EditFile
   },
   created () {
     this.getModelList({ pageNo: 0, pageSize: 0 })
@@ -152,7 +158,7 @@ export default {
     }
     let h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
     this.slideHeight = h - 130
-    let contentEl = document.getElementById('track-container')
+    let contentEl = document.getElementById('track-wrap')
     contentEl.oncontextmenu = (e) => {
       e.preventDefault()
     }
@@ -163,6 +169,14 @@ export default {
       }
     }
     this.initData(0)
+  },
+  watch: {
+    isShowEditFile (newVal, oldVal) {
+      setTimeout(() => {
+        var scrollDom = document.getElementById('track-wrap')
+        scrollDom.scrollLeft = scrollDom.scrollWidth
+      }, 0)
+    }
   },
   computed: {
     ...mapState({
@@ -293,7 +307,7 @@ export default {
           if (this.tracks.length) {
             this.setTrackSortable()
           }
-        }, 1000)
+        }, 10)
       }
     },
     setTrackSortable () {
@@ -370,6 +384,7 @@ export default {
       this.getPath(copy, this.uuid)
       if (params.folder.type === 'catalog') {
         this.initData(params.trackNum + 1)
+        this.isShowEditFile = false
       } else {
         let model = this.modelList.find(item => {
           return item.model_key === params.folder.content_model
@@ -383,7 +398,9 @@ export default {
             this.getPathDesc(copy, this.uuid)
           }
           let contents = res.data.contents
-          this.$refs['editForm'].show({ contents: contents, model: model, folder: params.folder, pathDesc: this.pathDesc })
+          // this.$refs['editForm'].show({ contents: contents, model: model, folder: params.folder, pathDesc: this.pathDesc })
+          this.isShowEditFile = true
+          this.$refs['editFile'].show({ contents: contents, model: model, folder: params.folder, pathDesc: this.pathDesc })
         })
       }
     },
@@ -666,18 +683,22 @@ export default {
   display: flex;
   flex-direction: row;
   .track-wrap {
-    // max-width: 50%;
     display: flex;
     flex-direction: row;
-    flex-wrap: nowrap;
+    width: auto;
+    height: 100%;
     overflow-x: auto;
+    transition: width, scrollLeft ease-in .5s;
+    -moz-transition: width, scrollLeft ease-in .5s; /* Firefox 4 */
+    -webkit-transition: width, scrollLeft ease-in .5s; /* Safari 和 Chrome */
+    -o-transition: width, scrollLeft ease-in .5s; /* Opera */
     .track-item {
+      vertical-align: top;
+      height: 100%;
       width: 200px;
+      min-width: 200px;
       background: #FAFAFA;
-      border-right: 1px solid rgba($color: #000000, $alpha: 0.1);
-      box-shadow:1px 0px 0px 0px rgba(183,183,183,0.29);
-      padding: 10px 0;
-      flex:none;
+      overflow-y: scroll;
       display: flex;
       flex-direction: column;
       .list {
@@ -686,98 +707,15 @@ export default {
       .other {
         flex: 1;
       }
-      ul {
-        width: 100%;
-        li {
-          display: flex;
-          flex-direction: row;
-          align-items: center;
-          justify-content: space-between;
-          padding: 5px 0;
-          .name {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            .icon {
-              width: 15px;
-              height: 15px;
-              border-radius: 50%;
-              margin: 0 5px 0 10px;
-              background: red;
-            }
-          }
-          .arror {
-            margin-right: 18px;
-            i {}
-          }
-        }
-      }
-      .el-image {
-        width: 15px;
-        height: 15px;
-        border-radius: 50%;
+      .list {
       }
     }
   }
-  .track-content {
-    width: auto;
-    background: #F5F6FA;
-    padding: 10px;
-    .add-slide {
-      font-size: 14px;
-      font-weight: 400;
-      margin-left: 28px;
-      color: #007AFF;
-      cursor: pointer;
-    }
-    .slide-list {
-      margin-top: 15px;
-      padding: 0 10px;
-      overflow-y: auto;
-    }
-  }
+  // .track-wrap-width {
+  //   width: 401px;
+  // }
 }
 
-.track-form {
-  width: 50%;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-content: flex-start;
-  padding: 10px;
-  .form {
-    position: relative;
-    margin: 5px;
-    width: 200px;
-    height: 170px;
-    border-radius: 4px;
-    background: rgba($color: #aeaeae, $alpha: 0.1);
-    overflow: hidden;
-    .type {
-      padding: 10px;
-      text-align: center;
-    }
-    img {
-      width: 100%;
-      height: 100px;
-      object-fit: cover;
-    }
-    .text {
-      margin-left: 5px;
-      margin-top: 5px;
-    }
-    .voice {
-      position: absolute;
-      top: 146px;
-      right: 10px;
-      width: 13px;
-      height: 13px;
-      // background-image: url('../../../assets/course/icon-voice.png');
-      background-repeat: no-repeat;
-      background-size: cover;
-    }
-  }
-}
 .slide-list::-webkit-scrollbar {
   width: 2px;
   background: rgba($color: #D8D8D8, $alpha: 0.1)
