@@ -22,7 +22,7 @@
           </el-select>
           <el-select v-model="selVersion" size="small" placeholder="请选择版本" @change="initCourseVersionList(3)">
             <el-option
-              v-for="item in version.versions"
+              v-for="item in versions"
               :key="item.uuid"
               :label="item.version"
               :value="item.version">
@@ -60,62 +60,8 @@
             <div class="other" @contextmenu="otherContextMenu($event, item[0], index)"></div>
           </div>
         </div>
-        <!-- <div class="track-content" v-show="false">
-          <div class="add-slide">新建Slide</div>
-          <div class="slide-list" :style="{'height': slideHeight + 'px'}">
-            <slide />
-          </div>
-          <div class="track-form" v-show="false">
-            <div class="form">
-              <div class="type">听句子选图片</div>
-              <img src="https://course-assets1.talkmate.com/course/images/common/Basic/Level2/Unit1/Chapter1/A0/1-4.webp?imageMogr2/thumbnail/460x258!/q/80" alt="" srcset="">
-              <div class="text">a notebook</div>
-              <div class="voice"></div>
-            </div>
-            <div class="form">
-              <div class="type">听句子选图片</div>
-              <img src="https://course-assets1.talkmate.com/course/images/common/Basic/Level2/Unit1/Chapter1/A0/1-4.webp?imageMogr2/thumbnail/460x258!/q/80" alt="" srcset="">
-              <div class="text">a book</div>
-              <div class="voice"></div>
-            </div>
-            <div class="form">
-              <div class="type">听句子选图片</div>
-              <img src="https://course-assets1.talkmate.com/course/images/common/Basic/Level2/Unit1/Chapter1/A0/1-1.webp?imageMogr2/thumbnail/460x258!/q/80" alt="" srcset="">
-              <div class="text">a pen</div>
-              <div class="voice"></div>
-            </div>
-            <div class="form">
-              <div class="type">听句子选图片</div>
-              <img src="https://course-assets1.talkmate.com/course/images/common/Basic/Level2/Unit1/Chapter1/A0/1-2.webp?imageMogr2/thumbnail/460x258!/q/80" alt="" srcset="">
-              <div class="text">a pencil</div>
-              <div class="voice"></div>
-            </div>
-          </div>
-          <div class="track-form" v-show="false">
-            <div class="form">
-              <div class="type">自动读</div>
-              <img src="https://course-assets1.talkmate.com/course/images/common/Basic/Level1/Unit1/Chapter1/A0/1-1.webp?imageMogr2/thumbnail/460x258!/q/80" alt="" srcset="">
-              <div class="text">Hello</div>
-              <div class="voice"></div>
-            </div>
-            <div class="form">
-              <div class="type">跟读</div>
-              <img src="https://course-assets1.talkmate.com/course/images/common/Basic/Level1/Unit1/Chapter1/A0/1-2.webp?imageMogr2/thumbnail/460x258!/q/80" alt="" srcset="">
-              <div class="text">Hello</div>
-              <div class="voice"></div>
-            </div>
-          </div>
-        </div> -->
       </div>
     </el-main>
-    <!-- <div id="example1" class="list-group col">
-      <div class="list-group-item">Item 1</div>
-      <div class="list-group-item">Item 2</div>
-      <div class="list-group-item">Item 3</div>
-      <div class="list-group-item">Item 4</div>
-      <div class="list-group-item">Item 5</div>
-      <div class="list-group-item">Item 6</div>
-    </div> -->
     <el-dialog
       title="提示"
       :visible.sync="dialogVisible"
@@ -128,7 +74,7 @@
     </el-dialog>
     <right-menu
       ref="rightMenu"
-      :userList="userList"
+      :authorityUsers="authorityUsers"
       @rename="rename"
       @copy="copy"
       @paste="paste"
@@ -152,6 +98,7 @@ import { mapState, mapActions, mapMutations } from 'vuex'
 import {
   getUserList
 } from '@/api/user'
+import { getAuthorityList } from '@/api/authority'
 import {
   getCatalogList,
   getContent,
@@ -177,7 +124,9 @@ export default {
       path: '',
       pathDesc: '',
       dialogVisible: false,
-      userList: []
+      authorityList: [],
+      copyAuthorityList: [],
+      authorityUsers: []
     }
   },
   components: {
@@ -191,9 +140,7 @@ export default {
     this.getModelList({ pageNo: 0, pageSize: 0 })
     this.getContentTypes()
     this.getContentTags({ pageNo: 0, pageSize: 0 })
-    getUserList({ pageNo: 0, pageSize: 100 }).then(res => {
-      this.userList = res.data.userList
-    })
+    this.getAuthorityUsers()
   },
   mounted () {
     if (this.version) {
@@ -225,7 +172,22 @@ export default {
       version: state => state.course.version,
       modelList: state => state.course.modelList,
       userInfo: state => state.user.userInfo
-    })
+    }),
+    versions () {
+      let arr = []
+      if (this.userInfo.authorityId === '1') {
+        arr = this.version.versions
+      } else {
+        this.version.versions.forEach(item => {
+          if (item.authorities && item.authorities.find(a => { return a.user_uuid === this.userInfo.uuid && a.auth })) {
+            let obj = item
+            obj['curUserAuth'] = item.authorities.find(a => { return a.user_uuid === this.userInfo.uuid && a.auth })
+            arr.push(obj)
+          }
+        })
+      }
+      return arr
+    }
   },
   methods: {
     ...mapMutations({
@@ -263,7 +225,6 @@ export default {
           this.updateVersion({ key: 'versions', val: [] })
           this.updateVersion({ key: 'selVersion', val: '' })
           this.updateVersion({ key: 'uuid', val: '' })
-          this.versions = []
           this.uuid = ''
           this.dialogVisible = true
         }
@@ -305,11 +266,22 @@ export default {
           catalogs = copyCatalogs
         }
 
-        if (this.userInfo.authorityId === '3') {
+        if (this.userInfo.authorityId !== '1') {
           catalogs = catalogs.filter(item => {
-            return item.authorities
+            let flag = false
+            if (item.authorities) {
+              let authority = item.authorities.find(a => { return a.user_uuid === this.userInfo.uuid })
+              if (authority && authority['auth']) {
+                flag = true
+              }
+            }
+            return flag
           })
+          if (!catalogs) {
+            catalogs = []
+          }
         }
+
         if (this.tracks[num]) {
           this.tracks[num] = catalogs
         } else {
@@ -459,7 +431,7 @@ export default {
           auth = obj['auth']
         }
       }
-      if (this.userInfo.authorityId === '2' || auth === 'rw') {
+      if (this.userInfo.authorityId === '1' || auth === 'rw') {
         this.$refs['rightMenu'].show(params)
       }
     },
@@ -473,7 +445,7 @@ export default {
       if (item && item.parent_uuid) {
         params['pUUID'] = item.parent_uuid
       } else {
-        if (this.tracks[index - 1].length) {
+        if (index > 0 && this.tracks[index - 1].length) {
           let uuidArr = this.path.split('/')
           this.uuid = uuidArr[uuidArr.length - 2]
           params['pUUID'] = this.uuid
@@ -587,6 +559,42 @@ export default {
       } else {
         return this.getParentAuthorities(folder.parent_uuid, trackNum - 1)
       }
+    },
+    getAuthOptions (list) {
+      if (list && list.length > 0) {
+        list.forEach(l => {
+          let obj = l
+          if (obj.children.length === 0) {
+            this.authorityList.push(obj)
+          } else {
+            let children = obj.children
+            this.authorityList.push(obj)
+            this.getAuthOptions(children)
+          }
+        })
+      }
+    },
+    // 获取需要授权的用户列表
+    async getAuthorityUsers () {
+      this.authorityList = []
+      this.authorityUsers = []
+      let res1 = await getUserList({ page: 1, pageSize: 999 })
+      let userList = res1.data.userList
+      let res = await getAuthorityList({ page: 1, pageSize: 999 })
+      this.copyAuthorityList = res.data.list
+      this.getAuthOptions(res.data.list)
+      let arr = this.authorityList.find(item => {
+        return item.authorityId === this.userInfo.authorityId
+      })
+      if (arr.children.length) {
+        arr.children.forEach(a => {
+          let aUsers = userList.filter(u => {
+            return u.authorityId === a.authorityId
+          })
+          this.authorityUsers = [...this.authorityUsers, ...aUsers]
+        })
+      }
+      console.log(this.authorityUsers)
     }
   }
 }

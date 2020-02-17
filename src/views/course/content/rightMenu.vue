@@ -41,7 +41,7 @@
         </div>
         <div class="menu-group" v-show="type == 'folder'">
           <div class="line"></div>
-          <div class="menu-item" v-show="userInfo.authorityId == '2'" @mouseenter="isShowAuthority = true" @mouseleave="isShowAuthority = false">
+          <div class="menu-item" v-show="authorityUsers && authorityUsers.length" @mouseenter="isShowAuthority = true" @mouseleave="isShowAuthority = false">
             <div class="name">
               权限设置
               <i class="el-icon-caret-right"></i>
@@ -49,9 +49,10 @@
             <transition name="fade">
               <div class="authority-container" v-show="isShowAuthority">
                 <div class="authority-wrap" v-if="authorities.length">
-                  <div class="user-item" v-for="item in editors" :key="item.uuid">
+                  <div class="user-item" v-for="item in authorityUsers" :key="item.uuid">
                     <div class="name">{{ item.nickName }}</div>
                     <el-radio-group v-model="authorities.find(a => { return a['user_uuid'] == item.uuid })['authority']">
+                      <el-radio label="">无</el-radio>
                       <el-radio label="r">只读</el-radio>
                       <el-radio label="rw">可读可编辑</el-radio>
                     </el-radio-group>
@@ -63,7 +64,7 @@
               </div>
             </transition>
           </div>
-          <div class="menu-item" v-show="userInfo.authorityId == '3'" @mouseenter="isShowAuthority1 = true" @mouseleave="isShowAuthority1 = false">
+          <!-- <div class="menu-item" v-show="userInfo.authorityId == '3'" @mouseenter="isShowAuthority1 = true" @mouseleave="isShowAuthority1 = false">
             <div class="name">
               提交审核
               <i class="el-icon-caret-right"></i>
@@ -80,7 +81,7 @@
                 </div>
               </div>
             </transition>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
@@ -89,12 +90,12 @@
 
 <script>
 import {
-  setCatalogAuthority,
+  setAuthority,
   submitExamin
 } from '@/api/course'
 import { mapState } from 'vuex'
 export default {
-  props: ['userList'],
+  props: ['authorityUsers'],
   data () {
     return {
       isShow: false,
@@ -122,33 +123,33 @@ export default {
       let ev = params.event
       this.left = ev.x + 20
       this.top = ev.y
-      this.editors = this.userList.filter(item => {
-        return item.authorityId === '3'
-      })
-      this.auth_uuid = ''
-      this.chiefEditors = this.userList.filter(item => {
-        return item.authorityId === '2'
-      })
+      // this.editors = this.userList.filter(item => {
+      //   return item.authorityId === '3'
+      // })
+      // this.auth_uuid = ''
+      // this.chiefEditors = this.userList.filter(item => {
+      //   return item.authorityId === '1'
+      // })
       if (params.type === 'other') {
         this.pUUID = params.pUUID
       } else {
         this.folder = params.folder
         this.authorities = []
-        if (this.editors && this.editors.length) {
-          this.editors.forEach(item => {
-            let authorities = this.folder.authorities
+        if (this.authorityUsers && this.authorityUsers.length) {
+          this.authorityUsers.forEach(item => {
             let auth = ''
-            if (authorities && authorities.length) {
-              let authority = authorities.find(a => {
-                return a.user_uuid === item.uuid
+            if (params.folder.authorities) {
+              let a = params.folder.authorities.find(i => {
+                return i.user_uuid === item.uuid
               })
-              if (authority) {
-                auth = authority['auth']
+              if (a) {
+                auth = a['auth']
               }
             }
-            let obj = {}
-            obj['user_uuid'] = item.uuid
-            obj['authority'] = auth
+            let obj = {
+              authority: auth,
+              user_uuid: item.uuid
+            }
             this.authorities.push(obj)
           })
         }
@@ -205,16 +206,13 @@ export default {
     // 权限设置
     authoritySetFn () {
       console.log(this.authorities)
-      let arr = this.authorities.filter(item => {
-        return item.authority
-      })
       let obj = {
-        authorities: arr,
+        authorities: this.authorities,
         type: 'catalog',
         uuid: this.folder.uuid
       }
       console.log(obj)
-      setCatalogAuthority(obj).then(res => {
+      setAuthority(obj).then(res => {
         this.$message({
           type: 'success',
           message: res.msg
@@ -292,7 +290,7 @@ export default {
   .authority-wrap {
     padding: 5px;
     .user-item {
-      width: 300px;
+      width: 400px;
       display: flex;
       flex-direction: row;
       margin: 10px 0;

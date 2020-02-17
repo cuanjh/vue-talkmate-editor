@@ -13,7 +13,7 @@
           <el-form-item label="版本号：">
             <el-input v-model="form.version"></el-input>
           </el-form-item>
-          <el-form-item label="背景：">
+          <el-form-item label="背景：" v-show="false">
             <div class="img-box">
               <div class="img">
                 <img :src="imgUrl ? imgUrl : ''" alt="">
@@ -33,16 +33,26 @@
               </el-upload>
             </div>
           </el-form-item>
-          <!-- <el-form-item label="是否上线：" class="flex-class">
+          <el-form-item label="是否展示：" class="flex-class">
             <el-radio-group v-model="form.is_show">
               <el-radio :label="true">是</el-radio>
               <el-radio :label="false">否</el-radio>
             </el-radio-group>
-          </el-form-item> -->
+          </el-form-item>
+          <el-form-item label="权限设置：" v-if="authorities.length">
+            <div class="user-item" v-for="item in authorityUsers" :key="item.uuid">
+              <div class="name">{{ item.nickName }}</div>
+              <el-radio-group v-model="authorities.find(a => { return a['user_uuid'] == item.uuid })['authority']">
+                <el-radio label="">无</el-radio>
+                <el-radio label="r">只读</el-radio>
+                <el-radio label="rw">可读可编辑</el-radio>
+              </el-radio-group>
+            </div>
+          </el-form-item>
         </el-form>
         <div class="btns">
-          <a class="cancel" @click="close()">取消</a>
-          <a class="determine active" @click="determine()">确定</a>
+          <a class="cancel" @click="close">取消</a>
+          <a class="determine active" @click="save">确定</a>
         </div>
       </div>
     </div>
@@ -51,12 +61,12 @@
 </template>
 
 <script>
-import { addCourseVersion, editCourseVersion, getInfoToken } from '@/api/course'
+import { addCourseVersion, editCourseVersion, getInfoToken, setAuthority } from '@/api/course'
 import { mapState } from 'vuex'
 import { uploadQiniu } from '@/utils/uploadQiniu'
 
 export default {
-  props: ['courseTypes'],
+  props: ['authorityUsers'],
   data () {
     return {
       showEdit: false,
@@ -77,7 +87,8 @@ export default {
       },
       imgUrl: '',
       fileRaw: {},
-      type: ''
+      type: '',
+      authorities: []
     }
   },
   components: {
@@ -87,7 +98,8 @@ export default {
   computed: {
     ...mapState({
       assetsDomain: state => state.course.assetsDomain,
-      langInfos: state => state.course.langInfos
+      langInfos: state => state.course.langInfos,
+      userInfo: state => state.user.userInfo
     })
   },
   mounted () {
@@ -95,7 +107,27 @@ export default {
   methods: {
     show (params) {
       console.log(params)
+      console.log(this.authorityList)
       this.type = params.type
+      this.authorities = []
+      if (this.authorityUsers && this.authorityUsers.length) {
+        this.authorityUsers.forEach(item => {
+          let auth = ''
+          if (this.type === 'edit' && params.obj.authorities) {
+            let a = params.obj.authorities.find(i => {
+              return i.user_uuid === item.uuid
+            })
+            if (a) {
+              auth = a['auth']
+            }
+          }
+          let obj = {
+            authority: auth,
+            user_uuid: item.uuid
+          }
+          this.authorities.push(obj)
+        })
+      }
       if (this.type === 'add') {
         this.form.name = params.obj.name
         this.form.parent_uuid = params.obj.parent_uuid
@@ -165,13 +197,19 @@ export default {
       }
     },
     // 添加
-    async determine () {
+    async save () {
       console.log(this.form)
       await this.upload()
       if (this.type === 'add') {
         await addCourseVersion(this.form).then(res => {
           console.log(res)
           if (res.success) {
+            let obj = {
+              authority: 'rw',
+              user_uuid: this.userInfo.uuid
+            }
+            this.authorities.push(obj)
+            this.setVersionAuthority(res.data.uuid)
             this.showEdit = false
           }
         })
@@ -194,14 +232,21 @@ export default {
         editCourseVersion(obj).then(res => {
           console.log(res)
           if (res.success) {
+            this.setVersionAuthority(this.form.uuid)
             this.showEdit = false
           }
         })
       }
-      this.$emit('newEditVersion')
     },
-    changeType () {
-      console.log(this.form)
+    async setVersionAuthority (uuid) {
+      let obj = {
+        authorities: (this.authorities && this.authorities.length) ? this.authorities : null,
+        type: 'content_version',
+        uuid: uuid
+      }
+      console.log(obj)
+      await setAuthority(obj)
+      this.$emit('newEditVersion')
     }
   }
 }
@@ -319,6 +364,17 @@ export default {
   background:rgba(216,216,216,1);
   border-radius:1px;
   opacity:0.1;
+}
+
+.user-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  border-bottom: 1px solid #DCDFE6;
+  .name {
+    width: 100px;
+    color: #000;
+  }
 }
 </style>
 <style>

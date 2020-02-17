@@ -19,12 +19,12 @@
       </el-select>
     </div>
     <div class="version-wrap">
-      <div class="version-item create" v-show="userInfo.authorityId == '2' || userInfo.authorityId == '1'" @click="addVersion">
+      <div class="version-item create" v-show="isHaveAuthority" @click="addVersion">
         <i class="el-icon-plus"></i>
         <span>创建新版本</span>
       </div>
-      <div class="version-item" v-for="item in version.versions" :key="item.uuid" @click="switchVersion(item)">
-        <div class="online-flag" v-show="item['is_show']">
+      <div class="version-item" v-for="item in versions" :key="item.uuid" @click="switchVersion(item)">
+        <div class="online-flag" v-show="item['is_show'] && false">
           <span>线上</span>
         </div>
         <div class="content">
@@ -36,24 +36,24 @@
         </div>
         <div class="operate">
           <el-tooltip class="item" effect="dark" content="编辑" placement="top">
-            <el-button type="primary" :disabled="!item.has_changed" icon="el-icon-setting" circle @click="editVersion(item)"></el-button>
+            <el-button type="primary" v-show="isHaveAuthority" :disabled="(userInfo.authorityId !== '1' && item.curUserAuth['auth'] == 'r')" icon="el-icon-setting" circle @click="editVersion(item)"></el-button>
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="上线" placement="top">
-            <el-button type="success" :disabled="item.is_show" icon="el-icon-check" circle @click="editShow(item)"></el-button>
+            <el-button type="success" v-show="isHaveAuthority" :disabled="!item.has_changed || (userInfo.authorityId !== '1' && item.curUserAuth['auth'] == 'r')" icon="el-icon-check" circle @click="onlineJob(item)"></el-button>
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="下线" placement="top">
-            <el-button type="warning" icon="el-icon-minus" circle :disabled="!item.is_show" @click="editShow(item)"></el-button>
+            <el-button type="warning" v-show="false" icon="el-icon-minus" circle :disabled="!item.is_show || (userInfo.authorityId !== '1' && item.curUserAuth['auth'] == 'r')" @click="editShow(item)"></el-button>
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="删除" placement="top">
-            <el-button type="danger" :disabled="item.is_show" icon="el-icon-delete" circle @click="delVerdion(item)"></el-button>
+            <el-button type="danger" v-show="isHaveAuthority" :disabled="(userInfo.authorityId !== '1' && item.curUserAuth['auth'] == 'r')" icon="el-icon-delete" circle @click="delVerdion(item)"></el-button>
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="编辑课程内容" placement="top">
-            <el-button type="primary" icon="el-icon-edit" :disabled="item.is_show" circle @click="courseContent(item)"></el-button>
+            <el-button type="primary" icon="el-icon-edit" :disabled="(userInfo.authorityId !== '1' && item.curUserAuth['auth'] == 'r')" circle @click="courseContent(item)"></el-button>
           </el-tooltip>
         </div>
       </div>
     </div>
-    <edit-comp ref="edit" @newEditVersion="initCourseVersionList"/>
+    <edit-comp ref="edit" :authorityUsers="authorityUsers" @newEditVersion="initCourseVersionList"/>
     <!-- <add-version ref="addVersion"/> -->
     <!-- <course-content :langList="langList" :courseTypes="courseTypes" :contents="contents" ref="content" /> -->
   </div>
@@ -65,13 +65,18 @@
 import editComp from './edit'
 import { mapState, mapActions, mapMutations } from 'vuex'
 // import { addCourseVersion, delCourseVersion, editCourseVersion } from '@/api/course'
-import { delCourseVersion, editCourseVersion } from '@/api/course'
+import { delCourseVersion, editCourseVersion, addOnlineJob } from '@/api/course'
+import { getAuthorityList } from '@/api/authority'
+import { getUserList } from '@/api/user'
 export default {
   data () {
     return {
       selLang: 'ENG',
       selCourseType: '',
-      contents: []
+      contents: [],
+      authorityList: [],
+      copyAuthorityList: [],
+      authorityUsers: []
     }
   },
   components: {
@@ -81,6 +86,7 @@ export default {
   },
   created () {
     this.getConfigInfo()
+    this.getAuthorityUsers()
     if (!this.langList.length) {
       this.getLangList({ 'pageNo': 0, 'pageSize': 999 })
     }
@@ -105,7 +111,45 @@ export default {
       courseTypes: state => state.course.courseTypes,
       version: state => state.course.version,
       userInfo: state => state.user.userInfo
-    })
+    }),
+    versions () {
+      let arr = []
+      if (this.userInfo.authorityId === '1') {
+        arr = this.version.versions
+      } else {
+        this.version.versions.forEach(item => {
+          if (item.authorities && item.authorities.find(a => { return a.user_uuid === this.userInfo.uuid && a.auth })) {
+            let obj = item
+            obj['curUserAuth'] = item.authorities.find(a => { return a.user_uuid === this.userInfo.uuid && a.auth })
+            arr.push(obj)
+          }
+        })
+      }
+      return arr
+    },
+    isHaveAuthority () {
+      let flag = false
+      if (this.userInfo.authorityId === '1') {
+        flag = true
+      } else {
+        if (!this.copyAuthorityList.length) {
+          return
+        }
+        let arr = this.copyAuthorityList.find(item => {
+          return item.authorityId === '1'
+        })
+        if (arr.children) {
+          for (let i = 0; i < arr.children.length; i++) {
+            let obj = arr.children[i]
+            if (obj.authorityId === this.userInfo.authorityId) {
+              flag = true
+              break
+            }
+          }
+        }
+      }
+      return flag
+    }
   },
   methods: {
     ...mapMutations({
@@ -165,6 +209,28 @@ export default {
       }
       this.$refs.edit.show(params)
     },
+    onlineJob (item) {
+      this.$confirm('确定要上线吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        addOnlineJob({ online_type: 'content_version', online_uuid: item.uuid }).then(res => {
+          if (res.success) {
+            this.$message({
+              type: 'success',
+              message: '上线成功'
+            })
+            this.initCourseVersionList()
+          }
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消上线'
+        })
+      })
+    },
     // 下线上线
     editShow (item) {
       console.log(item)
@@ -217,6 +283,42 @@ export default {
       this.updateVersion({ key: 'uuid', val: item.uuid })
       this.$router.push({ path: '/course-content' })
       // this.$refs['content'].show({ lang: this.selLang, courseType: this.selCourseType, version: item.version, uuid: item.uuid })
+    },
+    getAuthOptions (list) {
+      if (list && list.length > 0) {
+        list.forEach(l => {
+          let obj = l
+          if (obj.children.length === 0) {
+            this.authorityList.push(obj)
+          } else {
+            let children = obj.children
+            this.authorityList.push(obj)
+            this.getAuthOptions(children)
+          }
+        })
+      }
+    },
+    // 获取需要授权的用户列表
+    async getAuthorityUsers () {
+      this.authorityList = []
+      this.authorityUsers = []
+      let res1 = await getUserList({ page: 1, pageSize: 999 })
+      let userList = res1.data.userList
+      let res = await getAuthorityList({ page: 1, pageSize: 999 })
+      this.copyAuthorityList = res.data.list
+      this.getAuthOptions(res.data.list)
+      let arr = this.authorityList.find(item => {
+        return item.authorityId === this.userInfo.authorityId
+      })
+      if (arr.children.length) {
+        arr.children.forEach(a => {
+          let aUsers = userList.filter(u => {
+            return u.authorityId === a.authorityId
+          })
+          this.authorityUsers = [...this.authorityUsers, ...aUsers]
+        })
+      }
+      console.log(this.authorityUsers)
     }
   }
 }

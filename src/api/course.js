@@ -567,7 +567,7 @@ export const searchContent = (data) => {
  * @param {*} data
  * @Router /editor/authority/set [post]
  */
-export const setCatalogAuthority = (data) => {
+export const setAuthority = (data) => {
   return service({
     url: '/editor/authority/set',
     method: 'post',
@@ -583,6 +583,19 @@ export const setCatalogAuthority = (data) => {
 export const submitExamin = (data) => {
   return service({
     url: '/editor/examin/submit',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 添加上线任务
+ * @param {*} data
+ * @Router /editor/online/job [post]
+ */
+export const addOnlineJob = (data) => {
+  return service({
+    url: '/editor/online/job',
     method: 'post',
     data
   })
