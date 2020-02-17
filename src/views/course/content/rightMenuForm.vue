@@ -23,7 +23,7 @@ export default {
   },
   methods: {
     show (ev) {
-      this.left = ev.x - 250
+      this.left = ev.x - 30
       this.top = ev.y
       this.isShow = true
     },
