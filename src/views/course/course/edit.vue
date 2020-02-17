@@ -19,7 +19,8 @@
                 v-for="item in courseTypes"
                 :key="item.name"
                 :label="item.name"
-                :value="item.type">
+                :value="item.type"
+                :disabled="item.disabled ? item.disabled : false">
               </el-option>
             </el-select>
           </el-form-item>
@@ -83,8 +84,13 @@
           </el-form-item>
         </el-form>
         <div class="btns">
-          <a class="cancel" @click="close()">取消</a>
-          <a class="determine active" @click="determine()">确定</a>
+          <el-button
+            class="cancel"
+            @click="close()">取消</el-button>
+          <el-button
+            class="determine active"
+            type="primary"
+            @click="determine()" >确定</el-button>
         </div>
       </div>
     </div>
@@ -98,7 +104,7 @@ import { mapState } from 'vuex'
 import { uploadQiniu } from '@/utils/uploadQiniu'
 
 export default {
-  props: ['courseTypes'],
+  props: ['courseTypes', 'courseList'],
   data () {
     return {
       showEdit: false,
@@ -123,6 +129,7 @@ export default {
   components: {
   },
   created () {
+    console.log(this.courseTypes, this.courseList)
   },
   computed: {
     ...mapState({
@@ -134,6 +141,7 @@ export default {
   },
   methods: {
     show (params) {
+      console.log(this.courseTypesList())
       console.log(params)
       this.type = params.type
       if (this.type === 'add') {
@@ -230,6 +238,22 @@ export default {
     },
     // 添加
     async determine () {
+      if (!this.form.code) {
+        this.$message({
+          showClose: true,
+          message: '请输入课程编码',
+          type: 'error'
+        })
+        return false
+      }
+      if (this.form.course_type === '') {
+        this.$message({
+          showClose: true,
+          message: '请选择课程分类',
+          type: 'error'
+        })
+        return false
+      }
       await this.uploadBig()
       await this.uploadSml()
       console.log(this.form)
@@ -266,6 +290,23 @@ export default {
     },
     changeType () {
       console.log(this.form)
+    },
+    courseTypesList () {
+      let courseType = []
+      if (this.courseList) {
+        this.courseList.forEach(ele => {
+          console.log(ele)
+          this.courseTypes.forEach(item => {
+            if (ele.course_type === item.type) {
+              item.disabled = true
+            }
+            courseType.push(item)
+          })
+        })
+      } else {
+        courseType = this.courseTypes
+      }
+      return courseType
     }
   }
 }
@@ -349,12 +390,11 @@ export default {
     display: flex;
     justify-content: center;
     margin-top: 40px;
-    a {
+    button {
       cursor: pointer;
       display: inline-block;
       width:150px;
       height:40px;
-      line-height: 40px;
       font-size:14px;
       font-weight:400;
       border-radius:4px;
@@ -365,12 +405,16 @@ export default {
         margin-right: 0;
       }
       &:hover {
-        color:rgba(255,255,255,1);
-        background: #007AFF;
+        opacity: .8;
       }
       &.active {
         color:rgba(255,255,255,1);
         background: #007AFF;
+      }
+      &.is-disabled {
+        cursor: not-allowed;
+        border: none;
+        background-color: #a0cfff;
       }
     }
   }

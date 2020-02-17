@@ -178,6 +178,14 @@ export default {
     },
     // 添加
     async determine () {
+      if (!this.form.lan_code) {
+        this.$message({
+          showClose: true,
+          message: '请输入语种编码',
+          type: 'error'
+        })
+        return false
+      }
       await this.upload()
       console.log(this.form)
       if (this.type === 'edit') {
