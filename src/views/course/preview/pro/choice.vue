@@ -134,6 +134,7 @@ export default {
 <style lang="scss" scoped>
 .choice-container {
   padding: 50px 20px 0;
+  // padding: 50px 0px 0;
   .trumpet {
     i {
       background-image: url('../../../../assets/images/course/icon-voice.png');

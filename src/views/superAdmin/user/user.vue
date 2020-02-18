@@ -403,4 +403,12 @@ export default {
     display: block;
   }
 }
+.el-dialog {
+  margin-top: 50%!important;
+  transform: translate(-50%, 0)
+}
+.el-dialog__wrapper {
+  overflow: hidden;
+  height: 100%;
+}
 </style>

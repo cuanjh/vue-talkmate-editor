@@ -125,13 +125,14 @@ export default {
   .sentences {
     cursor: pointer;
     width: 100%;
-    height: 60px;
+    // height: 60px;
     display: inline-block;
     background:rgba(255,255,255,1);
     box-shadow:0px 11px 51px -13px rgba(0,0,0,0.14);
     border-radius:8px;
     margin-bottom: 16px;
-    padding: 0 30px 0 20px;
+    padding: 4% 4px 4% 20px;
+    // padding: 0 30px 0 20px;
     box-sizing: border-box;
     display: flex;
     align-items: center;
@@ -155,7 +156,7 @@ export default {
       width:1px;
       height:23px;
       background: #979797;
-      margin: 0 50px 0 16px;
+      margin: 0 10% 0 10px;
     }
     .sentence {
       cursor: pointer;

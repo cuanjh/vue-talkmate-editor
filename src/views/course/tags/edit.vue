@@ -15,8 +15,14 @@
           </el-form-item>
         </el-form>
         <div class="btns">
-          <a class="cancel" @click="close()">取消</a>
-          <a class="determine active" @click="determine()">确定</a>
+          <el-button
+            class="cancel"
+            @click="close()">取消</el-button>
+          <el-button
+            class="determine active"
+            type="primary"
+            :disabled="!isTagKey"
+            @click="determine()" >确定</el-button>
         </div>
       </div>
     </div>
@@ -36,6 +42,11 @@ export default {
         key: '',
         name: ''
       }
+    }
+  },
+  computed: {
+    isTagKey () {
+      return this.form.key
     }
   },
   methods: {
@@ -91,12 +102,11 @@ export default {
     display: flex;
     justify-content: center;
     margin-top: 40px;
-    a {
+    button {
       cursor: pointer;
       display: inline-block;
       width:150px;
       height:40px;
-      line-height: 40px;
       font-size:14px;
       font-weight:400;
       border-radius:4px;
@@ -107,12 +117,16 @@ export default {
         margin-right: 0;
       }
       &:hover {
-        color:rgba(255,255,255,1);
-        background: #007AFF;
+        opacity: .8;
       }
       &.active {
         color:rgba(255,255,255,1);
         background: #007AFF;
+      }
+      &.is-disabled {
+        cursor: not-allowed;
+        border: none;
+        background-color: #a0cfff;
       }
     }
   }

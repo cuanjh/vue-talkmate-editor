@@ -251,7 +251,7 @@ export default {
 .edit-content .lang-content {
   width: 100%;
   height: 100%;
-  max-height:560px;
+  max-height:500px;
   overflow-y: auto;
 
   .img-box {
@@ -372,7 +372,7 @@ export default {
   margin-bottom: 20px;
 }
 .lang-content .desc .el-textarea textarea{
-  width: 400px!important;
-  min-height: 130px!important;
+  width: 500px!important;
+  min-height: 80px!important;
 }
 </style>
