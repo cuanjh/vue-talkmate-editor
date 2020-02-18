@@ -39,10 +39,11 @@ router.beforeEach(async (to, from, next) => {
     // 不在白名单中并且未登陆的时候
     if (!token) {
       next({
-        name: 'login',
-        query: {
-          redirect: document.location.hash
-        }
+        name: 'login'
+        // ,
+        // query: {
+        //   redirect: document.location.hash
+        // }
       })
     }
   }

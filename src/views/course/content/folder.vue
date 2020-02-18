@@ -21,7 +21,7 @@
       </div>
     </div>
     <div class="arror">
-      <i class="icon-offline" v-show="!offline" @click="updateOffline"></i>
+      <i class="icon-offline" v-show="false" @click="updateOffline"></i>
       <i class="el-icon-caret-right" v-show="folder.type == 'catalog'"></i>
     </div>
   </div>
