@@ -23,10 +23,12 @@
       :data="courseList"
       style="width: 100%;">
       <el-table-column
+        width="60"
         label="序号"
         type="index">
       </el-table-column>
       <el-table-column
+        width="100"
         label="课程分类">
         <template slot-scope="scope">
           {{scope.row.course_type == 0 ? 'PRO' : 'KID'}}
@@ -41,7 +43,7 @@
         width="150"
         label="课程名称">
         <template slot-scope="scope">
-          <div v-for="l in langInfos" :key="l.langKey">{{ l.name + ': ' +  scope.row.title['' + l.langKey + ''] + ' ' }}</div>
+          <div v-for="l in langInfos" :key="l.langKey">{{ l.name + ': ' +  (scope.row.title['' + l.langKey + ''] ? scope.row.title['' + l.langKey + ''] : '') + ' ' }}</div>
         </template>
       </el-table-column>
       <el-table-column
@@ -85,6 +87,7 @@
     </el-table>
     <edit-comp ref="edit"
       :courseTypes="courseTypes"
+      :courseList="courseList"
       @addNewCourse="addNewCourse"/>
   </div>
 </template>
@@ -187,6 +190,7 @@ export default {
     curCourse () {
       console.log(this.selLang)
       this.initData()
+      this.getCourseTypes()
     },
     imageUrl (image) {
       let url = this.assetsDomain + image
@@ -233,6 +237,6 @@ export default {
 </style>
 <style>
 .course-table.el-table th>.cell {
-  width: 100px!important;
+  /* width: 100px!important; */
 }
 </style>
