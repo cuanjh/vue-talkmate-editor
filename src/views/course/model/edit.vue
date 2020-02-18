@@ -186,7 +186,6 @@ export default {
   left: 50%;
   transform: translate(-50%, -50%);
   width:800px;
-  max-height: 630px;
   background:rgba(245,246,250,1);
   border-radius:4px;
   padding: 50px 30px 40px;
@@ -275,18 +274,18 @@ export default {
     }
   }
 }
-form {
-  max-height: 480px;
+.content {
+  max-height: 500px;
   overflow-y: auto;
   padding-right: 20px;
 }
 /*滚动条样式*/
-form::-webkit-scrollbar {/*滚动条整体样式*/
+.content::-webkit-scrollbar {/*滚动条整体样式*/
   position: relative;
   width: 6px;     /*高宽分别对应横竖滚动条的尺寸*/
   height: 4px;
 }
-form::-webkit-scrollbar-thumb {/*滚动条里面小方块*/
+.content::-webkit-scrollbar-thumb {/*滚动条里面小方块*/
   position: absolute;
   width: 6px;
   border-radius: 4px;
@@ -294,7 +293,7 @@ form::-webkit-scrollbar-thumb {/*滚动条里面小方块*/
   background: rgba(0, 0, 0, .4);
   padding: 20px;
 }
-form::-webkit-scrollbar-track {/*滚动条里面轨道*/
+.content::-webkit-scrollbar-track {/*滚动条里面轨道*/
   width: 4px;
   width:2px;
   background:rgba(216,216,216,1);
@@ -308,13 +307,5 @@ form::-webkit-scrollbar-track {/*滚动条里面轨道*/
   .el-input {
     width: 230px;
   }
-}
-</style>
-<style >
-.edit-container .el-form-item__content {
-  /* display: flex; */
-}
-.edit-container .el-form-item__label {
-  /* width: 100px; */
 }
 </style>

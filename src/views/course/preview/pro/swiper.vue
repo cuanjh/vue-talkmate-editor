@@ -137,7 +137,7 @@ export default {
   width: 100%;
   height: 100%;
   padding-left: 10px;
-  padding-top: 50px;
+  padding-top: 10%;
   box-sizing: border-box;
   h1 {
     text-align: center;
@@ -152,6 +152,8 @@ export default {
     text-align: center;
   }
   .swiper-slide {
+    display: flex;
+    flex-direction: column;
     cursor: default;
     // width: 320px;
     width: 96%;

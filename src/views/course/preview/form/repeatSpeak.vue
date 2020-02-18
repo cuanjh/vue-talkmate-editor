@@ -59,7 +59,8 @@ export default {
   .record {
     width: 100%;
     position: absolute;
-    bottom: 86px;
+    // bottom: 86px;
+    bottom: 10%;
     min-height: 70px;
     display: flex;
     align-items: center;
@@ -78,7 +79,7 @@ export default {
   display: block;
   max-width: 100%;
   margin: 0 auto;
-  font-size:20px;
+  font-size:17px;
   font-weight: 400;
   color:rgba(0,0,0,1);
   line-height:28px;

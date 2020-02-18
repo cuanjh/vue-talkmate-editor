@@ -125,21 +125,26 @@ export default {
 }
 .preview-container {
   position: absolute;
-  top: 50%;
+  top: 53%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 436px;
-  height: 750px;
-  // width:375px;
-  // height:667px;
+  // width: 436px;
+  // height: 750px;
+  // width: 26%;
+  // height: 98%;
+  width:375px;
+  height:656px;
   border-radius:4px;
   box-sizing: border-box;
   background: url('../../../../assets/images/preview/pic-preview.png') no-repeat center;
   background-size: cover;
-  padding: 76px 66px 126px 60px;
+  padding: 70px 55px 110px 48px;
   .preview-content {
     width: 100%;
     height: 100%;
+    // padding: 18% 15% 29% 14%;
+    // padding: 20% 10% 33% 8%;
+    box-sizing: border-box;
   }
 }
 .preview-warp {

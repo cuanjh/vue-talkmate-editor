@@ -414,7 +414,7 @@ export default {
   margin-bottom: 20px;
 }
 .course-content .desc .el-textarea textarea{
-  width: 400px!important;
-  min-height: 130px!important;
+  width: 500px!important;
+  min-height: 80px!important;
 }
 </style>
