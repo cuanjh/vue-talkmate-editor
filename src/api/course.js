@@ -600,3 +600,42 @@ export const addOnlineJob = (data) => {
     data
   })
 }
+
+/**
+ * @Summary 获取内容类型列表
+ * @param {*} data
+ * @Router /editor/contenttype/list [post]
+ */
+export const getContentTypeList = (data) => {
+  return service({
+    url: '/editor/contenttype/list',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 删除内容类型
+ * @param {*} data
+ * @Router /editor/contenttype/del [post]
+ */
+export const delContentType = (data) => {
+  return service({
+    url: '/editor/contenttype/del',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 添加内容类型
+ * @param {*} data
+ * @Router /editor/contenttype/add [post]
+ */
+export const addContentType = (data) => {
+  return service({
+    url: '/editor/contenttype/add',
+    method: 'post',
+    data
+  })
+}

@@ -81,6 +81,7 @@ export default {
     'form-autoSpeak': AutoSpeak, // 自动读
     'form-repeatSpeak': RepeatSpeak, // 跟读
     'form-imgToSentence': ImgToSentence, // 由图片选句子
+    // 'form-imgtosentencew': ImgToSentence, // 由图片选句子
     'form-sentenceToImgBox': SentenceToImgBox, // 写单词
     'form-writeWords': WriteWords, // 写单词
     'form-makeSentence': MakeSentence, // 组句子
@@ -152,8 +153,6 @@ export default {
     text-align: center;
   }
   .swiper-slide {
-    display: flex;
-    flex-direction: column;
     cursor: default;
     // width: 320px;
     width: 96%;

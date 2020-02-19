@@ -87,7 +87,7 @@ export default {
   display: inline-block;
   background: #FFFFFF;
   width: 208px;
-  height: 220px;
+  // height: 220px;
   border-radius: 15px;
   margin: 9px;
   padding: 10px 16px;

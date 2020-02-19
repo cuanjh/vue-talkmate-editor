@@ -120,28 +120,5 @@ export default {
       }
     }
   }
-  // .words {
-  //   margin-top: 40px;
-  //   min-height: 50px;
-  //   display: flex;
-  //   flex-direction: row;
-  //   flex-wrap: wrap;
-  //   align-items: center;
-  //   a {
-  //     cursor: pointer;
-  //     padding: 10px 20px;
-  //     margin-right: 16px;
-  //     margin-bottom: 6px;
-  //     border-radius: 4px;
-  //     background:rgba(255,255,255,1);
-  //     box-shadow:0px 11px 51px -13px rgba(0,0,0,0.4);
-  //     border-radius:5px;
-  //     span {
-  //       font-size:16px;
-  //       font-weight:400;
-  //       color:rgba(68,68,68,1);
-  //     }
-  //   }
-  // }
 }
 </style>

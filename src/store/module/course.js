@@ -6,7 +6,8 @@ import {
   getCourseVersionList,
   getModelList,
   getContentTypes,
-  getContentTags
+  getContentTags,
+  getContentTypeList
 } from '@/api/course'
 export const course = {
   namespaced: true,
@@ -33,7 +34,8 @@ export const course = {
     },
     modelList: [], // 内容模型列表
     contentTypes: [], // 内容分类列表
-    contentTags: [] // 内容标签列表
+    contentTags: [], // 内容标签列表
+    contentTypeList: [] // 内容类型列表
   },
   mutations: {
     updateConfigInfo (state, configInfo) {
@@ -57,6 +59,9 @@ export const course = {
     },
     updateContentTags (state, tags) {
       state.contentTags = tags
+    },
+    updateContentTypeList (state, typesList) {
+      state.contentTypeList = typesList
     }
   },
   actions: {
@@ -138,6 +143,15 @@ export const course = {
       if (res.success) {
         let tags = res.data.tags
         commit('updateContentTags', tags)
+      }
+    },
+    // 获取内容类型列表
+    async getContentTypeList ({ commit }, data) {
+      const res = await getContentTypeList(data)
+      if (res.success) {
+        let typesList = res.data.types
+        console.log(typesList)
+        commit('updateContentTypeList', typesList)
       }
     }
   },

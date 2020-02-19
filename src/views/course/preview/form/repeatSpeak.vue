@@ -55,7 +55,7 @@ export default {
 .item-form {
   position: relative;
   width: 100%;
-  height: 100%;
+  height: 90%;
   .record {
     width: 100%;
     position: absolute;

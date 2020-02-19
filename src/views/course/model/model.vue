@@ -118,7 +118,7 @@ export default {
 
 <style lang="scss" scoped>
 .top-bar {
-  padding: 20px 100px;
+  padding: 20px 0px 0;
   text-align: right;
 }
 
