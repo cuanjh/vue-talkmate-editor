@@ -64,24 +64,9 @@
               </div>
             </transition>
           </div>
-          <!-- <div class="menu-item" v-show="userInfo.authorityId == '3'" @mouseenter="isShowAuthority1 = true" @mouseleave="isShowAuthority1 = false">
-            <div class="name">
-              提交审核
-              <i class="el-icon-caret-right"></i>
-            </div>
-            <transition name="fade">
-              <div class="authority-container" v-show="isShowAuthority1">
-                <div class="authority-wrap" v-if="authorities.length">
-                  <div class="chief-user-item" v-for="item in chiefEditors" :key="item.uuid">
-                    <el-radio v-model="auth_uuid" :label="item.uuid">{{ item.nickName }}</el-radio>
-                  </div>
-                  <div class="handler">
-                    <el-button size="small" type="primary" @click="submitAuthority">确定</el-button>
-                  </div>
-                </div>
-              </div>
-            </transition>
-          </div> -->
+          <div class="menu-item" v-show="folder && folder.authorities && folder.authorities.find(item => {return item.user_uuid == userInfo.uuid }) && folder.authorities.find(item => {return item.user_uuid == userInfo.uuid })['auth'] == 'rw'">
+            <div class="name" @click="submitAuthority">提交审核</div>
+          </div>
         </div>
       </div>
     </div>
@@ -95,15 +80,13 @@ import {
 } from '@/api/course'
 import { mapState } from 'vuex'
 export default {
-  props: ['authorityUsers'],
+  props: ['userList', 'authorityUsers', 'authorityList'],
   data () {
     return {
       isShow: false,
       isShowAuthority: false,
-      isShowAuthority1: false,
       editors: [],
       chiefEditors: [],
-      auth_uuid: '',
       authorities: [],
       left: 0,
       top: 0,
@@ -116,20 +99,23 @@ export default {
   computed: {
     ...mapState({
       userInfo: state => state.user.userInfo
-    })
+    }),
+    // 当前用户的审核权限
+    curUserAuthority () {
+      let obj = null
+      if (this.authorityList && this.authorityList.length) {
+        obj = this.authorityList.find(item => {
+          return item.authorityId === this.userInfo.authorityId
+        })
+      }
+      return obj
+    }
   },
   methods: {
     show (params) {
       let ev = params.event
       this.left = ev.x + 20
       this.top = ev.y
-      // this.editors = this.userList.filter(item => {
-      //   return item.authorityId === '3'
-      // })
-      // this.auth_uuid = ''
-      // this.chiefEditors = this.userList.filter(item => {
-      //   return item.authorityId === '1'
-      // })
       if (params.type === 'other') {
         this.pUUID = params.pUUID
       } else {
@@ -222,23 +208,26 @@ export default {
     },
     // 提交审核
     submitAuthority () {
-      if (!this.auth_uuid) {
-        this.$message({
-          type: 'warning',
-          message: '请选择审核人'
+      this.$confirm('确认要提交审核吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        let obj = {
+          catalog_uuid: this.folder.uuid
+        }
+        submitExamin(obj).then(res => {
+          this.$message({
+            type: 'success',
+            message: res.msg
+          })
+          this.$emit('resetTrackData', { pUUID: this.folder.parent_uuid, trackNum: this.trackNum })
         })
-        return false
-      }
-      let obj = {
-        auth_uuid: this.auth_uuid,
-        catalog_uuid: this.folder.uuid
-      }
-      submitExamin(obj).then(res => {
+      }).catch(() => {
         this.$message({
-          type: 'success',
-          message: res.msg
+          type: 'info',
+          message: '已取消提交审核'
         })
-        this.$emit('resetTrackData', { pUUID: this.folder.parent_uuid, trackNum: this.trackNum })
       })
     }
   }

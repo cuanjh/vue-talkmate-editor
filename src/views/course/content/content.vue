@@ -77,7 +77,9 @@
     </el-dialog>
     <right-menu
       ref="rightMenu"
+      :userList="userList"
       :authorityUsers="authorityUsers"
+      :authorityList="authorityList"
       @rename="rename"
       @copy="copy"
       @paste="paste"
@@ -129,6 +131,7 @@ export default {
       path: '',
       pathDesc: '',
       dialogVisible: false,
+      userList: [],
       authorityList: [],
       copyAuthorityList: [],
       authorityUsers: []
@@ -158,10 +161,11 @@ export default {
     }
     let h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
     this.slideHeight = h - 130
-    let contentEl = document.getElementById('track-wrap')
-    contentEl.oncontextmenu = (e) => {
+    let contentWrapEl = document.getElementById('track-wrap')
+    contentWrapEl.oncontextmenu = (e) => {
       e.preventDefault()
     }
+    let contentEl = document.getElementById('content-container')
     contentEl.onclick = () => {
       this.rightUUID = ''
       if (this.$refs['rightMenu']) {
@@ -231,8 +235,13 @@ export default {
               return v.version === this.selVersion
             })
             this.updateVersion({ key: 'selVersion', val: this.selVersion })
-            this.updateVersion({ key: 'uuid', val: curVersion.uuid })
-            this.uuid = curVersion.uuid
+            if (curVersion && curVersion.uuid) {
+              this.updateVersion({ key: 'uuid', val: curVersion.uuid })
+              this.uuid = curVersion.uuid
+            } else {
+              this.updateVersion({ key: 'uuid', val: '' })
+              this.uuid = ''
+            }
           }
           this.initData(0)
         } else {
@@ -269,12 +278,17 @@ export default {
         let catalogs = res.data.catalogs.sort((a, b) => {
           return a.list_order - b.list_order
         })
+        let copyCatalogs = []
         if (num > 0) {
-          let copyCatalogs = []
-          let authorities = this.getParentAuthorities(catalogs[0].parent_uuid, num - 1)
+          let authorities = null
+          if (catalogs[0] && catalogs[0].parent_uuid) {
+            authorities = this.getParentAuthorities(catalogs[0].parent_uuid, num - 1)
+          } else {
+            authorities = this.getParentAuthorities(this.uuid, num - 1)
+          }
           catalogs.forEach(c => {
             let obj = c
-            obj['authorities'] = authorities
+            obj['copyAuthorities'] = authorities
             copyCatalogs.push(obj)
           })
           catalogs = copyCatalogs
@@ -283,8 +297,14 @@ export default {
         if (this.userInfo.authorityId !== '1') {
           catalogs = catalogs.filter(item => {
             let flag = false
+            let authority = null
             if (item.authorities) {
-              let authority = item.authorities.find(a => { return a.user_uuid === this.userInfo.uuid })
+              authority = item.authorities.find(a => { return a.user_uuid === this.userInfo.uuid })
+              if (authority && authority['auth']) {
+                flag = true
+              }
+            } else {
+              authority = item.copyAuthorities.find(a => { return a.user_uuid === this.userInfo.uuid })
               if (authority && authority['auth']) {
                 flag = true
               }
@@ -327,7 +347,11 @@ export default {
             let toTrackNum = parseInt(toId.split('-').pop())
             let fromTrack = this.tracks[fromTrackNum][evt.oldIndex]
             let toTrack = this.tracks[toTrackNum]
-            let toPUUID = toTrack[0].parent_uuid
+            let toPUUID = this.uuid
+            if (toTrack && toTrack[0]) {
+              toPUUID = toTrack[0].parent_uuid
+            }
+
             let moveObj = {
               from_uuid: fromTrack.parent_uuid,
               to_uuid: toPUUID,
@@ -484,6 +508,7 @@ export default {
     // 复制
     copy (uuid) {
       this.copyUUID = uuid
+      this.contentMenuHide()
     },
     // 粘贴
     async paste (params) {
@@ -503,6 +528,7 @@ export default {
         this.resetTrackData({ pUUID: pUUID, trackNum: params.trackNum })
       }
       this.copyUUID = ''
+      this.contentMenuHide()
     },
     // 删除目录(文件)
     del (params) {
@@ -556,12 +582,14 @@ export default {
     },
     // 编辑目录完成后拉取数据重置当前轨道的数据
     resetTrackData (params) {
-      getCatalogList({ parent_uuid: params.pUUID }).then(res => {
-        if (res.success) {
-          let catalogs = res.data.catalogs
-          this.$set(this.tracks, params.trackNum, catalogs)
-        }
-      })
+      this.uuid = params.pUUID
+      this.initData(params.trackNum)
+      // getCatalogList({ parent_uuid: params.pUUID }).then(res => {
+      //   if (res.success) {
+      //     let catalogs = res.data.catalogs
+      //     this.$set(this.tracks, params.trackNum, catalogs)
+      //   }
+      // })
     },
     getParentAuthorities (pUUID, trackNum) {
       if (trackNum === -1) {
@@ -596,7 +624,7 @@ export default {
       this.authorityList = []
       this.authorityUsers = []
       let res1 = await getUserList({ page: 1, pageSize: 999 })
-      let userList = res1.data.userList
+      this.userList = res1.data.userList
       let res = await getAuthorityList({ page: 1, pageSize: 999 })
       this.copyAuthorityList = res.data.list
       this.getAuthOptions(res.data.list)
@@ -605,7 +633,7 @@ export default {
       })
       if (arr.children.length) {
         arr.children.forEach(a => {
-          let aUsers = userList.filter(u => {
+          let aUsers = this.userList.filter(u => {
             return u.authorityId === a.authorityId
           })
           this.authorityUsers = [...this.authorityUsers, ...aUsers]

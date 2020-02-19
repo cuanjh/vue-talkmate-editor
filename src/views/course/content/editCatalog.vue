@@ -11,10 +11,18 @@
         <el-form-item label="名称" prop="name">
           <el-input v-model="form.name"></el-input>
         </el-form-item>
+        <el-form-item label="个数" v-show="handler == 'add'">
+          <el-input-number v-model="form.num" :min="1"></el-input-number>
+        </el-form-item>
         <el-form-item label="模型" v-show="form.type === 'content'">
-          <el-radio-group v-model="form.content_model">
-            <el-radio v-for="item in modelList" :key="item.model_key" :label="item.model_key">{{ item.name }}</el-radio>
-          </el-radio-group>
+          <el-select v-model="form.content_model" placeholder="请选择模型">
+            <el-option
+              v-for="item in modelList"
+              :key="item.model_key"
+              :label="item.name"
+              :value="item.model_key">
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="标题">
           <div class="lang-input" v-for="l in langInfos" :key="l.langKey">
@@ -108,7 +116,8 @@ export default {
         cover: [],
         list_order: 0,
         content_model: '',
-        type: ''
+        type: '',
+        num: 1
       },
       rules: {
         name: [
@@ -194,19 +203,21 @@ export default {
       let res
       if (this.handler === 'add') {
         let obj1 = {
-          authorities: [{ authority: 'rw', user_uuid: this.userInfo.uuid }],
-          content_model: this.form.content_model,
-          cover: this.form.cover,
-          desc: this.form.desc,
-          flag: this.form.flag,
-          tags: [],
-          has_changed: true,
-          is_show: this.form.is_show,
-          list_order: this.form.list_order,
-          name: this.form.name,
-          parent_uuid: this.form.parent_uuid,
-          title: this.form.title,
-          type: this.form.type
+          catalogsInfo: {
+            content_model: this.form.content_model,
+            cover: this.form.cover,
+            desc: this.form.desc,
+            flag: this.form.flag,
+            tags: [],
+            has_changed: true,
+            is_show: this.form.is_show,
+            list_order: this.form.list_order,
+            name: this.form.name,
+            parent_uuid: this.form.parent_uuid,
+            title: this.form.title,
+            type: this.form.type
+          },
+          num: this.form.num
         }
         res = await addCatalog(obj1)
         this.trackNum += 1
@@ -251,7 +262,8 @@ export default {
         flag: [],
         cover: [],
         list_order: 0,
-        content_model: ''
+        content_model: '',
+        num: 1
       }
     },
     async uploadFlagOnchange (file, fileList) {
@@ -348,6 +360,9 @@ export default {
 .el-form {
   .el-radio {
     margin: 5px 10px;
+  }
+  .el-select {
+    width: 100%;
   }
 }
 .img-box {

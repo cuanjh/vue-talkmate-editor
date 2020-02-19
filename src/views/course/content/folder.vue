@@ -15,7 +15,12 @@
           fit="cover"></el-image>
         <i class="el-icon-document" v-show="folder.type == 'content'"></i>
       </div>
-      <div :class="['title', {'warning': folder.has_changed}]">
+      <div :class="['title', {
+        'warning': folder.has_changed,
+        'auth-state1': folder.authorities && folder.authorities.find(item => item.user_uuid && userInfo.uuid) && folder.authorities.find(item => item.user_uuid && userInfo.uuid)['examin_state'] == 1,
+        'auth-state3': folder.authorities && folder.authorities.find(item => item.user_uuid && userInfo.uuid) && folder.authorities.find(item => item.user_uuid && userInfo.uuid)['examin_state'] == 3,
+        'auth-state2': folder.authorities && folder.authorities.find(item => item.user_uuid && userInfo.uuid) && folder.authorities.find(item => item.user_uuid && userInfo.uuid)['examin_state'] == 2
+        }]">
         <span v-show="isShow">{{ title }}</span>
         <input ref="input" type="text" v-show="!isShow" v-model="title" @blur="blurFolder">
       </div>
@@ -51,7 +56,8 @@ export default {
   },
   computed: {
     ...mapState({
-      assetsDomain: state => state.course.assetsDomain
+      assetsDomain: state => state.course.assetsDomain,
+      userInfo: state => state.user.userInfo
     }),
     folderFlagUrl () {
       let url = ''
@@ -163,6 +169,18 @@ export default {
     }
     .warning {
       color: #E6A23C;
+    }
+    // 待审核
+    .auth-state1 {
+      color: #409EFF;
+    }
+    // 审核不通过
+    .auth-state3 {
+      color: #F56C6C;
+    }
+    // 审核通过
+    .auth-state2 {
+      color: #67C23A;
     }
   }
   .arror {
