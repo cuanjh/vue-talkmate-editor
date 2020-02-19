@@ -675,6 +675,7 @@ export default {
 
 .el-main {
   padding: 0;
+  height: 100%;
 }
 
 .track-container {

@@ -75,6 +75,14 @@ export default {
         this.view = 'choice'
       } else if (formTypes.length === 1 && formTypes.indexOf('speaktoimg') > -1) {
         this.view = 'imgAuto'
+      } else if (formTypes.indexOf('imgtosentencew') > -1) {
+        let arr = []
+        that.slideForms.forEach(item => {
+          item.type = 'imgToSentence'
+          arr.push(item)
+        })
+        arr = that.slideForms
+        this.view = 'swiper'
       } else {
         let arr = []
         if (formTypes.indexOf('sentencetoimg') > -1) {
@@ -128,17 +136,18 @@ export default {
   top: 53%;
   left: 50%;
   transform: translate(-50%, -50%);
-  // width: 436px;
-  // height: 750px;
   // width: 26%;
   // height: 98%;
-  width:375px;
-  height:656px;
+  // width:375px;
+  // height:656px;
+  width:367px;
+  height:629px;
   border-radius:4px;
   box-sizing: border-box;
   background: url('../../../../assets/images/preview/pic-preview.png') no-repeat center;
   background-size: cover;
-  padding: 70px 55px 110px 48px;
+  // padding: 70px 55px 110px 48px;
+  padding: 66px 57px 105px 50px;
   .preview-content {
     width: 100%;
     height: 100%;
