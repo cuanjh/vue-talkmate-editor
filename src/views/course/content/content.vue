@@ -130,7 +130,6 @@ export default {
       rightUUID: '',
       copyUUID: '',
       tracks: [],
-      selFolder: '',
       path: '',
       pathDesc: '',
       dialogVisible: false,
@@ -175,7 +174,51 @@ export default {
         this.$refs['rightMenu'].hide()
       }
     }
+    // 键盘上下左右键控制目录操作
+    document.onkeydown = (event) => {
+      let e = event || window.event
+      if (!this.path) return
+      let arr = this.path.split('/')
+      arr.pop()
+      let trackNum = arr.length - 1
+      let track = this.tracks[trackNum]
+      let folderIndex = track.findIndex(item => {
+        return item.uuid === arr[arr.length - 1]
+      })
+      let folder = null
+      // 左键
+      if (e && e.keyCode === 37) {
+        if (trackNum === 0) return
+        trackNum--
+        folderIndex = 0
+        track = this.tracks[trackNum]
+      }
+      // 上键
+      if (e && e.keyCode === 38) {
+        if (folderIndex === 0) return
+        folderIndex--
+      }
+      // 右键
+      if (e && e.keyCode === 39) {
+        if (trackNum === this.tracks.length - 1) return
+        trackNum++
+        folderIndex = 0
+        track = this.tracks[trackNum]
+      }
+      // 下键
+      if (e && e.keyCode === 40) {
+        if (folderIndex === track.length - 1) return
+        folderIndex++
+      }
+      folder = track[folderIndex]
+      if (folder) {
+        this.clickFolder({ folder: folder, trackNum: trackNum })
+      }
+    }
     this.initData(0)
+  },
+  destroyed () {
+    document.onkeydown = null
   },
   watch: {
     isShowEditFile (newVal, oldVal) {
