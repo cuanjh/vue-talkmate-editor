@@ -8,12 +8,16 @@
       </div>
     </div>
     <el-table
-      :data="langList"
+      :data="showTableData"
       style="width: 100%;">
-      <el-table-column
+      <!-- <el-table-column
         label="序号"
         width="60"
-        type="index">
+        type="index"> -->
+      <el-table-column label="序号" width="60" align="center">
+        <template slot-scope="scope">
+          <span>{{scope.$index+(pageRequest.pageNum - 1) * pageRequest.pageSize + 1}}</span>
+        </template>
       </el-table-column>
       <el-table-column
         label="排序号"
@@ -103,6 +107,17 @@
         </template>
       </el-table-column>
     </el-table>
+    <div class="pagination-box">
+      <el-pagination
+        background layout="prev, pager, next"
+        :current-page="pageRequest.pageNum"
+        :page-size="pageRequest.pageSize"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :total="langList.length"
+        >
+      </el-pagination>
+    </div>
     <edit-comp ref="edit" @addNewLang="updateNewLang" :langInfos="langInfos" :langList="langList"/>
     <sort-course-comp ref="sorLang" @sortLang="updateNewLang"/>
   </div>
@@ -119,8 +134,14 @@ export default {
     return {
       allLangs: [],
       langList: [],
+      showTableData: [],
       assetsUrl: '',
-      searchKey: ''
+      searchKey: '',
+      // 分页信息
+      pageRequest: {
+        pageNum: 1,
+        pageSize: 5
+      }
     }
   },
   components: {
@@ -155,6 +176,7 @@ export default {
         })
         this.allLangs = sortLangs
         this.langList = sortLangs
+        this.handleCurrentChange(1)
         this.assetsUrl = res.data.assetsUrl
       }
     },
@@ -170,9 +192,14 @@ export default {
     },
     handleSizeChange (val) {
       console.log(`每页 ${val} 条`)
+      this.pageRequest.pageSize = val
     },
     handleCurrentChange (val) {
       console.log(`当前页: ${val}`)
+      this.pageRequest.pageNum = val
+      let starNum = (val - 1) * this.pageRequest.pageSize
+      let endNum = val * this.pageRequest.pageSize
+      this.showTableData = this.langList.slice(starNum, endNum)
     },
     // 编辑
     editLang (lang) {
@@ -237,6 +264,10 @@ export default {
 </script>
 
 <style scoped lang="scss">
+  .pagination-box {
+    text-align: center;
+    padding-top: 20px;
+  }
   .lang-manage {
     padding: 20px;
   }
@@ -261,5 +292,13 @@ export default {
     width: 50px;
     height: 50px;
     border-radius: 4px;
+  }
+  .el-table td div {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    max-height: 46px;
   }
 </style>
