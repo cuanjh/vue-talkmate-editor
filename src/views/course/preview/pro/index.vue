@@ -66,6 +66,9 @@ export default {
         return false
       }
       let formTypes = this.getFormsTypes(this.slideForms)
+      if (formTypes.length === 0) {
+        return false
+      }
       // if (formTypes.length === 1 && (formTypes.indexOf('sentencetoimg') > -1 || formTypes.indexOf('speaktoimg') > -1)) {
       //   this.view = 'choice'
       // } else {
@@ -94,10 +97,14 @@ export default {
             data: _.groupBy(this.slideForms, 'type').sentenceToImg
           })
           that.slideForms = []
-          console.log(arr)
-          // this.$set(this, 'slideForms', arr)
+          that.slideForms = arr
+        } else {
+          arr = that.slideForms.filter(item => {
+            return (item.type)
+          })
           that.slideForms = arr
         }
+        console.log(that.slideForms)
         this.view = 'swiper'
       }
       this.showPreview = true
@@ -109,8 +116,14 @@ export default {
       var arr = []
       _.map(data, (val) => {
         if (_.isArray(val)) {
+          if (!val[0].type) {
+            return false
+          }
           arr.push(val[0].type.toLowerCase())
         } else {
+          if (!val.type) {
+            return false
+          }
           arr.push(val.type.toLowerCase())
         }
       })

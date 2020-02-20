@@ -17,12 +17,17 @@ export default {
   props: ['form'],
   data () {
     return {
-      isPlay: false
+      isPlay: false,
+      audio: new Audio()
     }
   },
   created () {
     this.$on('init', () => {
       this.playVoice()
+    })
+    this.$on('break', () => {
+      this.audio.pause()
+      this.isPlay = false
     })
   },
   computed: {
@@ -32,18 +37,18 @@ export default {
   },
   methods: {
     playVoice () {
-      let audio = new Audio()
+      this.audio = new Audio()
       if (!this.isPlay) {
-        audio.src = this.assetsDomain + this.form.sound
-        audio.oncanplay = () => {
-          audio.play()
+        this.audio.src = this.assetsDomain + this.form.sound
+        this.audio.oncanplay = () => {
+          this.audio.play()
           this.isPlay = true
         }
-        audio.onended = () => {
+        this.audio.onended = () => {
           this.isPlay = false
         }
       } else {
-        audio.pause()
+        this.audio.pause()
         this.isPlay = false
       }
     }

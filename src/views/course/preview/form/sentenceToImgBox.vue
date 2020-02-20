@@ -36,7 +36,8 @@ export default {
       curIndex: 0,
       addCorrect: false,
       addWrong: false,
-      current: 0
+      current: 0,
+      audio: new Audio()
     }
   },
   computed: {
@@ -52,6 +53,8 @@ export default {
       console.log(this.form.data, this.curForm)
     })
     this.$on('break', () => {
+      this.audio.pause()
+      this.isPlay = false
     })
   },
   methods: {
@@ -85,18 +88,18 @@ export default {
       console.log(this.curIndex, this.form.data.length)
     },
     playVoice () {
-      let audio = new Audio()
+      this.audio = new Audio()
       if (!this.isPlay) {
-        audio.src = this.assetsDomain + this.curForm.sound
-        audio.oncanplay = () => {
-          audio.play()
+        this.audio.src = this.assetsDomain + this.curForm.sound
+        this.audio.oncanplay = () => {
+          this.audio.play()
           this.isPlay = true
         }
-        audio.onended = () => {
+        this.audio.onended = () => {
           this.isPlay = false
         }
       } else {
-        audio.pause()
+        this.audio.pause()
         this.isPlay = false
       }
     },

@@ -34,7 +34,8 @@ export default {
     return {
       isPlay: false,
       options: [],
-      words: []
+      words: [],
+      audio: new Audio()
     }
   },
   created () {
@@ -55,18 +56,18 @@ export default {
   },
   methods: {
     playVoice () {
-      let audio = new Audio()
+      this.audio = new Audio()
       if (!this.isPlay) {
-        audio.src = this.assetsDomain + this.form.sound
-        audio.oncanplay = () => {
-          audio.play()
+        this.audio.src = this.assetsDomain + this.form.sound
+        this.audio.oncanplay = () => {
+          this.audio.play()
           this.isPlay = true
         }
-        audio.onended = () => {
+        this.audio.onended = () => {
           this.isPlay = false
         }
       } else {
-        audio.pause()
+        this.audio.pause()
         this.isPlay = false
       }
     },
@@ -92,6 +93,8 @@ export default {
       this.words.push(word)
     },
     resetAll () {
+      this.audio.pause()
+      this.isPlay = false
       let allWords = this.form.sentence.split(' ')
       console.log(allWords)
       this.words = allWords
