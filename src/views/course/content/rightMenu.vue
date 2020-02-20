@@ -67,6 +67,47 @@
           <div class="menu-item" v-show="folder && folder.authorities && folder.authorities.find(item => {return item.user_uuid == userInfo.uuid }) && folder.authorities.find(item => {return item.user_uuid == userInfo.uuid })['auth'] == 'rw'">
             <div class="name" @click="submitAuthority">提交审核</div>
           </div>
+          <div class="menu-item" v-show="folder && folder.authorities && folder.authorities.find(item => {return item.user_uuid == userInfo.uuid }) && folder.authorities.find(item => {return item.user_uuid == userInfo.uuid })['auth'] == 'rw'">
+            <div class="name" @click="resetAuthority">重置审核状态</div>
+          </div>
+          <div class="menu-item" v-show="folder && folder.authorities && folder.authorities.filter(item => {return item.examin_state == 1 ||  item.examin_state == 3}).length" @mouseenter="isShowAuthority1 = true" @mouseleave="isShowAuthority1 = false">
+            <div class="name">
+              审核
+              <i class="el-icon-caret-right"></i>
+            </div>
+            <transition name="fade">
+              <div class="authority-container" v-show="isShowAuthority1">
+                <div class="authority-wrap">
+                  <el-form ref="form" :model="form" label-width="80px">
+                    <el-form-item label="是否通过">
+                      <el-radio-group
+                        v-model="form.examin_state"
+                        :disabled="folder && folder.authorities && folder.authorities.find(item => {return item.user_uuid == userInfo.uuid }) && folder.authorities.find(item => {return item.user_uuid == userInfo.uuid })['examin_state'] !== 0">
+                        <el-radio :label="2">通过</el-radio>
+                        <el-radio :label="3">不通过</el-radio>
+                      </el-radio-group>
+                    </el-form-item>
+                    <el-form-item
+                      v-show="form.examin_state == 3"
+                      label="原因"
+                      prop="comment"
+                      :rules="{
+                        required: true, message: '原因不能为空', trigger: 'blur'
+                      }">
+                      <el-input
+                        type="textarea"
+                        v-model="form.comment"
+                        :disabled="folder && folder.authorities && folder.authorities.find(item => {return item.user_uuid == userInfo.uuid }) && folder.authorities.find(item => {return item.user_uuid == userInfo.uuid })['examin_state'] !== 0">
+                      </el-input>
+                    </el-form-item>
+                    <el-form-item v-show="authorityUsers && authorityUsers.length">
+                      <el-button type="primary" size="small" @click="onExamin">确定</el-button>
+                    </el-form-item>
+                  </el-form>
+                </div>
+              </div>
+            </transition>
+          </div>
         </div>
       </div>
     </div>
@@ -76,7 +117,9 @@
 <script>
 import {
   setAuthority,
-  submitExamin
+  submitExamin,
+  resetExamin,
+  examin
 } from '@/api/course'
 import { mapState } from 'vuex'
 export default {
@@ -85,6 +128,7 @@ export default {
     return {
       isShow: false,
       isShowAuthority: false,
+      isShowAuthority1: false,
       editors: [],
       chiefEditors: [],
       authorities: [],
@@ -93,7 +137,11 @@ export default {
       folder: null,
       pUUID: '',
       type: '',
-      trackNum: 0
+      trackNum: 0,
+      form: {
+        examin_state: 2,
+        comment: ''
+      }
     }
   },
   computed: {
@@ -138,6 +186,16 @@ export default {
             }
             this.authorities.push(obj)
           })
+        }
+
+        if (params.folder.authorities) {
+          let obj = params.folder.authorities.find(item => {
+            return item.user_uuid === this.userInfo.uuid
+          })
+          if (obj) {
+            this.form.examin_state = obj.examin_state
+            this.form.comment = obj.examin_state_info.comment
+          }
         }
       }
       console.log(params.folder)
@@ -208,6 +266,13 @@ export default {
     },
     // 提交审核
     submitAuthority () {
+      if (this.form.examin_state === 3) {
+        this.$message({
+          type: 'warning',
+          message: '需要重置审核状态'
+        })
+        return false
+      }
       this.$confirm('确认要提交审核吗?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -228,6 +293,55 @@ export default {
           type: 'info',
           message: '已取消提交审核'
         })
+      })
+    },
+    // 审核状态重置
+    resetAuthority () {
+      let obj = {
+        catalog_uuid: this.folder.uuid
+      }
+      resetExamin(obj).then(res => {
+        this.$message({
+          type: 'success',
+          message: res.msg
+        })
+        this.$emit('resetTrackData', { pUUID: this.folder.parent_uuid, trackNum: this.trackNum })
+      })
+    },
+    // 审核
+    onExamin () {
+      this.$refs['form'].validate((valid) => {
+        if (valid || this.form.examin_state === 2) {
+          let userUUID = ''
+          this.authorityUsers.forEach(u => {
+            let obj = this.folder.authorities.find(a => {
+              return a.user_uuid === u.uuid
+            })
+            if (obj && obj['auth']) {
+              userUUID = u.uuid
+            }
+          })
+          let obj = {
+            catalog_uuid: this.folder.uuid,
+            comment: this.form.comment,
+            examin_state: this.form.examin_state,
+            user_uuid: userUUID
+          }
+          // console.log(obj)
+          examin(obj).then(res => {
+            this.$message({
+              type: 'success',
+              message: res.msg
+            })
+            this.$emit('resetTrackData', { pUUID: this.folder.parent_uuid, trackNum: this.trackNum })
+          })
+        } else {
+          this.$message({
+            type: 'warning',
+            message: '请填写不通过原因'
+          })
+          return false
+        }
       })
     }
   }
@@ -288,14 +402,17 @@ export default {
         color: #000;
       }
     }
-    .chief-user-item {
-      width: 200px;
-      margin: 20px;
-    }
     .handler {
       text-align: center;
       .el-button {
         margin: 10px 0;
+      }
+    }
+    .el-form {
+      width: 350px;
+      padding-right: 20px;
+      .el-button {
+        margin-left: 80px;
       }
     }
   }

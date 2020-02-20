@@ -38,7 +38,10 @@
     </el-header>
     <el-main>
       <div id="track-container" class="track-container">
-        <div :class="['track-wrap', {'track-wrap-width': isShowEditFile}]" :style="{width: isShowEditFile ? '401px' : 'auto' }" id="track-wrap">
+        <div
+          :class="['track-wrap', {'track-wrap-width': isShowEditFile}]"
+          :style="{width: isShowEditFile ? '401px' : 'auto' }"
+          id="track-wrap">
           <div class="track-item" v-for="(item,index) in tracks" :key="index">
             <div class="list" :id="'track-item-' + index">
               <folder
@@ -165,7 +168,7 @@ export default {
     contentWrapEl.oncontextmenu = (e) => {
       e.preventDefault()
     }
-    let contentEl = document.getElementById('content-container')
+    let contentEl = document.getElementById('track-wrap')
     contentEl.onclick = () => {
       this.rightUUID = ''
       if (this.$refs['rightMenu']) {
@@ -270,6 +273,7 @@ export default {
       this.selSlide = num
     },
     async initData (num) {
+      this.contentMenuHide()
       if (num === 0) {
         this.tracks = []
       }
@@ -303,7 +307,7 @@ export default {
               if (authority && authority['auth']) {
                 flag = true
               }
-            } else {
+            } else if (item.copyAuthorities) {
               authority = item.copyAuthorities.find(a => { return a.user_uuid === this.userInfo.uuid })
               if (authority && authority['auth']) {
                 flag = true
@@ -321,6 +325,7 @@ export default {
         } else {
           this.tracks.push(catalogs)
         }
+        this.$set(this.tracks, num, catalogs)
         setTimeout(() => {
           var scrollDom = document.getElementById('track-wrap')
           scrollDom.scrollLeft = scrollDom.scrollWidth
@@ -513,8 +518,14 @@ export default {
     // 粘贴
     async paste (params) {
       console.log(params)
+      let trackNum = params.trackNum
       let track = this.tracks[params.trackNum]
-      let pUUID = track[0].parent_uuid
+      let pUUID = ''
+      if (track[0] && track[0].parent_uuid) {
+        pUUID = track[0].parent_uuid
+      } else {
+        pUUID = this.uuid
+      }
       let obj = {
         same_lang: true,
         to_uuid: pUUID,
@@ -525,7 +536,7 @@ export default {
       console.log(obj)
       let res = await copyCatalog(obj)
       if (res.success) {
-        this.resetTrackData({ pUUID: pUUID, trackNum: params.trackNum })
+        this.resetTrackData({ pUUID: pUUID, trackNum: trackNum })
       }
       this.copyUUID = ''
       this.contentMenuHide()
@@ -582,6 +593,7 @@ export default {
     },
     // 编辑目录完成后拉取数据重置当前轨道的数据
     resetTrackData (params) {
+      this.contentMenuHide()
       this.uuid = params.pUUID
       this.initData(params.trackNum)
       // getCatalogList({ parent_uuid: params.pUUID }).then(res => {
