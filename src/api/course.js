@@ -589,6 +589,32 @@ export const submitExamin = (data) => {
 }
 
 /**
+ * @Summary 重置审核状态
+ * @param {*} data
+ * @Router /editor/examin/reset [post]
+ */
+export const resetExamin = (data) => {
+  return service({
+    url: '/editor/examin/reset',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 审核
+ * @param {*} data
+ * @Router /editor/examin [post]
+ */
+export const examin = (data) => {
+  return service({
+    url: '/editor/examin',
+    method: 'post',
+    data
+  })
+}
+
+/**
  * @Summary 添加上线任务
  * @param {*} data
  * @Router /editor/online/job [post]
