@@ -82,6 +82,11 @@ export default {
     // 编辑
     editModel (params) {
       console.log(params)
+      let sortFeilds = params.feilds.sort((a, b) => {
+        return a.list_order - b.list_order
+      })
+      params.feilds = sortFeilds
+      console.log(params)
       let obj = {
         data: params,
         type: 'edit'

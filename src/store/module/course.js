@@ -7,7 +7,8 @@ import {
   getModelList,
   getContentTypes,
   getContentTags,
-  getContentTypeList
+  getContentTypeList,
+  getOnlineList
 } from '@/api/course'
 export const course = {
   namespaced: true,
@@ -35,7 +36,8 @@ export const course = {
     modelList: [], // 内容模型列表
     contentTypes: [], // 内容分类列表
     contentTags: [], // 内容标签列表
-    contentTypeList: [] // 内容类型列表
+    contentTypeList: [], // 内容类型列表
+    onlineList: [] // 上线列表
   },
   mutations: {
     updateConfigInfo (state, configInfo) {
@@ -62,6 +64,9 @@ export const course = {
     },
     updateContentTypeList (state, typesList) {
       state.contentTypeList = typesList
+    },
+    updateOnlineList (state, online) {
+      state.onlineList = online
     }
   },
   actions: {
@@ -152,6 +157,15 @@ export const course = {
         let typesList = res.data.types
         console.log(typesList)
         commit('updateContentTypeList', typesList)
+      }
+    },
+    // 获取内容类型列表
+    async getOnlineList ({ commit }, data) {
+      const res = await getOnlineList(data)
+      if (res.success) {
+        let online = res.data.jobs
+        console.log(online)
+        commit('updateOnlineList', online)
       }
     }
   },

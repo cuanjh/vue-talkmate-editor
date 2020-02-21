@@ -665,3 +665,16 @@ export const addContentType = (data) => {
     data
   })
 }
+
+/**
+ * @Summary 上线任务列表
+ * @param {*} data
+ * @Router /editor/online/list [post]
+ */
+export const getOnlineList = (data) => {
+  return service({
+    url: '/editor/online/list',
+    method: 'post',
+    data
+  })
+}
