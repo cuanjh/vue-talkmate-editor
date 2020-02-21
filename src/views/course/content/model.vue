@@ -237,6 +237,7 @@ export default {
           let newContents = []
           let copyContents = this.contents
           let indexArr = sortable.toArray()
+          console.log(indexArr)
           indexArr.forEach((item, index) => {
             let obj = copyContents[parseInt(item)]
             obj['list_order'] = (index + 1) * 10

@@ -24,32 +24,37 @@
               <span class="button" @click="add()">＋</span>
             </div>
           </div>
-          <div class="feilds" v-for="(feild, index) in form.feilds" :key="index">
-            <div class="del" @click="delFeild(feild, index)"><i class="el-icon-circle-close"></i></div>
-            <el-form-item label="data_from: ">
-              <el-input v-model="feild.data_from" ></el-input>
-            </el-form-item>
-            <el-form-item label="feild: ">
-              <el-input v-model="feild.feild" ></el-input>
-            </el-form-item>
-            <el-form-item label="name: ">
-              <el-input v-model="feild.name" ></el-input>
-            </el-form-item>
-            <el-form-item label="type: ">
-              <el-input v-model="feild.type" ></el-input>
-            </el-form-item>
+          <div id="feilds-lists" class="feilds">
+            <div class="feilds-item"
+              :data-id="index"
+              v-for="(feild, index) in form.feilds"
+              :key="index">
+              <div class="del" @click="delFeild(feild, index)"><i class="el-icon-circle-close"></i></div>
+              <el-form-item label="data_from: ">
+                <el-input v-model="feild.data_from" ></el-input>
+              </el-form-item>
+              <el-form-item label="feild: ">
+                <el-input v-model="feild.feild" ></el-input>
+              </el-form-item>
+              <el-form-item label="name: ">
+                <el-input v-model="feild.name" ></el-input>
+              </el-form-item>
+              <el-form-item label="type: ">
+                <el-input v-model="feild.type" ></el-input>
+              </el-form-item>
+            </div>
           </div>
         </el-form>
-        <div class="btns">
-          <el-button
-            class="cancel"
-            @click="close()">取消</el-button>
-          <el-button
-            class="determine active"
-            type="primary"
-            :disabled="!isDetermine"
-            @click="determine()" >确定</el-button>
-        </div>
+      </div>
+      <div class="btns">
+        <el-button
+          class="cancel"
+          @click="close()">取消</el-button>
+        <el-button
+          class="determine active"
+          type="primary"
+          :disabled="!isDetermine"
+          @click="determine()" >确定</el-button>
       </div>
     </div>
   </div>
@@ -61,6 +66,7 @@ import {
   addModel,
   editorModel
 } from '@/api/course'
+import Sortable from 'sortablejs'
 
 export default {
   data () {
@@ -75,14 +81,37 @@ export default {
             data_from: '',
             feild: '',
             name: '',
-            type: ''
+            type: '',
+            list_order: 1
           }
         ]
       },
+      newFeilds: [],
       type: ''
     }
   },
-  components: {
+  mounted () {
+    /* eslint-disable */
+    let $el = document.getElementById('feilds-lists')
+    let sortable = new Sortable($el, {
+      animation: 150,
+      onEnd: (evt) => {
+        let oldIndex = evt.oldIndex
+        let newIndex = evt.newIndex
+        console.log(oldIndex, newIndex)
+        this.newFeilds = []
+        let copyFeilds = this.form.feilds
+        let indexArr = sortable.toArray()
+        console.log(indexArr)
+        indexArr.forEach((item, index) => {
+          let obj = copyFeilds[item]
+          obj['list_order'] = (index + 1)
+          this.newFeilds.push(obj)
+        })
+        console.log(this.newFeilds)
+      }
+    })
+    /* eslint-enable */
   },
   computed: {
     isDetermine () {
@@ -96,6 +125,8 @@ export default {
       this.showEdit = true
       if (this.type === 'edit') {
         this.form = params.data
+        console.log(this.form)
+        this.newFeilds = this.form.feilds
       }
     },
     // 加
@@ -104,7 +135,8 @@ export default {
         data_from: '',
         feild: '',
         name: '',
-        type: ''
+        type: '',
+        list_order: this.form.feilds.length + 1
       }
       this.form.feilds.push(feild)
     },
@@ -120,8 +152,14 @@ export default {
       if (this.form.feilds.length === 1) {
         return false
       }
-      this.form.feilds.splice(index, 1)
-      console.log(this.form.feilds)
+      if (this.newFeilds.length > 0) {
+        this.form.feilds = this.newFeilds
+      }
+      let feild = this.form.feilds.findIndex((ele) => {
+        return ele.list_order === item.list_order
+      })
+      this.form.feilds.splice(feild, 1)
+      console.log(feild, this.form.feilds)
     },
     close () {
       this.form.model_key = ''
@@ -132,7 +170,8 @@ export default {
           data_from: '',
           feild: '',
           name: '',
-          type: ''
+          type: '',
+          list_order: 1
         }
       ]
       this.$emit('editModel')
@@ -152,16 +191,14 @@ export default {
         editorModel(obj).then(res => {
           console.log(res)
           if (res.success) {
-            this.showEdit = false
-            this.$emit('editModel')
+            this.close()
           }
         })
       } else {
         addModel(this.form).then(res => {
           console.log(res)
           if (res.success) {
-            this.showEdit = false
-            this.$emit('editModel')
+            this.close()
           }
         })
       }
@@ -188,14 +225,14 @@ export default {
   width:800px;
   background:rgba(245,246,250,1);
   border-radius:4px;
-  padding: 50px 30px 40px;
+  padding: 50px 30px 20px;
   box-sizing: border-box;
   .num-content {
     position: relative;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    margin: 20px 0;
+    margin: 0px 0 20px;
     .number {
       position: absolute;
       right: 0;
@@ -223,7 +260,7 @@ export default {
   .btns {
     display: flex;
     justify-content: center;
-    margin-top: 40px;
+    margin-top: 20px;
     button {
       cursor: pointer;
       display: inline-block;
@@ -254,10 +291,13 @@ export default {
   }
   .feilds {
     position: relative;
-    background: #fff;
-    padding: 32px 12px 10px;
-    margin-bottom: 10px;
-    border-radius: 4px;
+    .feilds-item {
+      position: relative;
+      background: #fff;
+      padding: 32px 12px 10px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+    }
     .del {
       position: absolute;
       top: 10px;
@@ -274,18 +314,19 @@ export default {
     }
   }
 }
-.content {
-  max-height: 500px;
+.feilds {
+  // max-height: 500px;
+  max-height: 300px;
   overflow-y: auto;
   padding-right: 20px;
 }
 /*滚动条样式*/
-.content::-webkit-scrollbar {/*滚动条整体样式*/
+.feilds::-webkit-scrollbar {/*滚动条整体样式*/
   position: relative;
   width: 6px;     /*高宽分别对应横竖滚动条的尺寸*/
   height: 4px;
 }
-.content::-webkit-scrollbar-thumb {/*滚动条里面小方块*/
+.feilds::-webkit-scrollbar-thumb {/*滚动条里面小方块*/
   position: absolute;
   width: 6px;
   border-radius: 4px;
@@ -293,7 +334,7 @@ export default {
   background: rgba(0, 0, 0, .4);
   padding: 20px;
 }
-.content::-webkit-scrollbar-track {/*滚动条里面轨道*/
+.feilds::-webkit-scrollbar-track {/*滚动条里面轨道*/
   width: 4px;
   width:2px;
   background:rgba(216,216,216,1);
