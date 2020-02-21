@@ -219,7 +219,7 @@ export default {
       this.$set(this.$data, 'pUUID', params.pUUID)
       this.$set(this.$data, 'contents', params.contents)
       this.baseFormDataSelf = params.baseFormData
-      this.$set(this.$data, 'feilds', params.feilds)
+      this.$set(this.$data, 'feilds', params.feilds.sort((a, b) => { return a.list_order - b.list_order }))
       this.$set(this.$data, 'contentModel', params.contentModel)
       this.formHeight = 220
       if (this.version.selCourseType === 0) {
