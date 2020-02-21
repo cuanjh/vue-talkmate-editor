@@ -31,7 +31,8 @@ export default {
       sentences: [],
       current: 0,
       addCorrect: false,
-      addWrong: false
+      addWrong: false,
+      audio: new Audio()
     }
   },
   computed: {
@@ -45,6 +46,10 @@ export default {
       console.log(this.form, this.slideForms)
       this.sentences = this.getSentences()
       this.playVoice()
+    })
+    this.$on('break', () => {
+      this.audio.pause()
+      this.isPlay = false
     })
   },
   mounted () {
@@ -69,18 +74,18 @@ export default {
       }
     },
     playVoice () {
-      let audio = new Audio()
+      this.audio = new Audio()
       if (!this.isPlay) {
-        audio.src = this.assetsDomain + this.form.sound
-        audio.oncanplay = () => {
-          audio.play()
+        this.audio.src = this.assetsDomain + this.form.sound
+        this.audio.oncanplay = () => {
+          this.audio.play()
           this.isPlay = true
         }
-        audio.onended = () => {
+        this.audio.onended = () => {
           this.isPlay = false
         }
       } else {
-        audio.pause()
+        this.audio.pause()
         this.isPlay = false
       }
     },

@@ -359,7 +359,6 @@ export default {
     },
     // 预览
     lookPreview () {
-      console.log(this.contentModel)
       let obj = {
         contents: this.contents,
         contentModel: this.contentModel
