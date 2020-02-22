@@ -215,7 +215,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        addOnlineJob({ online_type: 'content_version', online_uuid: item.uuid }).then(res => {
+        addOnlineJob({ jobName: item.name, online_type: 'content_version', online_uuid: item.uuid }).then(res => {
           if (res.success) {
             this.$message({
               type: 'success',

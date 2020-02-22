@@ -41,6 +41,9 @@
         </div>
         <div class="menu-group" v-show="type == 'folder'">
           <div class="line"></div>
+          <div class="menu-item" v-show="userInfo.authorityId === '1'">
+            <div class="name" @click="onlineJob">上线</div>
+          </div>
           <div class="menu-item" v-show="authorityUsers && authorityUsers.length" @mouseenter="isShowAuthority = true" @mouseleave="isShowAuthority = false">
             <div class="name">
               权限设置
@@ -70,7 +73,9 @@
           <div class="menu-item" v-show="folder && folder.authorities && folder.authorities.find(item => {return item.user_uuid == userInfo.uuid }) && folder.authorities.find(item => {return item.user_uuid == userInfo.uuid })['auth'] == 'rw'">
             <div class="name" @click="resetAuthority">重置审核状态</div>
           </div>
-          <div class="menu-item" v-show="folder && folder.authorities && folder.authorities.filter(item => {return item.examin_state == 1 ||  item.examin_state == 3}).length" @mouseenter="isShowAuthority1 = true" @mouseleave="isShowAuthority1 = false">
+          <div class="menu-item"
+            v-show="(authorityUsers && authorityUsers.length && folder && folder.authorities && folder.authorities.filter(item => {return item.examin_state == 1 ||  item.examin_state == 3}).length) || !(authorityUsers && authorityUsers.length) && folder && folder.authorities && folder.authorities.filter(item => {return item.examin_state == 3 && item.examin_state_info.comment}).length"
+            @mouseenter="isShowAuthority1 = true" @mouseleave="isShowAuthority1 = false">
             <div class="name">
               审核
               <i class="el-icon-caret-right"></i>
@@ -82,6 +87,7 @@
                     <el-form-item label="是否通过">
                       <el-radio-group
                         v-model="form.examin_state"
+                        @change="form.examin_state == 3 ? form.comment = '' : form.comment = form.comment"
                         :disabled="folder && folder.authorities && folder.authorities.find(item => {return item.user_uuid == userInfo.uuid }) && folder.authorities.find(item => {return item.user_uuid == userInfo.uuid })['examin_state'] !== 0">
                         <el-radio :label="2">通过</el-radio>
                         <el-radio :label="3">不通过</el-radio>
@@ -119,7 +125,8 @@ import {
   setAuthority,
   submitExamin,
   resetExamin,
-  examin
+  examin,
+  addOnlineJob
 } from '@/api/course'
 import { mapState } from 'vuex'
 export default {
@@ -342,6 +349,29 @@ export default {
           })
           return false
         }
+      })
+    },
+    // 添加上线
+    onlineJob () {
+      this.$confirm('确定要上线吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        addOnlineJob({ jobName: this.folder.name, online_type: 'catalog', online_uuid: this.folder.uuid }).then(res => {
+          if (res.success) {
+            this.$message({
+              type: 'success',
+              message: '上线成功'
+            })
+            this.$emit('resetTrackData', { pUUID: this.folder.parent_uuid, trackNum: this.trackNum })
+          }
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消上线'
+        })
       })
     }
   }

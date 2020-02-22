@@ -297,6 +297,7 @@ export default {
           this.uuid = ''
           this.dialogVisible = true
         }
+        this.isShowEditFile = false
       }, 300)
     },
     show (params) {
