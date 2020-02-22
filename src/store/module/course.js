@@ -10,6 +10,8 @@ import {
   getContentTypeList,
   getOnlineList
 } from '@/api/course'
+import moment from 'moment'
+
 export const course = {
   namespaced: true,
   state: {
@@ -163,7 +165,10 @@ export const course = {
     async getOnlineList ({ commit }, data) {
       const res = await getOnlineList(data)
       if (res.success) {
-        let online = res.data.jobs
+        let online = res.data.jobs.filter(item => {
+          item.time = moment(item.created_time * 1000).format('YYYY/MM/DD')
+          return item.online_type !== 'string'
+        })
         console.log(online)
         commit('updateOnlineList', online)
       }
