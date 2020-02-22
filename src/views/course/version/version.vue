@@ -87,12 +87,8 @@ export default {
   created () {
     this.getConfigInfo()
     this.getAuthorityUsers()
-    if (!this.langList.length) {
-      this.getLangList({ 'pageNo': 0, 'pageSize': 999 })
-    }
-    if (!this.courseTypes.length) {
-      this.getCourseTypes()
-    }
+    this.getLangList({ 'pageNo': 0, 'pageSize': 999 })
+    this.getCourseTypes()
   },
   mounted () {
     if (this.version) {

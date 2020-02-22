@@ -7,14 +7,17 @@
       </div>
       <div class="content">
         <el-form ref="form" :model="form">
-          <el-form-item label="key: ">
-            <el-input v-model="form.type" ></el-input>
+          <el-form-item label="key: " prop="type"  :rules="[
+            { required: true, message: 'key不能为空', trigger: 'blur'},
+            {pattern: /^[a-zA-Z_]{1,}$/, message: '只允许输入字母或下划线！'}
+          ]">
+            <el-input v-model="form.type" maxlength="30" show-word-limit></el-input>
           </el-form-item>
-          <el-form-item label="名称: ">
-            <el-input v-model="form.name" ></el-input>
+          <el-form-item label="名称: " prop="name"  :rules="{ required: true, message: '名称不能为空', trigger: 'blur'}">
+            <el-input v-model="form.name" maxlength="25" show-word-limit></el-input>
           </el-form-item>
-          <el-form-item label="描述: ">
-            <el-input v-model="form.desc" ></el-input>
+          <el-form-item label="描述: " prop="desc"  :rules="{ required: true, message: '描述不能为空', trigger: 'blur'}">
+            <el-input type="textarea" rows="3" v-model="form.desc" maxlength="50" show-word-limit></el-input>
           </el-form-item>
         </el-form>
         <div class="btns">
@@ -24,7 +27,6 @@
           <el-button
             class="determine active"
             type="primary"
-            :disabled="!isType"
             @click="determine()" >确定</el-button>
         </div>
       </div>
@@ -50,11 +52,6 @@ export default {
       }
     }
   },
-  computed: {
-    isType () {
-      return this.form.type && this.form.name && this.form.desc
-    }
-  },
   methods: {
     show () {
       this.showEdit = true
@@ -67,11 +64,15 @@ export default {
     },
     determine () {
       console.log(this.form)
-      addContentType(this.form).then(res => {
-        console.log(res)
-        if (res.success) {
-          this.$emit('addContentType')
-          this.close()
+      this.$refs['form'].validate((valid) => {
+        if (valid) {
+          addContentType(this.form).then(res => {
+            console.log(res)
+            if (res.success) {
+              this.$emit('addContentType')
+              this.close()
+            }
+          })
         }
       })
     }
@@ -137,5 +138,10 @@ export default {
       }
     }
   }
+}
+</style>
+<style>
+.el-input__count {
+  line-height: 10px;
 }
 </style>

@@ -7,14 +7,19 @@
       </div>
       <div class="content">
         <el-form :inline="true" label-width="95px" ref="form" :model="form">
-          <el-form-item label="model_key: ">
-            <el-input v-model="form.model_key" :disabled="type == 'edit'"></el-input>
+          <el-form-item label="model_key: " prop="model_key" :rules="[
+            {required: true, message: 'model_key不能为空', trigger: 'blur'},
+            {pattern: /^[a-zA-Z_]{1,}$/, message: '只允许输入字母或下划线！'}
+          ]">
+            <el-input v-model="form.model_key" maxlength="30" show-word-limit :disabled="type == 'edit'"></el-input>
           </el-form-item>
-          <el-form-item label="名称: ">
-            <el-input v-model="form.name" ></el-input>
+          <el-form-item label="名称: " prop="name" :rules="{
+            required: true, message: '名称不能为空', trigger: 'blur'
+          }">
+            <el-input v-model="form.name" maxlength="20" show-word-limit></el-input>
           </el-form-item>
-          <el-form-item label="描述: ">
-            <el-input v-model="form.desc" ></el-input>
+          <el-form-item label="描述: " class="desc">
+            <el-input v-model="form.desc" maxlength="40" show-word-limit></el-input>
           </el-form-item>
           <div class="num-content">
             <h1>feilds列表</h1>
@@ -53,7 +58,6 @@
         <el-button
           class="determine active"
           type="primary"
-          :disabled="!isDetermine"
           @click="determine()" >确定</el-button>
       </div>
     </div>
@@ -112,11 +116,6 @@ export default {
       }
     })
     /* eslint-enable */
-  },
-  computed: {
-    isDetermine () {
-      return this.form.model_key
-    }
   },
   methods: {
     show (params) {
@@ -178,30 +177,34 @@ export default {
       this.showEdit = false
     },
     determine () {
-      console.log(this.form)
-      if (this.type === 'edit') {
-        let obj = {
-          'model_info': {}
+      this.$refs['form'].validate((valid) => {
+        if (valid) {
+          console.log(this.form)
+          if (this.type === 'edit') {
+            let obj = {
+              'model_info': {}
+            }
+            obj['model_key'] = this.form.model_key
+            obj.model_info['desc'] = this.form.desc
+            obj.model_info['feilds'] = this.form.feilds
+            obj.model_info['name'] = this.form.name
+            console.log(obj)
+            editorModel(obj).then(res => {
+              console.log(res)
+              if (res.success) {
+                this.close()
+              }
+            })
+          } else {
+            addModel(this.form).then(res => {
+              console.log(res)
+              if (res.success) {
+                this.close()
+              }
+            })
+          }
         }
-        obj['model_key'] = this.form.model_key
-        obj.model_info['desc'] = this.form.desc
-        obj.model_info['feilds'] = this.form.feilds
-        obj.model_info['name'] = this.form.name
-        console.log(obj)
-        editorModel(obj).then(res => {
-          console.log(res)
-          if (res.success) {
-            this.close()
-          }
-        })
-      } else {
-        addModel(this.form).then(res => {
-          console.log(res)
-          if (res.success) {
-            this.close()
-          }
-        })
-      }
+      })
     }
   }
 }
@@ -347,6 +350,12 @@ export default {
   }
   .el-input {
     width: 230px;
+  }
+  .desc {
+    width: 100% !important;
+    .el-input {
+      width: 595px;
+    }
   }
 }
 </style>

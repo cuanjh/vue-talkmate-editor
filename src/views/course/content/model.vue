@@ -557,3 +557,9 @@ export default {
   }
 }
 </style>
+
+<style>
+.el-checkbox__label {
+  white-space: break-spaces;
+}
+</style>

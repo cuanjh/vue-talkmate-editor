@@ -4,7 +4,7 @@
       <div class="top-bar">
         <div class="left">
           <div class="icon-logo"></div>
-          <el-select v-model="selLang" size="small" placeholder="请选择语言" @change="initCourseVersionList">
+          <el-select v-model="selLang" size="small" placeholder="请选择语言" @change="initCourseVersionList(1)">
             <el-option
               v-for="item in langList"
               :key="item['lan_code']"
@@ -12,7 +12,7 @@
               :value="item['lan_code']">
             </el-option>
           </el-select>
-          <el-select v-model="selCourseType" size="small" placeholder="请选择项目" @change="initCourseVersionList">
+          <el-select v-model="selCourseType" size="small" placeholder="请选择项目" @change="initCourseVersionList(2)">
             <el-option
               v-for="item in courseTypes"
               :key="item.type"
@@ -271,11 +271,10 @@ export default {
         if (this.version.versions.length) {
           this.updateVersion({ key: 'versions', val: this.version.versions })
           if (flag !== 3) {
-            let item = this.version.versions[0]
-            this.selVersion = item.version
-            this.updateVersion({ key: 'selVersion', val: item.version })
-            this.updateVersion({ key: 'uuid', val: item.uuid })
-            this.uuid = item.uuid
+            this.updateVersion({ key: 'selVersion', val: '' })
+            this.updateVersion({ key: 'uuid', val: '' })
+            this.selVersion = ''
+            this.uuid = ''
           } else {
             let curVersion = this.version.versions.find(v => {
               return v.version === this.selVersion

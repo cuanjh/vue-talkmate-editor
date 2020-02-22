@@ -7,11 +7,14 @@
       </div>
       <div class="content">
         <el-form ref="form" :model="form">
-          <el-form-item label="key: ">
-            <el-input v-model="form.key" ></el-input>
+          <el-form-item label="key: " prop="key" :rules="[
+            { required: true, message: 'key不能为空', trigger: 'blur'},
+            {pattern: /^[a-zA-Z_]{1,}$/, message: '只允许输入字母或下划线！'}
+          ]">
+            <el-input v-model="form.key" maxlength="30" show-word-limit></el-input>
           </el-form-item>
-          <el-form-item label="名称: ">
-            <el-input v-model="form.name" ></el-input>
+          <el-form-item label="名称: " prop="name" :rules="{ required: true, message: '名称不能为空', trigger: 'blur'}">
+            <el-input v-model="form.name" maxlength="25" show-word-limit></el-input>
           </el-form-item>
         </el-form>
         <div class="btns">
@@ -21,7 +24,6 @@
           <el-button
             class="determine active"
             type="primary"
-            :disabled="!isTagKey"
             @click="determine()" >确定</el-button>
         </div>
       </div>
@@ -44,11 +46,6 @@ export default {
       }
     }
   },
-  computed: {
-    isTagKey () {
-      return this.form.key
-    }
-  },
   methods: {
     show () {
       this.showEdit = true
@@ -60,11 +57,15 @@ export default {
     },
     determine () {
       console.log(this.form)
-      addTags(this.form).then(res => {
-        console.log(res)
-        if (res.success) {
-          this.$emit('addTag')
-          this.close()
+      this.$refs['form'].validate((valid) => {
+        if (valid) {
+          addTags(this.form).then(res => {
+            console.log(res)
+            if (res.success) {
+              this.$emit('addTag')
+              this.close()
+            }
+          })
         }
       })
     }
