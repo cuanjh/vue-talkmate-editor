@@ -6,13 +6,13 @@
         <i class="el-icon-close"></i>
       </div>
       <div class="lang-content">
-        <el-form ref="form" :model="form">
-          <el-form-item label="编码：">
-            <el-input v-model="form.lan_code" :disabled="type == 'edit'"></el-input>
+        <el-form ref="form" :model="form" :rules="rules">
+          <el-form-item label="编码：" prop="lan_code">
+            <el-input v-model="form.lan_code" maxlength="20" show-word-limit :disabled="type == 'edit'"></el-input>
           </el-form-item>
           <el-form-item label="名称：" class="name">
             <div class="input-box" v-for="l in langInfos" :key="'title' + l.langKey">
-              <el-input v-model="form.title[l.langKey]"></el-input>
+              <el-input v-model="form.title[l.langKey]" maxlength="30" show-word-limit></el-input>
               <span>{{'(' + l.name + ')'}}</span>
             </div>
           </el-form-item>
@@ -97,7 +97,13 @@ export default {
       },
       imageUrl: '',
       fileRaw: {},
-      type: ''
+      type: '',
+      rules: {
+        lan_code: [
+          { required: true, message: '编码不能为空', trigger: 'blur' },
+          { pattern: /^[a-zA-Z]+$/, message: '只允许输入字母！' }
+        ]
+      }
     }
   },
   components: {
@@ -133,6 +139,7 @@ export default {
     },
     close () {
       this.showEdit = false
+      this.$refs.form.resetFields()
       this.$emit('addNewLang')
     },
     async upload () {
@@ -156,6 +163,7 @@ export default {
       this.imageUrl = URL.createObjectURL(file.raw)
       console.log(this.imageUrl)
       this.fileRaw = file
+      this.upload()
     },
     handleAvatarSuccess (res, file) {
       console.log(res, file)
@@ -177,45 +185,40 @@ export default {
       }
     },
     // 添加
-    async determine () {
-      if (!this.form.lan_code) {
-        this.$message({
-          showClose: true,
-          message: '请输入语种编码',
-          type: 'error'
-        })
-        return false
-      }
-      await this.upload()
-      console.log(this.form)
-      if (this.type === 'edit') {
-        let obj = {
-          'lang_info': {}
+    determine () {
+      this.$refs['form'].validate((valid) => {
+        if (valid) {
+          console.log(this.form)
+          if (this.type === 'edit') {
+            let obj = {
+              'lang_info': {}
+            }
+            obj['lan_code'] = this.form.lan_code
+            obj.lang_info['desc'] = this.form.desc
+            obj.lang_info['flag'] = this.form.flag
+            obj.lang_info['is_hot'] = this.form.is_hot
+            obj.lang_info['is_show'] = this.form.is_show
+            obj.lang_info['list_order'] = this.form.list_order
+            obj.lang_info['title'] = this.form.title
+            obj.lang_info['word_direction'] = this.form.word_direction
+            console.log(obj)
+            editLang(obj).then(res => {
+              console.log(res)
+              if (res.success) {
+                this.close()
+              }
+            })
+          } else if (this.type === 'add') {
+            console.log('add')
+            addLang(this.form).then(res => {
+              if (res.success) {
+                console.log(res)
+                this.close()
+              }
+            })
+          }
         }
-        obj['lan_code'] = this.form.lan_code
-        obj.lang_info['desc'] = this.form.desc
-        obj.lang_info['flag'] = this.form.flag
-        obj.lang_info['is_hot'] = this.form.is_hot
-        obj.lang_info['is_show'] = this.form.is_show
-        obj.lang_info['list_order'] = this.form.list_order
-        obj.lang_info['title'] = this.form.title
-        obj.lang_info['word_direction'] = this.form.word_direction
-        console.log(obj)
-        await editLang(obj).then(res => {
-          console.log(res)
-          if (res.success) {
-            this.showEdit = false
-          }
-        })
-      } else if (this.type === 'add') {
-        await addLang(this.form).then(res => {
-          console.log(res)
-          if (res.success) {
-            this.showEdit = false
-          }
-        })
-      }
-      this.$emit('addNewLang')
+      })
     }
   }
 }

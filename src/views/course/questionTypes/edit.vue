@@ -61,6 +61,8 @@ export default {
       this.form.type = ''
       this.form.name = ''
       this.form.desc = ''
+      this.$refs.form.resetFields()
+      this.$emit('addContentType')
     },
     determine () {
       console.log(this.form)
@@ -69,7 +71,6 @@ export default {
           addContentType(this.form).then(res => {
             console.log(res)
             if (res.success) {
-              this.$emit('addContentType')
               this.close()
             }
           })

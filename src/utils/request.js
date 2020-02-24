@@ -61,9 +61,13 @@ service.interceptors.response.use(
     if (response.data.success) {
       return response.data
     } else {
+      let msg = response.data.data.err
+      if (!msg) {
+        msg = response.data.msg
+      }
       Message({
         showClose: true,
-        message: response.data.msg,
+        message: msg,
         type: 'error',
         onClose: () => {
           if (response.data.data && response.data.data.reload) {

@@ -174,6 +174,7 @@ export default {
         }
       ]
       this.$emit('editModel')
+      this.$refs.form.resetFields()
       this.showEdit = false
     },
     determine () {

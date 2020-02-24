@@ -6,12 +6,12 @@
         <i class="el-icon-close"></i>
       </div>
       <div class="course-content">
-        <el-form ref="form" :model="form">
-          <el-form-item label="编码：">
-            <el-input v-model="form.code" :disabled="type == 'edit'">
+        <el-form ref="form" :model="form" :rules="rules">
+          <el-form-item label="编码：" prop="code">
+            <el-input v-model="form.code" maxlength="20" show-word-limit :disabled="type == 'edit'">
             </el-input>
           </el-form-item>
-          <el-form-item label="分类：">
+          <el-form-item label="分类：" prop="course_type">
             <el-select v-model="form.course_type"
               placeholder="请选择课程分类"
               @change="changeType">
@@ -26,7 +26,7 @@
           </el-form-item>
           <el-form-item label="名称：" class="name">
             <div class="input-box" v-for="l in langInfos" :key="'title' + l.langKey">
-              <el-input v-model="form.title[l.langKey]"></el-input>
+              <el-input v-model="form.title[l.langKey]" maxlength="30" show-word-limit></el-input>
               <span>{{'(' + l.name + ')'}}</span>
             </div>
           </el-form-item>
@@ -123,7 +123,17 @@ export default {
       bigFileRaw: {},
       smlImgUrl: '',
       smlFileRaw: {},
-      type: ''
+      type: '',
+      rules: {
+        code: [
+          { required: true, message: '编码不能为空', trigger: 'blur' },
+          { pattern: /^[a-zA-Z-]+$/, message: '只允许输入字母！' }
+          // ^[a-zA-Z_]{1,}$
+        ],
+        course_type: [
+          { required: true, message: '请选择分类', trigger: 'blur' }
+        ]
+      }
     }
   },
   components: {
@@ -165,6 +175,8 @@ export default {
     },
     close () {
       this.showEdit = false
+      this.$refs.form.resetFields()
+      this.$emit('addNewCourse')
     },
     async uploadBig () {
       if (Object.keys(this.bigFileRaw).length === 0) {
@@ -189,6 +201,7 @@ export default {
       // this.form.cover.unshift(URL.createObjectURL(file.raw))
       console.log(this.bigImgUrl)
       this.bigFileRaw = file
+      this.uploadBig()
     },
     handleBigSuccess (res, file) {
       console.log(res, file)
@@ -216,6 +229,7 @@ export default {
       // this.form.flag.unshift(URL.createObjectURL(file.raw))
       console.log(this.smlImgUrl)
       this.smlFileRaw = file
+      this.uploadSml()
     },
     handleSmlSuccess (res, file) {
       console.log(res, file)
@@ -237,57 +251,93 @@ export default {
       }
     },
     // 添加
-    async determine () {
-      if (!this.form.code) {
-        this.$message({
-          showClose: true,
-          message: '请输入课程编码',
-          type: 'error'
-        })
-        return false
-      }
-      if (this.form.course_type === '') {
-        this.$message({
-          showClose: true,
-          message: '请选择课程分类',
-          type: 'error'
-        })
-        return false
-      }
-      await this.uploadBig()
-      await this.uploadSml()
-      console.log(this.form)
-      if (this.type === 'add') {
-        this.form.code = this.form.code + '-Basic'
-        await addCourse(this.form).then(res => {
-          console.log(res)
-          if (res.success) {
-            this.showEdit = false
+    determine () {
+      this.$refs['form'].validate((valid) => {
+        if (valid) {
+          console.log(this.form)
+          if (this.type === 'add') {
+            this.form.code = this.form.code + '-Basic'
+            addCourse(this.form).then(res => {
+              console.log(res)
+              if (res.success) {
+                this.close()
+              }
+            })
+          } else {
+            let obj = {
+              editInfo: {
+                course_type: this.form.course_type,
+                cover: this.form.cover,
+                desc: this.form.desc,
+                flag: this.form.flag,
+                is_show: this.form.is_show,
+                tags: [],
+                title: this.form.title
+              },
+              uuid: this.form.uuid
+            }
+            console.log(obj)
+            courseEdit(obj).then(res => {
+              console.log(res)
+              if (res.success) {
+                this.close()
+              }
+            })
           }
-        })
-      } else {
-        let obj = {
-          editInfo: {
-            course_type: this.form.course_type,
-            cover: this.form.cover,
-            desc: this.form.desc,
-            flag: this.form.flag,
-            is_show: this.form.is_show,
-            tags: [],
-            title: this.form.title
-          },
-          uuid: this.form.uuid
         }
-        console.log(obj)
-        await courseEdit(obj).then(res => {
-          console.log(res)
-          if (res.success) {
-            this.showEdit = false
-          }
-        })
-      }
-      this.$emit('addNewCourse')
+      })
     },
+    // async determine () {
+    //   if (!this.form.code) {
+    //     this.$message({
+    //       showClose: true,
+    //       message: '请输入课程编码',
+    //       type: 'error'
+    //     })
+    //     return false
+    //   }
+    //   if (this.form.course_type === '') {
+    //     this.$message({
+    //       showClose: true,
+    //       message: '请选择课程分类',
+    //       type: 'error'
+    //     })
+    //     return false
+    //   }
+    //   await this.uploadBig()
+    //   await this.uploadSml()
+    //   console.log(this.form)
+    //   if (this.type === 'add') {
+    //     this.form.code = this.form.code + '-Basic'
+    //     await addCourse(this.form).then(res => {
+    //       console.log(res)
+    //       if (res.success) {
+    //         this.showEdit = false
+    //       }
+    //     })
+    //   } else {
+    //     let obj = {
+    //       editInfo: {
+    //         course_type: this.form.course_type,
+    //         cover: this.form.cover,
+    //         desc: this.form.desc,
+    //         flag: this.form.flag,
+    //         is_show: this.form.is_show,
+    //         tags: [],
+    //         title: this.form.title
+    //       },
+    //       uuid: this.form.uuid
+    //     }
+    //     console.log(obj)
+    //     await courseEdit(obj).then(res => {
+    //       console.log(res)
+    //       if (res.success) {
+    //         this.showEdit = false
+    //       }
+    //     })
+    //   }
+    //   this.$emit('addNewCourse')
+    // },
     changeType () {
       console.log(this.form)
     },
@@ -442,6 +492,9 @@ export default {
 }
 </style>
 <style>
+.course-content .el-input__inner {
+  padding: 0 44px 0 10px;
+}
 .course-content .el-input {
   width: 200px!important;
   margin-right: 10px;
