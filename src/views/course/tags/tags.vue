@@ -19,7 +19,7 @@
           width="300"
           label="key">
           <template slot-scope="scope">
-            <el-tooltip :content="scope.row.key" width="300" placement="top" effect="light">
+            <el-tooltip :content="scope.row.key" placement="top" effect="light">
               <span>{{ scope.row.key }}</span>
             </el-tooltip>
           </template>
@@ -28,7 +28,7 @@
           width="400"
           label="名称">
           <template slot-scope="scope">
-            <el-tooltip :content="scope.row.name" width="300" placement="top" effect="light">
+            <el-tooltip :content="scope.row.name" placement="top" effect="light">
               <span>{{ scope.row.name }}</span>
             </el-tooltip>
           </template>

@@ -307,9 +307,7 @@ export default {
 </style>
 <style>
 .el-tooltip__popper {
-  max-width: 300px;
-  max-height: 300px;
-  overflow-y: auto;
+  max-width: 500px;
   line-height: 20px;
 }
 </style>
