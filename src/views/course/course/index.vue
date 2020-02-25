@@ -2,7 +2,9 @@
   <div class="course-manage">
     <div class="top-bar">
       <el-select v-model="selLang"
-        filterable placeholder="请选择语种"
+        filterable
+        default-first-option
+        placeholder="请选择语种"
         @change="curCourse">
         <el-option
           v-for="item in langList"

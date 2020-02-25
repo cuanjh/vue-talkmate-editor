@@ -13,7 +13,10 @@
               <img :src="item.flag ? assetsUrl + item.flag[0] : ''" alt="">
               <p class="list-order">{{item.list_order}}</p>
             </div>
-            <p class="title">{{item.title ? item.title['zh-CN'] : ''}}</p>
+            <el-tooltip :content="item.title['zh-CN']" width="300" placement="top" effect="light">
+              <p class="title">{{item.title ? item.title['zh-CN'] : ''}}</p>
+            </el-tooltip>
+            <!-- <p class="title">{{item.title ? item.title['zh-CN'] : ''}}</p> -->
           </a>
         </div>
       </div>
@@ -23,7 +26,7 @@
 </template>
 
 <script>
-import { getLangList, editLang } from '@/api/course'
+import { editLang } from '@/api/course'
 import Sortable from 'sortablejs'
 
 export default {
@@ -34,8 +37,10 @@ export default {
       assetsUrl: ''
     }
   },
+  created () {
+  },
   mounted () {
-    this.initData()
+    // this.initData()
     console.log(this.allLangs, this.assetsUrl)
     let $chapterList = document.getElementById('langs-lists')
     let sortable = new Sortable($chapterList, {
@@ -69,8 +74,8 @@ export default {
         editLang(obj).then(res => {
           if (res.success) {
             console.log(res)
-            // this.$emit('sortLang')
-            this.initData()
+            this.$emit('sortLang')
+            // this.initData()
           }
         })
       }
@@ -78,18 +83,20 @@ export default {
     console.log(sortable)
   },
   methods: {
-    async initData () {
-      let res = await getLangList({ 'pageNo': 0, 'pageSize': 999 })
-      if (res.success) {
-        let sortLangs = res.data.langs.sort((a, b) => {
-          return a.list_order - b.list_order
-        })
-        this.allLangs = sortLangs
-        this.assetsUrl = res.data.assetsUrl
-        console.log(this.allLangs)
-      }
-    },
-    show () {
+    // async initData () {
+    //   let res = await getLangList({ 'pageNo': 0, 'pageSize': 999 })
+    //   if (res.success) {
+    //     let sortLangs = res.data.langs.sort((a, b) => {
+    //       return a.list_order - b.list_order
+    //     })
+    //     this.allLangs = sortLangs
+    //     this.assetsUrl = res.data.assetsUrl
+    //     console.log(this.allLangs)
+    //   }
+    // },
+    show (obj) {
+      this.allLangs = obj.allLangs
+      this.assetsUrl = obj.assetsUrl
       this.showSortLang = true
     },
     close () {
@@ -182,6 +189,12 @@ export default {
           line-height:20px;
           text-align: center;
           padding-top: 12px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: -webkit-box;
+          -webkit-line-clamp: 1;
+          -webkit-box-orient: vertical;
+          max-height: 46px;
         }
       }
     }
