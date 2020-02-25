@@ -6,12 +6,17 @@
         <i class="el-icon-close"></i>
       </div>
       <div class="course-content">
-        <el-form ref="form" :model="form" :rules="rules">
-          <el-form-item label="编码：" prop="code">
+        <el-form ref="form" :model="form">
+          <el-form-item label="编码：" prop="code" :rules="[
+            { required: true, message: '编码不能为空', trigger: 'blur' },
+            { pattern: /^[a-zA-Z-]+$/, message: '只允许输入字母！' }
+          ]">
             <el-input v-model="form.code" maxlength="20" show-word-limit :disabled="type == 'edit'">
             </el-input>
           </el-form-item>
-          <el-form-item label="分类：" prop="course_type">
+          <el-form-item label="分类：" prop="course_type" :rules="[
+            { required: true, message: '请选择分类', trigger: 'blur' }
+          ]">
             <el-select v-model="form.course_type"
               placeholder="请选择课程分类"
               @change="changeType">
@@ -24,11 +29,18 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="名称：" class="name">
-            <div class="input-box" v-for="l in langInfos" :key="'title' + l.langKey">
+          <el-form-item label="名称：" class="name" required>
+            <!-- <div class="input-box" v-for="l in langInfos" :key="'title' + l.langKey">
               <el-input v-model="form.title[l.langKey]" maxlength="30" show-word-limit></el-input>
               <span>{{'(' + l.name + ')'}}</span>
-            </div>
+            </div> -->
+            <el-row v-for="l in langInfos" :key="'title' + l.langKey">
+              <el-form-item  class="input-box" :prop="'title.' + l.langKey"
+                :rules="[{required: true, message: '名称不能为空', trigger: 'blur'}]">
+                <el-input v-model="form.title[l.langKey]" maxlength="30" show-word-limit></el-input>
+                <span>{{'(' + l.name + ')'}}</span>
+              </el-form-item>
+            </el-row>
           </el-form-item>
           <el-form-item label="描述：" class="desc">
             <div class="input-box" v-for="l in langInfos" :key="'desc' + l.langKey">
@@ -36,7 +48,9 @@
               <span>{{'(' + l.name + ')'}}</span>
             </div>
           </el-form-item>
-          <el-form-item label="大图：">
+          <el-form-item label="大图：" prop="flag[0]" :rules="[
+            { required: true, message: '大图标不能为空', trigger: 'blur' }
+          ]">
             <div class="img-box big-img-box">
               <div class="img">
                 <img :src="bigImgUrl" alt="">
@@ -56,7 +70,9 @@
               </el-upload>
             </div>
           </el-form-item>
-          <el-form-item label="小图：">
+          <el-form-item label="小图：" prop="flag[0]" :rules="[
+            { required: true, message: '小图标不能为空', trigger: 'blur' }
+          ]">
             <div class="img-box small-img-box">
               <div class="img">
                 <img :src="smlImgUrl" alt="">
@@ -123,17 +139,7 @@ export default {
       bigFileRaw: {},
       smlImgUrl: '',
       smlFileRaw: {},
-      type: '',
-      rules: {
-        code: [
-          { required: true, message: '编码不能为空', trigger: 'blur' },
-          { pattern: /^[a-zA-Z-]+$/, message: '只允许输入字母！' }
-          // ^[a-zA-Z_]{1,}$
-        ],
-        course_type: [
-          { required: true, message: '请选择分类', trigger: 'blur' }
-        ]
-      }
+      type: ''
     }
   },
   components: {
@@ -151,19 +157,41 @@ export default {
   },
   methods: {
     show (params) {
-      console.log(this.courseTypesList())
       console.log(params)
+      this.langInfos.forEach(item => {
+        if (!this.form.title) {
+          this.form.title[item.langKey] = ''
+        }
+        if (!this.form.desc) {
+          this.form.desc[item.langKey] = ''
+        }
+      })
+      console.log(this.form.title, this.form.desc)
       this.type = params.type
+      this.showEdit = true
       if (this.type === 'add') {
-        this.form.code = ''
-        this.form.course_type = ''
-        this.form.cover = []
-        this.form.desc = {}
-        this.form.flag = []
-        this.form.is_show = false
-        this.form.lan_code = params.selLang
-        this.form.tags = []
-        this.form.title = {}
+        // this.form.code = ''
+        // this.form.course_type = ''
+        // this.form.cover = []
+        // this.form.desc = {}
+        // this.form.flag = []
+        // this.form.is_show = false
+        // this.form.lan_code = params.selLang
+        // this.form.tags = []
+        // this.form.title = {}
+        let obj = {
+          code: '',
+          course_type: '', // 课程分类
+          cover: [], // 大图标
+          desc: {}, // 描述
+          flag: [], // 小图标
+          is_show: false, // 是否上线
+          lan_code: params.selLang, // 语种的编码
+          tags: [],
+          title: {} // 名称
+        }
+        this.form = obj
+        this.$refs.form.resetFields()
         this.bigImgUrl = ''
         this.smlImgUrl = ''
       } else if (this.type === 'edit') {
@@ -171,12 +199,9 @@ export default {
         this.bigImgUrl = this.assetsDomain + '/' + params.form.cover[0]
         this.smlImgUrl = this.assetsDomain + '/' + params.form.flag[0]
       }
-      this.showEdit = true
     },
     close () {
       this.showEdit = false
-      this.$refs.form.resetFields()
-      this.$emit('addNewCourse')
     },
     async uploadBig () {
       if (Object.keys(this.bigFileRaw).length === 0) {
@@ -261,6 +286,7 @@ export default {
               console.log(res)
               if (res.success) {
                 this.close()
+                this.$emit('addNewCourse')
               }
             })
           } else {
@@ -281,63 +307,13 @@ export default {
               console.log(res)
               if (res.success) {
                 this.close()
+                this.$emit('addNewCourse')
               }
             })
           }
         }
       })
     },
-    // async determine () {
-    //   if (!this.form.code) {
-    //     this.$message({
-    //       showClose: true,
-    //       message: '请输入课程编码',
-    //       type: 'error'
-    //     })
-    //     return false
-    //   }
-    //   if (this.form.course_type === '') {
-    //     this.$message({
-    //       showClose: true,
-    //       message: '请选择课程分类',
-    //       type: 'error'
-    //     })
-    //     return false
-    //   }
-    //   await this.uploadBig()
-    //   await this.uploadSml()
-    //   console.log(this.form)
-    //   if (this.type === 'add') {
-    //     this.form.code = this.form.code + '-Basic'
-    //     await addCourse(this.form).then(res => {
-    //       console.log(res)
-    //       if (res.success) {
-    //         this.showEdit = false
-    //       }
-    //     })
-    //   } else {
-    //     let obj = {
-    //       editInfo: {
-    //         course_type: this.form.course_type,
-    //         cover: this.form.cover,
-    //         desc: this.form.desc,
-    //         flag: this.form.flag,
-    //         is_show: this.form.is_show,
-    //         tags: [],
-    //         title: this.form.title
-    //       },
-    //       uuid: this.form.uuid
-    //     }
-    //     console.log(obj)
-    //     await courseEdit(obj).then(res => {
-    //       console.log(res)
-    //       if (res.success) {
-    //         this.showEdit = false
-    //       }
-    //     })
-    //   }
-    //   this.$emit('addNewCourse')
-    // },
     changeType () {
       console.log(this.form)
     },
@@ -533,5 +509,9 @@ export default {
 .course-content .desc .el-textarea textarea{
   width: 500px!important;
   min-height: 80px!important;
+}
+.course-content .el-row .el-form-item__content {
+  display: flex!important;
+  flex-direction: row;
 }
 </style>

@@ -66,6 +66,7 @@ export default {
         return false
       }
       let formTypes = this.getFormsTypes(this.slideForms)
+      console.log(formTypes.length)
       if (formTypes.length === 0) {
         return false
       }
@@ -100,7 +101,7 @@ export default {
           that.slideForms = arr
         } else {
           arr = that.slideForms.filter(item => {
-            return (item.type)
+            return (item.type && (item.type !== 'countDown'))
           })
           that.slideForms = arr
         }
@@ -115,6 +116,7 @@ export default {
     getFormsTypes (data) {
       var arr = []
       _.map(data, (val) => {
+        console.log(val.type)
         if (_.isArray(val)) {
           if (!val[0].type) {
             return false
@@ -127,8 +129,9 @@ export default {
           arr.push(val.type.toLowerCase())
         }
       })
-      console.log(_.uniq(arr))
-      return _.uniq(arr)
+      let result = _.uniq(arr)
+      console.log(result)
+      return result
     }
   }
 }

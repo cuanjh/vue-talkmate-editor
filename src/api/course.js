@@ -216,6 +216,20 @@ export const courseEdit = (data) => {
   })
 }
 
+/**
+ * @Summary 课程删除
+ * @Produce  application/json
+ * @param {*} data
+ * @Router /editor/course/del [post]
+ */
+export const courseDel = (data) => {
+  return service({
+    url: '/editor/course/del',
+    method: 'post',
+    data
+  })
+}
+
 // @Summary 获取课程列表
 // @Produce  application/json
 // @Param

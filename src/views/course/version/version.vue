@@ -1,7 +1,12 @@
 <template>
   <div class="version-container">
     <div class="top-bar">
-      <el-select v-model="selLang" filterable placeholder="请选择语种" @change="initCourseVersionList">
+      <el-select
+        v-model="selLang"
+        filterable
+        default-first-option
+        placeholder="请选择语种"
+        @change="initCourseVersionList">
         <el-option
           v-for="item in langList"
           :key="item['lan_code']"

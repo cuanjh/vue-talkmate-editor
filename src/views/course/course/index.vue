@@ -84,6 +84,11 @@
           <el-button
             size="mini"
             @click="handleEdit(scope.row)">{{scope.row.is_show ? '隐藏' : '显示'}}</el-button>
+          <el-button
+            size="mini"
+            type="danger"
+            plain
+            @click="deleteCourse(scope.row.uuid)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -99,7 +104,8 @@ import { mapGetters, mapActions, mapState } from 'vuex'
 import {
   getLangList,
   getCourseList,
-  courseEdit
+  courseEdit,
+  courseDel
 } from '@/api/course'
 import EditComp from './edit'
 
@@ -188,6 +194,30 @@ export default {
         selLang: this.selLang
       }
       this.$refs.edit.show(obj)
+    },
+    deleteCourse (id) {
+      console.log(id)
+      this.$confirm('此操作将永久删除该课程分类, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
+        })
+        courseDel({ uuid: id }).then(res => {
+          if (res.success) {
+            this.initData()
+            this.getCourseTypes()
+          }
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
     },
     curCourse () {
       console.log(this.selLang)
