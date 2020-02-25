@@ -34,8 +34,7 @@
           </el-form-item>
           <el-form-item label="图标：" prop="flag[0]" :rules="[
             { required: true, message: '图标不能为空', trigger: 'blur' }
-          ]"
-          >
+          ]">
             <div class="img-box">
               <div class="img">
                 <img :src="imageUrl" alt="">
@@ -127,29 +126,24 @@ export default {
   methods: {
     show (type, params) {
       console.log(type, params)
-      this.langInfos.forEach(item => {
-        if (!this.form.title) {
-          this.form.title[item.langKey] = ''
-        }
-        if (!this.form.desc) {
-          this.form.desc[item.langKey] = ''
-        }
-      })
-      console.log(this.form.title, this.form.desc)
       this.showEdit = true
       this.type = type
       if (type === 'edit' && params) {
         this.form = params
         this.imageUrl = this.assetsDomain + '/' + params.flag[0]
       } else if (type === 'add') {
-        this.form.desc = {}
-        this.form.flag = []
-        this.form.is_hot = false
-        this.form.is_show = false
-        this.form.lan_code = ''
-        this.form.title = {}
-        this.form.word_direction = 'l2r'
-        this.form.list_order = this.langList.pop().list_order + 10
+        let obj = {
+          desc: {},
+          flag: [],
+          is_hot: false,
+          is_show: false,
+          lan_code: '',
+          list_order: this.langList.pop().list_order + 10,
+          title: {},
+          word_direction: 'l2r'
+        }
+        this.form = obj
+        this.$refs.form.resetFields()
         this.imageUrl = ''
       }
       console.log(this.form)

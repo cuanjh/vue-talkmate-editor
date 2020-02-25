@@ -1,9 +1,9 @@
 <template>
   <div class="item-form">
-    <div class="img-box" @click="playVoice">
+    <div class="img-box" v-if="form.image" @click="playVoice">
       <img :src="(assetsDomain + form.image) | urlFix('imageView2/1/format/jpg')" alt="">
     </div>
-    <span class="sentence">{{form.sentence}}</span>
+    <span class="sentence">{{form.sentence ? form.sentence : ''}}</span>
     <div class="record">
       <i></i>
     </div>
