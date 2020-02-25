@@ -164,7 +164,7 @@ export const course = {
     // 获取内容类型列表
     async getOnlineList ({ commit }, data) {
       const res = await getOnlineList(data)
-      if (res.success) {
+      if (res.success && res.data.jobs) {
         let online = res.data.jobs.filter(item => {
           item.time = moment(item.created_time * 1000).format('YYYY/MM/DD')
           return item.online_type !== 'string'

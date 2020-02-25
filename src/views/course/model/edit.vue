@@ -126,6 +126,19 @@ export default {
         this.form = params.data
         console.log(this.form)
         this.newFeilds = this.form.feilds
+      } else {
+        this.form.model_key = ''
+        this.form.name = ''
+        this.form.desc = ''
+        this.form.feilds = [
+          {
+            data_from: '',
+            feild: '',
+            name: '',
+            type: '',
+            list_order: 1
+          }
+        ]
       }
     },
     // 加
@@ -161,18 +174,6 @@ export default {
       console.log(feild, this.form.feilds)
     },
     close () {
-      this.form.model_key = ''
-      this.form.name = ''
-      this.form.desc = ''
-      this.form.feilds = [
-        {
-          data_from: '',
-          feild: '',
-          name: '',
-          type: '',
-          list_order: 1
-        }
-      ]
       this.$emit('editModel')
       this.$refs.form.resetFields()
       this.showEdit = false

@@ -8,10 +8,10 @@
       <div class="course-content">
         <el-form ref="form" :model="form">
           <el-form-item label="名称：">
-            <el-input v-model="form.name"></el-input>
+            <el-input v-model="form.name" maxlength="25" show-word-limit></el-input>
           </el-form-item>
           <el-form-item label="版本号：">
-            <el-input v-model="form.version"></el-input>
+            <el-input v-model="form.version" :disabled="true"></el-input>
           </el-form-item>
           <el-form-item label="背景：" v-show="false">
             <div class="img-box">

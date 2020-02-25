@@ -28,7 +28,7 @@
       <el-table-column
         width="150"
         label="名称">
-        <template slot-scope="scope">
+        <template slot-scope="scope" v-if="Object.keys(scope.row.title).length">
           <!-- <div v-for="l in langInfos" :key="l.langKey">
             {{ l.name + ': ' +  (scope.row.title['' + l.langKey + ''] ? scope.row.title['' + l.langKey + ''] : '') + ' ' }}
           </div> -->
@@ -163,8 +163,10 @@ export default {
     }),
     // 添加新课程
     updateNewLang () {
-      this.initData()
-      console.log(this.pageRequest.pageSize)
+      setTimeout(() => {
+        this.initData()
+      }, 300)
+      console.log(this.pageRequest.pageNum)
     },
     async initData () {
       let res = await getLangList({ 'pageNo': 0, 'pageSize': 999 })
@@ -174,8 +176,9 @@ export default {
         })
         this.allLangs = sortLangs
         this.langList = sortLangs
-        this.handleCurrentChange(this.pageRequest.pageNum)
         this.assetsUrl = res.data.assetsUrl
+        console.log(this.showTableData)
+        this.handleCurrentChange(this.pageRequest.pageNum)
       }
     },
     search () {
@@ -193,11 +196,9 @@ export default {
       this.handleCurrentChange(1)
     },
     handleSizeChange (val) {
-      console.log(`每页 ${val} 条`)
       this.pageRequest.pageSize = val
     },
     handleCurrentChange (val) {
-      console.log(`当前页: ${val}`)
       this.pageRequest.pageNum = val
       let starNum = (val - 1) * this.pageRequest.pageSize
       let endNum = val * this.pageRequest.pageSize
@@ -259,7 +260,11 @@ export default {
     },
     // 预览排序
     previewSort () {
-      this.$refs.sorLang.show()
+      let obj = {
+        allLangs: this.allLangs,
+        assetsUrl: this.assetsUrl
+      }
+      this.$refs.sorLang.show(obj)
     }
   }
 }

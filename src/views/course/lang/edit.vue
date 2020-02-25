@@ -6,15 +6,25 @@
         <i class="el-icon-close"></i>
       </div>
       <div class="lang-content">
-        <el-form ref="form" :model="form" :rules="rules">
-          <el-form-item label="编码：" prop="lan_code">
+        <el-form ref="form" :model="form">
+          <el-form-item label="编码：" prop="lan_code" :rules="[
+            { required: true, message: '编码不能为空', trigger: 'blur' },
+            { pattern: /^[a-zA-Z]+$/, message: '只允许输入字母！' }
+          ]">
             <el-input v-model="form.lan_code" maxlength="20" show-word-limit :disabled="type == 'edit'"></el-input>
           </el-form-item>
-          <el-form-item label="名称：" class="name">
-            <div class="input-box" v-for="l in langInfos" :key="'title' + l.langKey">
+          <el-form-item label="名称：" class="name" required>
+            <!-- <div class="input-box" v-for="l in langInfos" :key="'title' + l.langKey">
               <el-input v-model="form.title[l.langKey]" maxlength="30" show-word-limit></el-input>
               <span>{{'(' + l.name + ')'}}</span>
-            </div>
+            </div> -->
+            <el-row v-for="l in langInfos" :key="'title' + l.langKey">
+              <el-form-item  class="input-box" :prop="'title.' + l.langKey"
+                :rules="[{required: true, message: '名称不能为空', trigger: 'blur'}]">
+                <el-input v-model="form.title[l.langKey]" maxlength="30" show-word-limit></el-input>
+                <span>{{'(' + l.name + ')'}}</span>
+              </el-form-item>
+            </el-row>
           </el-form-item>
           <el-form-item label="描述：" class="desc">
             <div class="input-box" v-for="l in langInfos" :key="'desc' + l.langKey">
@@ -22,7 +32,10 @@
               <span>{{'(' + l.name + ')'}}</span>
             </div>
           </el-form-item>
-          <el-form-item label="图标：">
+          <el-form-item label="图标：" prop="flag[0]" :rules="[
+            { required: true, message: '图标不能为空', trigger: 'blur' }
+          ]"
+          >
             <div class="img-box">
               <div class="img">
                 <img :src="imageUrl" alt="">
@@ -54,10 +67,10 @@
               <el-radio :label="true">是</el-radio>
             </el-radio-group>
           </el-form-item>
-          <el-form-item label="是否显示" class="flex-class">
+          <el-form-item label="是否显示：" class="flex-class">
             <el-radio-group v-model="form.is_show">
-              <el-radio :label="true">是</el-radio>
               <el-radio :label="false">否</el-radio>
+              <el-radio :label="true">是</el-radio>
             </el-radio-group>
           </el-form-item>
         </el-form>
@@ -97,13 +110,7 @@ export default {
       },
       imageUrl: '',
       fileRaw: {},
-      type: '',
-      rules: {
-        lan_code: [
-          { required: true, message: '编码不能为空', trigger: 'blur' },
-          { pattern: /^[a-zA-Z]+$/, message: '只允许输入字母！' }
-        ]
-      }
+      type: ''
     }
   },
   components: {
@@ -120,6 +127,15 @@ export default {
   methods: {
     show (type, params) {
       console.log(type, params)
+      this.langInfos.forEach(item => {
+        if (!this.form.title) {
+          this.form.title[item.langKey] = ''
+        }
+        if (!this.form.desc) {
+          this.form.desc[item.langKey] = ''
+        }
+      })
+      console.log(this.form.title, this.form.desc)
       this.showEdit = true
       this.type = type
       if (type === 'edit' && params) {
@@ -136,11 +152,15 @@ export default {
         this.form.list_order = this.langList.pop().list_order + 10
         this.imageUrl = ''
       }
+      console.log(this.form)
+    },
+    validatorTitle (rule, value, callback) {
+      console.log(rule, value, callback)
     },
     close () {
       this.showEdit = false
-      this.$refs.form.resetFields()
-      this.$emit('addNewLang')
+      // this.$refs.form.resetFields()
+      // this.$refs.form.clearValidate(['lan_code', 'flag[0]', 'title'])
     },
     async upload () {
       if (Object.keys(this.fileRaw).length === 0) {
@@ -206,6 +226,7 @@ export default {
               console.log(res)
               if (res.success) {
                 this.close()
+                this.$emit('addNewLang')
               }
             })
           } else if (this.type === 'add') {
@@ -214,6 +235,7 @@ export default {
               if (res.success) {
                 console.log(res)
                 this.close()
+                this.$emit('addNewLang')
               }
             })
           }
@@ -362,10 +384,14 @@ export default {
   display: flex!important;
   flex-direction: column;
 }
+.lang-content .el-row .el-form-item__content {
+  display: flex!important;
+  flex-direction: row;
+}
 .lang-content .input-box .el-input {
   margin-bottom: 10px;
 }
-.lang-content .desc .input-box {
+.lang-content .input-box {
   display: flex;
   align-items: center;
 }
