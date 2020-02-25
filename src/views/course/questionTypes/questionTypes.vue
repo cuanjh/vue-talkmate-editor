@@ -5,27 +5,42 @@
         <el-button style="outline:none;" type="primary" class="btnAdd" @click="addType()">添加</el-button>
       </div>
       <el-table
-        :data="contentTypeList"
+        :data="showTableData"
         style="width: 100%;">
         <el-table-column
           label="序号"
           width="80"
-          type="index">
+          align="center">
+          <template slot-scope="scope">
+            <span>{{scope.$index+(pageRequest.pageNum - 1) * pageRequest.pageSize + 1}}</span>
+          </template>
         </el-table-column>
         <el-table-column
           width="200"
-          label="类型"
-          prop="type">
+          label="类型">
+          <template slot-scope="scope">
+            <el-tooltip :content="scope.row.type" width="300" placement="top" effect="light">
+              <span>{{ scope.row.type }}</span>
+            </el-tooltip>
+          </template>
         </el-table-column>
         <el-table-column
           width="200"
-          label="名称"
-          prop="name">
+          label="名称">
+          <template slot-scope="scope">
+            <el-tooltip :content="scope.row.name" width="300" placement="top" effect="light">
+              <span>{{ scope.row.name }}</span>
+            </el-tooltip>
+          </template>
         </el-table-column>
         <el-table-column
           width="300"
-          label="描述"
-          prop="desc">
+          label="描述">
+          <template slot-scope="scope">
+            <el-tooltip :content="scope.row.desc" width="300" placement="top" effect="light">
+              <span>{{ scope.row.desc }}</span>
+            </el-tooltip>
+          </template>
         </el-table-column>
         <el-table-column
           fixed="right"
@@ -35,6 +50,17 @@
           </template>
         </el-table-column>
       </el-table>
+      <div class="pagination-box">
+        <el-pagination
+          background layout="prev, pager, next"
+          :current-page="pageRequest.pageNum"
+          :page-size="pageRequest.pageSize"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :total="contentTypeList.length"
+          >
+        </el-pagination>
+      </div>
     </div>
     <edit-comp ref="contentTypeEdit" @addContentType="initData"/>
   </div>
@@ -50,6 +76,12 @@ import EditComp from './edit'
 export default {
   data () {
     return {
+      showTableData: [],
+      // 分页信息
+      pageRequest: {
+        pageNum: 1,
+        pageSize: 5
+      }
     }
   },
   created () {
@@ -70,6 +102,18 @@ export default {
     initData () {
       this.getContentTypeList({ pageNo: 0, pageSize: 0 })
       console.log('initData')
+      this.handleCurrentChange(this.pageRequest.pageNum)
+    },
+    handleSizeChange (val) {
+      console.log(`每页 ${val} 条`)
+      this.pageRequest.pageSize = val
+    },
+    handleCurrentChange (val) {
+      console.log(`当前页: ${val}`)
+      this.pageRequest.pageNum = val
+      let starNum = (val - 1) * this.pageRequest.pageSize
+      let endNum = val * this.pageRequest.pageSize
+      this.showTableData = this.contentTypeList.slice(starNum, endNum)
     },
     addType () {
       this.$refs.contentTypeEdit.show()
@@ -102,6 +146,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.pagination-box {
+  text-align: center;
+  padding-top: 20px;
+}
 .question-content {
   padding-bottom: 50px;
 }
@@ -113,5 +161,13 @@ export default {
 <style>
 .question-container .el-table .cell {
   padding-right: 30px;
+}
+.question-container .el-table td div {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  max-height: 46px;
 }
 </style>

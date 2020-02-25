@@ -10,10 +10,6 @@
     <el-table
       :data="showTableData"
       style="width: 100%;">
-      <!-- <el-table-column
-        label="序号"
-        width="60"
-        type="index"> -->
       <el-table-column label="序号" width="60" align="center">
         <template slot-scope="scope">
           <span>{{scope.$index+(pageRequest.pageNum - 1) * pageRequest.pageSize + 1}}</span>
@@ -33,14 +29,26 @@
         width="150"
         label="名称">
         <template slot-scope="scope">
-          <div v-for="l in langInfos" :key="l.langKey">{{ l.name + ': ' +  (scope.row.title['' + l.langKey + ''] ? scope.row.title['' + l.langKey + ''] : '') + ' ' }}</div>
+          <!-- <div v-for="l in langInfos" :key="l.langKey">
+            {{ l.name + ': ' +  (scope.row.title['' + l.langKey + ''] ? scope.row.title['' + l.langKey + ''] : '') + ' ' }}
+          </div> -->
+          <div v-for="l in langInfos" :key="l.langKey">
+            <el-tooltip :content="l.name + ': ' +  (scope.row.title['' + l.langKey + ''] ? scope.row.title['' + l.langKey + ''] : '') + ' '" width="300" placement="top" effect="light">
+              <span>{{ l.name + ': ' +  (scope.row.title['' + l.langKey + ''] ? scope.row.title['' + l.langKey + ''] : '') + ' ' }}</span>
+            </el-tooltip>
+          </div>
         </template>
       </el-table-column>
       <el-table-column
         width="200"
         label="描述">
         <template slot-scope="scope" v-if="Object.keys(scope.row.desc).length">
-          <div v-for="l in langInfos" :key="l.langKey">{{ l.name + ': ' +  (scope.row.desc['' + l.langKey + ''] ? scope.row.desc['' + l.langKey + ''] : '') + ' ' }}</div>
+          <!-- <div v-for="l in langInfos" :key="l.langKey">{{ l.name + ': ' +  (scope.row.desc['' + l.langKey + ''] ? scope.row.desc['' + l.langKey + ''] : '') + ' ' }}</div> -->
+          <div v-for="l in langInfos" :key="l.langKey">
+            <el-tooltip :content="l.name + ': ' +  (scope.row.desc['' + l.langKey + ''] ? scope.row.desc['' + l.langKey + ''] : '') + ' '" width="300" placement="top" effect="light">
+              <span>{{ l.name + ': ' +  (scope.row.desc['' + l.langKey + ''] ? scope.row.desc['' + l.langKey + ''] : '') + ' ' }}</span>
+            </el-tooltip>
+          </div>
         </template>
         <template v-else>
         </template>
@@ -83,17 +91,6 @@
             size="mini"
             plain
             @click="editLang(scope.row)">编辑</el-button>
-          <!-- <el-button
-            size="mini"
-            plain
-            type="success"
-            :disabled="scope.row.is_show"
-            @click="handleEdit(scope.row)">显示</el-button>
-          <el-button
-            size="mini"
-            plain
-            type="warning"
-            @click="handleEdit(scope.row)">隐藏</el-button> -->
           <el-button
             size="mini"
             plain
@@ -167,6 +164,7 @@ export default {
     // 添加新课程
     updateNewLang () {
       this.initData()
+      console.log(this.pageRequest.pageSize)
     },
     async initData () {
       let res = await getLangList({ 'pageNo': 0, 'pageSize': 999 })
@@ -176,19 +174,23 @@ export default {
         })
         this.allLangs = sortLangs
         this.langList = sortLangs
-        this.handleCurrentChange(1)
+        this.handleCurrentChange(this.pageRequest.pageNum)
         this.assetsUrl = res.data.assetsUrl
       }
     },
     search () {
-      console.log(this.searchKey)
+      let _this = this
+      console.log(_this.searchKey)
       this.langList = this.allLangs.filter(item => {
         let flag = false
         this.langInfos.forEach(i => {
-          flag = flag || item.title['' + i.langKey + ''].indexOf(this.searchKey) > -1
+          flag = flag || (item.title['' + i.langKey + ''] && (item.title['' + i.langKey + ''].indexOf(_this.searchKey) > -1))
         })
         return flag
       })
+      console.log(this.langList)
+      console.log(this.showTableData)
+      this.handleCurrentChange(1)
     },
     handleSizeChange (val) {
       console.log(`每页 ${val} 条`)
@@ -301,4 +303,11 @@ export default {
     -webkit-box-orient: vertical;
     max-height: 46px;
   }
+
+</style>
+<style>
+.el-tooltip__popper {
+  max-width: 500px;
+  line-height: 20px;
+}
 </style>
