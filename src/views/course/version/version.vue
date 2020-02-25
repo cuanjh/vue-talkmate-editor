@@ -28,7 +28,9 @@
           <span>线上</span>
         </div>
         <div class="content">
-          <div class="title" v-text="item.name"></div>
+          <el-tooltip effect="dark" :content="item.name" placement="top">
+            <div class="title" v-text="item.name"></div>
+          </el-tooltip>
           <ul>
             <!-- <li>创建时间：2018年6月1日</li> -->
             <li>最后修改时间：{{ item.update_time | formatDate('YYYY年MM月DD日') }}</li>
@@ -393,6 +395,10 @@ export default {
       font-weight: 400;
       line-height:22px;
       color: #000;
+      width: 280px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     ul {
       padding-top: 10px;

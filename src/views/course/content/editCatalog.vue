@@ -198,55 +198,68 @@ export default {
       }
       this.drawer = true
     },
-    async onSubmit () {
+    onSubmit () {
       console.log('submit!', this.form)
-      let res
-      if (this.handler === 'add') {
-        let obj1 = {
-          catalogsInfo: {
-            content_model: this.form.content_model,
-            cover: this.form.cover,
-            desc: this.form.desc,
-            flag: this.form.flag,
-            tags: [],
-            has_changed: true,
-            is_show: this.form.is_show,
-            list_order: this.form.list_order,
-            name: this.form.name,
-            parent_uuid: this.form.parent_uuid,
-            title: this.form.title,
-            type: this.form.type
-          },
-          num: this.form.num
+      this.$refs['form'].validate((valid) => {
+        if (valid) {
+          if (this.handler === 'add') {
+            let obj1 = {
+              catalogsInfo: {
+                content_model: this.form.content_model,
+                cover: this.form.cover,
+                desc: this.form.desc,
+                flag: this.form.flag,
+                tags: [],
+                has_changed: true,
+                is_show: this.form.is_show,
+                list_order: this.form.list_order,
+                name: this.form.name,
+                parent_uuid: this.form.parent_uuid,
+                title: this.form.title,
+                type: this.form.type
+              },
+              num: this.form.num
+            }
+            addCatalog(obj1).then(res => {
+              this.trackNum += 1
+              if (res.success) {
+                this.$message({
+                  type: 'success',
+                  message: res.msg
+                })
+                this.$emit('resetTrackData', { pUUID: this.form.parent_uuid, trackNum: this.trackNum })
+                this.drawer = false
+              }
+            })
+          } else {
+            let obj2 = {
+              catalog_info: {
+                cover: this.form.cover,
+                desc: this.form.desc,
+                flag: this.form.flag,
+                has_changed: true,
+                list_order: this.form.list_order,
+                name: this.form.name,
+                tags: [],
+                title: this.form.title,
+                is_show: this.form.is_show
+              },
+              uuid: this.form.uuid
+            }
+            console.log(obj2)
+            editCatalog(obj2).then(res => {
+              if (res.success) {
+                this.$message({
+                  type: 'success',
+                  message: res.msg
+                })
+                this.$emit('resetTrackData', { pUUID: this.form.parent_uuid, trackNum: this.trackNum })
+                this.drawer = false
+              }
+            })
+          }
         }
-        res = await addCatalog(obj1)
-        this.trackNum += 1
-      } else {
-        let obj2 = {
-          catalog_info: {
-            cover: this.form.cover,
-            desc: this.form.desc,
-            flag: this.form.flag,
-            has_changed: true,
-            list_order: this.form.list_order,
-            name: this.form.name,
-            tags: [],
-            title: this.form.title,
-            is_show: this.form.is_show
-          },
-          uuid: this.form.uuid
-        }
-        console.log(obj2)
-        res = await editCatalog(obj2)
-      }
-      if (res.success) {
-        this.$message({
-          type: 'success',
-          message: res.msg
-        })
-        this.$emit('resetTrackData', { pUUID: this.form.parent_uuid, trackNum: this.trackNum })
-        this.drawer = false
-      }
+      })
     },
     resetFormData () {
       let h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight

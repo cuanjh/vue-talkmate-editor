@@ -58,6 +58,7 @@
                 }"
                 @clickFolder="clickFolder"
                 @contentMenu="contentMenu"
+                @resetTrackData="resetTrackData"
               />
             </div>
             <div class="other" @contextmenu="otherContextMenu($event, item[0], index)"></div>
@@ -211,7 +212,7 @@ export default {
         folderIndex++
       }
       folder = track[folderIndex]
-      if (folder) {
+      if (folder && (e.keyCode === 37 || e.keyCode === 38 || e.keyCode === 39 || e.keyCode === 40)) {
         this.clickFolder({ folder: folder, trackNum: trackNum })
       }
     }

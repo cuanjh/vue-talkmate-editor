@@ -22,6 +22,7 @@
           @delForm="delForm"
           @switchForm="switchForm"/>
       </div>
+      <div class="list" id="sort-form" v-else-if="contentModel == 'content_model_kid_test'"></div>
       <div class="list" id="sort-form" v-else>
         <form-comp
           :data-id="index"
@@ -38,7 +39,7 @@
       <div class="item" v-for="f in feilds" :key="f.feild">
         <el-form-item label-width="140px" :label="f.name" v-if="(f.feild !== 'list_order' && f.feild !== 'options' && f.type !== 'template' && f.type !== 'templateArray' && f.feild !== 'sentence_phoneticize' && f.feild !== 'options_phoneticize') || (f.type == 'template' && contents[activeFormIndex]['' + f.feild + '']) || (version['selLang'] == 'JPN' && (f.feild == 'sentence_phoneticize' || f.feild == 'options_phoneticize')) || (f.feild === 'options' && (contents[activeFormIndex]['type'] == 'makeSentence' || contents[activeFormIndex]['type'] == 'fillGap'))">
           <el-input
-            v-if="f.type != 'array' && f.data_from == '' && f.type !== 'templateArray'"
+            v-if="f.type != 'array_string' && f.type != 'array' && f.data_from == '' && f.type !== 'templateArray'"
             v-model="contents[activeFormIndex]['' + f.feild + '']"
             :disabled="f.feild == 'list_order' || f.type == 'template'"></el-input>
           <el-select v-if="f.data_from == 'content_types'" v-model="contents[activeFormIndex]['' + f.feild + '']" placeholder="请选择">
@@ -65,7 +66,7 @@
             <el-tag type="warning" v-show="contents[activeFormIndex]['type'] == 'fillGap'">注：第一个输入项为正确选项，其他为错误选项。</el-tag>
           </div>
           <!-- 图片声音 start-->
-          <div class="form-sound" v-if="f.feild == 'sound' || f.feild == 'image' || f.feild == 'cover' || f.feild == 'video'">
+          <div class="form-sound" v-if="f.type == 'string' && (f.feild == 'sound' || f.feild == 'image' || f.feild == 'cover' || f.feild == 'video')">
             <el-input v-model="contents[activeFormIndex]['' + f.feild + '']" :placeholder="f.feild == 'sound' ? '请上传mp3格式的音频' : ''">
               <el-button slot="append" @click="clear(f.feild)">清除</el-button>
             </el-input>
@@ -121,6 +122,21 @@
               @use="use"/>
           </div>
           <!-- 图片声音 end-->
+          <div class="array-string" v-if="f.type == 'array_string'">
+            <el-input placeholder="请输入内容" v-for="(item, index) in contents[activeFormIndex]['' + f.feild + '']" :key="f.feild + index" v-model="contents[activeFormIndex]['' + f.feild + ''][index]">
+              <el-upload slot="prepend"
+                v-if="f.data_from == 'upload'"
+                action="#"
+                :accept="f.feild == 'sound' ? 'audio/mp3' : 'image/png,image/jpg,image/jpeg'"
+                :on-change="uploadOnchange"
+                :show-file-list="false"
+                :auto-upload="false">
+                <el-button type="text" @click="upload(f.feild, index)">上传</el-button>
+              </el-upload>
+              <el-button slot="append" icon="el-icon-minus" @click="minus(index, f.feild)"></el-button>
+              <el-button v-show="index == contents[activeFormIndex]['' + f.feild + ''].length - 1" slot="append" icon="el-icon-plus" @click="plus(f.feild)"></el-button>
+            </el-input>
+          </div>
         </el-form-item>
         <el-form-item :label="f.name" v-if="(f.type == 'templateArray' && contents[activeFormIndex]['' + f.feild + ''] && contents[activeFormIndex]['' + f.feild + ''].length)">
           <div class="template-options">
@@ -178,7 +194,9 @@ export default {
       form: {},
       activeFormIndex: 0,
       activeFeild: '',
-      baseFormDataSelf: ''
+      baseFormDataSelf: '',
+      copyBaseFormDataSelf: '',
+      uploadIndex: ''
     }
   },
   components: {
@@ -219,6 +237,7 @@ export default {
       this.$set(this.$data, 'pUUID', params.pUUID)
       this.$set(this.$data, 'contents', params.contents)
       this.baseFormDataSelf = params.baseFormData
+      this.copyBaseFormDataSelf = params.baseFormData
       this.$set(this.$data, 'feilds', params.feilds.sort((a, b) => { return a.list_order - b.list_order }))
       this.$set(this.$data, 'contentModel', params.contentModel)
       this.formHeight = 220
@@ -292,6 +311,7 @@ export default {
       }
     },
     addForm () {
+      this.copyBaseFormDataSelf = this.baseFormDataSelf
       let obj = JSON.parse(this.baseFormDataSelf)
       this.contents.push(obj)
       this.activeFormIndex = this.contents.length - 1
@@ -451,6 +471,43 @@ export default {
       console.log(url)
       let res = await uploadQiniu(file.raw, this.token, url)
       this.$set(this.contents[this.activeFormIndex], 'cover', res.key)
+    },
+    // 减少输入框
+    minus (index, feild) {
+      console.log(index, feild)
+      if (this.contents[this.activeFormIndex]['' + feild + ''].length > 1) {
+        this.contents[this.activeFormIndex]['' + feild + ''].splice(index, 1)
+      } else {
+        this.$set(this.contents[this.activeFormIndex]['' + feild + ''], index, '')
+      }
+      this.copyBaseFormDataSelf = JSON.stringify(this.contents[this.activeFormIndex])
+    },
+    // 增加输入框
+    plus (feild) {
+      let obj = JSON.parse(this.copyBaseFormDataSelf)
+      obj['' + feild + ''].push('')
+      this.$set(this.contents, this.activeFormIndex, obj)
+      this.copyBaseFormDataSelf = JSON.stringify(obj)
+    },
+    upload (feild, index) {
+      this.uploadIndex = feild + '_' + index
+      console.log(this.uploadIndex)
+    },
+    async uploadOnchange (file) {
+      console.log(file)
+      let uploadIndexArr = this.uploadIndex.split('_')
+      let date = moment(new Date()).format('YYYY/MM/DD')
+      let ext = file.name.split('.')[1]
+      let url = ''
+      if (uploadIndexArr[0] === 'sound') {
+        url = 'course/sounds/' + this.version.selLang.toLowerCase() + '/' + date + '/' + file.uid + '.' + ext
+      } else if (uploadIndexArr[0] === 'image') {
+        url = 'course/images/common/' + this.version.selLang.toLowerCase() + '/kid/' + date + '/' + file.uid + '.' + ext
+      }
+      console.log(url)
+      let res = await uploadQiniu(file.raw, this.token, url)
+      this.$set(this.contents[this.activeFormIndex][uploadIndexArr[0]], uploadIndexArr[1], res.key)
+      this.copyBaseFormDataSelf = JSON.stringify(this.contents[this.activeFormIndex])
     }
   }
 }
@@ -471,6 +528,10 @@ export default {
   .left {
     padding-left: 20px;
   }
+  .right {
+    min-width: 70px;
+    margin-left: 20px;
+  }
 }
 .forms {
   background: #E5E6E5;
@@ -487,6 +548,7 @@ export default {
   }
 }
 .el-form {
+  position: relative;
   padding: 20px 40px 20px 20px;
 }
 .form-image {
@@ -554,6 +616,12 @@ export default {
   flex-direction: row;
   .el-button {
     margin-right: 20px;
+  }
+}
+
+.array-string {
+  .el-input {
+    margin: 5px 0;
   }
 }
 </style>

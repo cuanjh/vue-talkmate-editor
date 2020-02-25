@@ -33,6 +33,8 @@ export default {
           val = ''
         } else if (item.type === 'templateArray' || item.type === 'array') {
           val = []
+        } else if (item.type === 'array_string') {
+          val = ['']
         }
         baseFormData[item.feild] = val
       })

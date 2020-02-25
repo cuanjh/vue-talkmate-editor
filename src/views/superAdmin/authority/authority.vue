@@ -24,14 +24,19 @@
 
     <!-- 新增角色弹窗 -->
     <el-dialog :visible.sync="dialogFormVisible" title="新增角色">
-      <el-form :model="form">
+      <el-form ref="form" :model="form">
          <el-form-item label="父级角色ID">
           <el-input autocomplete="off" disabled v-model="form.parentId"></el-input>
         </el-form-item>
-        <el-form-item label="角色ID">
+        <el-form-item label="角色ID" prop="authorityId" :rules="[
+            {required: true, message: '角色ID不能为空', trigger: 'blur'},
+            {pattern: /^(?!0+$)^\d*$/, message: '只允许输入大于0的数字！'}
+          ]">
           <el-input autocomplete="off" v-model="form.authorityId"></el-input>
         </el-form-item>
-        <el-form-item label="角色姓名">
+        <el-form-item label="角色姓名" prop="authorityName" :rules="[
+            {required: true, message: '角色姓名不能为空', trigger: 'blur'},
+          ]">
           <el-input autocomplete="off" v-model="form.authorityName"></el-input>
         </el-form-item>
       </el-form>

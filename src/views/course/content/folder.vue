@@ -11,9 +11,8 @@
         <el-image
           v-show="folderFlagUrl"
           :src="folderFlagUrl"
-          lazy
           fit="cover"></el-image>
-        <i class="el-icon-document" v-show="folder.type == 'content'"></i>
+        <i class="el-icon-document" v-show="!folderFlagUrl && folder.type == 'content'"></i>
       </div>
       <div :class="['title', {
         'warning': folder.has_changed,
@@ -80,7 +79,7 @@ export default {
       this.isShow = false
       setTimeout(() => {
         this.$refs['input'].focus()
-      }, 0)
+      }, 100)
     },
     blurFolder () {
       let obj = {
@@ -96,8 +95,10 @@ export default {
         },
         uuid: this.folder.uuid
       }
-      editCatalog(obj)
-      this.isShow = true
+      editCatalog(obj).then(res => {
+        this.$emit('resetTrackData', { pUUID: this.folder.parent_uuid, trackNum: this.trackNum })
+        this.isShow = true
+      })
     },
     contentmenu (ev) {
       this.$emit('contentMenu', { event: ev, folder: this.folder, trackNum: this.trackNum })
@@ -120,7 +121,10 @@ export default {
         },
         uuid: this.folder.uuid
       }
-      editCatalog(obj)
+      editCatalog(obj).then(res => {
+        this.$emit('resetTrackData', { pUUID: this.folder.parent_uuid, trackNum: this.trackNum })
+        this.isShow = true
+      })
     }
   }
 }
@@ -162,6 +166,8 @@ export default {
       }
     }
     .el-image {
+      width: 100%;
+      height: 100%;
       border-radius: 50%;
     }
     .danger {
