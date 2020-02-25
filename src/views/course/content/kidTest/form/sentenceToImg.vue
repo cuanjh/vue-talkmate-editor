@@ -1,12 +1,12 @@
 <template>
   <div class="form">
     <div class="correct-area">
-      <div class="wrap">
+      <div class="wrap" v-show="correct">
         <i @click="play(correct)"></i>
         <span>{{ correct.sentence }}</span>
       </div>
     </div>
-    <div class="options">
+    <div class="options" v-show="options.length">
       <div class="option" v-for="(item, index) in options" :key="index" @click="play(item)">
         <el-image lazy :src="(assetsDomain + item.image) | urlFix('imageView2/1/format/jpg')" fit="cover"></el-image>
       </div>
@@ -64,6 +64,7 @@ export default {
   border-radius: 4px;
   background: #F5F6FA;
   padding-bottom: 20px;
+  min-height: 146px;
   .correct-area {
     text-align: center;
     width: 100%;

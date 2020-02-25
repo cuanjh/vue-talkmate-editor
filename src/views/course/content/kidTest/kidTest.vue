@@ -11,34 +11,41 @@
         </el-tooltip>
       </div>
     </div>
-    <!-- <div class="form-img">
-      <el-image v-show="imgUrl" :src="imgUrl | urlFix('imageView2/1/format/jpg')" fit="cover"></el-image>
+    <div class="form" v-show="form.type == 'sentenceToImg' || form.type == 'speakToImg'">
+      <div class="correct-area">
+        <div class="wrap" v-show="correct">
+          <i @click="play(correct)"></i>
+          <span v-show="form.type == 'sentenceToImg'">{{ correct.sentence }}</span>
+        </div>
+      </div>
+      <div class="options" v-show="options.length">
+        <div class="option" v-for="(item, index) in options" :key="index" @click="play(item)">
+          <el-image lazy :src="(assetsDomain + item.image) | urlFix('imageView2/1/format/jpg')" fit="cover"></el-image>
+        </div>
+      </div>
     </div>
-    <div class="text">
-      <span v-text="form.type == 'fillGap' ? form.sentence.replace(form.options[0], '______') : form.sentence"></span>
-      <i v-show="form.sound" @click="play"></i>
-    </div> -->
-    <!-- 看句子选图片 -->
-    <sentence-to-img v-show="form.type == 'sentenceToImg'" :form="form"></sentence-to-img>
-    <!-- 听声音选图片 -->
-    <speak-to-img v-show="form.type == 'speakToImg'"></speak-to-img>
+    <div :class="['form', form.type]" v-show="form.type == 'fillGap'">
+      <div class="correct-area">
+        <div class="wrap" v-show="correct">
+          <i @click="play(correct)"></i>
+          <span v-for="(item, index) in correct.sentence" :key="'word' + index">{{ item == correct.option ? ' ' :  item}}</span>
+        </div>
+      </div>
+      <div class="options">
+        <div class="option" v-for="item in form.options" :key="item">{{ item }}</div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import { mapState, mapMutations } from 'vuex'
-import sentenceToImg from './form/sentenceToImg'
-import speakToImg from './form/speakToImg'
 export default {
   props: ['form', 'formIndex'],
   data () {
     return {
       myAudio: new Audio()
     }
-  },
-  components: {
-    sentenceToImg,
-    speakToImg
   },
   computed: {
     ...mapState({
@@ -62,6 +69,26 @@ export default {
         url = this.assetsDomain + this.form.image
       }
       return url
+    },
+    correct () {
+      return {
+        sentence: this.form.sentence[0],
+        sound: this.form.sound[0],
+        image: this.form.image[0],
+        option: this.form.options[0]
+      }
+    },
+    options () {
+      let arr = []
+      if (this.form.image && this.form.image.length && this.form.sound && this.form.sound.length) {
+        this.form.image.forEach((val, index) => {
+          let obj = {}
+          obj['image'] = val
+          obj['sound'] = this.form.sound[index]
+          arr.push(obj)
+        })
+      }
+      return arr
     }
   },
   methods: {
@@ -71,9 +98,11 @@ export default {
     switchForm () {
       this.$emit('switchForm', { content: this.form, formIndex: this.formIndex })
     },
-    play () {
-      this.myAudio.src = this.assetsDomain + this.form.sound
-      this.myAudio.play()
+    play (item) {
+      this.myAudio.src = this.assetsDomain + item.sound
+      this.myAudio.oncanplay = () => {
+        this.myAudio.play()
+      }
     },
     delForm () {
       this.$emit('delForm', { form: this.form, formIndex: this.formIndex })
@@ -153,5 +182,68 @@ export default {
 }
 .active {
   border: 1px solid #007AFF;
+}
+.form {
+  margin-top: 16px;
+  border-radius: 4px;
+  background: #F5F6FA;
+  padding-bottom: 20px;
+  min-height: 146px;
+  .correct-area {
+    text-align: center;
+    width: 100%;
+    padding: 20px 0 10px;
+    .wrap {
+      i {
+        width: 15px;
+        min-width: 15px;
+        margin-right: 10px;
+        vertical-align: middle;
+        height: 15px;
+        display: inline-block;
+        background-image: url('../../../../assets/images/course/icon-voice.png');
+        background-repeat: no-repeat;
+        background-size: cover;
+        cursor: pointer;
+      }
+      background: #FFF;
+      display: inline-block;
+      padding: 10px 20px;
+      border-radius: 20px;
+    }
+  }
+  .options {
+    display: flex;
+    flex-direction: row;
+    .option {
+      background: #FFF;
+      width: 100px;
+      height: 50px;
+      margin: 10px;
+      padding: 5px;
+      border-radius: 4px;
+      cursor: pointer;
+      .el-image {
+        border-radius: 4px;
+      }
+    }
+  }
+}
+
+.fillGap {
+  .wrap {
+    span {
+      border-bottom: 2px solid rgba($color: #000000, $alpha: 0.4);
+      margin: 0 5px;
+      padding: 0 5px;
+    }
+  }
+  .options {
+    .option {
+      text-align: center;
+      margin-top: 20px;
+      line-height: 46px;
+    }
+  }
 }
 </style>

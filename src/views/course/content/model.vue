@@ -341,6 +341,7 @@ export default {
         }).then(() => {
           let obj = {
             content_model: this.contentModel,
+            parent_uuid: this.pUUID,
             del_uuids: [
               params.form.uuid
             ]
