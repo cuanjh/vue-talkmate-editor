@@ -45,7 +45,15 @@
                 <el-input v-model="feild.name" ></el-input>
               </el-form-item>
               <el-form-item label="type: ">
-                <el-input v-model="feild.type" ></el-input>
+                <!-- <el-input v-model="feild.type" ></el-input> -->
+                <el-select v-model="feild.type" placeholder="请选择字段类型">
+                  <el-option
+                    v-for="item in feildTypes"
+                    :key="item"
+                    :label="item"
+                    :value="item">
+                  </el-option>
+                </el-select>
               </el-form-item>
             </div>
           </div>
@@ -91,7 +99,14 @@ export default {
         ]
       },
       newFeilds: [],
-      type: ''
+      type: '',
+      feildTypes: [
+        'int',
+        'string',
+        'template',
+        'templateArray',
+        'array'
+      ]
     }
   },
   mounted () {

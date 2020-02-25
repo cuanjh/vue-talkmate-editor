@@ -22,7 +22,17 @@
           @delForm="delForm"
           @switchForm="switchForm"/>
       </div>
-      <div class="list" id="sort-form" v-else-if="contentModel == 'content_model_kid_test'"></div>
+      <div class="list" id="sort-form" v-else-if="contentModel == 'content_model_kid_test'">
+        <form-kid-test
+          :data-id="index"
+          :class="{'active': activeFormIndex == index}"
+          v-for="(content, index) in contents"
+          :key="index"
+          :form="content"
+          :formIndex="index"
+          @delForm="delForm"
+          @switchForm="switchForm"/>
+      </div>
       <div class="list" id="sort-form" v-else>
         <form-comp
           :data-id="index"
@@ -39,6 +49,7 @@
       <div class="item" v-for="f in feilds" :key="f.feild">
         <el-form-item label-width="140px" :label="f.name" v-if="(f.feild !== 'list_order' && f.feild !== 'options' && f.type !== 'template' && f.type !== 'templateArray' && f.feild !== 'sentence_phoneticize' && f.feild !== 'options_phoneticize') || (f.type == 'template' && contents[activeFormIndex]['' + f.feild + '']) || (version['selLang'] == 'JPN' && (f.feild == 'sentence_phoneticize' || f.feild == 'options_phoneticize')) || (f.feild === 'options' && (contents[activeFormIndex]['type'] == 'makeSentence' || contents[activeFormIndex]['type'] == 'fillGap'))">
           <el-input
+            :maxlength="100" show-word-limit
             v-if="f.type != 'array_string' && f.type != 'array' && f.data_from == '' && f.type !== 'templateArray'"
             v-model="contents[activeFormIndex]['' + f.feild + '']"
             :disabled="f.feild == 'list_order' || f.type == 'template'"></el-input>
@@ -53,7 +64,7 @@
           <el-checkbox-group v-if="f.data_from == 'content_tags'" v-model="contents[activeFormIndex]['' + f.feild + '']">
             <el-checkbox v-for="item in contentTags" :key="item.key" :label="item.key">{{ item.name }}</el-checkbox>
           </el-checkbox-group>
-          <div class="options" v-if="f.feild === 'options' && (contents[activeFormIndex]['type'] == 'makeSentence' || contents[activeFormIndex]['type'] == 'fillGap')">
+          <!-- <div class="options" v-if="f.feild === 'options' && (contents[activeFormIndex]['type'] == 'makeSentence' || contents[activeFormIndex]['type'] == 'fillGap')">
             <div class="option-list">
               <div class="option-item" v-for="(item, index) in contents[activeFormIndex]['' + f.feild + '']" :key="index">
                 <input type="text" v-model="contents[activeFormIndex]['' + f.feild + ''][index]">
@@ -64,7 +75,7 @@
               <i class="el-icon-plus"></i>
             </div>
             <el-tag type="warning" v-show="contents[activeFormIndex]['type'] == 'fillGap'">注：第一个输入项为正确选项，其他为错误选项。</el-tag>
-          </div>
+          </div> -->
           <!-- 图片声音 start-->
           <div class="form-sound" v-if="f.type == 'string' && (f.feild == 'sound' || f.feild == 'image' || f.feild == 'cover' || f.feild == 'video')">
             <el-input v-model="contents[activeFormIndex]['' + f.feild + '']" :placeholder="f.feild == 'sound' ? '请上传mp3格式的音频' : ''">
@@ -122,8 +133,8 @@
               @use="use"/>
           </div>
           <!-- 图片声音 end-->
-          <div class="array-string" v-if="f.type == 'array_string'">
-            <el-input placeholder="请输入内容" v-for="(item, index) in contents[activeFormIndex]['' + f.feild + '']" :key="f.feild + index" v-model="contents[activeFormIndex]['' + f.feild + ''][index]">
+          <div class="array-string" v-if="f.type == 'array'">
+            <el-input placeholder="请输入内容" :maxlength="f.data_from ? '' : (f.feild == 'options' ? 50 : 100)" show-word-limit v-for="(item, index) in contents[activeFormIndex]['' + f.feild + '']" :key="f.feild + index" v-model="contents[activeFormIndex]['' + f.feild + ''][index]">
               <el-upload slot="prepend"
                 v-if="f.data_from == 'upload'"
                 action="#"
@@ -136,6 +147,7 @@
               <el-button slot="append" icon="el-icon-minus" @click="minus(index, f.feild)"></el-button>
               <el-button v-show="index == contents[activeFormIndex]['' + f.feild + ''].length - 1" slot="append" icon="el-icon-plus" @click="plus(f.feild)"></el-button>
             </el-input>
+            <el-tag type="warning" v-show="f.feild == 'options' && contents[activeFormIndex]['type'] == 'fillGap'">注：第一个输入项为正确选项，其他为错误选项。</el-tag>
           </div>
         </el-form-item>
         <el-form-item :label="f.name" v-if="(f.type == 'templateArray' && contents[activeFormIndex]['' + f.feild + ''] && contents[activeFormIndex]['' + f.feild + ''].length)">
@@ -165,6 +177,7 @@
 <script>
 import FormComp from './form'
 import FormVideo from './formVideo'
+import FormKidTest from './kidTest/kidTest'
 import LookImage from './lookImage'
 import LookContent from './lookContent'
 import PreviewComp from '../preview/pro/index'
@@ -202,6 +215,7 @@ export default {
   components: {
     FormComp,
     FormVideo,
+    FormKidTest,
     LookImage,
     LookContent,
     PreviewComp,
@@ -484,6 +498,7 @@ export default {
     },
     // 增加输入框
     plus (feild) {
+      this.copyBaseFormDataSelf = JSON.stringify(this.contents[this.activeFormIndex])
       let obj = JSON.parse(this.copyBaseFormDataSelf)
       obj['' + feild + ''].push('')
       this.$set(this.contents, this.activeFormIndex, obj)
