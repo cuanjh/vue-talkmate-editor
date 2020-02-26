@@ -512,6 +512,7 @@ export default {
     // 显示右键菜单
     contentMenu (params) {
       console.log(params)
+      this.$refs['rightMenu'].hide()
       this.rightUUID = params.folder.uuid
       params['type'] = 'folder'
       let authorities = params.folder.authorities
