@@ -99,8 +99,8 @@ export default {
     ...mapActions({
       getContentTypeList: 'course/getContentTypeList'
     }),
-    initData () {
-      this.getContentTypeList({ pageNo: 0, pageSize: 0 })
+    async initData () {
+      await this.getContentTypeList({ pageNo: 0, pageSize: 0 })
       console.log('initData')
       this.handleCurrentChange(this.pageRequest.pageNum)
     },

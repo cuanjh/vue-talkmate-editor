@@ -10,8 +10,13 @@
           <el-form-item label="名称：">
             <el-input v-model="form.name" maxlength="25" show-word-limit></el-input>
           </el-form-item>
-          <el-form-item label="版本号：">
+          <!-- <el-form-item label="版本号：">
             <el-input v-model="form.version" :disabled="true"></el-input>
+          </el-form-item> -->
+          <el-form-item label="内容分类：" class="flex-class">
+            <el-radio-group v-model="form.module">
+              <el-radio v-for="item in modules" :key="item.val" :label="item.val">{{ item.text }}</el-radio>
+            </el-radio-group>
           </el-form-item>
           <el-form-item label="背景：" v-show="false">
             <div class="img-box">
@@ -74,6 +79,7 @@ export default {
         cover: [],
         desc: {},
         flag: [],
+        module: 'basic',
         has_changed: true,
         has_del: true,
         is_show: false,
@@ -85,6 +91,16 @@ export default {
         uuid: '',
         version: ''
       },
+      modules: [
+        {
+          val: 'basic',
+          text: '基础内容'
+        },
+        {
+          val: 'levelGrade',
+          text: '等级测试内容'
+        }
+      ],
       imgUrl: '',
       fileRaw: {},
       type: '',
@@ -131,13 +147,14 @@ export default {
       if (this.type === 'add') {
         this.form.name = params.obj.name
         this.form.parent_uuid = params.obj.parent_uuid
-        this.form.version = params.obj.name
+        // this.form.version = params.obj.name
         this.cover = []
         this.form.desc = {}
         this.form.flag = []
         this.form.has_changed = true
         this.form.has_del = true
         this.form.is_show = false
+        this.form.module = 'basic'
         this.form.tags = []
         this.form.title = {}
         this.form.update_time = 0

@@ -9,7 +9,7 @@
         <el-form ref="form" :model="form">
           <el-form-item label="key: " prop="type"  :rules="[
             { required: true, message: 'key不能为空', trigger: 'blur'},
-            {pattern: /^[a-zA-Z_]{1,}$/, message: '只允许输入字母或下划线！'}
+            {pattern: /^[1-9a-zA-Z_]{1,}$/, message: '只允许输入字母或下划线！'}
           ]">
             <el-input v-model="form.type" maxlength="30" show-word-limit></el-input>
           </el-form-item>

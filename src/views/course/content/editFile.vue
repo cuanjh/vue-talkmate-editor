@@ -31,7 +31,9 @@ export default {
           val = 0
         } else if (item.type === 'string' || item.type === 'template') {
           val = ''
-        } else if (item.type === 'templateArray' || item.type === 'array') {
+        } else if (item.type === 'templateArray') {
+          val = []
+        } else if (item.type === 'array') {
           val = ['']
         }
         baseFormData[item.feild] = val

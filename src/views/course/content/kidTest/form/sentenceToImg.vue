@@ -1,5 +1,6 @@
 <template>
-  <div class="form">
+  <!-- 听句子选图片 -->
+  <div class="form-wrap">
     <div class="correct-area">
       <div class="wrap" v-show="correct">
         <i @click="play(correct)"></i>
@@ -59,12 +60,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.form {
-  margin-top: 16px;
-  border-radius: 4px;
-  background: #F5F6FA;
-  padding-bottom: 20px;
-  min-height: 146px;
+.form-wrap {
   .correct-area {
     text-align: center;
     width: 100%;
@@ -91,15 +87,16 @@ export default {
   .options {
     display: flex;
     flex-direction: row;
+    justify-content:space-around;
     .option {
       background: #FFF;
-      width: 100px;
-      height: 50px;
-      margin: 10px;
+      margin-top: 10px;
       padding: 5px;
       border-radius: 4px;
       cursor: pointer;
       .el-image {
+        width: 100px;
+        height: 50px;
         border-radius: 4px;
       }
     }
