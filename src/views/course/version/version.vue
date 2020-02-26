@@ -34,7 +34,7 @@
         </div>
         <div class="content">
           <el-tooltip effect="dark" :content="item.name" placement="top">
-            <div class="title" v-text="item.name"></div>
+            <div class="title" v-text="item.name + ((item.module == 'levelGrade') ? '（等级测试）' : '') "></div>
           </el-tooltip>
           <ul>
             <!-- <li>创建时间：2018年6月1日</li> -->

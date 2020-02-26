@@ -4,7 +4,7 @@
     <div class="correct-area">
       <div class="wrap" v-show="correct">
         <i @click="play(correct)"></i>
-        <span v-for="(item, index) in correct.sentence" :key="'word' + index">{{ item == correct.option ? ' ' :  item}}</span>
+        <span>{{ correct.sentence }}</span>
       </div>
     </div>
     <div class="options">
@@ -87,7 +87,6 @@ export default {
         cursor: pointer;
       }
       span {
-        border-bottom: 2px solid rgba($color: #000000, $alpha: 0.4);
         margin: 0 5px;
         padding: 0 5px;
       }
@@ -100,8 +99,8 @@ export default {
       background: #FFF;
       width: 100px;
       height: 50px;
-      margin: 20px 10px 10px;
-      padding: 5px;
+      margin: 20px 5px 10px;
+      padding: 2px;
       border-radius: 4px;
       text-align: center;
       line-height: 46px;

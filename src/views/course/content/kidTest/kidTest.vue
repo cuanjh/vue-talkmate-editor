@@ -12,10 +12,11 @@
       </div>
     </div>
     <div class="form">
-      <sentence-to-img v-show="form.type == 'kid_pattern_words_1' || form.type == 'kid_pattern_sentences_1'" :form="form"></sentence-to-img>
-      <img-to-sentence v-show="form.type == 'kid_pattern_words_2' || form.type == 'kid_pattern_sentences_2'" :form="form"></img-to-sentence>
-      <fill-gap v-show="form.type == 'kid_pattern_words_3'" :form="form"></fill-gap>
-      <make-sentence v-show="form.type == 'kid_pattern_sentences_3'" :form="form"></make-sentence>
+      <sentence-to-img v-if="form.type == 'kid_pattern_words_1' || form.type == 'kid_pattern_sentences_1'" :form="form"></sentence-to-img>
+      <img-to-sentence v-if="form.type == 'kid_pattern_words_2' || form.type == 'kid_pattern_sentences_2'" :form="form"></img-to-sentence>
+      <fill-gap v-if="form.type == 'kid_pattern_words_3'" :form="form"></fill-gap>
+      <make-sentence v-if="form.type == 'kid_pattern_sentences_3'" :form="form"></make-sentence>
+      <repeat-speak v-if="form.type == 'kid_pattern_reading_1' || form.type == 'kid_pattern_reading_2'" :form="form"></repeat-speak>
     </div>
   </div>
 </template>
@@ -26,6 +27,7 @@ import SentenceToImg from './form/sentenceToImg'
 import ImgToSentence from './form/imgToSentence'
 import FillGap from './form/fillGap'
 import MakeSentence from './form/makeSentence'
+import RepeatSpeak from './form/repeatSpeak'
 
 export default {
   props: ['form', 'formIndex'],
@@ -38,7 +40,8 @@ export default {
     SentenceToImg,
     ImgToSentence,
     FillGap,
-    MakeSentence
+    MakeSentence,
+    RepeatSpeak
   },
   computed: {
     ...mapState({

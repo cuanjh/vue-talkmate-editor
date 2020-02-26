@@ -7,7 +7,7 @@
       </div>
     </div>
     <div class="options">
-      <div class="option" v-for="item in options" :key="form.type + item.sentence">
+      <div class="option" v-for="(item, index) in options" :key="form.type + index">
         <i @click="play(item)"></i>
         <span>{{ item.sentence }}</span>
       </div>

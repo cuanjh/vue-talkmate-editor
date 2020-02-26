@@ -25,6 +25,7 @@
       </div>
     </div>
     <div class="arror">
+      <span class="isShow" v-show="!folder.is_show"></span>
       <i class="icon-offline" v-show="false" @click="updateOffline"></i>
       <i class="el-icon-caret-right" v-show="folder.type == 'catalog'"></i>
     </div>
@@ -200,6 +201,14 @@ export default {
       background-repeat: no-repeat;
       margin-right: 10px;
       cursor: pointer;
+    }
+    .isShow {
+      display: inline-block;
+      margin-right: 5px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #F56C6C;
     }
     i {}
   }
