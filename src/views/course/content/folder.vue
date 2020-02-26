@@ -155,6 +155,7 @@ export default {
       font-weight: 400;
       color: #000;
       flex: 1;
+      max-width: 110px;
       span {
         display: block;
         padding: 2px 0;
@@ -205,8 +206,8 @@ export default {
     .isShow {
       display: inline-block;
       margin-right: 5px;
-      width: 10px;
-      height: 10px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
       background: #F56C6C;
     }
