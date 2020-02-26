@@ -40,7 +40,7 @@
       <div id="track-container" class="track-container">
         <div
           :class="['track-wrap', {'track-wrap-width': isShowEditFile}]"
-          :style="{width: isShowEditFile ? '401px' : 'auto' }"
+          :style="{width: (isShowEditFile && tracks.length > 1) ? '401px' : 'auto' }"
           id="track-wrap">
           <div class="track-item" v-for="(item,index) in tracks" :key="index">
             <div class="list" :id="'track-item-' + index">

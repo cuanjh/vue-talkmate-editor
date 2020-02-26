@@ -2,7 +2,7 @@
   <div class="look-image-container">
     <div class="search">
       <input type="text" v-model="words" @input="search" clearable placeholder="请输入...">
-      <span>搜索</span>
+      <span @click="search">搜索</span>
       <i class="el-icon-close" @click="close"></i>
     </div>
     <div class="result">
@@ -32,7 +32,22 @@ export default {
   },
   methods: {
     async search () {
+      if (!this.words) {
+        this.$message({
+          showClose: true,
+          message: '请输入您要查找的内容！',
+          type: 'warning'
+        })
+        return false
+      }
       let res = await searchImages({ words: this.words })
+      if (!res.data.contents) {
+        this.$message({
+          showClose: true,
+          message: '没有找到相关项，请重新输入！',
+          type: 'warning'
+        })
+      }
       this.searchResult = res.data.images
       console.log(res)
     },
@@ -42,7 +57,13 @@ export default {
       this.$emit('use', { type: 'image', flag: true, url: img })
     },
     close () {
+      this.words = ''
+      this.searchResult = []
       this.$emit('close')
+    },
+    reset () {
+      this.words = ''
+      this.searchResult = []
     }
   }
 }
@@ -62,6 +83,10 @@ export default {
     margin-right: 15px;
   }
   span {
+    cursor: pointer;
+    &:hover {
+      color: #409EFF;
+    }
   }
   i {
     float: right;

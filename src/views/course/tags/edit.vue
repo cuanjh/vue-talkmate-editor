@@ -54,6 +54,7 @@ export default {
       this.showEdit = false
       this.form.key = ''
       this.form.name = ''
+      this.$refs.form.resetFields()
     },
     determine () {
       console.log(this.form)

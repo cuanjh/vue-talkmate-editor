@@ -70,7 +70,7 @@
             </el-upload>
           </div>
         </el-form-item>
-        <el-form-item label="是否展示">
+        <el-form-item label="是否展示" v-show="handler === 'edit'" >
           <el-radio-group v-model="form.is_show">
             <el-radio :label="true">是</el-radio>
             <el-radio :label="false">否</el-radio>
@@ -111,7 +111,7 @@ export default {
         name: '',
         title: {},
         desc: {},
-        is_show: false,
+        is_show: true,
         flag: [],
         cover: [],
         list_order: 0,
@@ -271,7 +271,7 @@ export default {
         name: '',
         title: {},
         desc: {},
-        is_show: false,
+        is_show: true,
         flag: [],
         cover: [],
         list_order: 0,

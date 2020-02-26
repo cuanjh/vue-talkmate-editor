@@ -1,6 +1,6 @@
 <template>
 <transition name="fade">
-  <div class="edit-container" v-show="showEdit">
+  <div class="edit-container" v-if="showEdit">
     <div class="edit-content">
       <div class="close" @click="close">
         <i class="el-icon-close"></i>
@@ -49,7 +49,7 @@
             </div>
           </el-form-item>
           <el-form-item label="大图：" prop="flag[0]" :rules="[
-            { required: true, message: '大图标不能为空', trigger: 'blur' }
+            { required: true, message: '大图标不能为空', trigger: 'change' }
           ]">
             <div class="img-box big-img-box">
               <div class="img">
@@ -71,7 +71,7 @@
             </div>
           </el-form-item>
           <el-form-item label="小图：" prop="flag[0]" :rules="[
-            { required: true, message: '小图标不能为空', trigger: 'blur' }
+            { required: true, message: '小图标不能为空', trigger: 'change' }
           ]">
             <div class="img-box small-img-box">
               <div class="img">
@@ -158,27 +158,9 @@ export default {
   methods: {
     show (params) {
       console.log(params)
-      this.langInfos.forEach(item => {
-        if (!this.form.title) {
-          this.form.title[item.langKey] = ''
-        }
-        if (!this.form.desc) {
-          this.form.desc[item.langKey] = ''
-        }
-      })
-      console.log(this.form.title, this.form.desc)
       this.type = params.type
       this.showEdit = true
       if (this.type === 'add') {
-        // this.form.code = ''
-        // this.form.course_type = ''
-        // this.form.cover = []
-        // this.form.desc = {}
-        // this.form.flag = []
-        // this.form.is_show = false
-        // this.form.lan_code = params.selLang
-        // this.form.tags = []
-        // this.form.title = {}
         let obj = {
           code: '',
           course_type: '', // 课程分类
@@ -191,9 +173,9 @@ export default {
           title: {} // 名称
         }
         this.form = obj
-        this.$refs.form.resetFields()
         this.bigImgUrl = ''
         this.smlImgUrl = ''
+        // this.$refs.form.resetFields()
       } else if (this.type === 'edit') {
         this.form = params.form
         this.bigImgUrl = this.assetsDomain + '/' + params.form.cover[0]

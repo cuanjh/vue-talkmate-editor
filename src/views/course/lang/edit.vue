@@ -1,6 +1,6 @@
 <template>
 <transition name="fade">
-  <div class="edit-container" v-show="showEdit">
+  <div class="edit-container" v-if="showEdit">
     <div class="edit-content">
       <div class="close" @click="close">
         <i class="el-icon-close"></i>
@@ -143,8 +143,8 @@ export default {
           word_direction: 'l2r'
         }
         this.form = obj
-        this.$refs.form.resetFields()
         this.imageUrl = ''
+        // this.$refs.form.resetFields()
       }
       console.log(this.form)
     },

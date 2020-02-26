@@ -33,16 +33,38 @@ export default {
   },
   methods: {
     async search () {
+      if (!this.words) {
+        this.$message({
+          showClose: true,
+          message: '请输入您要查找的内容！',
+          type: 'warning'
+        })
+        return false
+      }
       let res = await searchContent({ content_model: this.contentModel, words: this.words })
       console.log(res)
+      if (!res.data.contents) {
+        this.$message({
+          showClose: true,
+          message: '没有找到相关项，请重新输入！',
+          type: 'warning'
+        })
+      }
       this.searchResult = res.data.contents
+      console.log(this.searchResult)
     },
     // 使用图片（声音）
     use (params) {
       this.$emit('use', params)
     },
     close () {
+      this.words = ''
+      this.searchResult = []
       this.$emit('close')
+    },
+    reset () {
+      this.words = ''
+      this.searchResult = []
     }
   }
 }
@@ -63,6 +85,9 @@ export default {
   }
   span {
     cursor: pointer;
+    &:hover {
+      color: #409EFF;
+    }
   }
   i {
     float: right;
