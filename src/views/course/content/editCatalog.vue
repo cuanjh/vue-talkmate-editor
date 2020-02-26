@@ -91,7 +91,8 @@
 import {
   addCatalog,
   editCatalog,
-  getInfoToken
+  getInfoToken,
+  setAuthority
 } from '@/api/course'
 import { uploadQiniu } from '@/utils/uploadQiniu'
 import { mapState } from 'vuex'
@@ -227,7 +228,21 @@ export default {
                   type: 'success',
                   message: res.msg
                 })
-                this.$emit('resetTrackData', { pUUID: this.form.parent_uuid, trackNum: this.trackNum })
+                if (this.trackNum === 0 && res.data && res.data.catalog.length) {
+                  res.data.catalog.forEach(item => {
+                    let obj = {
+                      authorities: [{
+                        authority: 'rw',
+                        user_uuid: this.userInfo.uuid
+                      }],
+                      type: 'catalog',
+                      uuid: item.uuid
+                    }
+                    setAuthority(obj).then(res => {
+                      this.$emit('resetTrackData', { pUUID: this.form.parent_uuid, trackNum: this.trackNum })
+                    })
+                  })
+                }
                 this.drawer = false
               }
             })
