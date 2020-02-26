@@ -6,13 +6,14 @@
       <i class="el-icon-close" @click="close"></i>
     </div>
     <div class="result">
-      <div class="list">
+      <div class="list" v-if="searchResult">
         <look-image-item
           v-for="(item, index) in searchResult"
           :key="index"
           :item="item"
           @useImg="useImg"/>
       </div>
+      <span v-else>没有找到相关项，请重新输入！</span>
     </div>
   </div>
 </template>
@@ -32,24 +33,12 @@ export default {
   },
   methods: {
     async search () {
-      if (!this.words) {
-        this.$message({
-          showClose: true,
-          message: '请输入您要查找的内容！',
-          type: 'warning'
-        })
+      if (this.words === '') {
         return false
       }
       let res = await searchImages({ words: this.words })
-      if (!res.data.contents) {
-        this.$message({
-          showClose: true,
-          message: '没有找到相关项，请重新输入！',
-          type: 'warning'
-        })
-      }
       this.searchResult = res.data.images
-      console.log(res)
+      console.log(this.searchResult)
     },
     // 使用图片
     useImg (img) {

@@ -4,7 +4,13 @@
       <div class="top-bar">
         <div class="left">
           <div class="icon-logo"></div>
-          <el-select v-model="selLang" size="small" placeholder="请选择语言" @change="initCourseVersionList(1)">
+          <el-select
+            v-model="selLang"
+            size="small"
+            filterable
+            default-first-option
+            placeholder="请选择语言"
+            @change="initCourseVersionList(1)">
             <el-option
               v-for="item in langList"
               :key="item['lan_code']"
@@ -634,6 +640,7 @@ export default {
       params['pathDesc'] = this.pathDesc
 
       this.$refs['editCatalog'].show(params)
+      this.$refs['rightMenu'].hide()
     },
     // 编辑目录完成后拉取数据重置当前轨道的数据
     resetTrackData (params) {

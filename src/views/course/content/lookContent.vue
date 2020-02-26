@@ -6,13 +6,14 @@
       <i class="el-icon-close" @click="close"></i>
     </div>
     <div class="result">
-      <div class="list">
+      <div class="list" v-if="searchResult">
         <look-content-item
           v-for="(item, index) in searchResult"
           :key="index"
           :item="item"
           @use="use"/>
       </div>
+      <span v-else>没有找到相关项，请重新输入！</span>
     </div>
   </div>
 </template>
@@ -34,22 +35,10 @@ export default {
   methods: {
     async search () {
       if (!this.words) {
-        this.$message({
-          showClose: true,
-          message: '请输入您要查找的内容！',
-          type: 'warning'
-        })
         return false
       }
       let res = await searchContent({ content_model: this.contentModel, words: this.words })
       console.log(res)
-      if (!res.data.contents) {
-        this.$message({
-          showClose: true,
-          message: '没有找到相关项，请重新输入！',
-          type: 'warning'
-        })
-      }
       this.searchResult = res.data.contents
       console.log(this.searchResult)
     },
