@@ -171,6 +171,8 @@ export default {
       let ev = params.event
       this.left = ev.x + 20
       this.top = ev.y
+      console.log(this.left, this.top)
+      console.log(document.documentElement.clientWidth, document.documentElement.clientHeight)
       if (params.type === 'other') {
         this.pUUID = params.pUUID
       } else {

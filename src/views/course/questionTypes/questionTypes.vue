@@ -125,12 +125,12 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$message({
-          type: 'success',
-          message: '删除成功!'
-        })
         delContentType({ type: type }).then(res => {
           if (res.success) {
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            })
             this.initData()
           }
         })

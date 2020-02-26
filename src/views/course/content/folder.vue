@@ -155,10 +155,13 @@ export default {
       font-weight: 400;
       color: #000;
       flex: 1;
-      max-width: 110px;
+      max-width: 100px;
       span {
         display: block;
         padding: 2px 0;
+        white-space:nowrap;
+        overflow:hidden;
+        text-overflow:ellipsis;
       }
       input {
         border: 0;
@@ -206,8 +209,8 @@ export default {
     .isShow {
       display: inline-block;
       margin-right: 5px;
-      width: 8px;
-      height: 8px;
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
       background: #F56C6C;
     }

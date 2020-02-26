@@ -79,14 +79,6 @@ export default {
         this.view = 'choice'
       } else if (formTypes.length === 1 && formTypes.indexOf('speaktoimg') > -1) {
         this.view = 'imgAuto'
-      } else if (formTypes.indexOf('imgtosentencew') > -1) {
-        let arr = []
-        that.slideForms.forEach(item => {
-          item.type = 'imgToSentence'
-          arr.push(item)
-        })
-        arr = that.slideForms
-        this.view = 'swiper'
       } else {
         let arr = []
         if (formTypes.indexOf('sentencetoimg') > -1) {
@@ -99,6 +91,11 @@ export default {
           })
           that.slideForms = []
           that.slideForms = arr
+        } else if (formTypes.indexOf('imgtosentencew') > -1) {
+          that.slideForms.forEach(item => {
+            item.type = 'imgToSentence'
+            arr.push(item)
+          })
         } else {
           arr = that.slideForms.filter(item => {
             return (item.type && (item.type !== 'countDown'))

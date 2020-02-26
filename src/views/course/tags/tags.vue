@@ -53,7 +53,7 @@
         </el-pagination>
       </div>
     </div>
-    <edit-comp ref="tagEdit" @addTag="initData"/>
+    <edit-comp ref="tagEdit" @addTagItem="initData"/>
   </div>
 </template>
 
@@ -93,8 +93,8 @@ export default {
     ...mapActions({
       getContentTags: 'course/getContentTags'
     }),
-    initData () {
-      this.getContentTags({ pageNo: 0, pageSize: 0 })
+    async initData () {
+      await this.getContentTags({ pageNo: 0, pageSize: 0 })
       console.log('initData')
       this.handleCurrentChange(this.pageRequest.pageNum)
     },

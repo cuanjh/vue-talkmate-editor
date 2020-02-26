@@ -97,8 +97,8 @@ export default {
     ...mapActions({
       getModelList: 'course/getModelList'
     }),
-    initData () {
-      this.getModelList({ pageNo: 0, pageSize: 0 })
+    async initData () {
+      await this.getModelList({ pageNo: 0, pageSize: 0 })
       console.log('initData')
       this.handleCurrentChange(this.pageRequest.pageNum)
     },
@@ -141,12 +141,12 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$message({
-          type: 'success',
-          message: '删除成功!'
-        })
         delModel({ model_key: key }).then(res => {
           if (res.success) {
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            })
             this.initData()
           }
         })

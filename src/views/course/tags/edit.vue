@@ -63,7 +63,7 @@ export default {
           addTags(this.form).then(res => {
             console.log(res)
             if (res.success) {
-              this.$emit('addTag')
+              this.$emit('addTagItem')
               this.close()
             }
           })

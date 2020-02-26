@@ -221,12 +221,12 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$message({
-          type: 'success',
-          message: '删除成功!'
-        })
         delLang({ lan_code: code }).then(res => {
           if (res.success) {
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            })
             this.initData()
           }
         })
@@ -314,5 +314,8 @@ export default {
 .el-tooltip__popper {
   max-width: 500px;
   line-height: 20px;
+}
+.lang-manage .el-table .cell {
+  line-height: 26px;
 }
 </style>

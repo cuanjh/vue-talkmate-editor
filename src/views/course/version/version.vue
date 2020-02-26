@@ -264,13 +264,14 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$message({
-          type: 'success',
-          message: '删除成功!'
-        })
         delCourseVersion({ uuid: uid }).then(res => {
           if (res.success) {
             this.initCourseVersionList()
+          } else {
+            this.$message({
+              type: 'warning',
+              message: res.msg
+            })
           }
         })
       }).catch(() => {
