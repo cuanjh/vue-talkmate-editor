@@ -128,6 +128,20 @@ export default {
           }
         })
       }
+      if (arr && arr.length) {
+        arr = arr.sort((a, b) => {
+          let pre = a.module ? a.module : 'basic'
+          let next = b.module ? b.module : 'basic'
+          let flag = 0
+          if (pre > next) {
+            flag = 1
+          }
+          if (pre < next) {
+            flag = -1
+          }
+          return flag
+        })
+      }
       return arr
     },
     isHaveAuthority () {
@@ -185,7 +199,8 @@ export default {
       }
       let params = {
         obj: obj,
-        type: 'add'
+        type: 'add',
+        versions: this.version.versions
       }
       console.log(obj, version)
       this.$refs.edit.show(params)

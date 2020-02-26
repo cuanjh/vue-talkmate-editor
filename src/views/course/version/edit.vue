@@ -75,6 +75,7 @@ export default {
   data () {
     return {
       showEdit: false,
+      versions: [],
       form: {
         cover: [],
         desc: {},
@@ -147,6 +148,7 @@ export default {
       if (this.type === 'add') {
         this.form.name = params.obj.name
         this.form.parent_uuid = params.obj.parent_uuid
+        this.versions = params.versions
         // this.form.version = params.obj.name
         this.cover = []
         this.form.desc = {}
@@ -218,18 +220,27 @@ export default {
       console.log(this.form)
       await this.upload()
       if (this.type === 'add') {
-        await addCourseVersion(this.form).then(res => {
-          console.log(res)
-          if (res.success) {
-            let obj = {
-              authority: 'rw',
-              user_uuid: this.userInfo.uuid
-            }
-            this.authorities.push(obj)
-            this.setVersionAuthority(res.data.uuid)
-            this.showEdit = false
+        let versionNum = 0
+        if (this.versions.length) {
+          let arr = this.versions.filter(item => {
+            return item.module === this.form.module
+          })
+          if (arr && arr.length) {
+            versionNum = arr.length
           }
-        })
+        }
+        this.form.version = 'V' + (versionNum + 1)
+        let res = await addCourseVersion(this.form)
+        console.log(res)
+        if (res.success) {
+          let obj = {
+            authority: 'rw',
+            user_uuid: this.userInfo.uuid
+          }
+          this.authorities.push(obj)
+          this.setVersionAuthority(res.data.uuid)
+          this.showEdit = false
+        }
       } else {
         console.log(this.form)
         let obj = {
