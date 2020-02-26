@@ -1,16 +1,14 @@
 <template>
-  <!-- 听句子选图片 -->
+  <!-- 补全句子（单词）-->
   <div class="form-wrap">
     <div class="correct-area">
       <div class="wrap" v-show="correct">
         <i @click="play(correct)"></i>
-        <span>{{ correct.sentence }}</span>
+        <span v-for="(item, index) in correct.sentence" :key="'word' + index">{{ item == correct.option ? ' ' :  item}}</span>
       </div>
     </div>
-    <div class="options" v-show="options.length">
-      <div class="option" v-for="(item, index) in options" :key="index" @click="play(item)">
-        <el-image lazy :src="(assetsDomain + item.image) | urlFix('imageView2/1/format/jpg')" fit="cover"></el-image>
-      </div>
+    <div class="options">
+      <div class="option" v-for="item in form.options" :key="item">{{ item }}</div>
     </div>
   </div>
 </template>
@@ -21,7 +19,7 @@ export default {
   props: ['form'],
   data () {
     return {
-      audio: new Audio()
+      myAudio: new Audio()
     }
   },
   computed: {
@@ -32,7 +30,8 @@ export default {
       return {
         sentence: this.form.sentence[0],
         sound: this.form.sound[0],
-        image: this.form.image[0]
+        image: this.form.image[0],
+        option: this.form.options[0]
       }
     },
     options () {
@@ -41,7 +40,12 @@ export default {
         this.form.image.forEach((val, index) => {
           let obj = {}
           obj['image'] = val
-          obj['sound'] = this.form.sound[index]
+          if (this.form.sound[index]) {
+            obj['sound'] = this.form.sound[index]
+          }
+          if (this.form.sentence[index]) {
+            obj['sentence'] = this.form.sentence[index]
+          }
           arr.push(obj)
         })
       }
@@ -50,9 +54,9 @@ export default {
   },
   methods: {
     play (item) {
-      this.audio.src = this.assetsDomain + item.sound
-      this.audio.oncanplay = () => {
-        this.audio.play()
+      this.myAudio.src = this.assetsDomain + item.sound
+      this.myAudio.oncanplay = () => {
+        this.myAudio.play()
       }
     }
   }
@@ -66,6 +70,10 @@ export default {
     width: 100%;
     padding: 20px 0 10px;
     .wrap {
+      background: #FFF;
+      display: inline-block;
+      padding: 10px 20px;
+      border-radius: 20px;
       i {
         width: 15px;
         min-width: 15px;
@@ -78,27 +86,25 @@ export default {
         background-size: cover;
         cursor: pointer;
       }
-      background: #FFF;
-      display: inline-block;
-      padding: 10px 20px;
-      border-radius: 20px;
+      span {
+        border-bottom: 2px solid rgba($color: #000000, $alpha: 0.4);
+        margin: 0 5px;
+        padding: 0 5px;
+      }
     }
   }
   .options {
     display: flex;
     flex-direction: row;
-    justify-content:space-around;
     .option {
       background: #FFF;
-      margin-top: 10px;
+      width: 100px;
+      height: 50px;
+      margin: 20px 10px 10px;
       padding: 5px;
       border-radius: 4px;
-      cursor: pointer;
-      .el-image {
-        width: 100px;
-        height: 50px;
-        border-radius: 4px;
-      }
+      text-align: center;
+      line-height: 46px;
     }
   }
 }

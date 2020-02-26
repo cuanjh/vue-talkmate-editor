@@ -11,41 +11,34 @@
         </el-tooltip>
       </div>
     </div>
-    <div class="form" v-show="form.type == 'sentenceToImg' || form.type == 'speakToImg'">
-      <div class="correct-area">
-        <div class="wrap" v-show="correct">
-          <i @click="play(correct)"></i>
-          <span v-show="form.type == 'sentenceToImg'">{{ correct.sentence }}</span>
-        </div>
-      </div>
-      <div class="options" v-show="options.length">
-        <div class="option" v-for="(item, index) in options" :key="index" @click="play(item)">
-          <el-image lazy :src="(assetsDomain + item.image) | urlFix('imageView2/1/format/jpg')" fit="cover"></el-image>
-        </div>
-      </div>
-    </div>
-    <div :class="['form', form.type]" v-show="form.type == 'fillGap'">
-      <div class="correct-area">
-        <div class="wrap" v-show="correct">
-          <i @click="play(correct)"></i>
-          <span v-for="(item, index) in correct.sentence" :key="'word' + index">{{ item == correct.option ? ' ' :  item}}</span>
-        </div>
-      </div>
-      <div class="options">
-        <div class="option" v-for="item in form.options" :key="item">{{ item }}</div>
-      </div>
+    <div class="form">
+      <sentence-to-img v-show="form.type == 'kid_pattern_words_1' || form.type == 'kid_pattern_sentences_1'" :form="form"></sentence-to-img>
+      <img-to-sentence v-show="form.type == 'kid_pattern_words_2' || form.type == 'kid_pattern_sentences_2'" :form="form"></img-to-sentence>
+      <fill-gap v-show="form.type == 'kid_pattern_words_3'" :form="form"></fill-gap>
+      <make-sentence v-show="form.type == 'kid_pattern_sentences_3'" :form="form"></make-sentence>
     </div>
   </div>
 </template>
 
 <script>
 import { mapState, mapMutations } from 'vuex'
+import SentenceToImg from './form/sentenceToImg'
+import ImgToSentence from './form/imgToSentence'
+import FillGap from './form/fillGap'
+import MakeSentence from './form/makeSentence'
+
 export default {
   props: ['form', 'formIndex'],
   data () {
     return {
       myAudio: new Audio()
     }
+  },
+  components: {
+    SentenceToImg,
+    ImgToSentence,
+    FillGap,
+    MakeSentence
   },
   computed: {
     ...mapState({
@@ -69,26 +62,6 @@ export default {
         url = this.assetsDomain + this.form.image
       }
       return url
-    },
-    correct () {
-      return {
-        sentence: this.form.sentence[0],
-        sound: this.form.sound[0],
-        image: this.form.image[0],
-        option: this.form.options[0]
-      }
-    },
-    options () {
-      let arr = []
-      if (this.form.image && this.form.image.length && this.form.sound && this.form.sound.length) {
-        this.form.image.forEach((val, index) => {
-          let obj = {}
-          obj['image'] = val
-          obj['sound'] = this.form.sound[index]
-          arr.push(obj)
-        })
-      }
-      return arr
     }
   },
   methods: {
@@ -188,12 +161,17 @@ export default {
   border-radius: 4px;
   background: #F5F6FA;
   padding-bottom: 20px;
-  min-height: 146px;
+  height: 146px;
+  width: 390px;
   .correct-area {
     text-align: center;
     width: 100%;
     padding: 20px 0 10px;
     .wrap {
+      background: #FFF;
+      display: inline-block;
+      padding: 10px 20px;
+      border-radius: 20px;
       i {
         width: 15px;
         min-width: 15px;
@@ -206,10 +184,6 @@ export default {
         background-size: cover;
         cursor: pointer;
       }
-      background: #FFF;
-      display: inline-block;
-      padding: 10px 20px;
-      border-radius: 20px;
     }
   }
   .options {
@@ -226,23 +200,6 @@ export default {
       .el-image {
         border-radius: 4px;
       }
-    }
-  }
-}
-
-.fillGap {
-  .wrap {
-    span {
-      border-bottom: 2px solid rgba($color: #000000, $alpha: 0.4);
-      margin: 0 5px;
-      padding: 0 5px;
-    }
-  }
-  .options {
-    .option {
-      text-align: center;
-      margin-top: 20px;
-      line-height: 46px;
     }
   }
 }
