@@ -48,11 +48,33 @@
     <el-form ref="form" :model="contents[activeFormIndex]" label-width="80px">
       <div class="item" v-for="f in feilds" :key="f.feild">
         <el-form-item label-width="140px" :label="f.name" v-if="(f.feild !== 'list_order' && f.feild !== 'options' && f.type !== 'template' && f.type !== 'templateArray' && f.feild !== 'sentence_phoneticize' && f.feild !== 'options_phoneticize') || (f.type == 'template' && contents[activeFormIndex]['' + f.feild + '']) || (version['selLang'] == 'JPN' && (f.feild == 'sentence_phoneticize' || f.feild == 'options_phoneticize')) || (f.feild === 'options' && (contents[activeFormIndex]['type'] == 'makeSentence' || contents[activeFormIndex]['type'] == 'fillGap'  || contents[activeFormIndex]['type'] == 'kid_pattern_words_3' || contents[activeFormIndex]['type'] == 'kid_pattern_sentences_3'))">
+          <!-- string -->
           <el-input
             :maxlength="100" show-word-limit
-            v-if="f.type != 'array_string' && f.type != 'array' && f.data_from == '' && f.type !== 'templateArray'"
+            v-if="f.type == 'string' && f.data_from == ''"
             v-model="contents[activeFormIndex]['' + f.feild + '']"
-            :disabled="f.feild == 'list_order' || f.type == 'template'"></el-input>
+            :disabled="f.feild == 'list_order' || f.type == 'template'">
+          </el-input>
+          <!-- string && upload -->
+          <el-input placeholder="请输入内容" v-if="f.type == 'string' && f.data_from == 'upload'" :maxlength="100" show-word-limit  v-model="contents[activeFormIndex]['' + f.feild + '']">
+            <el-upload slot="prepend"
+              v-if="f.data_from == 'upload'"
+              action="#"
+              :accept="f.feild == 'sound' ? 'audio/mp3' : 'image/png,image/jpg,image/jpeg'"
+              :on-change="uploadOnchange"
+              :show-file-list="false"
+              :auto-upload="false">
+              <el-button type="text" @click="upload(f.feild, index)">上传</el-button>
+            </el-upload>
+          </el-input>
+          <!-- text -->
+          <el-input
+            v-if="f.type == 'text'"
+            type="textarea"
+            :rows="3"
+            placeholder="请输入内容"
+            v-model="contents[activeFormIndex]['' + f.feild + '']">
+          </el-input>
           <el-select v-if="f.data_from == 'content_types'" v-model="contents[activeFormIndex]['' + f.feild + '']" placeholder="请选择">
             <el-option
               v-for="item in selfContentTypes"
@@ -76,6 +98,13 @@
             </div>
             <el-tag type="warning" v-show="contents[activeFormIndex]['type'] == 'fillGap'">注：第一个输入项为正确选项，其他为错误选项。</el-tag>
           </div> -->
+          <!-- int -->
+          <el-input-number v-if="f.type == 'int'" v-model="contents[activeFormIndex]['' + f.feild + '']"></el-input-number>
+          <!-- bool -->
+          <el-radio-group v-if="f.type == 'bool'" v-model="contents[activeFormIndex]['' + f.feild + '']">
+            <el-radio :label="true">是</el-radio>
+            <el-radio :label="false">否</el-radio>
+          </el-radio-group>
           <!-- 图片声音 start-->
           <div class="form-sound" v-if="f.type == 'string' && (f.feild == 'sound' || f.feild == 'image' || f.feild == 'cover' || f.feild == 'video')">
             <el-input v-model="contents[activeFormIndex]['' + f.feild + '']" :placeholder="f.feild == 'sound' ? '请上传mp3格式的音频' : ''">

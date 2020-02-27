@@ -102,7 +102,10 @@ export default {
       type: '',
       feildTypes: [
         'int',
+        'bool',
         'string',
+        'text',
+        'richText',
         'template',
         'templateArray',
         'array',
