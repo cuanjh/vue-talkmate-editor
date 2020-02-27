@@ -1,6 +1,6 @@
 <template>
   <div class="edit-file">
-    <model-comp ref="model" />
+    <model-comp ref="model"/>
   </div>
 </template>
 

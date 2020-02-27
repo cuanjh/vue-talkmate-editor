@@ -182,14 +182,18 @@ export default {
         this.authorityTop = true
       }
       if (topPercent > 60) {
-        console.log(params.type)
-        if (params.folder.type === 'content') {
-          this.top = ev.y - 200
+        console.log(params)
+        if (params.type === 'other') {
+          this.left = ev.x + 20
+          this.top = ev.y
         } else {
-          this.top = ev.y - 216
+          if (params && params.folder.type === 'content') {
+            this.top = ev.y - 200
+          } else if (params && params.folder.type === 'catalog') {
+            this.top = ev.y - 216
+          }
         }
       }
-      console.log('新定位', this.left, this.top)
       if (params.type === 'other') {
         this.pUUID = params.pUUID
       } else {
