@@ -17,7 +17,7 @@
             <el-input v-model="form.name" maxlength="25" show-word-limit></el-input>
           </el-form-item>
           <el-form-item label="文件类型: " prop="model_key"  :rules="{ required: true, message: '文件类型为空', trigger: 'blur'}">
-            <el-select v-model="form.model_key" placeholder="请选择" @change="changeModel">
+            <el-select v-model="form.model_key" placeholder="请选择">
               <el-option
                 v-for="item in modelList"
                 :key="item.model_key"

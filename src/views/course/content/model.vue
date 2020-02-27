@@ -47,11 +47,11 @@
     </div>
     <el-form ref="form" :model="contents[activeFormIndex]" label-width="80px">
       <div class="item" v-for="f in feilds" :key="f.feild">
-        <el-form-item label-width="140px" :label="f.name" v-if="(f.feild !== 'list_order' && f.feild !== 'options' && f.type !== 'template' && f.type !== 'templateArray' && f.feild !== 'sentence_phoneticize' && f.feild !== 'options_phoneticize') || (f.type == 'template' && contents[activeFormIndex]['' + f.feild + '']) || (version['selLang'] == 'JPN' && (f.feild == 'sentence_phoneticize' || f.feild == 'options_phoneticize')) || (f.feild === 'options' && (contents[activeFormIndex]['type'] == 'makeSentence' || contents[activeFormIndex]['type'] == 'fillGap'  || contents[activeFormIndex]['type'] == 'kid_pattern_words_3' || contents[activeFormIndex]['type'] == 'kid_pattern_sentences_3'))">
-          <!-- string -->
+        <el-form-item label-width="140px" :label="f.name" v-if="(f.feild !== 'list_order' && f.feild !== 'options' && f.type !== 'array' && f.type !== 'template' && f.type !== 'templateArray' && f.feild !== 'sentence_phoneticize' && f.feild !== 'options_phoneticize') || (f.type == 'template' && contents[activeFormIndex]['' + f.feild + '']) || (version['selLang'] == 'JPN' && (f.feild == 'sentence_phoneticize' || f.feild == 'options_phoneticize')) || (f.feild === 'options' && (contents[activeFormIndex]['type'] == 'makeSentence' || contents[activeFormIndex]['type'] == 'fillGap'  || contents[activeFormIndex]['type'] == 'kid_pattern_words_3' || contents[activeFormIndex]['type'] == 'kid_pattern_sentences_3') || (f.type == 'array' && contents[activeFormIndex][f.feild]))">
+          <!-- string 或 int -->
           <el-input
             :maxlength="100" show-word-limit
-            v-if="f.type == 'string' && f.data_from == ''"
+            v-if="(f.type == 'string' && f.data_from == '') || f.type == 'int'"
             v-model="contents[activeFormIndex]['' + f.feild + '']"
             :disabled="f.feild == 'list_order' || f.type == 'template'">
           </el-input>
@@ -98,8 +98,6 @@
             </div>
             <el-tag type="warning" v-show="contents[activeFormIndex]['type'] == 'fillGap'">注：第一个输入项为正确选项，其他为错误选项。</el-tag>
           </div> -->
-          <!-- int -->
-          <el-input-number v-if="f.type == 'int'" v-model="contents[activeFormIndex]['' + f.feild + '']"></el-input-number>
           <!-- bool -->
           <el-radio-group v-if="f.type == 'bool'" v-model="contents[activeFormIndex]['' + f.feild + '']">
             <el-radio :label="true">是</el-radio>
@@ -163,20 +161,38 @@
           </div>
           <!-- 图片声音 end-->
           <div class="array-string" v-if="f.type == 'array'">
-            <el-input placeholder="请输入内容" :maxlength="f.data_from ? '' : (f.feild == 'options' ? 50 : 100)" show-word-limit v-for="(item, index) in contents[activeFormIndex]['' + f.feild + '']" :key="f.feild + index" v-model="contents[activeFormIndex]['' + f.feild + ''][index]">
-              <el-upload slot="prepend"
-                v-if="f.data_from == 'upload'"
-                action="#"
-                :accept="f.feild == 'sound' ? 'audio/mp3' : 'image/png,image/jpg,image/jpeg'"
-                :on-change="uploadOnchange"
-                :show-file-list="false"
-                :auto-upload="false">
-                <el-button type="text" @click="upload(f.feild, index)">上传</el-button>
-              </el-upload>
-              <el-button slot="append" icon="el-icon-minus" @click="minus(index, f.feild)"></el-button>
-              <el-button v-show="index == contents[activeFormIndex]['' + f.feild + ''].length - 1" slot="append" icon="el-icon-plus" @click="plus(f.feild)"></el-button>
-            </el-input>
-            <el-tag type="warning" v-show="f.feild == 'options' && contents[activeFormIndex]['type'] == 'fillGap'">注：第一个输入项为正确选项，其他为错误选项。</el-tag>
+            <div class="list" v-if="contents[activeFormIndex]['' + f.feild + ''].length">
+              <el-input placeholder="请输入内容" :maxlength="f.data_from ? '' : (f.feild == 'options' ? 50 : 100)" show-word-limit v-for="(item, index) in contents[activeFormIndex]['' + f.feild + '']" :key="f.feild + index" v-model="contents[activeFormIndex]['' + f.feild + ''][index]">
+                <el-upload slot="prepend"
+                  v-if="f.data_from == 'upload'"
+                  action="#"
+                  :accept="f.feild == 'sound' ? 'audio/mp3' : 'image/png,image/jpg,image/jpeg'"
+                  :on-change="uploadOnchange"
+                  :show-file-list="false"
+                  :auto-upload="false">
+                  <el-button type="text" @click="upload(f.feild, index)">上传</el-button>
+                </el-upload>
+                <el-button slot="append" icon="el-icon-minus" @click="minus(index, f.feild)"></el-button>
+                <el-button v-show="index == contents[activeFormIndex]['' + f.feild + ''].length - 1" slot="append" icon="el-icon-plus" @click="plus('string', f.feild)"></el-button>
+              </el-input>
+              <el-tag type="warning" v-show="f.feild == 'options' && contents[activeFormIndex]['type'] == 'fillGap'">注：第一个输入项为正确选项，其他为错误选项。</el-tag>
+            </div>
+            <div class="list" v-else>
+              <el-button type="info" plain @click="plus('string', f.feild)">添加一条内容</el-button>
+            </div>
+          </div>
+          <div class="array-object" v-if="f.type == 'arrayObject'">
+            <div class="list" v-if="contents[activeFormIndex]['' + f.feild + ''].length">
+              <div class="object-item" v-for="(item, index) in contents[activeFormIndex]['' + f.feild + '']" :key="index">
+                key: <el-input v-model="contents[activeFormIndex]['' + f.feild + ''][index]['key']" :maxlength="20" show-word-limit></el-input>
+                value: <el-input v-model="contents[activeFormIndex]['' + f.feild + ''][index]['val']" :maxlength="20" show-word-limit></el-input>
+                <el-button type="info" plain icon="el-icon-minus" @click="minus(index, f.feild)"></el-button>
+                <el-button v-show="index == contents[activeFormIndex]['' + f.feild + ''].length - 1" type="info" plain icon="el-icon-plus" @click="plus('object', f.feild)"></el-button>
+              </div>
+            </div>
+            <div class="list" v-else>
+              <el-button type="info" plain @click="plus('object', f.feild)">添加一条k/v的内容</el-button>
+            </div>
           </div>
         </el-form-item>
         <el-form-item :label="f.name" v-if="(f.type == 'templateArray' && contents[activeFormIndex]['' + f.feild + ''] && contents[activeFormIndex]['' + f.feild + ''].length)">
@@ -524,19 +540,18 @@ export default {
     },
     // 减少输入框
     minus (index, feild) {
-      console.log(index, feild)
-      if (this.contents[this.activeFormIndex]['' + feild + ''].length > 1) {
-        this.contents[this.activeFormIndex]['' + feild + ''].splice(index, 1)
-      } else {
-        this.$set(this.contents[this.activeFormIndex]['' + feild + ''], index, '')
-      }
+      this.contents[this.activeFormIndex]['' + feild + ''].splice(index, 1)
       this.copyBaseFormDataSelf = JSON.stringify(this.contents[this.activeFormIndex])
     },
     // 增加输入框
-    plus (feild) {
+    plus (flag, feild) {
       this.copyBaseFormDataSelf = JSON.stringify(this.contents[this.activeFormIndex])
       let obj = JSON.parse(this.copyBaseFormDataSelf)
-      obj['' + feild + ''].push('')
+      if (flag === 'string') {
+        obj['' + feild + ''].push('')
+      } else {
+        obj['' + feild + ''].push({ key: '', val: '' })
+      }
       this.$set(this.contents, this.activeFormIndex, obj)
       this.copyBaseFormDataSelf = JSON.stringify(obj)
     },
@@ -673,6 +688,19 @@ export default {
 .array-string {
   .el-input {
     margin: 5px 0;
+  }
+}
+
+.array-object {
+  .object-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 5px;
+    .el-input {
+      width: 200px;
+      margin: 0 20px 0 10px;
+    }
   }
 }
 </style>

@@ -2,8 +2,8 @@
   <div class="question-container">
     <div class="question-content">
       <div class="top-bar">
-        <el-select v-model="selModel" placeholder="请选择文件类型" @change="changeModel">
-          <el-option value="" label="全部"></el-option>
+        <el-select v-model="selModel" placeholder="请选择文件类型" @change="changeModel()">
+          <!-- <el-option value="" label="全部"></el-option> -->
           <el-option
             v-for="item in modelList"
             :key="item.model_key"
