@@ -4,7 +4,7 @@
       <div class="menu">
         <div class="menu-group" v-show="type == 'folder' && folder.type !== 'catalog'">
           <div class="menu-item">
-            <div class="name">预览</div>
+            <div class="name look-preview" @click="lookPreview">预览</div>
           </div>
           <div class="line"></div>
         </div>
@@ -229,6 +229,11 @@ export default {
       this.trackNum = params.trackNum
       this.isShow = true
     },
+    // 预览
+    lookPreview () {
+      this.$emit('lookPreview', this.folder)
+      this.hide()
+    },
     hide () {
       this.isShow = false
     },
@@ -430,6 +435,9 @@ export default {
       margin: 2px 0;
       background: rgba($color: #000000, $alpha: 0.05)
     }
+  }
+  .look-preview {
+    cursor: pointer;
   }
 }
 .authority-container {

@@ -405,7 +405,7 @@ export default {
         contentModel: this.contentModel
       }
       // this.$refs.preview.show(obj)
-      this.$bus.emit(obj)
+      this.$bus.emit('showPreviewModel', obj)
     },
     // 取消图库查找
     closeLook () {

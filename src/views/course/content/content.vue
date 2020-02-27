@@ -96,6 +96,7 @@
       @del="del"
       @editCatalog="editCatalogFn"
       @resetTrackData="resetTrackData"
+      @lookPreview="previewContent"
     />
     <edit-catalog ref="editCatalog" @resetTrackData="resetTrackData"/>
     <edit-form ref="editForm"/>
@@ -459,6 +460,8 @@ export default {
       }
     },
     clickFolder (params) {
+      this.$bus.emit('closeImage')
+      this.$bus.emit('closeContent')
       this.path = ''
       this.uuid = params.folder.uuid
       let copy = this.tracks.slice(0, params.trackNum + 1)
@@ -485,6 +488,19 @@ export default {
           this.$refs['editFile'].show({ contents: contents, model: model, folder: params.folder, pathDesc: this.pathDesc })
         })
       }
+    },
+    // 预览
+    async previewContent (params) {
+      console.log(params)
+      let obj = {
+        contents: [],
+        contentModel: ''
+      }
+      let res = await getContent({ 'content_model': params.content_model, 'parent_uuid': params.uuid })
+      obj.contents = res.data.contents
+      obj.contentModel = params.content_model
+      console.log(obj)
+      await this.$bus.emit('showPreviewModel', obj)
     },
     getPath (tracks, uuid) {
       let catalogs = tracks.pop()
