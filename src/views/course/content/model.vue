@@ -211,7 +211,6 @@
         <el-button type="primary" @click="onSubmit">保存</el-button>
       </el-form-item>
     </el-form>
-    <!-- <preview-comp ref="preview"/> -->
     <right-menu-form
       ref="rightMenuForm"
       @paste="paste"
@@ -225,7 +224,6 @@ import FormVideo from './formVideo'
 import FormKidTest from './kidTest/kidTest'
 import LookImage from './lookImage'
 import LookContent from './lookContent'
-// import PreviewComp from '../preview/pro/index'
 import RightMenuForm from './rightMenuForm'
 import { mapState } from 'vuex'
 import {
@@ -263,7 +261,6 @@ export default {
     FormKidTest,
     LookImage,
     LookContent,
-    // PreviewComp,
     RightMenuForm
   },
   mounted () {
@@ -382,8 +379,15 @@ export default {
       this.resetSortable()
     },
     delForm (params) {
-      console.log(params)
+      if (!params.form.uuid) {
+        this.$message({
+          type: 'warning',
+          message: '没有可删除的内容!'
+        })
+        return false
+      }
       if (params.form.uuid) {
+        console.log(params)
         this.$confirm('确认要删除吗?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -403,10 +407,19 @@ export default {
                 type: 'success',
                 message: '删除成功!'
               })
-              let delIndex = this.contents.findIndex(item => {
-                return item.uuid === params.form.uuid
-              })
-              this.contents.splice(delIndex, 1)
+              if (this.contents.length > 1) {
+                let delIndex = this.contents.findIndex(item => {
+                  return item.uuid === params.form.uuid
+                })
+                this.contents.splice(delIndex, 1)
+              } else {
+                let obj = JSON.parse(this.baseFormDataSelf)
+                this.contents.splice(0, 1, obj)
+              }
+              // let delIndex = this.contents.findIndex(item => {
+              //   return item.uuid === params.form.uuid
+              // })
+              // this.contents.splice(delIndex, 1)
             }
           })
         }).catch(() => {
