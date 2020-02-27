@@ -391,10 +391,19 @@ export default {
                 type: 'success',
                 message: '删除成功!'
               })
-              let delIndex = this.contents.findIndex(item => {
-                return item.uuid === params.form.uuid
-              })
-              this.contents.splice(delIndex, 1)
+              if (this.contents.length > 1) {
+                let delIndex = this.contents.findIndex(item => {
+                  return item.uuid === params.form.uuid
+                })
+                this.contents.splice(delIndex, 1)
+              } else {
+                let obj = JSON.parse(this.baseFormDataSelf)
+                this.contents.splice(0, 1, obj)
+              }
+              // let delIndex = this.contents.findIndex(item => {
+              //   return item.uuid === params.form.uuid
+              // })
+              // this.contents.splice(delIndex, 1)
             }
           })
         }).catch(() => {

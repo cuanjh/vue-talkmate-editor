@@ -80,5 +80,13 @@ export const uploadQiniu = (file, token, key) => {
         resolve(res)
       }
     })
+  }, error => {
+    // 请求异常处理
+    this.$message({
+      showClose: true,
+      message: '好像没有成功哦，再试一次吧~',
+      type: 'error'
+    })
+    console.log(error)
   })
 }
