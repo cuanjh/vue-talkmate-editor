@@ -56,13 +56,13 @@ export const course = {
       state.courseTypes = courseTypes
     },
     updataModelList (state, models) {
-      state.modelList = models
+      state.modelList = models.reverse()
     },
     updateContentTypes (state, showTypes) {
       state.contentTypes = showTypes
     },
     updateContentTags (state, tags) {
-      state.contentTags = tags
+      state.contentTags = tags.reverse()
     },
     updateContentTypeList (state, typesList) {
       state.contentTypeList = typesList

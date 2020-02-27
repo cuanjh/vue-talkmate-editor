@@ -10,11 +10,11 @@
     <el-table
       :data="showTableData"
       style="width: 100%;">
-      <el-table-column label="序号" width="60" align="center">
+      <!-- <el-table-column label="序号" width="60" align="center">
         <template slot-scope="scope">
           <span>{{scope.$index+(pageRequest.pageNum - 1) * pageRequest.pageSize + 1}}</span>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column
         label="排序号"
         width="80"
@@ -115,7 +115,9 @@
         >
       </el-pagination>
     </div>
+    <edit-comp ref="edit"/>
     <edit-comp ref="edit" @addNewLang="updateNewLang" :langInfos="langInfos" :langList="langList"/>
+    <!-- <sort-course-comp ref="sorLang" @sortLang="updateNewLang"/> -->
     <sort-course-comp ref="sorLang" @sortLang="updateNewLang"/>
   </div>
 </template>
@@ -163,9 +165,7 @@ export default {
     }),
     // 添加新课程
     updateNewLang () {
-      setTimeout(() => {
-        this.initData()
-      }, 300)
+      this.initData()
       console.log(this.pageRequest.pageNum)
     },
     async initData () {
