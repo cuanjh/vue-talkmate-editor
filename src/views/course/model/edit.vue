@@ -105,7 +105,8 @@ export default {
         'string',
         'template',
         'templateArray',
-        'array'
+        'array',
+        'arrayObject'
       ]
     }
   },

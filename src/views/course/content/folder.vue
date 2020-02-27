@@ -196,6 +196,9 @@ export default {
   }
   .arror {
     margin-right: 18px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
     .icon-offline {
       display: inline-block;
       width: 12px;
@@ -209,8 +212,8 @@ export default {
     .isShow {
       display: inline-block;
       margin-right: 5px;
-      width: 6px;
-      height: 6px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
       background: #F56C6C;
     }

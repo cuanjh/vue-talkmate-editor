@@ -2,6 +2,15 @@
   <div class="question-container">
     <div class="question-content">
       <div class="top-bar">
+        <el-select v-model="selModel" placeholder="请选择文件类型" @change="changeModel">
+          <el-option label="">全部</el-option>
+          <el-option
+            v-for="item in modelList"
+            :key="item.model_key"
+            :label="item.name"
+            :value="item.model_key">
+          </el-option>
+        </el-select>
         <el-button style="outline:none;" type="primary" class="btnAdd" @click="addType()">添加</el-button>
       </div>
       <el-table
@@ -57,7 +66,7 @@
           :page-size="pageRequest.pageSize"
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
-          :total="contentTypeList.length"
+          :total="filterContentTypeList.length"
           >
         </el-pagination>
       </div>
@@ -77,6 +86,7 @@ export default {
   data () {
     return {
       showTableData: [],
+      selModel: '',
       // 分页信息
       pageRequest: {
         pageNum: 1,
@@ -85,6 +95,7 @@ export default {
     }
   },
   created () {
+    this.getModelList({ pageNo: 0, pageSize: 0 })
     this.initData()
   },
   components: {
@@ -92,12 +103,22 @@ export default {
   },
   computed: {
     ...mapState({
-      contentTypeList: state => state.course.contentTypeList
-    })
+      contentTypeList: state => state.course.contentTypeList,
+      modelList: state => state.course.modelList
+    }),
+    filterContentTypeList () {
+      if (this.selModel) {
+        return this.contentTypeList.filter(item => {
+          return item.model_key === this.selModel
+        })
+      }
+      return this.contentTypeList
+    }
   },
   methods: {
     ...mapActions({
-      getContentTypeList: 'course/getContentTypeList'
+      getContentTypeList: 'course/getContentTypeList',
+      getModelList: 'course/getModelList'
     }),
     async initData () {
       await this.getContentTypeList({ pageNo: 0, pageSize: 0 })
@@ -113,7 +134,7 @@ export default {
       this.pageRequest.pageNum = val
       let starNum = (val - 1) * this.pageRequest.pageSize
       let endNum = val * this.pageRequest.pageSize
-      this.showTableData = this.contentTypeList.slice(starNum, endNum)
+      this.showTableData = this.filterContentTypeList.slice(starNum, endNum)
     },
     addType () {
       this.$refs.contentTypeEdit.show()
@@ -140,6 +161,9 @@ export default {
           message: '已取消删除'
         })
       })
+    },
+    changeModel () {
+      this.handleCurrentChange(1)
     }
   }
 }
@@ -156,6 +180,9 @@ export default {
 .top-bar {
   padding: 20px 0px 0;
   text-align: right;
+  .el-select {
+    float: left;
+  }
 }
 </style>
 <style>

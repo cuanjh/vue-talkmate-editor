@@ -16,6 +16,16 @@
           <el-form-item label="名称: " prop="name"  :rules="{ required: true, message: '名称不能为空', trigger: 'blur'}">
             <el-input v-model="form.name" maxlength="25" show-word-limit></el-input>
           </el-form-item>
+          <el-form-item label="文件类型: " prop="model_key"  :rules="{ required: true, message: '文件类型为空', trigger: 'blur'}">
+            <el-select v-model="form.model_key" placeholder="请选择" @change="changeModel">
+              <el-option
+                v-for="item in modelList"
+                :key="item.model_key"
+                :label="item.name"
+                :value="item.model_key">
+              </el-option>
+            </el-select>
+          </el-form-item>
           <el-form-item label="描述: " prop="desc"  :rules="{ required: true, message: '描述不能为空', trigger: 'blur'}">
             <el-input type="textarea" rows="3" v-model="form.desc" maxlength="50" show-word-limit></el-input>
           </el-form-item>
@@ -39,6 +49,7 @@
 import {
   addContentType
 } from '@/api/course'
+import { mapState } from 'vuex'
 
 export default {
   data () {
@@ -48,9 +59,15 @@ export default {
         type: '',
         name: '',
         desc: '',
+        model_key: '',
         has_del: true
       }
     }
+  },
+  computed: {
+    ...mapState({
+      modelList: state => state.course.modelList
+    })
   },
   methods: {
     show () {
@@ -61,6 +78,7 @@ export default {
       this.form.type = ''
       this.form.name = ''
       this.form.desc = ''
+      this.model_key = ''
       this.$refs.form.resetFields()
       this.$emit('addContentType')
     },
@@ -139,6 +157,9 @@ export default {
       }
     }
   }
+}
+.el-select {
+  width: 100%;
 }
 </style>
 <style>

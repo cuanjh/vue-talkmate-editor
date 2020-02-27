@@ -240,13 +240,8 @@ export default {
       version: state => state.course.version
     }),
     selfContentTypes () {
-      if (this.contentModel === 'content_model_kid_test' && this.contentTypes.length) {
-        return this.contentTypes.filter(item => {
-          return item.type.indexOf('kid_pattern_') > -1
-        })
-      }
       return this.contentTypes.filter(item => {
-        return item.type.indexOf('kid_pattern_') === -1
+        return item.model_key === this.contentModel
       })
     }
   },
