@@ -2,7 +2,7 @@
   <transition name="fade">
     <div class="right-menu-container" :style="{'left': left + 'px', 'top': top + 'px'}" v-show="isShow">
       <div class="menu">
-        <div class="menu-group" v-show="type == 'folder'">
+        <div class="menu-group" v-show="type == 'folder' && folder.type !== 'catalog'">
           <div class="menu-item">
             <div class="name">预览</div>
           </div>
@@ -50,7 +50,7 @@
               <i class="el-icon-caret-right"></i>
             </div>
             <transition name="fade">
-              <div class="authority-container" v-show="isShowAuthority">
+              <div :class="['authority-container', {'authority-top': authorityTop}]" v-show="isShowAuthority">
                 <div class="authority-wrap" v-if="authorities.length">
                   <div class="user-item" v-for="item in authorityUsers" :key="item.uuid">
                     <div class="name">{{ item.nickName }}</div>
@@ -148,7 +148,8 @@ export default {
       form: {
         examin_state: 2,
         comment: ''
-      }
+      },
+      authorityTop: false
     }
   },
   computed: {
@@ -169,10 +170,26 @@ export default {
   methods: {
     show (params) {
       let ev = params.event
+      console.log('ev', ev)
       this.left = ev.x + 20
       this.top = ev.y
-      console.log(this.left, this.top)
-      console.log(document.documentElement.clientWidth, document.documentElement.clientHeight)
+      this.authorityTop = false
+      console.log('定位', this.left, this.top)
+      let topPercent = Math.floor((ev.y / document.documentElement.clientHeight) * 100) / 100
+      topPercent = topPercent * 100
+      console.log('topPercent', topPercent)
+      if (topPercent > 52) {
+        this.authorityTop = true
+      }
+      if (topPercent > 60) {
+        console.log(params.type)
+        if (params.folder.type === 'content') {
+          this.top = ev.y - 200
+        } else {
+          this.top = ev.y - 216
+        }
+      }
+      console.log('新定位', this.left, this.top)
       if (params.type === 'other') {
         this.pUUID = params.pUUID
       } else {
@@ -422,6 +439,9 @@ export default {
   margin-left: 110px;
   margin-top: -22px;
   border-radius: 4px;
+  &.authority-top {
+    margin-top: -178px;
+  }
   .authority-wrap {
     padding: 5px;
     .user-item {

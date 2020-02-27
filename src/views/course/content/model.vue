@@ -166,7 +166,7 @@
         <el-button type="primary" @click="onSubmit">保存</el-button>
       </el-form-item>
     </el-form>
-    <preview-comp ref="preview"/>
+    <!-- <preview-comp ref="preview"/> -->
     <right-menu-form
       ref="rightMenuForm"
       @paste="paste"
@@ -180,7 +180,7 @@ import FormVideo from './formVideo'
 import FormKidTest from './kidTest/kidTest'
 import LookImage from './lookImage'
 import LookContent from './lookContent'
-import PreviewComp from '../preview/pro/index'
+// import PreviewComp from '../preview/pro/index'
 import RightMenuForm from './rightMenuForm'
 import { mapState } from 'vuex'
 import {
@@ -218,7 +218,7 @@ export default {
     FormKidTest,
     LookImage,
     LookContent,
-    PreviewComp,
+    // PreviewComp,
     RightMenuForm
   },
   mounted () {
@@ -404,7 +404,8 @@ export default {
         contents: this.contents,
         contentModel: this.contentModel
       }
-      this.$refs.preview.show(obj)
+      // this.$refs.preview.show(obj)
+      this.$bus.emit(obj)
     },
     // 取消图库查找
     closeLook () {

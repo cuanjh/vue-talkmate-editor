@@ -99,6 +99,7 @@
     />
     <edit-catalog ref="editCatalog" @resetTrackData="resetTrackData"/>
     <edit-form ref="editForm"/>
+    <preview-comp ref="preview"/>
   </el-container>
 </template>
 
@@ -110,6 +111,7 @@ import RightMenu from './rightMenu'
 import EditCatalog from './editCatalog'
 import EditForm from './editForm'
 import EditFile from './editFile'
+import PreviewComp from '../preview/pro/index'
 import { mapState, mapActions, mapMutations } from 'vuex'
 import {
   getUserList
@@ -152,7 +154,8 @@ export default {
     RightMenu,
     EditCatalog,
     EditForm,
-    EditFile
+    EditFile,
+    PreviewComp
   },
   created () {
     this.getModelList({ pageNo: 0, pageSize: 0 })

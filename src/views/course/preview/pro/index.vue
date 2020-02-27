@@ -1,6 +1,6 @@
 <template>
 <transition name="fade">
-  <div class="preview" v-if="showPreview" @click="hideModel">
+  <div class="preview" v-show="showPreview" @click="hideModel">
     <div class="preview-container" id="preview-container" @click.stop="showModel">
       <div class="preview-content">
         <div class="preview-warp">
@@ -32,6 +32,14 @@ export default {
       slideForms: []
     }
   },
+  created () {
+    this.$bus.on('showPreviewModel', (params) => {
+      this.slideForms = params.contents
+      this.contentModel = params.contentModel
+      console.log(params, this.slideForms, this.contentModel)
+      this.changeView(params.contents)
+    })
+  },
   mounted () {
   },
   components: {
@@ -49,12 +57,12 @@ export default {
     showModel () {
       this.showPreview = true
     },
-    show (params) {
-      this.slideForms = params.contents
-      this.contentModel = params.contentModel
-      console.log(params, this.slideForms, this.contentModel)
-      this.changeView(params.contents)
-    },
+    // show (params) {
+    //   this.slideForms = params.contents
+    //   this.contentModel = params.contentModel
+    //   console.log(params, this.slideForms, this.contentModel)
+    //   this.changeView(params.contents)
+    // },
     changeView (thunk) {
       let that = this
       if (this.contentModel === 'content_model_video') {
@@ -130,6 +138,9 @@ export default {
       console.log(result)
       return result
     }
+  },
+  beforeDestroy () {
+    this.$bus.off('showPreviewModel')
   }
 }
 </script>

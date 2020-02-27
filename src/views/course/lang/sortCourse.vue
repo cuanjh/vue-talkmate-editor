@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import { editLang } from '@/api/course'
+import { getLangList, editLang } from '@/api/course'
 import Sortable from 'sortablejs'
 
 export default {
@@ -74,8 +74,8 @@ export default {
         editLang(obj).then(res => {
           if (res.success) {
             console.log(res)
-            this.$emit('sortLang')
-            // this.initData()
+            // this.$emit('sortLang')
+            this.initData()
           }
         })
       }
@@ -83,20 +83,21 @@ export default {
     console.log(sortable)
   },
   methods: {
-    // async initData () {
-    //   let res = await getLangList({ 'pageNo': 0, 'pageSize': 999 })
-    //   if (res.success) {
-    //     let sortLangs = res.data.langs.sort((a, b) => {
-    //       return a.list_order - b.list_order
-    //     })
-    //     this.allLangs = sortLangs
-    //     this.assetsUrl = res.data.assetsUrl
-    //     console.log(this.allLangs)
-    //   }
-    // },
+    async initData () {
+      let res = await getLangList({ 'pageNo': 0, 'pageSize': 999 })
+      if (res.success) {
+        let sortLangs = res.data.langs.sort((a, b) => {
+          return a.list_order - b.list_order
+        })
+        this.allLangs = sortLangs
+        this.assetsUrl = res.data.assetsUrl
+        console.log(this.allLangs)
+      }
+    },
     show (obj) {
-      this.allLangs = obj.allLangs
-      this.assetsUrl = obj.assetsUrl
+      // this.allLangs = obj.allLangs
+      // this.assetsUrl = obj.assetsUrl
+      this.initData()
       this.showSortLang = true
     },
     close () {
