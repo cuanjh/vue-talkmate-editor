@@ -2,7 +2,7 @@
   <div class="item" @mouseleave="isShow = false" @mouseenter="isShow = true">
     <div class="form-type">
       <i @click="playVoice"></i>
-      <el-button size="small" type="text" @click="save">确定</el-button>
+      <el-button size="small" type="text" v-show="showSave" @click="save">确定</el-button>
     </div>
     <el-image
       class="form-img"
@@ -32,7 +32,8 @@ export default {
       isShow: false,
       isPlay: false,
       checkedImg: false,
-      checkedSound: false
+      checkedSound: false,
+      showSave: false
     }
   },
   computed: {
@@ -48,6 +49,7 @@ export default {
         flag: type === 'image' ? this.checkedImg : this.checkedSound,
         url: type === 'image' ? this.item.image : this.item.sound
       })
+      this.showSave = true
     },
     save () {
       if (this.checkedImg) {
@@ -56,6 +58,7 @@ export default {
       if (this.checkedSound) {
         this.use('sound')
       }
+      this.$emit('closeUse')
     },
     playVoice () {
       let audio = new Audio()

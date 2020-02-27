@@ -11,7 +11,8 @@
           v-for="(item, index) in searchResult"
           :key="index"
           :item="item"
-          @use="use"/>
+          @use="use"
+          @closeUse="close"/>
       </div>
       <span v-else>没有找到相关项，请重新输入！</span>
     </div>
@@ -31,6 +32,11 @@ export default {
   },
   components: {
     LookContentItem
+  },
+  created () {
+    this.$bus.on('closeContent', () => {
+      this.close()
+    })
   },
   methods: {
     async search () {

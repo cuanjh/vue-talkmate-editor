@@ -31,6 +31,11 @@ export default {
   components: {
     LookImageItem
   },
+  created () {
+    this.$bus.on('closeImage', () => {
+      this.close()
+    })
+  },
   methods: {
     async search () {
       if (this.words === '') {
@@ -44,6 +49,7 @@ export default {
     useImg (img) {
       console.log(img)
       this.$emit('use', { type: 'image', flag: true, url: img })
+      this.close()
     },
     close () {
       this.words = ''
