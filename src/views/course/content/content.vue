@@ -459,6 +459,7 @@ export default {
         /* eslint-enable */
       }
     },
+    isShowCatalog () {},
     clickFolder (params) {
       this.$bus.emit('closeImage')
       this.$bus.emit('closeContent')

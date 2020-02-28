@@ -40,6 +40,11 @@
           </div>
         </div>
         <div class="menu-group" v-show="type == 'folder'">
+          <div class="menu-item">
+            <div class="name" @click="clickShow()">{{folder.is_show ? '隐藏' : '显示'}}</div>
+          </div>
+        </div>
+        <div class="menu-group" v-show="type == 'folder'">
           <div class="line"></div>
           <div class="menu-item" v-show="userInfo.authorityId === '1'">
             <div class="name" @click="onlineJob">上线</div>
@@ -169,6 +174,7 @@ export default {
   },
   methods: {
     show (params) {
+      console.log('params', params)
       let ev = params.event
       console.log('ev', ev)
       this.left = ev.x + 20
@@ -281,6 +287,10 @@ export default {
     editCatalog () {
       let uuid = this.folder.uuid
       this.$emit('editCatalog', { handler: 'edit', type: this.folder.type, uuid: uuid, folder: this.folder, trackNum: this.trackNum, clickType: this.type })
+    },
+    // 显示隐藏
+    clickShow () {
+      console.log()
     },
     // 权限设置
     authoritySetFn () {
