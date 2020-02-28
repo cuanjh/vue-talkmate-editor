@@ -48,7 +48,7 @@
           :class="['track-wrap', {'track-wrap-width': isShowEditFile}]"
           :style="{width: (isShowEditFile && tracks.length > 1) ? '401px' : 'auto' }"
           id="track-wrap">
-          <div class="track-item" v-for="(item,index) in tracks" :key="index">
+          <div class="track-item" :v-intro="item.length == 0 ? '右键点击空白区域，出现右键菜单' : ''" v-for="(item,index) in tracks" :key="index">
             <div class="list" :id="'track-item-' + index">
               <folder
                 :ref="'folder-' + f.uuid"
@@ -386,6 +386,9 @@ export default {
           if (this.tracks.length) {
             this.setTrackSortable()
           }
+          setTimeout(() => {
+            this.$intro().start()
+          }, 100)
         }, 10)
       }
     },

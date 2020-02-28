@@ -160,7 +160,7 @@
               @use="use"/>
           </div>
           <!-- 图片声音 end-->
-          <div class="array-string" v-if="f.type == 'array'">
+          <div class="array-string" v-if="f.type == 'array' && (f.data_from == '' || f.data_from == 'upload') ">
             <div class="list" v-if="contents[activeFormIndex]['' + f.feild + ''].length">
               <el-input placeholder="请输入内容" :maxlength="f.data_from ? '' : (f.feild == 'options' ? 50 : 100)" show-word-limit v-for="(item, index) in contents[activeFormIndex]['' + f.feild + '']" :key="f.feild + index" v-model="contents[activeFormIndex]['' + f.feild + ''][index]">
                 <el-upload slot="prepend"

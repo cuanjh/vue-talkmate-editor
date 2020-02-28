@@ -1,5 +1,5 @@
 'use strict'
-
+const webpack = require('webpack')
 module.exports = {
   devServer: {
     port: 5000,
@@ -19,5 +19,12 @@ module.exports = {
         }
       }
     }
+  },
+  configureWebpack: {
+    plugins: [
+      new webpack.ProvidePlugin({
+        introJs: ['intro.js', 'introJs']
+      })
+    ]
   }
 }
