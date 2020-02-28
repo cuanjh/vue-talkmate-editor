@@ -338,6 +338,9 @@ export default {
         })
       }
       console.log(this.authorityUsers)
+    },
+    cascaderFilterMethod (node, keyWord) {
+      console.log(node, keyWord)
     }
   }
 }
