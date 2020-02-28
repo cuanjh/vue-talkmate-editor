@@ -242,6 +242,8 @@ export default {
                       this.$emit('resetTrackData', { pUUID: this.form.parent_uuid, trackNum: this.trackNum })
                     })
                   })
+                } else {
+                  this.$emit('resetTrackData', { pUUID: this.form.parent_uuid, trackNum: this.trackNum })
                 }
                 this.drawer = false
               }

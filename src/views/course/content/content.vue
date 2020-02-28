@@ -30,7 +30,7 @@
             <el-option
               v-for="item in versions"
               :key="item.uuid"
-              :label="item.version"
+              :label="item.name"
               :value="item.version">
             </el-option>
           </el-select>
