@@ -30,8 +30,8 @@
 <script>
 import _ from 'lodash'
 import { mapState } from 'vuex'
-import SentenceToImg from '../form/sentenceToImg'
-import SpeakToImg from '../form/speakToImg'
+import SentenceToImg from './form/sentenceToImg'
+import SpeakToImg from './form/speakToImg'
 
 export default {
   props: ['slideForms'],

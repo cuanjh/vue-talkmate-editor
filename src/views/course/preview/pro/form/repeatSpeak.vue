@@ -74,7 +74,7 @@ export default {
       display: inline-block;
       width: 56px;
       height: 56px;
-      background: url('../../../../assets/images/preview/pic-bofang.png') no-repeat center;
+      background: url('../../../../../assets/images/preview/pic-bofang.png') no-repeat center;
       background-size: cover;
       padding: 2px;
     }

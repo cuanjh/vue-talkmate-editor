@@ -1,6 +1,6 @@
 <template>
   <transition name="fade">
-    <div class="right-menu-container" :style="{'left': left + 'px', 'top': top + 'px'}" v-show="isShow">
+    <div class="right-menu-container" id="right-menu-container" :style="{'left': left + 'px', 'top': top + 'px'}" v-show="isShow">
       <div class="menu">
         <div class="menu-group" v-show="type == 'folder' && folder.type !== 'catalog'">
           <div class="menu-item">
@@ -37,6 +37,11 @@
         <div class="menu-group" v-show="type == 'folder'">
           <div class="menu-item">
             <div class="name" @click="editCatalog">信息编辑</div>
+          </div>
+        </div>
+        <div class="menu-group" v-show="type == 'folder'">
+          <div class="menu-item" v-if="folder">
+            <div class="name" @click="clickShow(!folder.is_show)">{{folder.is_show ? '隐藏' : '显示'}}</div>
           </div>
         </div>
         <div class="menu-group" v-show="type == 'folder'">
@@ -169,8 +174,11 @@ export default {
   },
   methods: {
     show (params) {
+      console.log('params', params)
       let ev = params.event
-      console.log('ev', ev)
+      // let height = this.$refs.menuContent.offsetHeight
+      let height = document.getElementById('right-menu-container')
+      console.log('height', height.offsetHeight)
       this.left = ev.x + 20
       this.top = ev.y
       this.authorityTop = false
@@ -188,9 +196,9 @@ export default {
           this.top = ev.y
         } else {
           if (params && params.folder.type === 'content') {
-            this.top = ev.y - 200
+            this.top = ev.y - 260
           } else if (params && params.folder.type === 'catalog') {
-            this.top = ev.y - 216
+            this.top = ev.y - 276
           }
         }
       }
@@ -232,9 +240,11 @@ export default {
       this.type = params.type
       this.trackNum = params.trackNum
       this.isShow = true
+      console.log(this.folder)
     },
     // 预览
     lookPreview () {
+      console.log(this.folder)
       this.$emit('lookPreview', this.folder)
       this.hide()
     },
@@ -281,6 +291,27 @@ export default {
     editCatalog () {
       let uuid = this.folder.uuid
       this.$emit('editCatalog', { handler: 'edit', type: this.folder.type, uuid: uuid, folder: this.folder, trackNum: this.trackNum, clickType: this.type })
+    },
+    // 显示隐藏
+    clickShow (show) {
+      console.log(show)
+      let obj = {
+        catalog_info: {
+          cover: this.folder.cover,
+          desc: this.folder.desc,
+          flag: this.folder.flag,
+          has_changed: true,
+          is_show: show,
+          list_order: this.folder.list_order,
+          name: this.folder.name,
+          tags: this.folder.tags,
+          title: this.folder.title,
+          parent_uuid: this.folder.parent_uuid
+        },
+        uuid: this.folder.uuid,
+        trackNum: this.trackNum
+      }
+      this.$emit('clickShow', obj)
     },
     // 权限设置
     authoritySetFn () {

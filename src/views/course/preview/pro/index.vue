@@ -22,6 +22,7 @@ import SwiperComp from './swiper'
 import ChoiceComp from './choice'
 import imgAutoComp from './imgAuto'
 import modelVideoComp from './modelVideo'
+import gradeTestComp from '../grade/gradeTest'
 
 export default {
   data () {
@@ -36,7 +37,7 @@ export default {
     this.$bus.on('showPreviewModel', (params) => {
       this.slideForms = params.contents
       this.contentModel = params.contentModel
-      console.log(params, this.slideForms, this.contentModel)
+      console.log('showPreviewModel', params, this.slideForms, this.contentModel)
       this.changeView(params.contents)
     })
   },
@@ -46,7 +47,8 @@ export default {
     'swiper': SwiperComp, // 轮播
     'choice': ChoiceComp, // 由句子选图片
     'imgAuto': imgAutoComp, // 由图片跟读
-    'modelVideo': modelVideoComp // 视频课程
+    'modelVideo': modelVideoComp, // 视频课程
+    'gradeTest': gradeTestComp // 定级测试
   },
   computed: {
   },
@@ -67,6 +69,14 @@ export default {
       let that = this
       if (this.contentModel === 'content_model_video') {
         this.view = 'modelVideo'
+        this.showPreview = true
+        setTimeout(() => {
+          that.$refs[this.view].$emit('init')
+        }, 200)
+        return false
+      }
+      if (this.contentModel === 'content_model_level_grade') {
+        this.view = 'gradeTest'
         this.showPreview = true
         setTimeout(() => {
           that.$refs[this.view].$emit('init')

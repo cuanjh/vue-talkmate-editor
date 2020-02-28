@@ -104,3 +104,57 @@
     }
   }
 }
+.grade-test-container {
+  width: 100%;
+  height: 100%;
+  .grade-test-content {
+    width: 100%;
+    height: 100%;
+    padding-top: 10%;
+    box-sizing: border-box;
+  }
+  h2 {
+    font-size:16px;
+    font-weight: 400;
+    color:rgba(0,0,0,1);
+    line-height:28px;
+    text-align: center;
+  }
+  .grade-item {
+    width: 100%;
+    height: 100%;
+  }
+  .form {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+  .trumpet-box {
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding-top: 40px;
+    border-radius: 5px;
+    .trumpet {
+      display: flex;
+      padding-right: 10px;
+      i {
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: cover;
+        width: 15px;
+        height: 15px;
+      }
+    }
+  }
+  .sentence {
+    font-size:17px;
+    font-weight:400;
+    color:rgba(0,0,0,1);
+    line-height: 26px;
+  }
+}

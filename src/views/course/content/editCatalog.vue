@@ -157,6 +157,7 @@ export default {
   },
   methods: {
     show (params) {
+      console.log(params)
       this.resetFormData()
       // 获取上传图片token
       getInfoToken().then(res => {

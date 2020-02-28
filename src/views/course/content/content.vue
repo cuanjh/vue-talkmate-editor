@@ -97,6 +97,7 @@
       @editCatalog="editCatalogFn"
       @resetTrackData="resetTrackData"
       @lookPreview="previewContent"
+      @clickShow="isShowCatalog"
     />
     <edit-catalog ref="editCatalog" @resetTrackData="resetTrackData"/>
     <edit-form ref="editForm"/>
@@ -463,6 +464,16 @@ export default {
         /* eslint-enable */
       }
     },
+    isShowCatalog (obj) {
+      console.log(obj)
+      editCatalog(obj).then(res => {
+        console.log(res)
+        if (res.success) {
+          this.resetTrackData({ pUUID: obj.catalog_info.parent_uuid, trackNum: obj.trackNum })
+          this.$refs.rightMenu.hide()
+        }
+      })
+    },
     clickFolder (params) {
       this.$bus.emit('closeImage')
       this.$bus.emit('closeContent')
@@ -503,8 +514,8 @@ export default {
       let res = await getContent({ 'content_model': params.content_model, 'parent_uuid': params.uuid })
       obj.contents = res.data.contents
       obj.contentModel = params.content_model
-      console.log(obj)
-      await this.$bus.emit('showPreviewModel', obj)
+      console.log(res)
+      this.$bus.emit('showPreviewModel', obj)
     },
     getPath (tracks, uuid) {
       let catalogs = tracks.pop()
