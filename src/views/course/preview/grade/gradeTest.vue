@@ -7,7 +7,8 @@
           :is="'form-' + slideForms[0].content_type"
           :contentTypes="contentTypes"
           :assetsDomain="assetsDomain"
-          :form='slideForms[0]'/>
+          :form='slideForms[0]'
+          :slideForms='slideForms'/>
       </div>
     </div>
   </div>
@@ -20,6 +21,7 @@ import listenForSentence from './form/listenForSentence'
 import fillGap from './form/fillGap'
 import followRead from './form/followRead'
 import makeSentence from './form/makeSentence'
+import listenAnswerQuestion from './form/listenAnswerQuestion'
 
 export default {
   props: ['slideForms'],
@@ -32,7 +34,8 @@ export default {
     'form-listenForSentence': listenForSentence, // 听录音选择正确的句子 content_type: "listenForSentence"
     'form-fillGap': fillGap, // 选词填空 content_type: "fillGap"
     'form-followRead': followRead, // 跟读 content_type: "followRead"
-    'form-makeSentence': makeSentence // 造句 content_type: "makeSentence"
+    'form-makeSentence': makeSentence, // 造句 content_type: "makeSentence"
+    'form-listenAnswerQuestion': listenAnswerQuestion // 造句 content_type: "listenAnswerQuestion"
   },
   created () {
     this.$on('init', () => {
