@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import FormVideoComp from '../form/formVideo'
+import FormVideoComp from './form/formVideo'
 
 export default {
   props: ['slideForms'],

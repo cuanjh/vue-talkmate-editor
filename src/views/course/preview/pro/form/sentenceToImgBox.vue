@@ -124,7 +124,7 @@ export default {
 .choice-container {
   .trumpet {
     i {
-      background-image: url('../../../../assets/images/course/icon-voice.png');
+      background-image: url('../../../../../assets/images/course/icon-voice.png');
     }
   }
 }

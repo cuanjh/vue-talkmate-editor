@@ -24,13 +24,13 @@ import Swiper from 'swiper'
 import 'swiper/css/swiper.css'
 import { mapState } from 'vuex'
 
-import AutoSpeak from '../form/autoSpeak'
-import RepeatSpeak from '../form/repeatSpeak'
-import ImgToSentence from '../form/imgToSentence'
-import MakeSentence from '../form/makeSentence'
-import FillGap from '../form/fillGap'
-import WriteWords from '../form/writewords'
-import SentenceToImgBox from '../form/sentenceToImgBox'
+import AutoSpeak from './form/autoSpeak'
+import RepeatSpeak from './form/repeatSpeak'
+import ImgToSentence from './form/imgToSentence'
+import MakeSentence from './form/makeSentence'
+import FillGap from './form/fillGap'
+import WriteWords from './form/writewords'
+import SentenceToImgBox from './form/sentenceToImgBox'
 
 export default {
   props: ['slideForms'],

@@ -152,7 +152,7 @@ export default {
         display: inline-block;
         width:17px;
         height:15px;
-        background: url('../../../../assets/images/course/icon-voice.png') no-repeat center;
+        background: url('../../../../../assets/images/course/icon-voice.png') no-repeat center;
         background-size: cover;
       }
     }

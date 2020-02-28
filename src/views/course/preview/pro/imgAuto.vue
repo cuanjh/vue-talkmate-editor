@@ -48,8 +48,8 @@ import _ from 'lodash'
 import Swiper from 'swiper'
 import 'swiper/css/swiper.css'
 import { mapState } from 'vuex'
-import SpeakToImg from '../form/speakToImg'
-import SentenceToImg from '../form/sentenceToImg'
+import SpeakToImg from './form/speakToImg'
+import SentenceToImg from './form/sentenceToImg'
 
 export default {
   props: ['slideForms'],
