@@ -17,6 +17,10 @@ import 'element-ui/lib/theme-chalk/index.css'
 // import 'video.js/dist/video-js.css'
 // Vue.prototype.$video = Videojs
 
+import VueIntro from 'vue-introjs'
+import 'intro.js/introjs.css'
+Vue.use(VueIntro)
+
 Vue.use(ElementUI)
 Vue.use(Bus)
 Vue.filter('formatDate', formatDate)
