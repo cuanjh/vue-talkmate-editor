@@ -80,19 +80,23 @@ export const course = {
       }
     },
     // 获取语种列表
-    async getLangList ({ commit }, data) {
+    async getLangList ({ state, commit }, data) {
       const res = await getLangList(data)
       if (res.success) {
         commit('updateLangList', res.data.langs)
-        commit('updateVersion', { key: 'selLang', val: res.data.langs[0]['lan_code'] })
+        if (!state.version.selLang) {
+          commit('updateVersion', { key: 'selLang', val: res.data.langs[0]['lan_code'] })
+        }
       }
     },
     // 获取课程类型
-    async getCourseTypes ({ commit }) {
+    async getCourseTypes ({ state, commit }) {
       const res = await getCourseTypes()
       if (res.success) {
         commit('updateCourseTypes', res.data.types)
-        commit('updateVersion', { key: 'selCourseType', val: res.data.types[0]['type'] })
+        if (!state.version.selCourseType) {
+          commit('updateVersion', { key: 'selCourseType', val: res.data.types[0]['type'] })
+        }
       }
     },
     // 获取课程列表，并根据当前课程分类获取课程版本

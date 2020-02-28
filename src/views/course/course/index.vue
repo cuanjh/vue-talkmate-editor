@@ -1,7 +1,7 @@
 <template>
   <div class="course-manage">
     <div class="top-bar">
-      <el-select v-model="selLang"
+      <el-select v-model="version.selLang"
         filterable
         default-first-option
         placeholder="请选择语种"
@@ -95,14 +95,13 @@
     <edit-comp ref="edit"
       :courseTypes="courseTypes"
       :courseList="courseList"
-      @addNewCourse="addNewCourse"/>
+      @addNewCourse="initData"/>
   </div>
 </template>
 
 <script>
 import { mapGetters, mapActions, mapState } from 'vuex'
 import {
-  getLangList,
   getCourseList,
   courseEdit,
   courseDel
@@ -112,8 +111,6 @@ import EditComp from './edit'
 export default {
   data () {
     return {
-      langList: [],
-      selLang: 'ENG',
       courseList: [],
       isShow: false
     }
@@ -122,6 +119,7 @@ export default {
     EditComp
   },
   created () {
+    this.getLangList({ 'pageNo': 0, 'pageSize': 999 })
     this.getConfigInfo()
     this.getCourseTypes()
   },
@@ -132,26 +130,21 @@ export default {
     ...mapGetters('user', ['userInfo']),
     ...mapState({
       assetsDomain: state => state.course.assetsDomain,
+      langList: state => state.course.langList,
       langInfos: state => state.course.langInfos,
       locale: state => state.course.locale,
-      courseTypes: state => state.course.courseTypes
+      courseTypes: state => state.course.courseTypes,
+      version: state => state.course.version
     })
   },
   methods: {
     ...mapActions({
+      getLangList: 'course/getLangList',
       getConfigInfo: 'course/getConfigInfo',
       getCourseTypes: 'course/getCourseTypes'
     }),
-    addNewCourse () {
-      this.initData()
-    },
     async initData () {
-      let langInfo = await getLangList({ 'pageNo': 0, 'pageSize': 999 })
-      if (langInfo.success) {
-        this.langList = langInfo.data.langs
-      }
-
-      let courseListInfo = await getCourseList({ 'lan_code': this.selLang, 'pageNo': 0, 'pageSize': 0 })
+      let courseListInfo = await getCourseList({ 'lan_code': this.version.selLang, 'pageNo': 0, 'pageSize': 0 })
       if (courseListInfo.success) {
         this.courseList = courseListInfo.data.courses
       }
@@ -160,7 +153,7 @@ export default {
       console.log(this.courseList)
       let obj = {
         type: 'edit',
-        selLang: this.selLang,
+        selLang: this.version.selLang,
         form: row
       }
       this.$refs.edit.show(obj)
@@ -191,7 +184,7 @@ export default {
       console.log(this.courseList)
       let obj = {
         type: 'add',
-        selLang: this.selLang
+        selLang: this.version.selLang
       }
       this.$refs.edit.show(obj)
     },
@@ -220,7 +213,7 @@ export default {
       })
     },
     curCourse () {
-      console.log(this.selLang)
+      console.log(this.version.selLang)
       this.initData()
       this.getCourseTypes()
     },

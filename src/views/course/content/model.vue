@@ -33,6 +33,17 @@
           @delForm="delForm"
           @switchForm="switchForm"/>
       </div>
+      <div class="list" id="sort-form" v-else-if="contentModel == 'content_model_level_grade'">
+        <form-level-grade
+          :data-id="index"
+          :class="{'active': activeFormIndex == index}"
+          v-for="(content, index) in contents"
+          :key="index"
+          :form="content"
+          :formIndex="index"
+          @delForm="delForm"
+          @switchForm="switchForm"/>
+      </div>
       <div class="list" id="sort-form" v-else>
         <form-comp
           :data-id="index"
@@ -50,7 +61,7 @@
         <el-form-item label-width="140px" :label="f.name" v-if="(f.feild !== 'list_order' && f.feild !== 'options' && f.type !== 'array' && f.type !== 'template' && f.type !== 'templateArray' && f.feild !== 'sentence_phoneticize' && f.feild !== 'options_phoneticize') || (f.type == 'template' && contents[activeFormIndex]['' + f.feild + '']) || (version['selLang'] == 'JPN' && (f.feild == 'sentence_phoneticize' || f.feild == 'options_phoneticize')) || (f.feild === 'options' && (contents[activeFormIndex]['type'] == 'makeSentence' || contents[activeFormIndex]['type'] == 'fillGap'  || contents[activeFormIndex]['type'] == 'kid_pattern_words_3' || contents[activeFormIndex]['type'] == 'kid_pattern_sentences_3') || (f.type == 'array' && contents[activeFormIndex][f.feild]))">
           <!-- string 或 int -->
           <el-input
-            :maxlength="100" show-word-limit
+            :maxlength="120" show-word-limit
             v-if="(f.type == 'string' && f.data_from == '') || f.type == 'int'"
             v-model="contents[activeFormIndex]['' + f.feild + '']"
             :disabled="f.feild == 'list_order' || f.type == 'template'">
@@ -222,6 +233,7 @@
 import FormComp from './form'
 import FormVideo from './formVideo'
 import FormKidTest from './kidTest/kidTest'
+import FormLevelGrade from './levelGrade/levelGrade'
 import LookImage from './lookImage'
 import LookContent from './lookContent'
 import RightMenuForm from './rightMenuForm'
@@ -259,6 +271,7 @@ export default {
     FormComp,
     FormVideo,
     FormKidTest,
+    FormLevelGrade,
     LookImage,
     LookContent,
     RightMenuForm
