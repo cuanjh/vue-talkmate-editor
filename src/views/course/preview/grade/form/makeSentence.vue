@@ -35,6 +35,8 @@ export default {
       console.log('makeSentence init', this.form)
       this.resetAll()
     })
+    this.$on('break', () => {
+    })
   },
   methods: {
     typeName (type) {
@@ -49,7 +51,7 @@ export default {
       return desc
     },
     resetAll () {
-      this.allWords = this.form.words_choice
+      this.allWords = JSON.parse(JSON.stringify(this.form.words_choice))
       this.options = []
       this.allWords.forEach(item => {
         this.options.push('')
@@ -80,31 +82,32 @@ export default {
   width: 100%;
   padding: 0 20px;
   box-sizing: border-box;
+  min-height: 60px;
 }
 .choice-list {
   background:rgba(255,255,255,1);
   box-shadow:0px 24px 24px 0px rgba(0,0,0,0.12);
   border-radius:14px;
-  margin: 30px 20px 0;
+  margin: 6% 20px 0;
   // position: absolute;
   // width: 86%;
   // bottom: 8%;
   min-height: 300px;
   .choice-content {
     width: 100%;
-    padding: 20px;
+    padding: 6%;
     box-sizing: border-box;
   }
   a span {
     cursor: pointer;
     display: inline-block;
-    font-size:17px;
+    font-size:14px;
     font-weight:400;
     color:rgba(0,0,0,1);
-    line-height:24px;
-    padding: 8px 16px;
-    border: 0.5px solid rgba(7,7,7,.2);
-    margin: 0 20px 20px 0;
+    line-height:18px;
+    padding: 6px 12px;
+    border: .5px solid rgba(7,7,7,.2);
+    margin: 0 10px 10px 0;
     border-radius: 6px;
     box-sizing: border-box;
   }

@@ -18,7 +18,8 @@ export default {
   props: ['form', 'contentTypes', 'assetsDomain'],
   data () {
     return {
-      isPlay: false
+      isPlay: false,
+      audio: new Audio()
     }
   },
   created () {
@@ -26,21 +27,25 @@ export default {
       console.log('followRead init', this.form)
       this.playAudio()
     })
+    this.$on('break', () => {
+      this.audio.pause()
+      this.isPlay = false
+    })
   },
   methods: {
     playAudio () {
-      let audio = new Audio()
+      this.audio = new Audio()
       if (!this.isPlay) {
-        audio.src = this.assetsDomain + this.form.sentence_audio
-        audio.oncanplay = () => {
-          audio.play()
+        this.audio.src = this.assetsDomain + this.form.sentence_audio
+        this.audio.oncanplay = () => {
+          this.audio.play()
           this.isPlay = true
         }
-        audio.onended = () => {
+        this.audio.onended = () => {
           this.isPlay = false
         }
       } else {
-        audio.pause()
+        this.audio.pause()
         this.isPlay = false
       }
     },
@@ -82,7 +87,7 @@ export default {
   display: inline-block;
   width: 56px;
   height: 56px;
-  background: url('../../../../../assets/images/preview/pic-bofang.png') no-repeat center;
+  background: url('../../../../../assets/images/course/icon-follow-read.png') no-repeat center;
   background-size: cover;
   padding: 2px;
 }

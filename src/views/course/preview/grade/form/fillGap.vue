@@ -4,7 +4,16 @@
     <div class="fillGap-box">
       <span class="sentence">{{sentence}}</span>
     </div>
-    <div class="choice-list">
+    <div class="choice-list img-choice" v-if="form.imgs_choice.length > 0">
+      <img :src="(assetsDomain + form.imgs_choice[0]) | urlFix('imageView2/1/format/jpg')" alt="">
+      <a v-for="(item, index) in form.words_choice" :key="index">
+        <span
+        :class="{'active': currIndex == index && word == item && aadActive}"
+        @click="choiceSentence(item, index)">
+        {{item}}</span>
+      </a>
+    </div>
+    <div class="choice-list" v-else>
       <ul>
         <li v-for="(item, index) in form.words_choice" :key="index">
           <span
@@ -32,6 +41,8 @@ export default {
     this.$on('init', () => {
       console.log('fillGap init', this.form)
       this.initWords()
+    })
+    this.$on('break', () => {
     })
   },
   methods: {
@@ -83,10 +94,10 @@ export default {
       text-align: center;
       span {
         cursor: pointer;
-        font-size:17px;
+        font-size:14px;
         font-weight:400;
         color:rgba(0,0,0,1);
-        line-height:24px;
+        line-height:18px;
         display: inline-block;
         width: 100%;
         padding: 20px;
@@ -98,5 +109,32 @@ export default {
       }
     }
   }
+  img {
+    display: block;
+    width: 116px;
+    height: 118px;
+    object-fit: cover;
+    margin: 0 auto 20px;
+  }
+  a span {
+    cursor: pointer;
+    display: inline-block;
+    font-size:14px;
+    font-weight:400;
+    color:rgba(0,0,0,1);
+    line-height:18px;
+    padding: 6px 12px;
+    border: .5px solid rgba(7,7,7,.2);
+    margin: 0 10px 10px 0;
+    border-radius: 6px;
+    box-sizing: border-box;
+    &.active {
+      background: #4CD964;
+    }
+  }
+}
+.img-choice {
+  padding: 20px 10px 20px;
+  box-sizing: border-box;
 }
 </style>

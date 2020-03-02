@@ -24,13 +24,18 @@ export default {
   props: ['form', 'contentTypes', 'assetsDomain'],
   data () {
     return {
-      isPlay: false
+      isPlay: false,
+      audio: new Audio()
     }
   },
   created () {
     this.$on('init', () => {
       console.log('listenForImg init', this.form, this.contentTypes, this.selfContentTypes)
       this.playAudio()
+    })
+    this.$on('break', () => {
+      this.audio.pause()
+      this.isPlay = false
     })
   },
   mounted () {
@@ -45,18 +50,18 @@ export default {
   },
   methods: {
     playAudio () {
-      let audio = new Audio()
+      this.audio = new Audio()
       if (!this.isPlay) {
-        audio.src = this.assetsDomain + this.form.sentence_audio
-        audio.oncanplay = () => {
-          audio.play()
+        this.audio.src = this.assetsDomain + this.form.sentence_audio
+        this.audio.oncanplay = () => {
+          this.audio.play()
           this.isPlay = true
         }
-        audio.onended = () => {
+        this.audio.onended = () => {
           this.isPlay = false
         }
       } else {
-        audio.pause()
+        this.audio.pause()
         this.isPlay = false
       }
     },
@@ -104,6 +109,9 @@ export default {
 </style>
 <style >
 .preview .grade-test-content .trumpet-box .trumpet i {
+  background-image: url('../../../../../assets/images/course/icon-voice.png');
+}
+.preview .grade-test-content .correct-area .wrap i {
   background-image: url('../../../../../assets/images/course/icon-voice.png');
 }
 </style>

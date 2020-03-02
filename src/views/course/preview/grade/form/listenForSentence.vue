@@ -2,7 +2,7 @@
   <div :class="['form', form.content_type]">
     <h2>{{typeName(form.content_type)}}</h2>
     <div class="trumpet-box">
-      <div class="trumpet" @click="playAudio">
+      <div class="trumpet" @click="playAudio(form.sentence_audio)">
         <i></i>
       </div>
       <span class="sentence">{{form.sentence}}</span>
@@ -27,29 +27,34 @@ export default {
     return {
       isPlay: false,
       aadActive: false,
-      currIndex: ''
+      currIndex: '',
+      audio: new Audio()
     }
   },
   created () {
     this.$on('init', () => {
       console.log('listenForSentence init', this.form, this.contentTypes, this.selfContentTypes)
-      this.playAudio()
+      this.playAudio(this.form.sentence_audio)
+    })
+    this.$on('break', () => {
+      this.audio.pause()
+      this.isPlay = false
     })
   },
   methods: {
-    playAudio () {
-      let audio = new Audio()
+    playAudio (sound) {
+      this.audio = new Audio()
       if (!this.isPlay) {
-        audio.src = this.assetsDomain + this.form.sentence_audio
-        audio.oncanplay = () => {
-          audio.play()
+        this.audio.src = this.assetsDomain + sound
+        this.audio.oncanplay = () => {
+          this.audio.play()
           this.isPlay = true
         }
-        audio.onended = () => {
+        this.audio.onended = () => {
           this.isPlay = false
         }
       } else {
-        audio.pause()
+        this.audio.pause()
         this.isPlay = false
       }
     },
@@ -91,10 +96,10 @@ export default {
       text-align: center;
       span {
         cursor: pointer;
-        font-size:17px;
+        font-size:14px;
         font-weight:400;
         color:rgba(0,0,0,1);
-        line-height:24px;
+        line-height:18px;
         display: inline-block;
         width: 100%;
         padding: 20px;
