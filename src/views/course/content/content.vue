@@ -31,7 +31,7 @@
               v-for="item in versions"
               :key="item.uuid"
               :label="item.name"
-              :value="item.version">
+              :value="item.uuid">
             </el-option>
           </el-select>
         </div>
@@ -137,7 +137,7 @@ export default {
       isShowEditFile: false,
       selLang: 'ENG',
       selCourseType: 0,
-      selVersion: 1,
+      selVersion: '',
       selSlide: '1',
       slideHeight: 0,
       uuid: '',
@@ -293,7 +293,7 @@ export default {
             this.uuid = ''
           } else {
             let curVersion = this.version.versions.find(v => {
-              return v.version === this.selVersion
+              return v.uuid === this.selVersion
             })
             this.updateVersion({ key: 'selVersion', val: this.selVersion })
             if (curVersion && curVersion.uuid) {

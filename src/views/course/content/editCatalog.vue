@@ -11,6 +11,16 @@
         <el-form-item label="名称" prop="name">
           <el-input v-model="form.name"></el-input>
         </el-form-item>
+        <el-form-item label="目录属性">
+          <el-select v-model="form.attr_tag" filterable placeholder="请选择">
+            <el-option
+              v-for="item in catalogAttr"
+              :key="item.key"
+              :label="item.name"
+              :value="item.key">
+            </el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="个数" v-show="handler == 'add'">
           <el-input-number v-model="form.num" :min="1"></el-input-number>
         </el-form-item>
@@ -55,7 +65,7 @@
         </el-form-item>
         <el-form-item label="封面">
           <div class="img-box big-img-box">
-            <div class="img">
+            <div class="img" v-if="form.cover.length">
               <!-- <img v-if="coverUrl" :src="coverUrl" /> -->
               <div
                 class="block"
@@ -65,25 +75,49 @@
                 <el-image
                   lazy
                   :src="assetsDomain + cover"
-                  :preview-src-list="[cover]"
+                  :preview-src-list="[assetsDomain + cover]"
                   fit="cover">
                 </el-image>
-                <el-button round size="small" @click="cropperImage(assetsDomain + cover)">裁剪</el-button>
+                <div class="btn-handler">
+                  <el-button round size="small" @click="cropperImage(assetsDomain + cover)">裁剪</el-button>
+                  <el-button round plain type="danger" size="small" @click="delImage('cover', index)">删除</el-button>
+                </div>
+              </div>
+              <div class="block">
+                <el-upload
+                  action="#"
+                  accept="image/png,image/jpg,image/jpeg"
+                  :on-change="uploadCoverOnchange"
+                  :show-file-list="false"
+                  :auto-upload="false">
+                  <div class="self-upload">
+                    <i class="el-icon-plus"></i>
+                  </div>
+                </el-upload>
               </div>
             </div>
-            <el-upload
-              action="#"
-              accept="image/png,image/jpg,image/jpeg"
-              :on-change="uploadCoverOnchange"
-              :show-file-list="false"
-              :auto-upload="false">
-              <div id="upload-btn">
-                <i class="el-icon-plus avatar-uploader-icon"></i>
+            <div class="img" v-else>
+              <div class="block">
+                <el-upload
+                  action="#"
+                  accept="image/png,image/jpg,image/jpeg"
+                  :on-change="uploadCoverOnchange"
+                  :show-file-list="false"
+                  :auto-upload="false">
+                  <div class="self-upload">
+                    <i class="el-icon-plus"></i>
+                  </div>
+                </el-upload>
               </div>
-            </el-upload>
+            </div>
           </div>
         </el-form-item>
-        <el-form-item label="是否展示" v-show="handler === 'edit'" >
+        <el-form-item label="选择标签">
+          <el-checkbox-group v-model="form.tags">
+            <el-checkbox v-for="tag in selfContentTags" :key="tag.key" :label="tag.key">{{ tag.name }}</el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
+        <el-form-item label="是否展示" v-show="handler === 'edit' && false" >
           <el-radio-group v-model="form.is_show">
             <el-radio :label="true">是</el-radio>
             <el-radio :label="false">否</el-radio>
@@ -119,8 +153,10 @@ export default {
       drawer: false,
       handler: '',
       pathDesc: '',
+      selfContentTags: [],
       form: {
         parent_uuid: '',
+        attr_tag: '',
         uuid: '',
         name: '',
         title: {},
@@ -128,6 +164,7 @@ export default {
         is_show: true,
         flag: [],
         cover: [],
+        tags: [],
         list_order: 0,
         content_model: '',
         type: '',
@@ -140,11 +177,20 @@ export default {
       }
     }
   },
+  created () {
+    this.$bus.$on('uploadCopperImages', (data) => {
+      console.log(data)
+      this.form.cover = [...this.form.cover, ...data]
+      console.log(this.form.cover)
+    })
+  },
   computed: {
     ...mapState({
       langInfos: state => state.course.langInfos,
       assetsDomain: state => state.course.assetsDomain,
       modelList: state => state.course.modelList,
+      contentTags: state => state.course.contentTags,
+      version: state => state.course.version,
       userInfo: state => state.user.userInfo
     }),
     flagUrl () {
@@ -166,12 +212,38 @@ export default {
         url = this.assetsDomain + url
       }
       return url
+    },
+    catalogAttr () {
+      let arr = []
+      if (this.version && this.contentTags) {
+        let courseType = this.version.selCourseType
+        let type = 'catalog'
+        if (courseType === 3) {
+          type = 'kidCatalog'
+        }
+        arr = this.contentTags.filter(item => {
+          return item.type === type
+        })
+      }
+      if (arr.length) {
+        arr = arr.sort((a, b) => {
+          return a.list_order - b.list_order
+        })
+      }
+      return arr
     }
   },
   methods: {
     show (params) {
       console.log(params)
       this.resetFormData()
+      let arr = []
+      if (this.contentTags) {
+        arr = this.contentTags.filter(item => {
+          return item.type.toLowerCase() === 'kid' || item.type.toLowerCase() === 'pro'
+        })
+      }
+      this.selfContentTags = arr
       // 获取上传图片token
       getInfoToken().then(res => {
         this.token = res.data.token
@@ -194,6 +266,7 @@ export default {
       }
       this.form.type = params.type
       if (params.handler === 'add') {
+        this.form.tags = []
         this.form.parent_uuid = params.uuid
         this.form.list_order = params.maxOrder + 10
       }
@@ -201,12 +274,13 @@ export default {
         this.form.parent_uuid = params.folder.parent_uuid
         let folder = params.folder
         this.form.uuid = folder.uuid
+        this.form.attr_tag = folder.attr_tag
+        this.form.tags = folder.tags ? folder.tags : []
         this.form.name = folder.name
         this.form.title = folder.title
         this.form.desc = folder.desc
         this.form.flag = folder.flag
-        this.$set(this.form, 'cover', folder.cover)
-        // this.form.cover = folder.cover
+        this.form.cover = folder.cover
         this.form.is_show = folder.is_show
         this.form.content_model = folder.content_model
         this.form.type = folder.type
@@ -222,10 +296,11 @@ export default {
             let obj1 = {
               catalogsInfo: {
                 content_model: this.form.content_model,
+                attr_tag: this.form.attr_tag,
                 cover: this.form.cover,
                 desc: this.form.desc,
                 flag: this.form.flag,
-                tags: [],
+                tags: this.form.tags,
                 has_changed: true,
                 is_show: this.form.is_show,
                 list_order: this.form.list_order,
@@ -267,12 +342,13 @@ export default {
             let obj2 = {
               catalog_info: {
                 cover: this.form.cover,
+                attr_tag: this.form.attr_tag,
                 desc: this.form.desc,
                 flag: this.form.flag,
                 has_changed: true,
                 list_order: this.form.list_order,
                 name: this.form.name,
-                tags: [],
+                tags: this.form.tags,
                 title: this.form.title,
                 is_show: this.form.is_show
               },
@@ -319,17 +395,37 @@ export default {
       this.form.flag.push(res.key)
     },
     async uploadCoverOnchange (file, fileList) {
-      this.form.cover = []
-      let url = 'course/content/catalog/cover/' + file.raw.name
-      let res = await uploadQiniu(file.raw, this.token, url)
-      this.form.cover.push(res.key)
+      console.log(file)
+      let reader = new FileReader()
+      reader.onload = (e) => {
+        console.log(e)
+        let data = e.target.result
+        let image = new Image()
+        image.onload = () => {
+          let width = image.width
+          let height = image.height
+          let ext = file.raw.name.split('.')[1]
+          let url = 'course/images/icon/' + width + '*' + height + '/' + file.uid + '.' + ext
+          uploadQiniu(file.raw, this.token, url).then(res => {
+            this.form.cover.push(res.key)
+          })
+        }
+        image.src = data
+      }
+      reader.readAsDataURL(file.raw)
     },
     close () {
       this.drawer = false
     },
     cropperImage (url) {
-      this.$bus.$emit('showCropperDialog', url)
+      this.$bus.$emit('showCropperDialog', { url: url, token: this.token })
+    },
+    delImage (flag, index) {
+      this.form[flag].splice(index, 1)
     }
+  },
+  destroyed () {
+    this.$bus.$off('uploadCopperImages')
   }
 }
 </script>
@@ -417,6 +513,14 @@ export default {
 .img-box {
   display: flex;
   align-items: flex-end;
+  .self-upload {
+    width: 100px;
+    height: 100px;
+    i {
+      font-size: 30px;
+      line-height: 100px;
+    }
+  }
   #upload-btn {
     width: 30px;
     height: 30px;
@@ -434,13 +538,20 @@ export default {
 .big-img-box .img {
   // width:400px;
   // height:120px;
-  border: 1px solid rgba(239,239,239,1);
-  padding: 10px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
   .block {
     padding: 5px 0;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    min-width: 200px;
+    min-height: 182px;
+    border: 1px solid rgba(239,239,239,1);
+    padding: 10px;
+    margin: 5px;
     span {
     }
     .el-image {

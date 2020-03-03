@@ -95,7 +95,7 @@
             </el-option>
           </el-select>
           <el-checkbox-group v-if="f.data_from == 'content_tags'" v-model="contents[activeFormIndex]['' + f.feild + '']">
-            <el-checkbox v-for="item in contentTags" :key="item.key" :label="item.key">{{ item.name }}</el-checkbox>
+            <el-checkbox v-for="item in selfContentTags" :key="item.key" :label="item.key">{{ item.name }}</el-checkbox>
           </el-checkbox-group>
           <!-- <div class="options" v-if="f.feild === 'options' && (contents[activeFormIndex]['type'] == 'makeSentence' || contents[activeFormIndex]['type'] == 'fillGap')">
             <div class="option-list">
@@ -241,7 +241,8 @@ import { mapState } from 'vuex'
 import {
   editContent,
   delContent,
-  getInfoToken
+  getInfoToken,
+  getContent
 } from '@/api/course'
 import {
   uploadQiniu
@@ -298,6 +299,20 @@ export default {
       return this.contentTypes.filter(item => {
         return item.model_key === this.contentModel
       })
+    },
+    selfContentTags () {
+      let arr = []
+      if (this.version && this.contentTags.length) {
+        let courseType = this.version.selCourseType
+        let type = 'pro'
+        if (courseType === 3) {
+          type = 'kid'
+        }
+        arr = this.contentTags.filter(item => {
+          return item.type.toLowerCase() === type
+        })
+      }
+      return arr
     }
   },
   methods: {
@@ -343,7 +358,12 @@ export default {
             contents: this.contents,
             parent_uuid: this.pUUID
           }
-          editContent(obj)
+          console.log(obj)
+          editContent(obj).then(() => {
+            getContent({ 'content_model': this.contentModel, 'parent_uuid': this.pUUID }).then(res => {
+              this.$set(this, 'contents', res.data.contents)
+            })
+          })
         }
       })
       /* eslint-enable */
@@ -392,13 +412,6 @@ export default {
       this.resetSortable()
     },
     delForm (params) {
-      if (!params.form.uuid) {
-        this.$message({
-          type: 'warning',
-          message: '没有可删除的内容!'
-        })
-        return false
-      }
       if (params.form.uuid) {
         console.log(params)
         this.$confirm('确认要删除吗?', '提示', {
@@ -442,6 +455,13 @@ export default {
           })
         })
       } else {
+        if (this.contents.length === 1 && params.form.uuid === '') {
+          this.$message({
+            type: 'warning',
+            message: '没有可删除的内容!'
+          })
+          return false
+        }
         this.activeFormIndex = 0
         this.contents.splice(params.formIndex, 1)
       }

@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-  title="图片裁剪（默认16 / 9）"
+  title="图片裁剪"
   :visible.sync="dialogVisible"
   custom-class="cropper-dialog"
   width="50%"
@@ -13,7 +13,7 @@
           宽：<el-input-number v-model="form.cropperWidth" :min="0"></el-input-number>
           高：<el-input-number v-model="form.cropperHeight" :min="0"></el-input-number>
         </el-form-item>
-        <el-form-item label="裁剪倍数">
+        <el-form-item label="裁剪倍数" v-show="false">
           <el-radio-group v-model="form.times">
             <el-radio :label="2">2倍</el-radio>
             <el-radio :label="3">3倍</el-radio>
@@ -21,6 +21,10 @@
         </el-form-item>
         <vue-cropper
           ref="cropper"
+          :ready="cropperReady"
+          :aspectRatio="form.cropperWidth / form.cropperHeight"
+          :cropBoxResizable="false"
+          dragMode="none"
           :src="form.imgUrl">
         </vue-cropper>
         <el-button-group class="cropper-actions">
@@ -34,8 +38,6 @@
         </el-button-group>
       </el-form>
     </section>
-    <!-- <section class="preview-area">
-    </section> -->
   </div>
   <div slot="footer" class="dialog-footer">
     <el-button type="success" @click.prevent="saveCropper">保 存</el-button>
@@ -46,15 +48,17 @@
 <script>
 import VueCropper from 'vue-cropperjs'
 import 'cropperjs/dist/cropper.css'
-import { convertBase64ToBlob } from '../../utils/uploadQiniu'
+import { convertBase64ToBlob, uploadQiniu } from '../../utils/uploadQiniu'
+import moment from 'moment'
 export default {
   data () {
     return {
       dialogVisible: false,
+      token: '',
       form: {
         imgSrc: '',
-        cropperWidth: 0,
-        cropperHeight: 0,
+        cropperWidth: 303,
+        cropperHeight: 310,
         times: 2
       }
     }
@@ -63,8 +67,9 @@ export default {
     VueCropper
   },
   created () {
-    this.$bus.on('showCropperDialog', (url) => {
-      this.form.imgSrc = url
+    this.$bus.on('showCropperDialog', (params) => {
+      this.form.imgSrc = params.url
+      this.token = params.token
       this.dialogVisible = true
     })
   },
@@ -82,9 +87,9 @@ export default {
   },
   methods: {
     show () {
-      setTimeout(() => {
-        this.reset()
-      }, 500)
+      this.$nextTick(() => {
+        this.$refs.cropper.replace(this.form.imgSrc)
+      })
     },
     // 上下左右移动
     move (offsetX, offsetY) {
@@ -96,29 +101,37 @@ export default {
     },
     // 重置
     reset () {
-      this.form.cropperHeight = 0
-      this.form.cropperWidth = 0
-      this.$refs.cropper.replace(this.form.imgSrc)
+      this.form.cropperHeight = 310
+      this.form.cropperWidth = 303
       this.$refs.cropper.reset()
     },
     // 保存裁剪图片
-    saveCropper () {
+    async saveCropper () {
       let cropBoxData = this.$refs.cropper.getCropBoxData()
-      let width = cropBoxData.width
-      let height = cropBoxData.height
-      let times = this.form.times
-      let $imgData = this.$refs.cropper.getCroppedCanvas({ width: width * times, height: height * times })
-      let base64 = $imgData.toDataURL('image/jpeg')
-      console.log(base64)
-      let blobData = convertBase64ToBlob(base64)
-      console.log(blobData)
-      return blobData
+      let width = Math.round(cropBoxData.width)
+      let height = Math.round(cropBoxData.height)
+      let times = [2, 3]
+      let date = moment(new Date()).format('YYYYMMDDHHmmss')
+      let urls = []
+      for (let i = 0; i < times.length; i++) {
+        let url = 'course/images/icon/' + (width * times[i]) + '*' + (height * times[i]) + '/' + date + '@' + times[i] + 'x.png'
+        let $imgData = this.$refs.cropper.getCroppedCanvas({ width: width * times[i], height: height * times[i] })
+        let base64 = $imgData.toDataURL('image/png')
+        let blobData = convertBase64ToBlob(base64)
+        await uploadQiniu(blobData, this.token, url)
+        urls.push(url)
+      }
+      this.$bus.$emit('uploadCopperImages', urls)
+      this.dialogVisible = false
     },
     close () {
       this.form.imgSrc = ''
-      this.form.cropperWidth = 0
-      this.form.cropperHeight = 0
+      this.form.cropperWidth = 303
+      this.form.cropperHeight = 310
       this.form.times = 2
+    },
+    cropperReady () {
+      this.$refs.cropper.setCropBoxData({ width: this.form.cropperWidth, height: this.form.cropperHeight })
     }
   },
   beforeDestroy () {
