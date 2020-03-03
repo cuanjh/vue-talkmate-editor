@@ -1,6 +1,6 @@
 <template>
 <transition name="fade">
-  <div class="edit-container" v-show="showEdit">
+  <div class="tags-edit-container" v-if="showEdit">
     <div class="edit-content">
       <div class="close" @click="close">
         <i class="el-icon-close"></i>
@@ -8,13 +8,84 @@
       <div class="content">
         <el-form ref="form" :model="form">
           <el-form-item label="key: " prop="key" :rules="[
-            { required: true, message: 'key不能为空', trigger: 'blur'},
-            {pattern: /^[a-zA-Z_]{1,}$/, message: '只允许输入字母或下划线！'}
+            { required: true, message: 'key不能为空', trigger: 'blur'}
           ]">
-            <el-input v-model="form.key" maxlength="30" show-word-limit></el-input>
+            <el-input v-model="form.key" maxlength="30" show-word-limit :disabled="type == 'edit'"></el-input>
           </el-form-item>
           <el-form-item label="名称: " prop="name" :rules="{ required: true, message: '名称不能为空', trigger: 'blur'}">
             <el-input v-model="form.name" maxlength="25" show-word-limit></el-input>
+          </el-form-item>
+          <el-form-item class="tag-types" label="分类: " prop="type" :rules="[
+            { required: true, message: '请选择分类', trigger: 'change' }
+          ]">
+            <el-select v-model="form.type"
+              placeholder="请选择分类"
+              @change="changeType">
+              <el-option
+                v-for="item in tagTypes"
+                :key="item.name"
+                :label="item.name"
+                :value="item.type">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="标题: ">
+            <div class="lang-input" v-for="l in langInfos" :key="l.langKey">
+              <el-input v-model="form.title[l.langKey]"></el-input>
+              <div class="text" v-text="'(' + l.name + ')'"></div>
+            </div>
+          </el-form-item>
+          <el-form-item label="描述: ">
+            <div class="lang-input" v-for="l in langInfos" :key="l.langKey">
+              <el-input type="textarea" v-model="form.desc[l.langKey]"></el-input>
+              <div class="text" v-text="'(' + l.name + ')'"></div>
+            </div>
+          </el-form-item>
+          <el-form-item label="图标: ">
+            <div class="img-box small-img-box">
+              <div class="img">
+                <img v-if="flagUrl" :src="flagUrl" fit="cover" />
+              </div>
+              <el-upload
+                action="#"
+                accept="image/png,image/jpg,image/jpeg"
+                :on-change="uploadFlagOnchange"
+                :show-file-list="false"
+                :auto-upload="false">
+                <div id="upload-btn">
+                  <i class="el-icon-plus avatar-uploader-icon"></i>
+                </div>
+              </el-upload>
+            </div>
+          </el-form-item>
+          <el-form-item label="封面: ">
+            <div class="img-box big-img-box">
+              <div class="img">
+                <div
+                  class="block"
+                  v-for="(cover, index) in form.cover"
+                  :key="'cover' + index">
+                  <span>{{ cover.split('/')[cover.split('/').length - 2]}}</span>
+                  <el-image
+                    lazy
+                    :src="assetsDomain + cover"
+                    :preview-src-list="[cover]"
+                    fit="cover">
+                  </el-image>
+                  <el-button round size="small" @click="cropperImage(assetsDomain + cover)">裁剪</el-button>
+                </div>
+              </div>
+              <el-upload
+                action="#"
+                accept="image/png,image/jpg,image/jpeg"
+                :on-change="uploadCoverOnchange"
+                :show-file-list="false"
+                :auto-upload="false">
+                <div id="upload-btn">
+                  <i class="el-icon-plus avatar-uploader-icon"></i>
+                </div>
+              </el-upload>
+            </div>
           </el-form-item>
         </el-form>
         <div class="btns">
@@ -33,40 +104,130 @@
 </template>
 
 <script>
+// editTags
 import {
-  addTags
+  editTags,
+  addTags,
+  getInfoToken
 } from '@/api/course'
+import { uploadQiniu } from '@/utils/uploadQiniu'
+import { mapState } from 'vuex'
+
 export default {
+  props: ['tagTypes'],
   data () {
     return {
+      token: '',
       showEdit: false,
       form: {
+        cover: [],
+        desc: {},
+        flag: [],
         key: '',
-        name: ''
-      }
+        list_order: 0,
+        name: '',
+        title: {},
+        type: ''
+      },
+      type: ''
     }
   },
+  computed: {
+    ...mapState({
+      assetsDomain: state => state.course.assetsDomain,
+      langInfos: state => state.course.langInfos
+    }),
+    flagUrl () {
+      let url = ''
+      if (this.form.flag && this.form.flag.length > 0) {
+        url = this.form.flag[0]
+      }
+      if (url && url.indexOf('http') === -1) {
+        url = this.assetsDomain + url
+      }
+      return url
+    },
+    coverUrl () {
+      let url = ''
+      if (this.form.cover && this.form.cover.length > 0) {
+        url = this.form.cover[0]
+      }
+      if (url && url.indexOf('http') === -1) {
+        url = this.assetsDomain + url
+      }
+      return url
+    }
+  },
+  mounted () {
+  },
   methods: {
-    show () {
+    show (params) {
+      console.log(params)
+      this.type = params.type
       this.showEdit = true
+      // 获取上传图片token
+      getInfoToken().then(res => {
+        this.token = res.data.token
+      })
+      if (this.type === 'edit') {
+        this.form = params.params
+      } else {
+        let obj = {
+          cover: [],
+          desc: {},
+          flag: [],
+          key: '',
+          list_order: 0,
+          name: '',
+          title: {},
+          type: ''
+        }
+        this.form = obj
+      }
     },
     close () {
       this.showEdit = false
-      this.form.key = ''
-      this.form.name = ''
       this.$refs.form.resetFields()
+    },
+    cropperImage (url) {
+      this.$bus.$emit('showCropperDialog', url)
+    },
+    async uploadFlagOnchange (file, fileList) {
+      this.form.flag = []
+      let url = 'course/content/catalog/flag/' + file.raw.name
+      let res = await uploadQiniu(file.raw, this.token, url)
+      this.form.flag.push(res.key)
+    },
+    async uploadCoverOnchange (file, fileList) {
+      this.form.cover = []
+      let url = 'course/content/catalog/cover/' + file.raw.name
+      let res = await uploadQiniu(file.raw, this.token, url)
+      this.form.cover.push(res.key)
+    },
+    changeType () {
+      console.log(this.form)
     },
     determine () {
       console.log(this.form)
       this.$refs['form'].validate((valid) => {
         if (valid) {
-          addTags(this.form).then(res => {
-            console.log(res)
-            if (res.success) {
-              this.$emit('addTagItem')
-              this.close()
-            }
-          })
+          if (this.type === 'edit') {
+            editTags(this.form).then(res => {
+              console.log(res)
+              if (res.success) {
+                this.$emit('addTagItem')
+                this.close()
+              }
+            })
+          } else {
+            addTags(this.form).then(res => {
+              console.log(res)
+              if (res.success) {
+                this.$emit('addTagItem')
+                this.close()
+              }
+            })
+          }
         }
       })
     }
@@ -75,7 +236,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.edit-container {
+.tags-edit-container {
   position: fixed;
   top: 0;
   left: 0;
@@ -89,7 +250,7 @@ export default {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width:400px;
+  width:800px;
   background:rgba(245,246,250,1);
   border-radius:4px;
   padding: 50px 30px 40px;
@@ -132,5 +293,164 @@ export default {
       }
     }
   }
+}
+.edit-content .content {
+  width: 100%;
+  height: 100%;
+  max-height:500px;
+  overflow-y: auto;
+}
+.lang-input {
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+.flag {
+  position: relative;
+  .flag-image {
+    display: inline-block;
+    width: 80px;
+    height: 80px;
+    background: #EFEFEF;
+    border-radius: 4px;
+    overflow: hidden;
+    .el-image {
+      width: 100%;
+      height: 100%;
+    }
+  }
+  .el-button {
+    position: absolute;
+    margin: 40px 0 0 20px;
+  }
+}
+
+.cover {
+  position: relative;
+  .cover-image {
+    display: inline-block;
+    width: 169px;
+    height: 113px;
+    background: #EFEFEF;
+    border-radius: 4px;
+    overflow: hidden;
+    .el-image {
+      width: 100%;
+      height: 100%;
+    }
+  }
+  .el-button {
+    position: absolute;
+    margin: 70px 0 0 20px;
+  }
+}
+.el-form {
+  .el-radio {
+    margin: 5px 10px;
+  }
+  .el-select {
+    width: 100%;
+  }
+}
+.img-box {
+  display: flex;
+  align-items: flex-end;
+  #upload-btn {
+    width: 30px;
+    height: 30px;
+    border:1px solid rgba(0,0,0,.1);
+    border-radius: 2px;
+    margin-left: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .avatar-uploader-icon {
+      color: #007AFF;
+    }
+  }
+}
+.big-img-box .img {
+  border: 1px solid #EFEFEF;
+  padding: 10px;
+  min-height: 100px;
+  min-width: 300px;
+  background:#EFEFEF;
+  .block {
+    padding: 5px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    span {
+    }
+    .el-image {
+      width: 200px;
+      height: 100px;
+      background:#EFEFEF;
+      border-radius: 4px;
+    }
+    .el-button {
+      margin-top: 10px;
+      width: 80px;
+    }
+  }
+}
+.small-img-box .img {
+  width:120px;
+  height:120px;
+  background: #EFEFEF;
+  border-radius:4px;
+  border: 1px solid #EFEFEF;
+  overflow: hidden;
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    margin-bottom: 20px;
+  }
+}
+/*滚动条样式*/
+.content::-webkit-scrollbar {/*滚动条整体样式*/
+  position: relative;
+  width: 6px;     /*高宽分别对应横竖滚动条的尺寸*/
+  height: 4px;
+}
+.content::-webkit-scrollbar-thumb {/*滚动条里面小方块*/
+  position: absolute;
+  width: 6px;
+  border-radius: 4px;
+  -webkit-box-shadow: inset 0 0 4px rgba(0,0,0,0.4);
+  background: rgba(0, 0, 0, .4);
+  padding: 20px;
+}
+.content::-webkit-scrollbar-track {/*滚动条里面轨道*/
+  width: 4px;
+  width:2px;
+  background:rgba(216,216,216,1);
+  border-radius:1px;
+  opacity:0.1;
+}
+</style>
+<style>
+.tags-edit-container .el-input {
+  width: 80%;
+  margin-right: 10px;
+}
+.tags-edit-container .el-form-item {
+  display: flex;
+  width: 100%;
+}
+.tags-edit-container .el-form-item__content {
+  width: 90%;
+}
+.tags-edit-container .el-textarea {
+  width: 80%;
+  margin-right: 10px;
+}
+.tags-edit-container .el-form-item__label {
+  width: 60px;
+}
+.tags-edit-container .tag-types .el-select {
+  width: 30%;
 }
 </style>

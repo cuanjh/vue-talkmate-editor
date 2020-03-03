@@ -538,6 +538,31 @@ export const addTags = (data) => {
 }
 
 /**
+ * @Summary 编辑标签
+ * @param {*} data
+ * @Router /editor/tag/edit [post]
+ */
+export const editTags = (data) => {
+  return service({
+    url: '/editor/tag/edit',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 标签类型
+ * @param {*} data
+ * @Router /editor/tag/types [post]
+ */
+export const tagTypes = (data) => {
+  return service({
+    url: '/editor/tag/types',
+    method: 'get'
+  })
+}
+
+/**
  * @Summary 删除标签
  * @param {*} data
  * @Router /editor/tag/del [post]
