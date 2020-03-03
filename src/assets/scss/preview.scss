@@ -110,7 +110,7 @@
   .grade-test-content {
     width: 100%;
     height: 100%;
-    padding-top: 10%;
+    padding-top: 6%;
     box-sizing: border-box;
   }
   h2 {
@@ -137,7 +137,7 @@
     align-items: center;
     justify-content: center;
     position: relative;
-    padding-top: 40px;
+    padding: 10px;
     border-radius: 5px;
     .trumpet {
       display: flex;
@@ -152,9 +152,9 @@
     }
   }
   .sentence {
-    font-size:17px;
+    font-size:14px;
     font-weight:400;
     color:rgba(0,0,0,1);
-    line-height: 26px;
+    line-height: 20px;
   }
 }

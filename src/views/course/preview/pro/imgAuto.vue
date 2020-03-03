@@ -117,6 +117,9 @@ export default {
     this.$on('curFormPlay', () => {
       this.playVoice()
     })
+    this.$on('reset', () => {
+      this.$refs['comp-' + this.mySwiper.activeIndex][0].$emit('break')
+    })
   },
   computed: {
     ...mapState({

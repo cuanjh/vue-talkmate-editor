@@ -1,6 +1,6 @@
 <template>
 <transition name="fade">
-  <div class="preview" v-show="showPreview" @click="hideModel">
+  <div class="preview" v-if="showPreview" @click="hideModel">
     <div class="preview-container" id="preview-container" @click.stop="showModel">
       <div class="preview-content">
         <div class="preview-warp">
@@ -54,6 +54,7 @@ export default {
   },
   methods: {
     hideModel () {
+      this.$refs[this.view].$emit('reset')
       this.showPreview = false
     },
     showModel () {

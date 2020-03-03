@@ -2,18 +2,16 @@
   <div :class="['form', form.content_type]">
     <h2>{{typeName(form.content_type)}}</h2>
     <div class="trumpet-box">
-      <div class="trumpet" @click="playAudio">
+      <div class="trumpet" @click="playAudio(form.text_audio)">
         <i></i>
       </div>
     </div>
-    <span class="sentence">{{form.sentence}}</span>
-    <div class="record">
-      <i></i>
-    </div>
+    <span class="sentence" v-html="form.text.replace(new RegExp(/\n/, 'g'), '<br />')"></span>
   </div>
 </template>
 
 <script>
+
 export default {
   props: ['form', 'contentTypes', 'assetsDomain'],
   data () {
@@ -24,8 +22,8 @@ export default {
   },
   created () {
     this.$on('init', () => {
-      console.log('followRead init', this.form)
-      this.playAudio()
+      console.log('listenAnswerQuestion init', this.form)
+      this.playAudio(this.form.text_audio)
     })
     this.$on('break', () => {
       this.audio.pause()
@@ -33,10 +31,10 @@ export default {
     })
   },
   methods: {
-    playAudio () {
+    playAudio (sound) {
       this.audio = new Audio()
       if (!this.isPlay) {
-        this.audio.src = this.assetsDomain + this.form.sentence_audio
+        this.audio.src = this.assetsDomain + sound
         this.audio.oncanplay = () => {
           this.audio.play()
           this.isPlay = true
@@ -64,31 +62,41 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.sentence {
-  display: inline-block;
-  width: 100%;
-  text-align: center;
-  padding: 0 20px;
+.listenAnswerQuestion {
+  padding: 0 10px 0;
   box-sizing: border-box;
 }
-</style>
-<style >
-.preview .grade-test-content .record {
-  width: 100%;
-  position: absolute;
-  /* bottom: 86px; */
-  bottom: 10%;
-  min-height: 70px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.preview .grade-test-content .record i {
-  display: inline-block;
-  width: 56px;
-  height: 56px;
-  background: url('../../../../../assets/images/course/icon-follow-read.png') no-repeat center;
-  background-size: cover;
-  padding: 2px;
+
+#listen-answer-question {
+  .swiper-slide {
+    padding: 10px;
+    box-sizing: border-box;
+  }
+  .choice-list {
+    background:rgba(255,255,255,1);
+    box-shadow:0px 24px 24px 0px rgba(0,0,0,0.12);
+    border-radius:14px;
+    margin: 10% 6px 0;
+    ul {
+      li {
+        text-align: center;
+        span {
+          cursor: pointer;
+          font-size:14px;
+          font-weight:400;
+          color:rgba(0,0,0,1);
+          line-height:24px;
+          display: inline-block;
+          width: 100%;
+          padding: 18px;
+          border-bottom: .5px solid rgba(0, 0, 0, .2);
+          box-sizing: border-box;
+          &.active {
+            background: #4CD964;
+          }
+        }
+      }
+    }
+  }
 }
 </style>

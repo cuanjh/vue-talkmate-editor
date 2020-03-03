@@ -59,6 +59,9 @@ export default {
         this.mySwiper.mousewheel.disable()
       }
     })
+    this.$on('reset', () => {
+      this.$refs['comp-' + this.mySwiper.activeIndex][0].$emit('break')
+    })
   },
   computed: {
     ...mapState({

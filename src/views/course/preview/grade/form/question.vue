@@ -9,11 +9,8 @@
     </div>
     <div class="choice-list">
       <ul>
-        <li v-for="(item, index) in form.words_choice" :key="index">
-          <span
-          :class="{'active': currIndex == index && form.sentence == item && aadActive}"
-          @click="choiceSentence(item, index)">
-          {{item}}</span>
+        <li v-for="(word, index) in form.words_choice" :key="index">
+          <span>{{word}}</span>
         </li>
       </ul>
     </div>
@@ -21,19 +18,18 @@
 </template>
 
 <script>
+
 export default {
   props: ['form', 'contentTypes', 'assetsDomain'],
   data () {
     return {
       isPlay: false,
-      aadActive: false,
-      currIndex: '',
       audio: new Audio()
     }
   },
   created () {
     this.$on('init', () => {
-      console.log('listenForSentence init', this.form, this.contentTypes, this.selfContentTypes)
+      console.log('question init', this.form)
       this.playAudio(this.form.sentence_audio)
     })
     this.$on('break', () => {
@@ -67,30 +63,21 @@ export default {
         desc = obj.desc
       }
       return desc
-    },
-    choiceSentence (item, index) {
-      console.log(item, index)
-      if (item === this.form.sentence) {
-        this.currIndex = index
-        this.aadActive = true
-        setTimeout(() => {
-          this.close()
-        }, 1000)
-      }
-    },
-    close () {
-      this.currIndex = ''
-      this.aadActive = false
     }
   }
 }
 </script>
+
 <style lang="scss" scoped>
+.question {
+  padding: 0 10px 0;
+  box-sizing: border-box;
+}
 .choice-list {
   background:rgba(255,255,255,1);
   box-shadow:0px 24px 24px 0px rgba(0,0,0,0.12);
   border-radius:14px;
-  margin: 30px 20px 0;
+  margin: 10% 6px 0;
   ul {
     li {
       text-align: center;
@@ -99,10 +86,10 @@ export default {
         font-size:14px;
         font-weight:400;
         color:rgba(0,0,0,1);
-        line-height:18px;
+        line-height:24px;
         display: inline-block;
         width: 100%;
-        padding: 20px;
+        padding: 18px;
         border-bottom: .5px solid rgba(0, 0, 0, .2);
         box-sizing: border-box;
         &.active {
