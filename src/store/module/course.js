@@ -8,7 +8,8 @@ import {
   getContentTypes,
   getContentTags,
   getContentTypeList,
-  getOnlineList
+  getOnlineList,
+  tagTypes
 } from '@/api/course'
 import moment from 'moment'
 
@@ -39,7 +40,8 @@ export const course = {
     contentTypes: [], // 内容分类列表
     contentTags: [], // 内容标签列表
     contentTypeList: [], // 内容类型列表
-    onlineList: [] // 上线列表
+    onlineList: [], // 上线列表
+    tagTypes: [] // 标签类型
   },
   mutations: {
     updateConfigInfo (state, configInfo) {
@@ -69,6 +71,9 @@ export const course = {
     },
     updateOnlineList (state, online) {
       state.onlineList = online
+    },
+    updateTagsTypes (state, types) {
+      state.tagTypes = types
     }
   },
   actions: {
@@ -175,6 +180,15 @@ export const course = {
         })
         console.log(online)
         commit('updateOnlineList', online)
+      }
+    },
+    // 获取标签类型
+    async getTagTypes ({ commit }, data) {
+      const res = await tagTypes(data)
+      if (res.success) {
+        let tags = res.data.types
+        console.log(tags)
+        commit('updateTagsTypes', tags)
       }
     }
   },

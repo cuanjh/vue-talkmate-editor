@@ -2,6 +2,7 @@
   <div class="tags-container">
     <div class="tags-content">
       <div class="top-bar">
+        <el-input v-model="searchKey" @input="search" clearable placeholder="请输入要查找的key或名称"></el-input>
         <el-button style="outline:none;" type="primary" class="btnAdd" @click="addTags()">添加</el-button>
       </div>
       <el-table
@@ -25,7 +26,6 @@
           </template>
         </el-table-column>
         <el-table-column
-          width="400"
           label="名称">
           <template slot-scope="scope">
             <el-tooltip :content="scope.row.name" placement="top" effect="light">
@@ -34,9 +34,18 @@
           </template>
         </el-table-column>
         <el-table-column
+          label="type">
+          <template slot-scope="scope">
+            <el-tooltip :content="scope.row.type" placement="top" effect="light">
+              <span>{{ scope.row.type }}</span>
+            </el-tooltip>
+          </template>
+        </el-table-column>
+        <el-table-column
           fixed="right"
           label="操作">
           <template slot-scope="scope">
+            <el-button size="small" @click="editTag(scope.row)">编辑</el-button>
             <el-button type="danger" size="small" @click="deleteTag(scope.row.key)">删除</el-button>
           </template>
         </el-table-column>
@@ -48,12 +57,13 @@
           :page-size="pageRequest.pageSize"
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
-          :total="contentTags.length"
+          :total="tagsLists.length"
           >
         </el-pagination>
       </div>
     </div>
-    <edit-comp ref="tagEdit" @addTagItem="initData"/>
+    <edit-comp ref="tagEdit" :tagTypes="tagTypes" @addTagItem="initData"/>
+    <cropper-dialog ></cropper-dialog>
   </div>
 </template>
 
@@ -63,43 +73,68 @@ import {
   delTags
 } from '@/api/course'
 import EditComp from './edit'
+import CropperDialog from '../../../components/common/cropper'
 
 export default {
   data () {
     return {
+      searchKey: '',
       showTableData: [],
       // 分页信息
       pageRequest: {
         pageNum: 1,
         pageSize: 5
-      }
+      },
+      allTags: [],
+      tagsLists: []
     }
   },
   components: {
-    EditComp
+    EditComp,
+    CropperDialog
   },
   created () {
     this.initData()
   },
   computed: {
     ...mapState({
+      tagTypes: state => state.course.tagTypes,
       contentTags: state => state.course.contentTags
     })
   },
   mounted () {
-    console.log(this.contentTags)
+    this.getTagTypes()
+    // this.tagsLists = this.contentTags
+    // this.allTags = this.contentTags
+    // console.log(this.contentTags, this.allTags)
   },
   methods: {
     ...mapActions({
+      getTagTypes: 'course/getTagTypes',
       getContentTags: 'course/getContentTags'
     }),
+    test () {
+      // 浅
+    },
     async initData () {
       await this.getContentTags({ pageNo: 0, pageSize: 0 })
       console.log('initData')
+      this.tagsLists = this.contentTags
+      this.allTags = this.contentTags
+      // console.log(this.contentTags, this.allTags)
       this.handleCurrentChange(this.pageRequest.pageNum)
     },
-    addTags () {
-      this.$refs.tagEdit.show()
+    // 模糊搜索
+    search () {
+      let _this = this
+      console.log(_this.searchKey)
+      this.tagsLists = this.allTags.filter(item => {
+        let res = item.name.indexOf(this.searchKey) > -1 || item.key.indexOf(this.searchKey) > -1
+        return res
+      })
+      // console.log(this.tagsLists)
+      // console.log(this.showTableData)
+      this.handleCurrentChange(1)
     },
     handleSizeChange (val) {
       console.log(`每页 ${val} 条`)
@@ -110,8 +145,25 @@ export default {
       this.pageRequest.pageNum = val
       let starNum = (val - 1) * this.pageRequest.pageSize
       let endNum = val * this.pageRequest.pageSize
-      this.showTableData = this.contentTags.slice(starNum, endNum)
+      this.showTableData = this.tagsLists.slice(starNum, endNum)
     },
+    // 添加
+    addTags () {
+      let obj = {
+        type: 'add'
+      }
+      this.$refs.tagEdit.show(obj)
+    },
+    // 编辑
+    editTag (row) {
+      let obj = {
+        type: 'edit',
+        params: row
+      }
+      console.log(obj)
+      this.$refs.tagEdit.show(obj)
+    },
+    // 删除
     deleteTag (key) {
       console.log(key)
       this.$confirm('此操作将永久删除该标签, 是否继续?', '提示', {
@@ -145,7 +197,11 @@ export default {
 }
 .top-bar {
   padding: 20px 0px 0;
-  text-align: right;
+  display: flex;
+  justify-content: space-between;
+}
+.el-input {
+  width: 300px;
 }
 
 </style>
@@ -153,6 +209,7 @@ export default {
 .tags-container .el-table td, .el-table th {
   padding: 14px 0!important;
 }
+
 .tags-container .el-table td div {
   overflow: hidden;
   text-overflow: ellipsis;
