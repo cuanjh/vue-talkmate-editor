@@ -56,7 +56,20 @@
         <el-form-item label="封面">
           <div class="img-box big-img-box">
             <div class="img">
-              <img v-if="coverUrl" :src="coverUrl" />
+              <!-- <img v-if="coverUrl" :src="coverUrl" /> -->
+              <div
+                class="block"
+                v-for="(cover, index) in form.cover"
+                :key="'cover' + index">
+                <span>{{ cover.split('/')[cover.split('/').length - 2]}}</span>
+                <el-image
+                  lazy
+                  :src="assetsDomain + cover"
+                  :preview-src-list="[cover]"
+                  fit="cover">
+                </el-image>
+                <el-button round size="small" @click="cropperImage(assetsDomain + cover)">裁剪</el-button>
+              </div>
             </div>
             <el-upload
               action="#"
@@ -192,7 +205,8 @@ export default {
         this.form.title = folder.title
         this.form.desc = folder.desc
         this.form.flag = folder.flag
-        this.form.cover = folder.cover
+        this.$set(this.form, 'cover', folder.cover)
+        // this.form.cover = folder.cover
         this.form.is_show = folder.is_show
         this.form.content_model = folder.content_model
         this.form.type = folder.type
@@ -296,6 +310,7 @@ export default {
         content_model: '',
         num: 1
       }
+      this.form.cover.length = 0
     },
     async uploadFlagOnchange (file, fileList) {
       this.form.flag = []
@@ -311,6 +326,9 @@ export default {
     },
     close () {
       this.drawer = false
+    },
+    cropperImage (url) {
+      this.$bus.$emit('showCropperDialog', url)
     }
   }
 }
@@ -414,18 +432,34 @@ export default {
   }
 }
 .big-img-box .img {
-  width:400px;
-  height:120px;
-  background:rgba(239,239,239,1);
-  overflow: hidden;
+  // width:400px;
+  // height:120px;
   border: 1px solid rgba(239,239,239,1);
-  border-radius:4px;
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    margin-bottom: 20px;
+  padding: 10px;
+  .block {
+    padding: 5px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    span {
+    }
+    .el-image {
+      width: 200px;
+      height: 100px;
+      background:rgba(239,239,239,1);
+      border-radius: 4px;
+    }
+    .el-button {
+      margin-top: 10px;
+      width: 80px;
+    }
   }
+  // img {
+  //   width: 100%;
+  //   height: 100%;
+  //   object-fit: cover;
+  //   margin-bottom: 20px;
+  // }
 }
 .small-img-box .img {
   width:120px;

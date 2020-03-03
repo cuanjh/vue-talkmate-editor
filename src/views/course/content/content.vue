@@ -102,6 +102,7 @@
     <edit-catalog ref="editCatalog" @resetTrackData="resetTrackData"/>
     <edit-form ref="editForm"/>
     <preview-comp ref="preview"/>
+    <cropper-dialog ref="cropperDialog"></cropper-dialog>
   </el-container>
 </template>
 
@@ -114,6 +115,7 @@ import EditCatalog from './editCatalog'
 import EditForm from './editForm'
 import EditFile from './editFile'
 import PreviewComp from '../preview/pro/index'
+import CropperDialog from '../../../components/common/cropper'
 import { mapState, mapActions, mapMutations } from 'vuex'
 import {
   getUserList
@@ -158,7 +160,8 @@ export default {
     EditCatalog,
     EditForm,
     EditFile,
-    PreviewComp
+    PreviewComp,
+    CropperDialog
   },
   created () {
     this.getModelList({ pageNo: 0, pageSize: 0 })
