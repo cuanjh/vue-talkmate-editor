@@ -158,7 +158,12 @@ export default {
       return url
     }
   },
-  mounted () {
+  created () {
+    this.$bus.$on('uploadCopperImages', (data) => {
+      console.log(data)
+      this.form.cover = [...this.form.cover, ...data]
+      console.log(this.form.cover)
+    })
   },
   methods: {
     show (params) {
@@ -190,7 +195,7 @@ export default {
       this.$refs.form.resetFields()
     },
     cropperImage (url) {
-      this.$bus.$emit('showCropperDialog', url)
+      this.$bus.$emit('showCropperDialog', { url: url, token: this.token })
     },
     async uploadFlagOnchange (file, fileList) {
       this.form.flag = []
@@ -231,6 +236,9 @@ export default {
         }
       })
     }
+  },
+  destroyed () {
+    this.$bus.$off('uploadCopperImages')
   }
 }
 </script>

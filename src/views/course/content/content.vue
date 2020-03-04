@@ -3,7 +3,7 @@
     <el-header height="70px">
       <div class="top-bar">
         <div class="left">
-          <div class="icon-logo"></div>
+          <div class="icon-logo" @click="back"></div>
           <el-select
             v-model="selLang"
             size="small"
@@ -776,6 +776,7 @@ export default {
   flex-direction: row;
   align-items: center;
   .icon-logo {
+    cursor: pointer;
     width: 175px;
     height: 20px;
     margin-left: 20px;
