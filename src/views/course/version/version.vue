@@ -298,7 +298,7 @@ export default {
     },
     // 课程内容
     courseContent (item) {
-      this.updateVersion({ key: 'selVersion', val: item.version })
+      this.updateVersion({ key: 'selVersion', val: item.uuid })
       this.updateVersion({ key: 'uuid', val: item.uuid })
       this.$router.push({ path: '/course-content' })
       // this.$refs['content'].show({ lang: this.selLang, courseType: this.selCourseType, version: item.version, uuid: item.uuid })

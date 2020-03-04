@@ -2,12 +2,12 @@
   <div class="edit-catalog-container">
     <div class="path">{{ '路径: ' + pathDesc }}</div>
     <div class="title" v-text="title"></div>
-    <el-form ref="form" :rules="rules" :model="form" label-width="80px">
+    <el-form ref="form" :model="form" :rules="rules"  label-width="80px">
       <el-form-item label="名称" prop="name">
         <el-input v-model="form.name"></el-input>
       </el-form-item>
-      <el-form-item label="目录属性">
-        <el-select v-model="form.attr_tag" filterable placeholder="请选择">
+      <el-form-item label="目录属性" v-show="catalogAttr && catalogAttr.length">
+        <el-select v-model="attr_tag" filterable placeholder="请选择">
           <el-option
             v-for="item in catalogAttr"
             :key="item.key"
@@ -61,7 +61,6 @@
       <el-form-item label="封面">
         <div class="img-box big-img-box">
           <div class="img" v-if="form.cover.length">
-            <!-- <img v-if="coverUrl" :src="coverUrl" /> -->
             <div
               class="block"
               v-for="(cover, index) in form.cover"
@@ -107,9 +106,9 @@
           </div>
         </div>
       </el-form-item>
-      <el-form-item label="选择标签">
-        <el-checkbox-group v-model="form.tags">
-          <el-checkbox v-for="tag in selfContentTags" :key="tag.key" :label="tag.key">{{ tag.name }}</el-checkbox>
+      <el-form-item label="选择标签" v-show="selfContentTags && selfContentTags.length">
+        <el-checkbox-group v-model="tags">
+          <el-checkbox v-for="(tag, index) in selfContentTags" :key="tag.key + index" :label="tag.key">{{ tag.name }}</el-checkbox>
         </el-checkbox-group>
       </el-form-item>
       <el-form-item label="是否展示" v-show="handler === 'edit' && false" >
@@ -145,10 +144,10 @@ export default {
       title: '',
       handler: '',
       pathDesc: '',
-      selfContentTags: [],
+      attr_tag: '',
+      tags: [],
       form: {
         parent_uuid: '',
-        attr_tag: '',
         uuid: '',
         name: '',
         title: {},
@@ -156,7 +155,6 @@ export default {
         is_show: true,
         flag: [],
         cover: [],
-        tags: [],
         list_order: 0,
         content_model: '',
         type: '',
@@ -205,37 +203,40 @@ export default {
       }
       return url
     },
-    catalogAttr () {
-      let arr = []
-      if (this.version && this.contentTags) {
-        let courseType = this.version.selCourseType
-        let type = 'catalog'
-        if (courseType === 3) {
-          type = 'kidCatalog'
-        }
-        arr = this.contentTags.filter(item => {
-          return item.type === type
-        })
-      }
-      if (arr.length) {
-        arr = arr.sort((a, b) => {
-          return a.list_order - b.list_order
-        })
-      }
-      return arr
-    }
-  },
-  methods: {
-    show (params) {
-      console.log(params)
-      this.resetFormData()
+    selfContentTags () {
       let arr = []
       if (this.contentTags) {
         arr = this.contentTags.filter(item => {
           return item.type.toLowerCase() === 'kid' || item.type.toLowerCase() === 'pro'
         })
       }
-      this.selfContentTags = arr
+      console.log(arr)
+      return arr
+    },
+    catalogAttr () {
+      let arr1 = []
+      if (this.version && this.contentTags) {
+        let courseType = this.version.selCourseType
+        let type = 'catalog'
+        if (courseType === 3) {
+          type = 'kidCatalog'
+        }
+        arr1 = this.contentTags.filter(item => {
+          return item.type === type
+        })
+      }
+      if (arr1.length) {
+        arr1 = arr1.sort((a, b) => {
+          return a.list_order - b.list_order
+        })
+      }
+      return arr1
+    }
+  },
+  methods: {
+    show (params) {
+      console.log(params)
+      this.resetFormData()
       // 获取上传图片token
       getInfoToken().then(res => {
         this.token = res.data.token
@@ -258,7 +259,7 @@ export default {
       }
       this.form.type = params.type
       if (params.handler === 'add') {
-        this.form.tags = []
+        this.tags = []
         this.form.parent_uuid = params.uuid
         this.form.list_order = params.maxOrder + 10
       }
@@ -266,8 +267,8 @@ export default {
         this.form.parent_uuid = params.folder.parent_uuid
         let folder = params.folder
         this.form.uuid = folder.uuid
-        this.form.attr_tag = folder.attr_tag
-        this.form.tags = folder.tags ? folder.tags : []
+        this.attr_tag = folder.attr_tag ? folder.attr_tag : ''
+        this.tags = folder.tags ? folder.tags : []
         this.form.name = folder.name
         this.form.title = folder.title
         this.form.desc = folder.desc
@@ -287,11 +288,11 @@ export default {
             let obj1 = {
               catalogsInfo: {
                 content_model: this.form.content_model,
-                attr_tag: this.form.attr_tag,
+                attr_tag: this.attr_tag,
                 cover: this.form.cover,
                 desc: this.form.desc,
                 flag: this.form.flag,
-                tags: this.form.tags,
+                tags: this.tags,
                 has_changed: true,
                 is_show: this.form.is_show,
                 list_order: this.form.list_order,
@@ -332,13 +333,13 @@ export default {
             let obj2 = {
               catalog_info: {
                 cover: this.form.cover,
-                attr_tag: this.form.attr_tag,
+                attr_tag: this.attr_tag,
                 desc: this.form.desc,
                 flag: this.form.flag,
                 has_changed: true,
                 list_order: this.form.list_order,
                 name: this.form.name,
-                tags: this.form.tags,
+                tags: this.tags,
                 title: this.form.title,
                 is_show: this.form.is_show
               },
