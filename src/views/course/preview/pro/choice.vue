@@ -40,6 +40,7 @@ export default {
       curForm: this.slideForms[0],
       forms: [],
       isPlay: false,
+      audio: new Audio(),
       curIndex: 0,
       addCorrect: false,
       addWrong: false,
@@ -86,7 +87,8 @@ export default {
       this.playVoice()
     })
     this.$on('reset', () => {
-      this.$refs['comp-' + this.mySwiper.activeIndex][0].$emit('break')
+      this.audio.pause()
+      this.isPlay = false
     })
   },
   components: {
@@ -102,18 +104,18 @@ export default {
   methods: {
     playVoice () {
       console.log(this.curForm)
-      let audio = new Audio()
+      this.audio = new Audio()
       if (!this.isPlay) {
-        audio.src = this.assetsDomain + this.curForm.sound
-        audio.oncanplay = () => {
-          audio.play()
+        this.audio.src = this.assetsDomain + this.curForm.sound
+        this.audio.oncanplay = () => {
+          this.audio.play()
           this.isPlay = true
         }
-        audio.onended = () => {
+        this.audio.onended = () => {
           this.isPlay = false
         }
       } else {
-        audio.pause()
+        this.audio.pause()
         this.isPlay = false
       }
     },

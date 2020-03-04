@@ -60,6 +60,7 @@ export default {
       showSentence: false,
       mySwiper: null,
       isPlay: false,
+      audio: new Audio(),
       curIndex: 0,
       addCorrect: false,
       addWrong: false,
@@ -118,6 +119,7 @@ export default {
       this.playVoice()
     })
     this.$on('reset', () => {
+      console.log('关声音')
       this.$refs['comp-' + this.mySwiper.activeIndex][0].$emit('break')
     })
   },
@@ -187,18 +189,18 @@ export default {
     },
     playVoice () {
       console.log(this.curForm)
-      let audio = new Audio()
+      this.audio = new Audio()
       if (!this.isPlay) {
-        audio.src = this.assetsDomain + this.curForm.sound
-        audio.oncanplay = () => {
-          audio.play()
+        this.audio.src = this.assetsDomain + this.curForm.sound
+        this.audio.oncanplay = () => {
+          this.audio.play()
           this.isPlay = true
         }
-        audio.onended = () => {
+        this.audio.onended = () => {
           this.isPlay = false
         }
       } else {
-        audio.pause()
+        this.audio.pause()
         this.isPlay = false
       }
     },

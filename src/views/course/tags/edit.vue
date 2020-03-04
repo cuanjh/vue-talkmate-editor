@@ -59,7 +59,7 @@
             </div>
           </el-form-item>
           <el-form-item label="封面: ">
-            <div class="img-box big-img-box">
+            <!-- <div class="img-box big-img-box">
               <div class="img">
                 <div
                   class="block"
@@ -85,6 +85,52 @@
                   <i class="el-icon-plus avatar-uploader-icon"></i>
                 </div>
               </el-upload>
+            </div> -->
+            <div class="img-box big-img-box">
+              <div class="img" v-if="form.cover.length">
+                <div
+                  class="block"
+                  v-for="(cover, index) in form.cover"
+                  :key="'cover' + index">
+                  <span>{{ cover.split('/')[cover.split('/').length - 2]}}</span>
+                  <el-image
+                    lazy
+                    :src="assetsDomain + cover"
+                    :preview-src-list="[assetsDomain + cover]"
+                    fit="cover">
+                  </el-image>
+                  <div class="btn-handler">
+                    <el-button round size="small" @click="cropperImage(assetsDomain + cover)">裁剪</el-button>
+                    <el-button round plain type="danger" size="small" @click="delImage('cover', index)">删除</el-button>
+                  </div>
+                </div>
+                <div class="block">
+                  <el-upload
+                    action="#"
+                    accept="image/png,image/jpg,image/jpeg"
+                    :on-change="uploadCoverOnchange"
+                    :show-file-list="false"
+                    :auto-upload="false">
+                    <div class="self-upload">
+                      <i class="el-icon-plus"></i>
+                    </div>
+                  </el-upload>
+                </div>
+              </div>
+              <div class="img" v-else>
+                <div class="block">
+                  <el-upload
+                    action="#"
+                    accept="image/png,image/jpg,image/jpeg"
+                    :on-change="uploadCoverOnchange"
+                    :show-file-list="false"
+                    :auto-upload="false">
+                    <div class="self-upload">
+                      <i class="el-icon-plus"></i>
+                    </div>
+                  </el-upload>
+                </div>
+              </div>
             </div>
           </el-form-item>
         </el-form>
@@ -158,7 +204,12 @@ export default {
       return url
     }
   },
-  mounted () {
+  created () {
+    this.$bus.$on('uploadCopperImages', (data) => {
+      console.log(data)
+      this.form.cover = [...this.form.cover, ...data]
+      console.log(this.form.cover)
+    })
   },
   methods: {
     show (params) {
@@ -187,10 +238,10 @@ export default {
     },
     close () {
       this.showEdit = false
-      this.$refs.form.resetFields()
+      this.$emit('addTagItem')
     },
     cropperImage (url) {
-      this.$bus.$emit('showCropperDialog', url)
+      this.$bus.$emit('showCropperDialog', { url: url, token: this.token })
     },
     async uploadFlagOnchange (file, fileList) {
       this.form.flag = []
@@ -230,7 +281,13 @@ export default {
           }
         }
       })
+    },
+    delImage (flag, index) {
+      this.form[flag].splice(index, 1)
     }
+  },
+  destroyed () {
+    this.$bus.$off('uploadCopperImages')
   }
 }
 </script>
@@ -371,16 +428,24 @@ export default {
   }
 }
 .big-img-box .img {
-  border: 1px solid #EFEFEF;
-  padding: 10px;
+  // border: 1px solid #EFEFEF;
   min-height: 100px;
   min-width: 300px;
-  background:#EFEFEF;
+  // background:#EFEFEF;
+  display: flex;
+  flex-wrap: wrap;
   .block {
     padding: 5px 0;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    min-width: 200px;
+    min-height: 182px;
+    padding: 10px;
+    margin: 5px;
+    border: 1px solid #EFEFEF;
+    background:#EFEFEF;
     span {
     }
     .el-image {
