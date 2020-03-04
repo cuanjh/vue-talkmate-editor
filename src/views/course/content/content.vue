@@ -46,7 +46,7 @@
       <div id="track-container" class="track-container">
         <div
           :class="['track-wrap', {'track-wrap-width': isShowEditFile}]"
-          :style="{width: (isShowEditFile && tracks.length > 1) ? '401px' : 'auto' }"
+          :style="{width: (isShowEditFile && tracks.length > 1) ? '401px' : (tracks.length > 2 ? '602px' : 'auto'), maxWidth: '600px'}"
           id="track-wrap">
           <div class="track-item" data-intro='右键点击空白区域可操作右键菜单' v-for="(item,index) in tracks" :key="index">
             <div class="list" :id="'track-item-' + index">
@@ -73,6 +73,7 @@
         <transition name="fade" mode="out-in">
           <edit-file ref="editFile" v-show="isShowEditFile"/>
         </transition>
+        <edit-catalog1 class="edit-catalog" ref="editCatalog1" v-show="!isShowEditFile && tracks.length > 1" @resetTrackData="resetTrackData"/>
       </div>
     </el-main>
     <el-dialog
@@ -111,7 +112,10 @@ import Sortable from 'sortablejs'
 import Folder from './folder'
 // import Slide from './slide'
 import RightMenu from './rightMenu'
+// 弹框形式
 import EditCatalog from './editCatalog'
+// 内嵌形式
+import EditCatalog1 from './editCatalog1'
 import EditForm from './editForm'
 import EditFile from './editFile'
 import PreviewComp from '../preview/pro/index'
@@ -158,6 +162,7 @@ export default {
     // Slide,
     RightMenu,
     EditCatalog,
+    EditCatalog1,
     EditForm,
     EditFile,
     PreviewComp,
@@ -487,6 +492,7 @@ export default {
       this.getPath(copy, this.uuid)
       if (params.folder.type === 'catalog') {
         this.initData(params.trackNum + 1)
+        this.editCatalogFn1(params)
         this.isShowEditFile = false
       } else {
         let model = this.modelList.find(item => {
@@ -679,6 +685,21 @@ export default {
 
       this.$refs['editCatalog'].show(params)
       this.$refs['rightMenu'].hide()
+    },
+    // 编辑目录1
+    editCatalogFn1 (params) {
+      console.log(params)
+      let tracks = this.tracks
+      this.pathDesc = ''
+      let copy = tracks.slice(0, params.trackNum + 1)
+      if (copy.length) {
+        this.getPathDesc(copy, params.folder.uuid)
+      }
+      params['pathDesc'] = this.pathDesc
+      params['handler'] = 'edit'
+      params['type'] = params.folder.type
+      params['uuid'] = params.folder.uuid
+      this.$refs['editCatalog1'].show(params)
     },
     // 编辑目录完成后拉取数据重置当前轨道的数据
     resetTrackData (params) {

@@ -35,7 +35,7 @@
           <div class="line"></div>
         </div>
         <div class="menu-group" v-show="type == 'folder'">
-          <div class="menu-item">
+          <div class="menu-item" v-show="false">
             <div class="name" @click="editCatalog">信息编辑</div>
           </div>
         </div>

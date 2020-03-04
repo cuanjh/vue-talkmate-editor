@@ -58,7 +58,7 @@
     </div>
     <el-form ref="form" :model="contents[activeFormIndex]" label-width="80px">
       <div class="item" v-for="f in feilds" :key="f.feild">
-        <el-form-item label-width="140px" :label="f.name" v-if="(f.feild !== 'list_order' && f.feild !== 'options' && f.type !== 'array' && f.type !== 'template' && f.type !== 'templateArray' && f.feild !== 'sentence_phoneticize' && f.feild !== 'options_phoneticize') || (f.type == 'template' && contents[activeFormIndex]['' + f.feild + '']) || (version['selLang'] == 'JPN' && (f.feild == 'sentence_phoneticize' || f.feild == 'options_phoneticize')) || (f.feild === 'options' && (contents[activeFormIndex]['type'] == 'makeSentence' || contents[activeFormIndex]['type'] == 'fillGap'  || contents[activeFormIndex]['type'] == 'kid_pattern_words_3' || contents[activeFormIndex]['type'] == 'kid_pattern_sentences_3') || (f.type == 'array' && contents[activeFormIndex][f.feild]))">
+        <el-form-item label-width="140px" :label="f.name" v-if="(f.data_from !== 'content_types' && f.feild !== 'list_order' && f.feild !== 'options' && f.type !== 'array' && f.type !== 'template' && f.type !== 'templateArray' && f.feild !== 'sentence_phoneticize' && f.feild !== 'options_phoneticize') || (f.type == 'template' && contents[activeFormIndex]['' + f.feild + '']) || (version['selLang'] == 'JPN' && (f.feild == 'sentence_phoneticize' || f.feild == 'options_phoneticize')) || (f.feild === 'options' && (contents[activeFormIndex]['type'] == 'makeSentence' || contents[activeFormIndex]['type'] == 'fillGap'  || contents[activeFormIndex]['type'] == 'kid_pattern_words_3' || contents[activeFormIndex]['type'] == 'kid_pattern_sentences_3') || (f.type == 'array' && contents[activeFormIndex][f.feild]))">
           <!-- string 或 int -->
           <el-input
             :maxlength="120" show-word-limit
@@ -86,14 +86,18 @@
             placeholder="请输入内容"
             v-model="contents[activeFormIndex]['' + f.feild + '']">
           </el-input>
-          <el-select v-if="f.data_from == 'content_types'" v-model="contents[activeFormIndex]['' + f.feild + '']" placeholder="请选择">
+          <!-- <el-select
+            v-if="f.data_from == 'content_types'"
+            v-model="contents[activeFormIndex]['' + f.feild + '']"
+            placeholder="请选择">
             <el-option
               v-for="item in selfContentTypes"
               :key="item.type"
               :label="item.name"
               :value="item.type">
             </el-option>
-          </el-select>
+          </el-select> -->
+          <!-- 标签 -->
           <el-checkbox-group v-if="f.data_from == 'content_tags'" v-model="contents[activeFormIndex]['' + f.feild + '']">
             <el-checkbox v-for="item in selfContentTags" :key="item.key" :label="item.key">{{ item.name }}</el-checkbox>
           </el-checkbox-group>
@@ -114,7 +118,7 @@
             <el-radio :label="true">是</el-radio>
             <el-radio :label="false">否</el-radio>
           </el-radio-group>
-          <!-- 图片声音 start-->
+          <!-- 图片声音-->
           <div class="form-sound" v-if="f.type == 'string' && (f.feild == 'sound' || f.feild == 'image' || f.feild == 'cover' || f.feild == 'video')">
             <el-input v-model="contents[activeFormIndex]['' + f.feild + '']" :placeholder="f.feild == 'sound' ? '请上传mp3格式的音频' : ''">
               <el-button slot="append" @click="clear(f.feild)">清除</el-button>
@@ -170,7 +174,7 @@
               @close="closeLook"
               @use="use"/>
           </div>
-          <!-- 图片声音 end-->
+          <!-- 字符串数组 -->
           <div class="array-string" v-if="f.type == 'array' && (f.data_from == '' || f.data_from == 'upload') ">
             <div class="list" v-if="contents[activeFormIndex]['' + f.feild + ''].length">
               <el-input placeholder="请输入内容" :maxlength="f.data_from ? '' : (f.feild == 'options' ? 50 : 100)" show-word-limit v-for="(item, index) in contents[activeFormIndex]['' + f.feild + '']" :key="f.feild + index" v-model="contents[activeFormIndex]['' + f.feild + ''][index]">
@@ -192,6 +196,7 @@
               <el-button type="info" plain @click="plus('string', f.feild)">添加一条内容</el-button>
             </div>
           </div>
+          <!-- 对象数组 -->
           <div class="array-object" v-if="f.type == 'arrayObject'">
             <div class="list" v-if="contents[activeFormIndex]['' + f.feild + ''].length">
               <div class="object-item" v-for="(item, index) in contents[activeFormIndex]['' + f.feild + '']" :key="index">
@@ -205,6 +210,25 @@
               <el-button type="info" plain @click="plus('object', f.feild)">添加一条k/v的内容</el-button>
             </div>
           </div>
+        </el-form-item>
+        <el-form-item
+          label-width="140px"
+          label="题型"
+          v-if="f.data_from == 'content_types'"
+          :prop="f.feild"
+          :rules="[
+            { required: true, message: '请选择题型', trigger: 'change' }
+          ]">
+          <el-select
+            v-model="contents[activeFormIndex]['' + f.feild + '']"
+            placeholder="请选择题型">
+            <el-option
+              v-for="item in selfContentTypes"
+              :key="item.type"
+              :label="item.name"
+              :value="item.type">
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item :label="f.name" v-if="(f.type == 'templateArray' && contents[activeFormIndex]['' + f.feild + ''] && contents[activeFormIndex]['' + f.feild + ''].length)">
           <div class="template-options">
@@ -383,26 +407,31 @@ export default {
       this.$set(this.contents, this.activeFormIndex, params.content)
     },
     async onSubmit () {
-      let arr = []
-      this.contents.forEach((item, index) => {
-        let obj = item
-        obj['list_order'] = (index + 1) * 10
-        arr.push(obj)
+      this.$refs['form'].validate((valid) => {
+        if (valid) {
+          let arr = []
+          this.contents.forEach((item, index) => {
+            let obj = item
+            obj['list_order'] = (index + 1) * 10
+            arr.push(obj)
+          })
+          this.$set(this.$data, 'contents', arr)
+          let obj = {
+            content_model: this.contentModel,
+            contents: this.contents,
+            parent_uuid: this.pUUID
+          }
+          editContent(obj).then(res => {
+            if (res.success) {
+              this.$message({
+                type: 'success',
+                message: res.msg
+              })
+              this.$set(this.$data, 'contents', res.data.contents)
+            }
+          })
+        }
       })
-      this.$set(this.$data, 'contents', arr)
-      let obj = {
-        content_model: this.contentModel,
-        contents: this.contents,
-        parent_uuid: this.pUUID
-      }
-      let res = await editContent(obj)
-      if (res.success) {
-        this.$message({
-          type: 'success',
-          message: res.msg
-        })
-        this.$set(this.$data, 'contents', res.data.contents)
-      }
     },
     addForm () {
       this.copyBaseFormDataSelf = this.baseFormDataSelf
