@@ -114,6 +114,7 @@ export default {
   display: flex;
   flex-direction: column;
 }
+
 .sentence {
   // margin-top: 30px;
   margin-top: 6%;
@@ -126,7 +127,7 @@ export default {
     border-bottom: 1px solid #D8D8D8;
     font-size:17px;
     font-weight:400;
-    color:rgba(0,0,0,1);
+    color:#000000;
     height: 26px;
     line-height: 25px;
     margin-right: 10px;
