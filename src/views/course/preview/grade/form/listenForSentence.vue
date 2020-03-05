@@ -109,6 +109,9 @@ export default {
           background: #4CD964;
         }
       }
+      &:last-child span {
+        border-bottom: none;
+      }
     }
   }
 }

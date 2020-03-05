@@ -36,8 +36,8 @@
         <el-table-column
           label="type">
           <template slot-scope="scope">
-            <el-tooltip :content="scope.row.type" placement="top" effect="light">
-              <span>{{ scope.row.type }}</span>
+            <el-tooltip :content="typeName(scope.row.type)" placement="top" effect="light">
+              <span>{{ typeName(scope.row.type) }}</span>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -113,8 +113,14 @@ export default {
       getTagTypes: 'course/getTagTypes',
       getContentTags: 'course/getContentTags'
     }),
-    test () {
-      // 浅
+    typeName (key) {
+      let obj = {}
+      this.tagTypes.forEach(element => {
+        if (element.type === key) {
+          obj = element
+        }
+      })
+      return obj.name
     },
     async initData () {
       await this.getContentTags({ pageNo: 0, pageSize: 0 })

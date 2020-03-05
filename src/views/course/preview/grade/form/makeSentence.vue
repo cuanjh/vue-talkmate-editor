@@ -61,21 +61,17 @@ export default {
     reset (index) {
       var word = this.options[index]
       this.options[index] = ''
-      this.allWords.push(word)
+      // this.allWords.push(word)
+      this.allWords.splice(index, 1, word)
     },
     makeSentence (index) {
       let word = this.allWords[index]
-      this.allWords.splice(index, 1)
+      this.allWords.splice(index, 1, '')
+      // this.allWords[index].replace(word, '')
       let i = _.findIndex(this.options, (o) => {
         return o === ''
       })
       this.options[i] = word
-      let sentence = this.options.join(' ')
-      console.log(sentence, this.form.sentence)
-      if (sentence === this.form.sentence) {
-        console.log('句子')
-      }
-      console.log('this.options', this.options)
     }
   }
 }
@@ -109,18 +105,24 @@ export default {
     padding: 6%;
     box-sizing: border-box;
   }
-  a span {
-    cursor: pointer;
+  a {
     display: inline-block;
-    font-size:14px;
-    font-weight:400;
-    color:rgba(0,0,0,1);
-    line-height:18px;
-    padding: 6px 12px;
-    border: .5px solid rgba(7,7,7,.2);
-    margin: 0 10px 10px 0;
-    border-radius: 6px;
-    box-sizing: border-box;
+    min-width: 26px;
+    min-height: 30px;
+    text-align: center;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    span {
+      cursor: pointer;
+      font-size:14px;
+      font-weight:400;
+      color:rgba(0,0,0,1);
+      line-height:18px;
+      padding: 6px 12px;
+      border: .5px solid rgba(7,7,7,.2);
+      border-radius: 6px;
+      box-sizing: border-box;
+    }
   }
 }
 </style>

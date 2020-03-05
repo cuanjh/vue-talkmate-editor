@@ -196,9 +196,9 @@ export default {
           this.top = ev.y
         } else {
           if (params && params.folder.type === 'content') {
-            this.top = ev.y - 260
+            this.top = ev.y - 220
           } else if (params && params.folder.type === 'catalog') {
-            this.top = ev.y - 276
+            this.top = ev.y - 236
           }
         }
       }

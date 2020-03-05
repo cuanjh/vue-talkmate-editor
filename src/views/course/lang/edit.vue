@@ -33,7 +33,7 @@
             </div>
           </el-form-item>
           <el-form-item label="图标：" prop="flag[0]" :rules="[
-            { required: true, message: '图标不能为空', trigger: 'blur' }
+            { required: true, message: '图标不能为空', trigger: 'change' }
           ]">
             <div class="img-box">
               <div class="img">
