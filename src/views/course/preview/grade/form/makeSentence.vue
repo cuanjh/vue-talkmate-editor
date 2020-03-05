@@ -1,13 +1,13 @@
 <template>
 <div :class="['form', form.content_type]">
   <h2>{{typeName(form.content_type)}}</h2>
-  <span class="sentence">
+  <div class="sentence">
     <a v-for="(itm, index) in options"
       :key="index"
       v-text="itm"
       @click="reset(index)">
     </a>
-  </span>
+  </div>
   <div class="choice-list">
     <div class="choice-content">
       <a  v-for="(item, index) in allWords" :key="index">
@@ -58,6 +58,11 @@ export default {
       })
       console.log(this.allWords, this.options)
     },
+    reset (index) {
+      var word = this.options[index]
+      this.options[index] = ''
+      this.allWords.push(word)
+    },
     makeSentence (index) {
       let word = this.allWords[index]
       this.allWords.splice(index, 1)
@@ -83,6 +88,12 @@ export default {
   padding: 0 20px;
   box-sizing: border-box;
   min-height: 60px;
+  a {
+    font-size:14px;
+    font-weight:400;
+    color:rgba(0,0,0,1);
+    line-height:18px;
+  }
 }
 .choice-list {
   background:rgba(255,255,255,1);
