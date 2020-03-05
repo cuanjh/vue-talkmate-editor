@@ -71,7 +71,7 @@
             <el-upload slot="prepend"
               v-if="f.data_from.indexOf('upload_') > -1"
               action="#"
-              :accept="f.data_from == 'upload_audio' ? 'audio/mp3' : 'image/png,image/jpg,image/jpeg'"
+              :accept="f.data_from == 'upload_audio' ? 'audio/mp3' : (f.data_from == 'upload_video' ? 'video/mp4' : 'image/png,image/jpg,image/jpeg')"
               :on-change="uploadOnchange"
               :show-file-list="false"
               :auto-upload="false">
@@ -119,7 +119,7 @@
             <el-radio :label="false">否</el-radio>
           </el-radio-group>
           <!-- 图片声音-->
-          <div class="form-sound" v-if="f.type == 'string' && (f.feild == 'sound' || f.feild == 'image' || f.feild == 'cover' || f.feild == 'video')">
+          <div class="form-sound" v-if="f.data_from.indexOf('upload_') === -1 && f.type == 'string' && (f.feild == 'sound' || f.feild == 'image' || f.feild == 'cover' || f.feild == 'video')">
             <el-input v-model="contents[activeFormIndex]['' + f.feild + '']" :placeholder="f.feild == 'sound' ? '请上传mp3格式的音频' : ''">
               <el-button slot="append" @click="clear(f.feild)">清除</el-button>
             </el-input>
@@ -388,7 +388,9 @@ export default {
           console.log(obj)
           editContent(obj).then(() => {
             getContent({ 'content_model': this.contentModel, 'parent_uuid': this.pUUID }).then(res => {
-              this.$set(this, 'contents', res.data.contents)
+              this.$set(this, 'contents', res.data.contents.sort((a, b) => {
+                return a.list_order - b.list_order
+              }))
             })
           })
         }
@@ -646,9 +648,11 @@ export default {
       let ext = file.name.split('.')[1]
       let url = ''
       if (dataFrom === 'upload_audio') {
-        url = 'course/sounds/' + this.version.selLang.toLowerCase() + '/' + date + '/' + file.uid + '.' + ext
+        url = 'course/sounds/' + this.version.selLang + '/' + date + '/' + file.uid + '.' + ext
       } else if (dataFrom === 'upload_image') {
-        url = 'course/images/common/' + this.version.selLang.toLowerCase() + '/kid/' + date + '/' + file.uid + '.' + ext
+        url = 'course/images/' + this.version.selLang + '/' + date + '/' + file.uid + '.' + ext
+      } else if (dataFrom === 'upload_video') {
+        url = 'course/videos/' + this.version.selLang + '/' + date + '/' + file.uid + '.' + ext
       }
       let res = await uploadQiniu(file.raw, this.token, url)
       if (index === '-1') {
