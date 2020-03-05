@@ -67,15 +67,15 @@
             :disabled="f.feild == 'list_order' || f.type == 'template'">
           </el-input>
           <!-- string && upload -->
-          <el-input placeholder="请输入内容" v-if="f.type == 'string' && f.data_from == 'upload'" :maxlength="100" show-word-limit  v-model="contents[activeFormIndex]['' + f.feild + '']">
+          <el-input placeholder="请输入内容" v-if="f.type == 'string' && f.data_from.indexOf('upload_') > -1" :maxlength="100" show-word-limit  v-model="contents[activeFormIndex]['' + f.feild + '']">
             <el-upload slot="prepend"
-              v-if="f.data_from == 'upload'"
+              v-if="f.data_from.indexOf('upload_') > -1"
               action="#"
-              :accept="f.feild == 'sound' ? 'audio/mp3' : 'image/png,image/jpg,image/jpeg'"
+              :accept="f.data_from == 'upload_audio' ? 'audio/mp3' : 'image/png,image/jpg,image/jpeg'"
               :on-change="uploadOnchange"
               :show-file-list="false"
               :auto-upload="false">
-              <el-button type="text" @click="upload(f.feild, index)">上传</el-button>
+              <el-button type="text" @click="upload(f, -1)">上传</el-button>
             </el-upload>
           </el-input>
           <!-- text -->
@@ -175,17 +175,20 @@
               @use="use"/>
           </div>
           <!-- 字符串数组 -->
-          <div class="array-string" v-if="f.type == 'array' && (f.data_from == '' || f.data_from == 'upload') ">
+          <div class="array-string" v-if="f.type == 'array' && (f.data_from == '' || f.data_from.indexOf('upload_') > -1) ">
             <div class="list" v-if="contents[activeFormIndex]['' + f.feild + ''].length">
-              <el-input placeholder="请输入内容" :maxlength="f.data_from ? '' : (f.feild == 'options' ? 50 : 100)" show-word-limit v-for="(item, index) in contents[activeFormIndex]['' + f.feild + '']" :key="f.feild + index" v-model="contents[activeFormIndex]['' + f.feild + ''][index]">
+              <el-input placeholder="请输入内容"
+                :maxlength="f.data_from ? '' : (f.feild == 'options' ? 50 : 100)"
+                show-word-limit
+                v-for="(item, index) in contents[activeFormIndex]['' + f.feild + '']" :key="f.feild + index" v-model="contents[activeFormIndex]['' + f.feild + ''][index]">
                 <el-upload slot="prepend"
-                  v-if="f.data_from == 'upload'"
+                  v-if="f.data_from.indexOf('upload_') > -1"
                   action="#"
-                  :accept="f.feild == 'sound' ? 'audio/mp3' : 'image/png,image/jpg,image/jpeg'"
+                  :accept="f.data_from == 'upload_audio' ? 'audio/mp3' : 'image/png,image/jpg,image/jpeg'"
                   :on-change="uploadOnchange"
                   :show-file-list="false"
                   :auto-upload="false">
-                  <el-button type="text" @click="upload(f.feild, index)">上传</el-button>
+                  <el-button type="text" @click="upload(f, index)">上传</el-button>
                 </el-upload>
                 <el-button slot="append" icon="el-icon-minus" @click="minus(index, f.feild)"></el-button>
                 <el-button v-show="index == contents[activeFormIndex]['' + f.feild + ''].length - 1" slot="append" icon="el-icon-plus" @click="plus('string', f.feild)"></el-button>
@@ -630,25 +633,49 @@ export default {
       this.$set(this.contents, this.activeFormIndex, obj)
       this.copyBaseFormDataSelf = JSON.stringify(obj)
     },
-    upload (feild, index) {
-      this.uploadIndex = feild + '_' + index
+    upload (f, index) {
+      this.uploadIndex = f.data_from + ',' + f.feild + ',' + index
       console.log(this.uploadIndex)
     },
     async uploadOnchange (file) {
-      console.log(file)
-      let uploadIndexArr = this.uploadIndex.split('_')
+      let uploadIndexArr = this.uploadIndex.split(',')
+      let dataFrom = uploadIndexArr[0]
+      let feild = uploadIndexArr[1]
+      let index = uploadIndexArr[2]
       let date = moment(new Date()).format('YYYY/MM/DD')
       let ext = file.name.split('.')[1]
       let url = ''
-      if (uploadIndexArr[0] === 'sound') {
+      if (dataFrom === 'upload_audio') {
         url = 'course/sounds/' + this.version.selLang.toLowerCase() + '/' + date + '/' + file.uid + '.' + ext
-      } else if (uploadIndexArr[0] === 'image') {
+      } else if (dataFrom === 'upload_image') {
         url = 'course/images/common/' + this.version.selLang.toLowerCase() + '/kid/' + date + '/' + file.uid + '.' + ext
       }
-      console.log(url)
       let res = await uploadQiniu(file.raw, this.token, url)
-      this.$set(this.contents[this.activeFormIndex][uploadIndexArr[0]], uploadIndexArr[1], res.key)
-      this.copyBaseFormDataSelf = JSON.stringify(this.contents[this.activeFormIndex])
+      if (index === '-1') {
+        this.$set(this.contents[this.activeFormIndex], feild, res.key)
+        this.copyBaseFormDataSelf = JSON.stringify(this.contents[this.activeFormIndex])
+        // 计算声音时长
+        if (typeof this.contents[this.activeFormIndex][feild + '_time'] !== 'undefined') {
+          let mySound = new Audio()
+          mySound.src = this.assetsDomain + res.key
+          mySound.oncanplay = () => {
+            this.$set(this.contents[this.activeFormIndex], feild + '_time', mySound.duration)
+            this.copyBaseFormDataSelf = JSON.stringify(this.contents[this.activeFormIndex])
+          }
+        }
+      } else {
+        this.$set(this.contents[this.activeFormIndex][feild], index, res.key)
+        this.copyBaseFormDataSelf = JSON.stringify(this.contents[this.activeFormIndex])
+        // 计算声音时长
+        if (typeof this.contents[this.activeFormIndex][feild + '_time'] !== 'undefined' && typeof this.contents[this.activeFormIndex][feild + '_time'].length > 0) {
+          let mySound = new Audio()
+          mySound.src = this.assetsDomain + res.key
+          mySound.oncanplay = () => {
+            this.$set(this.contents[this.activeFormIndex][feild + '_time'], index, mySound.duration)
+            this.copyBaseFormDataSelf = JSON.stringify(this.contents[this.activeFormIndex])
+          }
+        }
+      }
     }
   }
 }
