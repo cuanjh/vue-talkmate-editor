@@ -8,6 +8,7 @@
       </el-form-item>
       <el-form-item label="目录属性" v-show="catalogAttr && catalogAttr.length">
         <el-select v-model="attr_tag" filterable placeholder="请选择">
+          <el-option value="" label="无"></el-option>
           <el-option
             v-for="item in catalogAttr"
             :key="item.key"
