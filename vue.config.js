@@ -1,4 +1,3 @@
-'use strict'
 const webpack = require('webpack')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const CompressionWebpackPlugin = require('compression-webpack-plugin')
@@ -49,7 +48,7 @@ module.exports = {
               pure_funcs: ['console.log']
             }
           },
-          sourceMap: true,
+          sourceMap: false,
           parallel: true
         })
       )
