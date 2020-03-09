@@ -116,7 +116,7 @@ export default {
     typeName (key) {
       let obj = {}
       this.tagTypes.forEach(element => {
-        if (element.type === key) {
+        if (element.type.toLowerCase() === key.toLowerCase()) {
           obj = element
         }
       })
