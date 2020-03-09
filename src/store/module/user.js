@@ -30,6 +30,9 @@ export const user = {
       state.expiresAt = ''
       router.push({ name: 'login', replace: true })
       window.location.reload()
+    },
+    ResetUserInfo (state, userInfo = {}) {
+      state.userInfo = { ...state.userInfo, ...userInfo }
     }
   },
   actions: {
