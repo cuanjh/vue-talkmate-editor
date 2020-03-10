@@ -16,6 +16,13 @@ export const user = {
   },
   mutations: {
     setUserInfo (state, userInfo) {
+      console.log('userInfo', userInfo)
+      let obj = {
+        name: userInfo.userName,
+        avatar: userInfo.headerImg,
+        uuid: userInfo.uuid
+      }
+      window.zhuge.identify(userInfo.uuid, obj)
       state.userInfo = userInfo
     },
     setToken (state, token) {
