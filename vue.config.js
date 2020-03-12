@@ -23,35 +23,42 @@ module.exports = {
       }
     }
   },
-  configureWebpack: config => {
-    config.plugins.push(
+  configureWebpack: {
+    // 警告 webpack 的性能提示
+    performance: {
+      hints: 'warning',
+      // 入口起点的最大体积
+      maxEntrypointSize: 50000000,
+      // 生成文件的最大体积
+      maxAssetSize: 30000000,
+      // 只给出 js 文件的性能提示
+      assetFilter: function (assetFilename) {
+        return assetFilename.endsWith('.js')
+      }
+    },
+    plugins: [
       new webpack.ProvidePlugin({
         introJs: ['intro.js', 'introJs']
+      }),
+      new CompressionWebpackPlugin({
+        algorithm: 'gzip',
+        test: new RegExp('\\.(' + productionGzipExtensions.join('|') + ')$'),
+        threshold: 1024000,
+        minRatio: 0.8
+      }),
+      new UglifyJsPlugin({
+        uglifyOptions: {
+          compress: {
+            // warnings: false,
+            drop_debugger: true,
+            drop_console: true,
+            pure_funcs: ['console.log']
+          }
+        },
+        sourceMap: false,
+        parallel: true
       })
-    )
-    if (process.env.NODE_ENV === 'production') {
-      config.plugins.push(
-        new CompressionWebpackPlugin({
-          algorithm: 'gzip',
-          test: new RegExp('\\.(' + productionGzipExtensions.join('|') + ')$'),
-          threshold: 10240,
-          minRatio: 0.8
-        })
-      )
-      config.plugins.push(
-        new UglifyJsPlugin({
-          uglifyOptions: {
-            compress: {
-              // warnings: false,
-              drop_debugger: true,
-              drop_console: true,
-              pure_funcs: ['console.log']
-            }
-          },
-          sourceMap: false,
-          parallel: true
-        })
-      )
-    }
-  }
+    ]
+  },
+  productionSourceMap: false
 }
