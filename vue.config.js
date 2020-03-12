@@ -43,7 +43,7 @@ module.exports = {
       new CompressionWebpackPlugin({
         algorithm: 'gzip',
         test: new RegExp('\\.(' + productionGzipExtensions.join('|') + ')$'),
-        threshold: 1024000,
+        threshold: 10240,
         minRatio: 0.8
       }),
       new UglifyJsPlugin({
