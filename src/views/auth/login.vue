@@ -156,7 +156,7 @@ input:-ms-input-placeholder { /* Internet Explorer 10+ */
   width:100%;
   height: 100%;
   position: absolute;
-  background: url('../../assets/images/login/pic-login-bg.png') no-repeat center;
+  background: url('../../assets/images/login/pic-login-bg.jpg') no-repeat center;
   background-size: cover;
   .login_wrapper {
     position: relative;
