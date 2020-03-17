@@ -460,7 +460,8 @@ export default {
                 list_order: newOrder,
                 name: dragObj.name,
                 tags: dragObj.tags,
-                title: dragObj.title
+                title: dragObj.title,
+                is_show: dragObj.is_show
               },
               uuid: dragObj.uuid
             }
