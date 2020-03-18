@@ -44,9 +44,10 @@
     </el-header>
     <el-main>
       <div id="track-container" class="track-container">
+        <!-- :style="{width: (isShowEditFile && tracks.length > 1) ? '401px' : (tracks.length > 2 ? '602px' : 'auto'), maxWidth: '600px'}" -->
         <div
           :class="['track-wrap', {'track-wrap-width': isShowEditFile}]"
-          :style="{width: (isShowEditFile && tracks.length > 1) ? '401px' : (tracks.length > 2 ? '602px' : 'auto'), maxWidth: '600px'}"
+          :style="{width: settingWidth}"
           id="track-wrap">
           <div class="track-item" data-intro='右键点击空白区域可操作右键菜单' v-for="(item,index) in tracks" :key="index">
             <div class="list" :id="'track-item-' + index">
@@ -73,7 +74,12 @@
         <transition name="fade" mode="out-in">
           <edit-file ref="editFile" v-show="isShowEditFile"/>
         </transition>
-        <edit-catalog1 class="edit-catalog" ref="editCatalog1" v-show="!isShowEditFile && tracks.length > 1" @resetTrackData="resetTrackData"/>
+        <edit-catalog1
+          class="edit-catalog"
+          ref="editCatalog1"
+          v-show="!isShowEditFile && tracks.length > 1"
+          @resetTrackData="resetTrackData"
+          @hideCatalog1="hideCatalog1"/>
       </div>
     </el-main>
     <el-dialog
@@ -137,6 +143,7 @@ const introJs = require('intro.js')
 export default {
   data () {
     return {
+      isHideCatalog1: true,
       isShow: true,
       isShowEditFile: false,
       selLang: 'ENG',
@@ -258,6 +265,16 @@ export default {
       modelList: state => state.course.modelList,
       userInfo: state => state.user.userInfo
     }),
+    settingWidth () {
+      let width = ''
+      if (!this.isHideCatalog1) {
+        width = '97%'
+      } else {
+        width = (this.isShowEditFile && this.tracks.length > 1) ? '401px' : (this.tracks.length > 2 ? '602px' : 'auto')
+      }
+      console.log(width)
+      return width
+    },
     versions () {
       let arr = []
       if (this.userInfo.authorityId === '1') {
@@ -284,6 +301,10 @@ export default {
       getContentTypes: 'course/getContentTypes',
       getContentTags: 'course/getContentTags'
     }),
+    hideCatalog1 (type) {
+      console.log(type)
+      this.isHideCatalog1 = type
+    },
     initCourseVersionList (flag) {
       this.updateVersion({ key: 'selLang', val: this.selLang })
       this.updateVersion({ key: 'selCourseType', val: this.selCourseType })
