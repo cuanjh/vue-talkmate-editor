@@ -154,6 +154,7 @@ export default {
       uuid: '',
       rightUUID: '',
       copyUUID: '',
+      copySelLang: '',
       tracks: [],
       path: '',
       pathDesc: '',
@@ -481,7 +482,8 @@ export default {
                 list_order: newOrder,
                 name: dragObj.name,
                 tags: dragObj.tags,
-                title: dragObj.title
+                title: dragObj.title,
+                is_show: dragObj.is_show
               },
               uuid: dragObj.uuid
             }
@@ -628,11 +630,29 @@ export default {
     // 复制
     copy (uuid) {
       this.copyUUID = uuid
+      this.copySelLang = this.version.selLang
+      let copy = {
+        copyUUID: this.copyUUID,
+        copySelLang: this.copySelLang
+      }
+      localStorage.setItem('copyCatalog', JSON.stringify(copy))
       this.contentMenuHide()
     },
     // 粘贴
     async paste (params) {
       console.log(params)
+      let copy = JSON.parse(localStorage.getItem('copyCatalog'))
+      if (copy) {
+        this.copyUUID = copy.copyUUID
+        this.copySelLang = copy.copySelLang
+      }
+      if (!this.copyUUID) {
+        this.$message({
+          type: 'warning',
+          message: '先选择要复制的内容，再粘贴'
+        })
+        return false
+      }
       let trackNum = params.trackNum
       let track = this.tracks[params.trackNum]
       let pUUID = ''
@@ -642,7 +662,7 @@ export default {
         pUUID = this.uuid
       }
       let obj = {
-        same_lang: true,
+        same_lang: this.copySelLang === this.version.selLang,
         to_uuid: pUUID,
         uuids: [
           this.copyUUID
@@ -654,6 +674,8 @@ export default {
         this.resetTrackData({ pUUID: pUUID, trackNum: trackNum })
       }
       this.copyUUID = ''
+      this.copySelLang = ''
+      localStorage.removeItem('copyCatalog')
       this.contentMenuHide()
     },
     // 删除目录(文件)

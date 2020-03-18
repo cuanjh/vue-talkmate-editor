@@ -62,7 +62,7 @@
           <!-- string 或 int -->
           <el-input
             :maxlength="120" show-word-limit
-            v-if="(f.type == 'string' && f.data_from == '') || f.type == 'int'"
+            v-if="(f.type == 'string' && f.data_from == '') || f.type == 'int' || f.type == 'template'"
             v-model="contents[activeFormIndex]['' + f.feild + '']"
             :disabled="f.feild == 'list_order' || f.type == 'template'">
           </el-input>
