@@ -133,6 +133,8 @@ $mainHight: 100vh;
       overflow: auto;
       padding: 0px 0px;
       background: #FFF;
+      display: flex;
+      flex-direction: column;
     }
     height: $mainHight !important;
     overflow: visible;

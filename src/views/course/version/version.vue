@@ -1,5 +1,5 @@
 <template>
-  <div class="version-container">
+  <div class="version-container" id="version-container" @contextmenu="contentmenu">
     <div class="top-bar">
       <el-select
         v-model="selLang"
@@ -28,7 +28,7 @@
         <i class="el-icon-plus"></i>
         <span>创建新版本</span>
       </div>
-      <div class="version-item" v-for="item in versions" :key="item.uuid" @click="switchVersion(item)">
+      <div class="version-item" v-for="item in versions" :key="item.uuid">
         <div class="online-flag" v-show="item['is_show'] && false">
           <span>线上</span>
         </div>
@@ -57,10 +57,17 @@
           <el-tooltip class="item" effect="dark" content="编辑课程内容" placement="top">
             <el-button type="primary" icon="el-icon-edit" :disabled="(userInfo.authorityId !== '1' && item.curUserAuth['auth'] == 'r')" circle @click="courseContent(item)"></el-button>
           </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="复制" placement="top">
+            <el-button type="info" icon="el-icon-document-copy" :disabled="(userInfo.authorityId !== '1' && item.curUserAuth['auth'] == 'r')" circle @click="copyVersion(item)"></el-button>
+          </el-tooltip>
         </div>
       </div>
     </div>
     <edit-comp ref="edit" :authorityUsers="authorityUsers" @newEditVersion="initCourseVersionList"/>
+    <right-menu
+      ref="rightMenu"
+      @paste="paste"
+    />
     <!-- <add-version ref="addVersion"/> -->
     <!-- <course-content :langList="langList" :courseTypes="courseTypes" :contents="contents" ref="content" /> -->
   </div>
@@ -71,10 +78,10 @@
 // import CourseContent from '../content/content'
 import editComp from './edit'
 import { mapState, mapActions, mapMutations } from 'vuex'
-// import { addCourseVersion, delCourseVersion, editCourseVersion } from '@/api/course'
-import { delCourseVersion, editCourseVersion, addOnlineJob } from '@/api/course'
+import { addCourseVersion, delCourseVersion, editCourseVersion, addOnlineJob, setAuthority } from '@/api/course'
 import { getAuthorityList } from '@/api/authority'
 import { getUserList } from '@/api/user'
+import RightMenu from './rightMenu'
 export default {
   data () {
     return {
@@ -83,13 +90,15 @@ export default {
       contents: [],
       authorityList: [],
       copyAuthorityList: [],
-      authorityUsers: []
+      authorityUsers: [],
+      copyAuthorities: []
     }
   },
   components: {
     // AddVersion
     // CourseContent
-    editComp
+    editComp,
+    RightMenu
   },
   created () {
     this.getConfigInfo()
@@ -98,6 +107,15 @@ export default {
     this.getCourseTypes()
   },
   mounted () {
+    let el = document.getElementById('version-container')
+    el.oncontextmenu = (e) => {
+      e.preventDefault()
+    }
+    el.onclick = () => {
+      if (this.$refs['rightMenu']) {
+        this.$refs['rightMenu'].hide()
+      }
+    }
     if (this.version) {
       this.selLang = this.version.selLang
     }
@@ -182,9 +200,6 @@ export default {
       this.updateVersion({ key: 'selLang', val: this.selLang })
       this.updateVersion({ key: 'selCourseType', val: this.selCourseType })
       this.getCourseList({ 'lan_code': this.selLang, 'pageNo': 0, 'pageSize': 0 })
-    },
-    switchVersion (version) {
-      console.log(version)
     },
     // 添加版本
     addVersion () {
@@ -341,6 +356,84 @@ export default {
     },
     cascaderFilterMethod (node, keyWord) {
       console.log(node, keyWord)
+    },
+    // form区域右键菜单
+    contentmenu (ev) {
+      this.$refs['rightMenu'].show(ev)
+    },
+    // 复制版本
+    copyVersion (item) {
+      this.$message({
+        type: 'success',
+        message: '复制成功'
+      })
+      let obj = {
+        selLang: this.selLang,
+        selCourseType: this.selCourseType,
+        version: item
+      }
+      localStorage.setItem('copyVersion', JSON.stringify(obj))
+    },
+    // 粘贴
+    async paste () {
+      let pUUID = ''
+      if (this.version.selCourse) {
+        pUUID = this.version.selCourse.uuid
+      } else {
+        this.$message({
+          type: 'warning',
+          message: '请选择课程分类'
+        })
+        return false
+      }
+      let copy = localStorage.getItem('copyVersion') ? JSON.parse(localStorage.getItem('copyVersion')) : ''
+      if (!copy) {
+        this.$message({
+          type: 'warning',
+          message: '请先复制要粘贴的版本'
+        })
+        return false
+      }
+      if (copy.selCourseType !== this.selCourseType) {
+        this.$message({
+          type: 'warning',
+          message: '请选择相同的课程分类再粘贴'
+        })
+        return false
+      }
+      let copySameLang = false
+      if (this.selLang === copy.selLang) {
+        copySameLang = true
+      }
+      let obj = {
+        copy_from_uuid: copy.version.uuid,
+        copy_same_lang: copySameLang,
+        cover: copy.version.cover,
+        desc: copy.version.desc,
+        flag: copy.version.flag,
+        has_changed: true,
+        is_show: true,
+        module: copy.version.module,
+        name: '复制-' + copy.version.name,
+        parent_uuid: pUUID,
+        tags: copy.version.tags,
+        title: copy.version.title
+      }
+      let res = await addCourseVersion(obj)
+      if (res.success) {
+        let copyAuthorities = {
+          authorities: [{
+            authority: 'rw',
+            user_uuid: this.userInfo.uuid
+          }],
+          type: 'content_version',
+          uuid: res.data.uuid
+        }
+        await setAuthority(copyAuthorities)
+        this.initCourseVersionList()
+        localStorage.removeItem('copyVersion')
+        this.$refs['rightMenu'].hide()
+      }
     }
   }
 }
@@ -348,6 +441,8 @@ export default {
 
 <style lang="scss" scoped>
 .version-container {
+  position: relative;
+  flex: 1;
   .top-bar{
     margin-top: 20px;
   }

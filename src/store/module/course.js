@@ -117,6 +117,9 @@ export const course = {
           if (selCourse) {
             let uuid = selCourse.uuid
             dispatch('getCourseVersions', { 'pageNo': 0, 'pageSize': 0, 'parent_uuid': uuid })
+          } else {
+            commit('updateVersion', { key: 'uuid', val: '' })
+            commit('updateVersion', { key: 'versions', val: [] })
           }
         } else {
           commit('updateVersion', { key: 'selCourse', val: {} })
