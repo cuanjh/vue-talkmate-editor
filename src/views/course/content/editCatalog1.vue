@@ -1,130 +1,140 @@
 <template>
   <div class="edit-catalog-container">
-    <div class="path">{{ '路径: ' + pathDesc }}</div>
-    <div class="title" v-text="title"></div>
-    <el-form ref="form" :model="form" :rules="rules"  label-width="80px">
-      <el-form-item label="名称" prop="name">
-        <el-input v-model="form.name"></el-input>
-      </el-form-item>
-      <el-form-item label="目录属性" v-show="catalogAttr && catalogAttr.length">
-        <el-select v-model="attr_tag" filterable placeholder="请选择">
-          <el-option value="" label="无"></el-option>
-          <el-option
-            v-for="item in catalogAttr"
-            :key="item.key"
-            :label="item.name"
-            :value="item.key">
-          </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="个数" v-show="handler == 'add'">
-        <el-input-number v-model="form.num" :min="1"></el-input-number>
-      </el-form-item>
-      <el-form-item label="模型" v-show="form.type === 'content'">
-        <el-select v-model="form.content_model" placeholder="请选择模型">
-          <el-option
-            v-for="item in modelList"
-            :key="item.model_key"
-            :label="item.name"
-            :value="item.model_key">
-          </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="标题">
-        <div class="lang-input" v-for="l in langInfos" :key="l.langKey">
-          <el-input v-model="form.title[l.langKey]"></el-input>
-          <div class="text" v-text="'(' + l.name + ')'"></div>
-        </div>
-      </el-form-item>
-      <el-form-item label="描述">
-        <div class="lang-input" v-for="l in langInfos" :key="l.langKey">
-          <el-input type="textarea" v-model="form.desc[l.langKey]"></el-input>
-          <div class="text" v-text="'(' + l.name + ')'"></div>
-        </div>
-      </el-form-item>
-      <el-form-item label="图标">
-        <div class="img-box small-img-box">
-          <div class="img">
-            <img v-if="flagUrl" :src="flagUrl" fit="cover" />
+    <div class="left-bar">
+      <div class="icon-box right" @click="hideCatalog" v-if="isLeft">
+        <a href="javascript:;" class="icon-left"></a>
+      </div>
+      <div class="icon-box left" @click="hideCatalog" v-else>
+        <a href="javascript:;" class="icon-right"></a>
+      </div>
+    </div>
+    <div v-show="isShowRight">
+      <div class="path">{{ '路径: ' + pathDesc }}</div>
+      <div class="title" v-text="title"></div>
+      <el-form ref="form" :model="form" :rules="rules"  label-width="80px">
+        <el-form-item label="名称" prop="name">
+          <el-input v-model="form.name"></el-input>
+        </el-form-item>
+        <el-form-item label="目录属性" v-show="catalogAttr && catalogAttr.length">
+          <el-select v-model="attr_tag" filterable placeholder="请选择">
+            <el-option value="" label="无"></el-option>
+            <el-option
+              v-for="item in catalogAttr"
+              :key="item.key"
+              :label="item.name"
+              :value="item.key">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="个数" v-show="handler == 'add'">
+          <el-input-number v-model="form.num" :min="1"></el-input-number>
+        </el-form-item>
+        <el-form-item label="模型" v-show="form.type === 'content'">
+          <el-select v-model="form.content_model" placeholder="请选择模型">
+            <el-option
+              v-for="item in modelList"
+              :key="item.model_key"
+              :label="item.name"
+              :value="item.model_key">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="标题">
+          <div class="lang-input" v-for="l in langInfos" :key="l.langKey">
+            <el-input v-model="form.title[l.langKey]"></el-input>
+            <div class="text" v-text="'(' + l.name + ')'"></div>
           </div>
-          <el-upload
-            action="#"
-            accept="image/png,image/jpg,image/jpeg"
-            :on-change="uploadFlagOnchange"
-            :show-file-list="false"
-            :auto-upload="false">
-            <div id="upload-btn">
-              <i class="el-icon-plus avatar-uploader-icon"></i>
+        </el-form-item>
+        <el-form-item label="描述">
+          <div class="lang-input" v-for="l in langInfos" :key="l.langKey">
+            <el-input type="textarea" v-model="form.desc[l.langKey]"></el-input>
+            <div class="text" v-text="'(' + l.name + ')'"></div>
+          </div>
+        </el-form-item>
+        <el-form-item label="图标">
+          <div class="img-box small-img-box">
+            <div class="img">
+              <img v-if="flagUrl" :src="flagUrl" fit="cover" />
             </div>
-          </el-upload>
-        </div>
-      </el-form-item>
-      <el-form-item label="封面">
-        <div class="img-box big-img-box">
-          <div class="img" v-if="form.cover.length">
-            <div
-              class="block"
-              v-for="(cover, index) in form.cover"
-              :key="'cover' + index">
-              <span>{{ cover.split('/')[cover.split('/').length - 2]}}</span>
-              <el-image
-                lazy
-                :src="assetsDomain + cover"
-                :preview-src-list="[assetsDomain + cover]"
-                fit="cover">
-              </el-image>
-              <div class="btn-handler">
-                <el-button round size="small" @click="cropperImage(assetsDomain + cover)">裁剪</el-button>
-                <el-button round plain type="danger" size="small" @click="delImage('cover', index)">删除</el-button>
+            <el-upload
+              action="#"
+              accept="image/png,image/jpg,image/jpeg"
+              :on-change="uploadFlagOnchange"
+              :show-file-list="false"
+              :auto-upload="false">
+              <div id="upload-btn">
+                <i class="el-icon-plus avatar-uploader-icon"></i>
+              </div>
+            </el-upload>
+          </div>
+        </el-form-item>
+        <el-form-item label="封面">
+          <div class="img-box big-img-box">
+            <div class="img" v-if="form.cover.length">
+              <div
+                class="block"
+                v-for="(cover, index) in form.cover"
+                :key="'cover' + index">
+                <span>{{ cover.split('/')[cover.split('/').length - 2]}}</span>
+                <el-image
+                  lazy
+                  :src="assetsDomain + cover"
+                  :preview-src-list="[assetsDomain + cover]"
+                  fit="cover">
+                </el-image>
+                <div class="btn-handler">
+                  <el-button round size="small" @click="cropperImage(assetsDomain + cover)">裁剪</el-button>
+                  <el-button round plain type="danger" size="small" @click="delImage('cover', index)">删除</el-button>
+                </div>
+              </div>
+              <div class="block">
+                <el-upload
+                  action="#"
+                  accept="image/png,image/jpg,image/jpeg"
+                  :on-change="uploadCoverOnchange"
+                  :show-file-list="false"
+                  :auto-upload="false">
+                  <div class="self-upload">
+                    <i class="el-icon-plus"></i>
+                  </div>
+                </el-upload>
               </div>
             </div>
-            <div class="block">
-              <el-upload
-                action="#"
-                accept="image/png,image/jpg,image/jpeg"
-                :on-change="uploadCoverOnchange"
-                :show-file-list="false"
-                :auto-upload="false">
-                <div class="self-upload">
-                  <i class="el-icon-plus"></i>
-                </div>
-              </el-upload>
+            <div class="img" v-else>
+              <div class="block">
+                <el-upload
+                  action="#"
+                  accept="image/png,image/jpg,image/jpeg"
+                  :on-change="uploadCoverOnchange"
+                  :show-file-list="false"
+                  :auto-upload="false">
+                  <div class="self-upload">
+                    <i class="el-icon-plus"></i>
+                  </div>
+                </el-upload>
+              </div>
             </div>
           </div>
-          <div class="img" v-else>
-            <div class="block">
-              <el-upload
-                action="#"
-                accept="image/png,image/jpg,image/jpeg"
-                :on-change="uploadCoverOnchange"
-                :show-file-list="false"
-                :auto-upload="false">
-                <div class="self-upload">
-                  <i class="el-icon-plus"></i>
-                </div>
-              </el-upload>
-            </div>
+        </el-form-item>
+        <el-form-item label="选择标签" v-show="selfContentTags && selfContentTags.length">
+          <el-checkbox-group v-model="tags">
+            <el-checkbox v-for="(tag, index) in selfContentTags" :key="tag.key + index" :label="tag.key">{{ tag.name }}</el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
+        <el-form-item label="是否展示" v-show="handler === 'edit' && false" >
+          <el-radio-group v-model="form.is_show">
+            <el-radio :label="true">是</el-radio>
+            <el-radio :label="false">否</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item>
+          <div class="handler">
+            <el-button type="primary" @click="onSubmit">保存</el-button>
+            <el-button @click="close">取消</el-button>
           </div>
-        </div>
-      </el-form-item>
-      <el-form-item label="选择标签" v-show="selfContentTags && selfContentTags.length">
-        <el-checkbox-group v-model="tags">
-          <el-checkbox v-for="(tag, index) in selfContentTags" :key="tag.key + index" :label="tag.key">{{ tag.name }}</el-checkbox>
-        </el-checkbox-group>
-      </el-form-item>
-      <el-form-item label="是否展示" v-show="handler === 'edit' && false" >
-        <el-radio-group v-model="form.is_show">
-          <el-radio :label="true">是</el-radio>
-          <el-radio :label="false">否</el-radio>
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item>
-        <div class="handler">
-          <el-button type="primary" @click="onSubmit">保存</el-button>
-          <el-button @click="close">取消</el-button>
-        </div>
-      </el-form-item>
-    </el-form>
+        </el-form-item>
+      </el-form>
+    </div>
   </div>
 </template>
 
@@ -140,6 +150,8 @@ import { mapState } from 'vuex'
 export default {
   data () {
     return {
+      isLeft: true,
+      isShowRight: true,
       token: '',
       trackNum: 0,
       title: '',
@@ -235,6 +247,11 @@ export default {
     }
   },
   methods: {
+    hideCatalog () {
+      this.isLeft = !this.isLeft
+      this.isShowRight = !this.isShowRight
+      this.$emit('hideCatalog1', this.isLeft)
+    },
     show (params) {
       console.log(params)
       this.resetFormData()
@@ -419,7 +436,68 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.left-bar {
+  width: 40px;
+  height: 100%;
+}
+.icon-box {
+  width: 40px;
+  height: 40px;
+  position: fixed;
+  top: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  a::before {
+    content: '';
+  }
+  a {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+  }
+  .icon-left {
+    background-image: url('../../../assets/images/icons/icon-right.png');
+  }
+  .icon-right {
+    background-image: url('../../../assets/images/icons/icon-left.png');
+  }
+  &.right {
+    animation: bb 2s linear 0s infinite;
+  }
+  &.left {
+    animation: bb2 2s linear 0s infinite;
+  }
+  &:hover {
+    animation: none;
+  }
+}
+@keyframes bb {
+  from {
+    margin-left: -15px;
+    opacity: 0;
+  }
+  to {
+    margin-left: 0px;
+    opacity: 1;
+  }
+}
+@keyframes bb2 {
+  from {
+    margin-left: 15px;
+    opacity: 0;
+  }
+  to {
+    margin-left: 0px;
+    opacity: 1;
+  }
+}
 .edit-catalog-container {
+  display: flex;
+  position: relative;
   flex: 1;
   height: 100%;
   padding: 0 10px;
