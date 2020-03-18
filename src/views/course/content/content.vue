@@ -268,10 +268,10 @@ export default {
     }),
     settingWidth () {
       let width = ''
-      if (!this.isHideCatalog1) {
+      if (!this.isHideCatalog1 && !this.isShowEditFile) {
         width = '97%'
       } else {
-        width = (this.isShowEditFile && this.tracks.length > 1) ? '401px' : (this.tracks.length > 2 ? '602px' : 'auto')
+        width = this.tracks.length > 1 ? '401px' : (this.tracks.length > 2 ? '602px' : 'auto')
       }
       console.log(width)
       return width
@@ -506,6 +506,7 @@ export default {
       })
     },
     clickFolder (params) {
+      console.log('===>', params)
       this.$bus.emit('closeImage')
       this.$bus.emit('closeContent')
       this.path = ''

@@ -487,11 +487,11 @@ export default {
 }
 @keyframes bb2 {
   from {
-    margin-left: 15px;
+    margin-left: 5px;
     opacity: 0;
   }
   to {
-    margin-left: 0px;
+    margin-left: -5px;
     opacity: 1;
   }
 }
