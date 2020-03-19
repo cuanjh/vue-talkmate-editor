@@ -233,7 +233,7 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item :label="f.name" v-if="(f.type == 'templateArray' && contents[activeFormIndex]['' + f.feild + ''] && contents[activeFormIndex]['' + f.feild + ''].length)">
+        <el-form-item label-width="140px" :label="f.name" v-if="(f.type == 'templateArray' && contents[activeFormIndex]['' + f.feild + ''] && contents[activeFormIndex]['' + f.feild + ''].length)">
           <div class="template-options">
             <el-tag
               v-for="(item, index) in contents[activeFormIndex]['' + f.feild + '']"
