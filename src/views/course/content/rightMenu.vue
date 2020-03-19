@@ -131,7 +131,8 @@ import {
   submitExamin,
   resetExamin,
   examin,
-  addOnlineJob
+  addOnlineJob,
+  setIsShowCatalog
 } from '@/api/course'
 import { mapState } from 'vuex'
 export default {
@@ -294,24 +295,18 @@ export default {
     },
     // 显示隐藏
     clickShow (show) {
-      console.log(show)
       let obj = {
-        catalog_info: {
-          cover: this.folder.cover,
-          desc: this.folder.desc,
-          flag: this.folder.flag,
-          has_changed: true,
-          is_show: show,
-          list_order: this.folder.list_order,
-          name: this.folder.name,
-          tags: this.folder.tags,
-          title: this.folder.title,
-          parent_uuid: this.folder.parent_uuid
-        },
-        uuid: this.folder.uuid,
-        trackNum: this.trackNum
+        is_show: show,
+        uuid: this.folder.uuid
       }
-      this.$emit('clickShow', obj)
+      // this.$emit('setIsShow', obj)
+      setIsShowCatalog(obj).then(res => {
+        this.$message({
+          type: 'success',
+          message: '设置成功'
+        })
+        this.$emit('resetTrackData', { pUUID: this.folder.parent_uuid, trackNum: this.trackNum, curUUID: this.folder.uuid })
+      })
     },
     // 权限设置
     authoritySetFn () {

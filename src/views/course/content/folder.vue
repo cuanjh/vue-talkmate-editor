@@ -35,7 +35,8 @@
 <script>
 import { mapState } from 'vuex'
 import {
-  editCatalog
+  editCatalog,
+  renameCatalog
 } from '@/api/course'
 let timer = null
 export default {
@@ -84,19 +85,10 @@ export default {
     },
     blurFolder () {
       let obj = {
-        catalog_info: {
-          cover: this.folder.cover,
-          desc: this.folder.desc,
-          flag: this.folder.flag,
-          has_changed: true,
-          list_order: this.folder.list_order,
-          name: this.title,
-          tags: this.folder.tags,
-          title: this.folder.title
-        },
+        name: this.title,
         uuid: this.folder.uuid
       }
-      editCatalog(obj).then(res => {
+      renameCatalog(obj).then(res => {
         this.$emit('resetTrackData', { pUUID: this.folder.parent_uuid, trackNum: this.trackNum })
         this.isShow = true
       })

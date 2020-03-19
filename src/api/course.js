@@ -370,6 +370,32 @@ export const copyCatalog = (data) => {
 }
 
 /**
+ * @Summary 重命名目录（文件）
+ * @param {*} data
+ * @Router /editor/catalog/rename [post]
+ */
+export const renameCatalog = (data) => {
+  return service({
+    url: '/editor/catalog/rename',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 目录（文件）显示或隐藏
+ * @param {*} data
+ * @Router /editor/catalog/show [post]
+ */
+export const setIsShowCatalog = (data) => {
+  return service({
+    url: '/editor/catalog/show',
+    method: 'post',
+    data
+  })
+}
+
+/**
  * @Summary 获取内容列表
  * @Produce  application/json
  * @Param

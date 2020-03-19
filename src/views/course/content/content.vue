@@ -60,7 +60,7 @@
                 :name="f.name"
                 :class="{
                   'active': path.indexOf(f.uuid) > -1,
-                  'cur-active': uuid == f.uuid,
+                  'cur-active': curUUID == f.uuid,
                   'right-active': rightUUID == f.uuid
                 }"
                 @clickFolder="clickFolder"
@@ -104,7 +104,7 @@
       @editCatalog="editCatalogFn"
       @resetTrackData="resetTrackData"
       @lookPreview="previewContent"
-      @clickShow="isShowCatalog"
+      @setIsShow="setIsShow"
     />
     <edit-catalog ref="editCatalog" @resetTrackData="resetTrackData"/>
     <edit-form ref="editForm"/>
@@ -151,6 +151,7 @@ export default {
       selVersion: '',
       selSlide: '1',
       slideHeight: 0,
+      curUUID: '',
       uuid: '',
       rightUUID: '',
       copyUUID: '',
@@ -495,7 +496,7 @@ export default {
         /* eslint-enable */
       }
     },
-    isShowCatalog (obj) {
+    setIsShow (obj) {
       console.log(obj)
       editCatalog(obj).then(res => {
         console.log(res)
@@ -510,6 +511,7 @@ export default {
       this.$bus.emit('closeContent')
       this.path = ''
       this.uuid = params.folder.uuid
+      this.curUUID = params.folder.uuid
       let copy = this.tracks.slice(0, params.trackNum + 1)
       this.tracks = this.tracks.slice(0, params.trackNum + 1)
       this.getPath(copy, this.uuid)
@@ -602,6 +604,7 @@ export default {
     otherContextMenu (ev, item, index) {
       console.log(index)
       this.uuid = ''
+      this.curUUID = ''
       let params = {}
       params['event'] = ev
       params['type'] = 'other'
@@ -747,6 +750,9 @@ export default {
     // 编辑目录完成后拉取数据重置当前轨道的数据
     resetTrackData (params) {
       this.contentMenuHide()
+      if (params.curUUID) {
+        this.curUUID = params.curUUID
+      }
       this.uuid = params.pUUID
       this.initData(params.trackNum)
       // getCatalogList({ parent_uuid: params.pUUID }).then(res => {

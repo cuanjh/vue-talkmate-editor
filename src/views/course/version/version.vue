@@ -37,13 +37,16 @@
             <div class="title" v-text="item.name + ((item.module == 'levelGrade') ? '（等级测试）' : '') "></div>
           </el-tooltip>
           <ul>
-            <!-- <li>创建时间：2018年6月1日</li> -->
+            <li>版本：{{ item.version }}</li>
             <li>最后修改时间：{{ item.update_time | formatDate('YYYY年MM月DD日') }}</li>
           </ul>
         </div>
         <div class="operate">
           <el-tooltip class="item" effect="dark" content="编辑" placement="top">
             <el-button type="primary" v-show="isHaveAuthority" :disabled="(userInfo.authorityId !== '1' && item.curUserAuth['auth'] == 'r')" icon="el-icon-setting" circle @click="editVersion(item)"></el-button>
+          </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="复制" placement="top">
+            <el-button type="info" icon="el-icon-document-copy" :disabled="(userInfo.authorityId !== '1' && item.curUserAuth['auth'] == 'r')" circle @click="copyVersion(item)"></el-button>
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="上线" placement="top">
             <el-button type="success" v-show="isHaveAuthority" :disabled="!item.has_changed || (userInfo.authorityId !== '1' && item.curUserAuth['auth'] == 'r')" icon="el-icon-check" circle @click="onlineJob(item)"></el-button>
@@ -56,9 +59,6 @@
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="编辑课程内容" placement="top">
             <el-button type="primary" icon="el-icon-edit" :disabled="(userInfo.authorityId !== '1' && item.curUserAuth['auth'] == 'r')" circle @click="courseContent(item)"></el-button>
-          </el-tooltip>
-          <el-tooltip class="item" effect="dark" content="复制" placement="top">
-            <el-button type="info" icon="el-icon-document-copy" :disabled="(userInfo.authorityId !== '1' && item.curUserAuth['auth'] == 'r')" circle @click="copyVersion(item)"></el-button>
           </el-tooltip>
         </div>
       </div>
@@ -475,6 +475,7 @@ export default {
     text-align: center;
     display: flex;
     flex-direction: column;
+    cursor: pointer;
     i {
       margin-top: 88px;
       font-size: 24px;
@@ -503,7 +504,6 @@ export default {
     }
   }
   .content {
-    cursor: pointer;
     position: relative;
     min-height: 174px;
     border-bottom: 1px solid rgba($color: #000000, $alpha: 0.05);

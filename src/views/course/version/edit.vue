@@ -407,7 +407,7 @@ export default {
 </style>
 <style>
 .course-content .el-input {
-  width: 200px!important;
+  width: 400px!important;
   margin-right: 10px;
 }
 .course-content .name .el-input {
