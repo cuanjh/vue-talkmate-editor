@@ -197,14 +197,24 @@ export default {
       userInfo: state => state.user.userInfo
     }),
     selfLangInfos () {
-      let arr = []
-      let obj = {
-        langKey: this.version.selLang,
-        name: '目标语'
+      if (this.langInfos && this.langInfos.length) {
+        let index = this.langInfos.findIndex(item => {
+          return item.langKey === 'native'
+        })
+        if (index === -1) {
+          let obj = {
+            langKey: 'native',
+            name: '目标语'
+          }
+          let arr = this.langInfos
+          arr.push(obj)
+          return arr
+        } else {
+          return this.langInfos
+        }
+      } else {
+        return []
       }
-      arr = this.langInfos
-      arr.push(obj)
-      return arr
     },
     flagUrl () {
       let url = ''
