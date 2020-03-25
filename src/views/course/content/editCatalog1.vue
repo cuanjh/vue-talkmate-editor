@@ -40,13 +40,13 @@
           </el-select>
         </el-form-item>
         <el-form-item label="标题">
-          <div class="lang-input" v-for="l in langInfos" :key="l.langKey">
+          <div class="lang-input" v-for="l in selfLangInfos" :key="l.langKey">
             <el-input v-model="form.title[l.langKey]"></el-input>
             <div class="text" v-text="'(' + l.name + ')'"></div>
           </div>
         </el-form-item>
         <el-form-item label="描述">
-          <div class="lang-input" v-for="l in langInfos" :key="l.langKey">
+          <div class="lang-input" v-for="l in selfLangInfos" :key="l.langKey">
             <el-input type="textarea" v-model="form.desc[l.langKey]"></el-input>
             <div class="text" v-text="'(' + l.name + ')'"></div>
           </div>
@@ -196,6 +196,16 @@ export default {
       version: state => state.course.version,
       userInfo: state => state.user.userInfo
     }),
+    selfLangInfos () {
+      let arr = []
+      let obj = {
+        langKey: this.version.selLang,
+        name: '目标语'
+      }
+      arr = this.langInfos
+      arr.push(obj)
+      return arr
+    },
     flagUrl () {
       let url = ''
       if (this.form.flag && this.form.flag.length > 0) {
