@@ -10,9 +10,17 @@
           <el-input v-model="form.moduleName" maxlength="30" show-word-limit></el-input>
         </el-form-item>
         <el-form-item label="所属语种">
-          <el-select v-model="form.region" filterable placeholder="请选择活动区域">
+          <el-select v-model="form.lanCode" filterable placeholder="请选择所属语种">
             <el-option v-for="lang in langList" :key="lang.lan_key" :label="lang.title['' + locale + '']" :value="lang.lan_code"></el-option>
           </el-select>
+        </el-form-item>
+        <el-form-item label="发现频道" prop="tagKeys"
+          :rules="[
+            {type: 'array', required: true, message: '频道至少选择一个', trigger: 'change'}
+          ]">
+          <el-checkbox-group v-model="form.tagKeys">
+            <el-checkbox v-for="(item, index) in disChannels" :key="item.uuid + index" :label="item.uuid" name="tagKeys">{{ item.title['zh-CN'] }}</el-checkbox>
+          </el-checkbox-group>
         </el-form-item>
         <el-form-item label="专辑封面" prop="coverV2"
           :rules="[
@@ -20,12 +28,15 @@
           ]">
           <el-upload
             class="avatar-uploader"
-            action="https://jsonplaceholder.typicode.com/posts/"
+            action="#"
+            accept="image/png,image/jpg,image/jpeg"
+            :on-change="uploadOnchange"
             :show-file-list="false"
-            :on-success="handleAvatarSuccess"
-            :before-upload="beforeAvatarUpload">
-            <img v-if="form.coverV2" :src="form.coverV2" class="cover">
-            <i v-else class="el-icon-plus cover-uploader-icon"></i>
+            :auto-upload="false">
+            <div class="upload-area" @click="setUploadField('image,coverV2')">
+              <img v-if="form.coverV2" :src="assetsUrl + form.coverV2" class="cover">
+              <i v-else class="el-icon-plus cover-uploader-icon"></i>
+            </div>
           </el-upload>
           <el-tag type="warning">注：专辑封面将在发现页大图、课程详情页上方播放器和课程列表处展示</el-tag>
         </el-form-item>
@@ -58,12 +69,15 @@
           ]">
           <el-upload
             class="avatar-uploader"
-            action="https://jsonplaceholder.typicode.com/posts/"
+            action="#"
+            accept="image/png,image/jpg,image/jpeg"
+            :on-change="uploadOnchange"
             :show-file-list="false"
-            :on-success="handleAvatarSuccess"
-            :before-upload="beforeAvatarUpload">
-            <img v-if="form.teacherPhoto" :src="form.teacherPhoto" class="teacher">
-            <i v-else class="el-icon-plus teacher-uploader-icon"></i>
+            :auto-upload="false">
+            <div class="upload-area" @click="setUploadField('image,teacherPhoto')">
+              <img v-if="form.teacherPhoto" :src="assetsUrl + form.teacherPhoto" class="teacher">
+              <i v-else class="el-icon-plus teacher-uploader-icon"></i>
+            </div>
           </el-upload>
           <el-tag type="warning">注：讲师照片将在发现页小图和分类课程-直播处展示</el-tag>
         </el-form-item>
@@ -83,12 +97,16 @@
           :rules="[
             { required: true, message: '请上传宣传视频'}
           ]">
+          <div class="video" v-if="form.videoUrl">
+            <video :src="assetsUrl + form.videoUrl" controls></video>
+          </div>
           <el-upload
-            action="https://jsonplaceholder.typicode.com/posts/"
+            action="#"
+            accept="video/mp4"
+            :on-change="uploadOnchange"
             :show-file-list="false"
-            :on-success="handleAvatarSuccess"
-            :before-upload="beforeAvatarUpload">
-            <el-button type="primary" icon="el-icon-upload">上传</el-button>
+            :auto-upload="false">
+            <el-button type="primary" icon="el-icon-upload" @click="setUploadField('image,videoUrl')">上传</el-button>
           </el-upload>
         </el-form-item>
         <el-form-item label="课程海报" prop="posterUrl"
@@ -97,17 +115,23 @@
           ]">
           <el-upload
             class="avatar-uploader"
-            action="https://jsonplaceholder.typicode.com/posts/"
+            action="#"
+            accept="image/png,image/jpg,image/jpeg"
+            :on-change="uploadOnchange"
             :show-file-list="false"
-            :on-success="handleAvatarSuccess"
-            :before-upload="beforeAvatarUpload">
-            <img v-if="form.posterUrl" :src="form.posterUrl" class="cover">
-            <i v-else class="el-icon-plus cover-uploader-icon"></i>
+            :auto-upload="false">
+            <div class="upload-area" @click="setUploadField('image,posterUrl')">
+              <img v-if="form.posterUrl" :src="assetsUrl + form.posterUrl" class="cover">
+              <i v-else class="el-icon-plus cover-uploader-icon"></i>
+            </div>
           </el-upload>
         </el-form-item>
-        <el-form-item label="直播日期">
+        <el-form-item label="直播日期" prop="date"
+          :rules="[
+            {type: 'array', required: true, message: '请选择直播日期', trigger: 'change'}
+          ]">
           <el-date-picker
-            v-model="form.date1"
+            v-model="form.date"
             @change="changeDate"
             type="daterange"
             range-separator="至"
@@ -115,10 +139,13 @@
             end-placeholder="结束日期">
           </el-date-picker>
         </el-form-item>
-        <el-form-item label="直播时间">
+        <el-form-item label="直播时间" prop="time"
+          :rules="[
+            {type: 'array', required: true, message: '请选择直播时间', trigger: 'change'}
+          ]">
           <el-time-picker
             is-range
-            v-model="form.date2"
+            v-model="form.time"
             range-separator="至"
             start-placeholder="开始时间"
             end-placeholder="结束时间"
@@ -136,18 +163,18 @@
           </div>
         </el-form-item>
       </div>
-      <div class="course-info" v-show="form.date1 && form.liveRate.filter(item => {return item.selected === true}).length">
+      <div class="course-info" v-show="form.date && form.liveRate.filter(item => {return item.selected === true}).length">
         <div class="title">课程信息</div>
         <el-form-item
           label-width="200px"
           :label="course.date + ' 周' + form.liveRate.find(item => { return item.id == course.week })['text'] + ' 第' + (index + 1) + '课'"
           v-for="(course, index) in form.courses.slice(0, form.courseSlice)"
-          :key="'course' + index" >
+          :key="'course' + index">
           <el-input v-model="form.courses[index].title"></el-input>
         </el-form-item>
       </div>
       <el-form-item class="btn-area">
-        <el-button type="primary" @click="onSubmit">保存</el-button>
+        <el-button type="primary" @click="onSubmit" :disabled="form.courses.length == 0">保存</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -155,17 +182,26 @@
 
 <script>
 import moment from 'moment'
+import { uploadQiniu } from '@/utils/uploadQiniu'
 import {
-  getLangList
+  getLangList,
+  getInfoToken,
+  getDisChannelList,
+  addLive
 } from '@/api/course'
 import { mapState } from 'vuex'
 export default {
   data () {
     return {
       langList: [],
+      disChannels: [],
+      uploadField: '',
+      assetsUrl: '',
+      token: '',
       form: {
         moduleName: '',
         coverV2: '', // 大图
+        lanCode: 'all',
         money: 0,
         moneyDiscount: 0,
         teacherPhoto: '',
@@ -173,17 +209,8 @@ export default {
         teacherDesc: '',
         videoUrl: '',
         posterUrl: '',
-        region: '',
-        date1: '',
-        date2: '',
-        delivery: false,
-        type: [],
-        resource: '',
-        desc: '',
-        cover: '',
-        photo: '',
-        price: '',
-        salePrice: '',
+        date: [],
+        time: [ new Date(), new Date() ],
         liveRate: [
           {
             id: '1',
@@ -222,16 +249,25 @@ export default {
           }
         ],
         courses: [],
-        courseSlice: 0
+        courseSlice: 0,
+        tagKeys: []
       }
     }
   },
   mounted () {
+    getInfoToken().then(res => {
+      this.token = res.data.token
+    })
+    getDisChannelList().then(res => {
+      console.log(res)
+      this.disChannels = res.data.channels
+    })
     this.langList = []
     getLangList({ 'pageNo': 0, 'pageSize': 999 }).then(res => {
       console.log(res)
+      this.assetsUrl = res.data.assetsUrl
       this.langList.push({
-        lan_code: '',
+        lan_code: 'all',
         title: {
           'en': 'All',
           'zh-CN': '所有语种'
@@ -248,22 +284,74 @@ export default {
   },
   methods: {
     onSubmit () {
-      console.log('submit!')
-    },
-    handleAvatarSuccess (res, file) {
-      this.imageUrl = URL.createObjectURL(file.raw)
-    },
-    beforeAvatarUpload (file) {
-      const isJPG = file.type === 'image/jpeg'
-      const isLt2M = file.size / 1024 / 1024 < 2
-
-      if (!isJPG) {
-        this.$message.error('上传头像图片只能是 JPG 格式!')
-      }
-      if (!isLt2M) {
-        this.$message.error('上传头像图片大小不能超过 2MB!')
-      }
-      return isJPG && isLt2M
+      this.$refs['form'].validate((valid) => {
+        if (valid) {
+          let courses = []
+          let listOrder = 1
+          this.form.courses.slice(0, this.form.courseSlice).forEach(item => {
+            let obj = {
+              EndTime: moment(this.form.time[1]).format('HH:mm:ss'),
+              cover: this.form.coverV2,
+              date: item.date,
+              lanCode: this.form.lanCode,
+              listOrder: listOrder,
+              startTime: moment(this.form.time[0]).format('HH:mm:ss'),
+              title: item.title,
+              uuid: item.uuid
+            }
+            courses.push(obj)
+            listOrder++
+          })
+          let weekDays = []
+          this.form.liveRate.forEach(item => {
+            if (item.selected) {
+              weekDays.push(item.id)
+            }
+          })
+          let params = {
+            courses: courses,
+            room: {
+              code: '',
+              course_type: 6,
+              cover: this.form.teacherPhoto,
+              cover_v2: this.form.coverV2,
+              lan_code: this.form.lanCode,
+              liveInfo: {
+                endDate: moment(this.form.date[1]).format('YYYY-MM-DD'),
+                endTime: moment(this.form.time[1]).format('HH:mm:ss'),
+                posters: [
+                  this.form.posterUrl
+                ],
+                startDate: moment(this.form.date[0]).format('YYYY-MM-DD'),
+                startTime: moment(this.form.time[0]).format('HH:mm:ss'),
+                tech_desc: this.form.teacherDesc,
+                tech_name: this.form.teacherName,
+                tech_photo: this.form.teacherPhoto,
+                videoUrl: this.form.videoUrl,
+                weekDays: weekDays
+              },
+              module_name: this.form.moduleName,
+              money: this.form.money,
+              moneyDiscount: this.form.moneyDiscount,
+              money_type: 'CNY',
+              tag_keys: this.form.tagKeys
+            }
+          }
+          console.log(params)
+          addLive(params).then(res => {
+            if (res.success) {
+              this.$message({
+                type: 'success',
+                message: '添加成功!'
+              })
+              this.$router.push({ name: 'live-list' })
+            }
+          })
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
     },
     selLiveRate (item) {
       let index = parseInt(item.id)
@@ -272,13 +360,13 @@ export default {
       this.generateCourses()
     },
     changeDate () {
-      console.log(this.form.date1)
+      console.log(this.form.date)
       this.generateCourses()
     },
     generateCourses () {
-      if (this.form.date1 && this.form.liveRate.filter(item => { return item.selected }).length) {
-        let startDate = new Date(this.form.date1[0]).getTime()
-        let endDate = new Date(this.form.date1[1]).getTime()
+      if (this.form.date.length && this.form.liveRate.filter(item => { return item.selected }).length) {
+        let startDate = new Date(this.form.date[0]).getTime()
+        let endDate = new Date(this.form.date[1]).getTime()
         let count = 0
         for (let i = startDate; i <= endDate;) {
           console.log(moment(i).format('YYYY-MM-DD'), moment(i).day())
@@ -290,7 +378,8 @@ export default {
               let obj = {
                 date: moment(i).format('YYYY-MM-DD'),
                 week: moment(i).day(),
-                title: ''
+                title: '',
+                uuid: ''
               }
               this.form.courses.push(obj)
             }
@@ -301,6 +390,26 @@ export default {
         this.form.courseSlice = count
         console.log(this.form.courses)
       }
+    },
+    setUploadField (name) {
+      this.uploadField = name
+    },
+    async uploadOnchange (file) {
+      let uploadIndexArr = this.uploadField.split(',')
+      let dataFrom = uploadIndexArr[0]
+      let feild = uploadIndexArr[1]
+      let date = moment(new Date()).format('YYYY/MM/DD')
+      let ext = file.name.split('.')[1]
+      let url = ''
+      if (dataFrom === 'audio') {
+        url = 'live/sounds/' + date + '/' + file.uid + '.' + ext
+      } else if (dataFrom === 'image') {
+        url = 'live/images/' + date + '/' + file.uid + '.' + ext
+      } else if (dataFrom === 'video') {
+        url = 'live/videos/' + date + '/' + file.uid + '.' + ext
+      }
+      let res = await uploadQiniu(file.raw, this.token, url)
+      this.$set(this.form, feild, res.key)
     }
   }
 }
@@ -315,6 +424,16 @@ export default {
   font-weight: 500;
   color: #000000;
   margin: 20px 0;
+}
+
+.video {
+  width: 300px;
+  height: 200px;
+  display: inline-block;
+  video {
+    width: 100%;
+    height: 100%;
+  }
 }
 
 .avatar {
@@ -391,6 +510,7 @@ export default {
 .cover {
   width: 343px;
   height: 192px;
+  object-fit: cover;
 }
 
 .teacher-uploader-icon {
@@ -404,5 +524,6 @@ export default {
 .teacher {
   width: 120px;
   height: 120px;
+  object-fit: cover;
 }
 </style>

@@ -12,7 +12,7 @@
           <el-input v-model="form.name"></el-input>
         </el-form-item>
         <el-form-item label="目录属性">
-          <el-select v-model="attr_tag" filterable placeholder="请选择">
+          <el-select v-model="attr_tag" filterable placeholder="请选择" @change="changeAttrTag()">
             <el-option value="" label="无"></el-option>
             <el-option
               v-for="item in catalogAttr"
@@ -35,15 +35,18 @@
             </el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label="目标语">
+          <el-input v-model="form.goalTitle"></el-input>
+        </el-form-item>
         <el-form-item label="标题">
-          <div class="lang-input" v-for="l in selfLangInfos" :key="l.langKey">
-            <el-input v-model="form.title[l.langKey]"></el-input>
+          <div class="lang-input" v-for="l in langInfos" :key="l.langKey">
+            <el-input v-model="form.title[l.langKey]" :disabled="attr_tag != ''"></el-input>
             <div class="text" v-text="'(' + l.name + ')'"></div>
           </div>
         </el-form-item>
         <el-form-item label="描述">
-          <div class="lang-input" v-for="l in selfLangInfos" :key="l.langKey">
-            <el-input type="textarea" v-model="form.desc[l.langKey]"></el-input>
+          <div class="lang-input" v-for="l in langInfos" :key="l.langKey">
+            <el-input type="textarea" v-model="form.desc[l.langKey]" :disabled="attr_tag != ''"></el-input>
             <div class="text" v-text="'(' + l.name + ')'"></div>
           </div>
         </el-form-item>
@@ -53,6 +56,7 @@
               <img v-if="flagUrl" :src="flagUrl" fit="cover" />
             </div>
             <el-upload
+              v-show="attr_tag == ''"
               action="#"
               accept="image/png,image/jpg,image/jpeg"
               :on-change="uploadFlagOnchange"
@@ -79,12 +83,12 @@
                   :preview-src-list="[assetsDomain + cover]"
                   fit="cover">
                 </el-image>
-                <div class="btn-handler">
+                <div class="btn-handler" v-show="attr_tag == ''">
                   <el-button round size="small" @click="cropperImage(assetsDomain + cover)">裁剪</el-button>
                   <el-button round plain type="danger" size="small" @click="delImage('cover', index)">删除</el-button>
                 </div>
               </div>
-              <div class="block">
+              <div class="block" v-show="attr_tag == ''">
                 <el-upload
                   action="#"
                   accept="image/png,image/jpg,image/jpeg"
@@ -156,11 +160,13 @@ export default {
       pathDesc: '',
       attr_tag: '',
       tags: [],
+      folder: {},
       form: {
         parent_uuid: '',
         uuid: '',
         name: '',
         title: {},
+        goalTitle: '',
         desc: {},
         is_show: true,
         flag: [],
@@ -193,26 +199,6 @@ export default {
       version: state => state.course.version,
       userInfo: state => state.user.userInfo
     }),
-    selfLangInfos () {
-      if (this.langInfos && this.langInfos.length) {
-        let index = this.langInfos.findIndex(item => {
-          return item.langKey === 'native'
-        })
-        if (index === -1) {
-          let obj = {
-            langKey: 'native',
-            name: '目标语'
-          }
-          let arr = this.langInfos
-          arr.push(obj)
-          return arr
-        } else {
-          return this.langInfos
-        }
-      } else {
-        return []
-      }
-    },
     flagUrl () {
       let url = ''
       if (this.form.flag && this.form.flag.length > 0) {
@@ -294,6 +280,7 @@ export default {
       }
       if (params.handler === 'edit') {
         this.form.parent_uuid = params.folder.parent_uuid
+        this.folder = params.folder
         let folder = params.folder
         this.form.uuid = folder.uuid
         this.attr_tag = folder.attr_tag
@@ -329,6 +316,7 @@ export default {
                 name: this.form.name,
                 parent_uuid: this.form.parent_uuid,
                 title: this.form.title,
+                goalTitle: this.form.goalTitle,
                 type: this.form.type
               },
               num: this.form.num
@@ -372,6 +360,7 @@ export default {
                 name: this.form.name,
                 tags: this.tags,
                 title: this.form.title,
+                goalTitle: this.form.goalTitle,
                 is_show: this.form.is_show
               },
               uuid: this.form.uuid
@@ -445,6 +434,30 @@ export default {
     },
     delImage (flag, index) {
       this.form[flag].splice(index, 1)
+    },
+    changeAttrTag () {
+      if (this.attr_tag) {
+        let attr = this.catalogAttr.find(item => {
+          return item.key === this.attr_tag
+        })
+        console.log(attr)
+        this.form.title = attr.title
+        this.form.desc = attr.desc
+        this.form.cover = attr.cover
+        this.form.flag = attr.flag
+      } else {
+        if (this.handler === 'edit') {
+          this.form.title = this.folder.title
+          this.form.desc = this.folder.desc
+          this.form.cover = this.folder.cover
+          this.form.flag = this.folder.flag
+        } else {
+          this.form.title = {}
+          this.form.desc = {}
+          this.form.cover = []
+          this.form.flag = []
+        }
+      }
     }
   },
   destroyed () {

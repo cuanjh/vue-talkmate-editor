@@ -743,3 +743,27 @@ export const getOnlineList = (data) => {
     data
   })
 }
+
+// @Summary 获取发现频道列表
+// @Produce  application/json
+// @Param none
+// @Router /dis/channel/list [get]
+export const getDisChannelList = () => {
+  return service({
+    url: '/dis/channel/list',
+    method: 'get'
+  })
+}
+
+/**
+ * @Summary 添加直播
+ * @param {*} data
+ * @Router /live/add [post]
+ */
+export const addLive = (data) => {
+  return service({
+    url: '/live/add',
+    method: 'post',
+    data
+  })
+}
