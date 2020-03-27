@@ -128,6 +128,10 @@ export default {
       this.tagsLists = this.contentTags
       this.allTags = this.contentTags
       // console.log(this.contentTags, this.allTags)
+      this.tagsLists = this.allTags.filter(item => {
+        let res = item.name.indexOf(this.searchKey) > -1 || item.key.indexOf(this.searchKey) > -1
+        return res
+      })
       this.handleCurrentChange(this.pageRequest.pageNum)
     },
     // 模糊搜索
