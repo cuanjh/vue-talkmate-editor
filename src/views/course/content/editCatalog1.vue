@@ -433,7 +433,7 @@ export default {
           let ext = file.raw.name.split('.')[1]
           let url = 'course/images/icon/' + width + '*' + height + '/' + file.uid + '.' + ext
           uploadQiniu(file.raw, this.token, url).then(res => {
-            this.form.cover.push(res.key)
+            this.form.cover.unshift(res.key)
           })
         }
         image.src = data

@@ -56,15 +56,17 @@ export default {
     }
   },
   created () {
-    this.initData()
   },
   mounted () {
-    console.log(this.versionList, this.catalogList)
-    this.initEchart()
-    console.log(this.addDate(new Date(), -29))
+    console.log(this.userInfo)
+    if (this.userInfo.authorityId !== '2') {
+      this.initData()
+      this.initEchart()
+    }
   },
   computed: {
     ...mapState({
+      userInfo: state => state.user.userInfo,
       onlineList: state => state.course.onlineList
     })
   },

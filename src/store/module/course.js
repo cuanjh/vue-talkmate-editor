@@ -41,7 +41,39 @@ export const course = {
     contentTags: [], // 内容标签列表
     contentTypeList: [], // 内容类型列表
     onlineList: [], // 上线列表
-    tagTypes: [] // 标签类型
+    tagTypes: [], // 标签类型
+    // 直播课程定价
+    livePrices: [
+      { value: 0, text: '¥ 0' },
+      { value: 1, text: '¥ 1' },
+      { value: 3, text: '¥ 3' },
+      { value: 6, text: '¥ 6' },
+      { value: 8, text: '¥ 8' },
+      { value: 12, text: '¥ 12' },
+      { value: 18, text: '¥ 18' },
+      { value: 25, text: '¥ 25' },
+      { value: 28, text: '¥ 28' },
+      { value: 30, text: '¥ 30' },
+      { value: 40, text: '¥ 40' },
+      { value: 45, text: '¥ 45' },
+      { value: 50, text: '¥ 50' },
+      { value: 60, text: '¥ 60' },
+      { value: 68, text: '¥ 68' },
+      { value: 73, text: '¥ 73' },
+      { value: 78, text: '¥ 78' },
+      { value: 88, text: '¥ 88' },
+      { value: 93, text: '¥ 93' },
+      { value: 98, text: '¥ 98' },
+      { value: 108, text: '¥ 108' },
+      { value: 168, text: '¥ 168' },
+      { value: 198, text: '¥ 198' },
+      { value: 328, text: '¥ 328' },
+      { value: 588, text: '¥ 588' },
+      { value: 998, text: '¥ 998' },
+      { value: 1998, text: '¥ 1998' },
+      { value: 3298, text: '¥ 3298' },
+      { value: 6498, text: '¥ 6498' }
+    ]
   },
   mutations: {
     updateConfigInfo (state, configInfo) {

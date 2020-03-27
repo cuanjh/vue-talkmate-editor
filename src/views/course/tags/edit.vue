@@ -250,10 +250,24 @@ export default {
       this.form.flag.push(res.key)
     },
     async uploadCoverOnchange (file, fileList) {
-      this.form.cover = []
-      let url = 'course/content/catalog/cover/' + file.raw.name
-      let res = await uploadQiniu(file.raw, this.token, url)
-      this.form.cover.push(res.key)
+      console.log(file)
+      let reader = new FileReader()
+      reader.onload = (e) => {
+        console.log(e)
+        let data = e.target.result
+        let image = new Image()
+        image.onload = () => {
+          let width = image.width
+          let height = image.height
+          let ext = file.raw.name.split('.')[1]
+          let url = 'course/images/icon/' + width + '*' + height + '/' + file.uid + '.' + ext
+          uploadQiniu(file.raw, this.token, url).then(res => {
+            this.form.cover.unshift(res.key)
+          })
+        }
+        image.src = data
+      }
+      reader.readAsDataURL(file.raw)
     },
     changeType () {
       console.log(this.form)
