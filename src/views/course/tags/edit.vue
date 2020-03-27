@@ -245,7 +245,8 @@ export default {
     },
     async uploadFlagOnchange (file, fileList) {
       this.form.flag = []
-      let url = 'course/content/catalog/flag/' + file.raw.name
+      let ext = file.raw.name.split('.')[1]
+      let url = 'course/content/catalog/flag/' + file.uid + '.' + ext
       let res = await uploadQiniu(file.raw, this.token, url)
       this.form.flag.push(res.key)
     },
@@ -262,7 +263,7 @@ export default {
           let ext = file.raw.name.split('.')[1]
           let url = 'course/images/icon/' + width + '*' + height + '/' + file.uid + '.' + ext
           uploadQiniu(file.raw, this.token, url).then(res => {
-            this.form.cover.unshift(res.key)
+            this.form.cover.push(res.key)
           })
         }
         image.src = data
