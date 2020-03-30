@@ -19,7 +19,7 @@
             {type: 'array', required: true, message: '频道至少选择一个', trigger: 'change'}
           ]">
           <el-checkbox-group v-model="form.tagKeys">
-            <el-checkbox v-for="(item, index) in disChannels" :key="item.uuid + index" :label="item.uuid" name="tagKeys">{{ item.title['zh-CN'] }}</el-checkbox>
+            <el-checkbox v-for="(item, index) in disChannels" :key="item.uuid + index" :label="item.uuid" name="tagKeys">{{ item.title['zh-CN'] + ' (' + (item.showPos == 'index' ? '发现首页' : '列表页') + ')' }}</el-checkbox>
           </el-checkbox-group>
         </el-form-item>
         <el-form-item label="专辑封面" prop="coverV2"

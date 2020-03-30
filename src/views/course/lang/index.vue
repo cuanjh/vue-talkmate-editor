@@ -123,7 +123,7 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
+import { mapState } from 'vuex'
 import { getLangList, delLang, editLang } from '@/api/course'
 import EditComp from './edit'
 import SortCourseComp from './sortCourse'
@@ -147,9 +147,6 @@ export default {
     EditComp,
     SortCourseComp
   },
-  created () {
-    this.getConfigInfo()
-  },
   mounted () {
     this.initData()
   },
@@ -160,9 +157,6 @@ export default {
     })
   },
   methods: {
-    ...mapActions({
-      getConfigInfo: 'course/getConfigInfo'
-    }),
     // 添加新课程
     updateNewLang () {
       this.initData()

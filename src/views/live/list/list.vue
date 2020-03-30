@@ -8,29 +8,20 @@
       style="width: 100%">
       <el-table-column type="expand">
         <template slot-scope="props">
-          <el-form label-position="left" inline class="demo-table-expand">
-            <el-form-item label="商品名称">
-              <span>{{ props.row.name }}</span>
-            </el-form-item>
-            <el-form-item label="所属店铺">
-              <span>{{ props.row.shop }}</span>
-            </el-form-item>
-            <el-form-item label="商品 ID">
-              <span>{{ props.row.id }}</span>
-            </el-form-item>
-            <el-form-item label="店铺 ID">
-              <span>{{ props.row.shopId }}</span>
-            </el-form-item>
-            <el-form-item label="商品分类">
-              <span>{{ props.row.category }}</span>
-            </el-form-item>
-            <el-form-item label="店铺地址">
-              <span>{{ props.row.address }}</span>
-            </el-form-item>
-            <el-form-item label="商品描述">
-              <span>{{ props.row.desc }}</span>
-            </el-form-item>
-          </el-form>
+          <div class="live-courses">
+            <div class="course disabled" v-for="(c, index) in props.row.courses" :key="c.uuid">
+              <div class="course-column">{{ '第' + (index + 1) + '课'}}</div>
+              <div class="course-column">{{ c.title }}</div>
+              <div class="course-column">{{ formatCourseDate(c) }}</div>
+              <div class="course-column">
+                <el-select size="small" :disabled="props.row.courses[index].state == -1" v-model="props.row.courses[index].state" placeholder="请选择..." @change="changeCourseState(c)">
+                  <el-option :label="'未开始'" :disabled="props.row.courses[index].state == 1" :value="0"></el-option>
+                  <el-option :label="'上课中'" :value="1"></el-option>
+                  <el-option :label="'已下课'" :disabled="props.row.courses[index].state == 0" :value="-1"></el-option>
+                </el-select>
+              </div>
+            </div>
+          </div>
         </template>
       </el-table-column>
       <el-table-column
@@ -44,23 +35,23 @@
         <template slot-scope="scope">
           <div class="room-info">
             <el-image
-              v-show="scope.row.cover_v2"
+              v-show="scope.row.room.cover_v2"
               style="width: 157px; height: 88px"
-              :src="domain + scope.row.cover_v2"
+              :src="assetsDomain + scope.row.room.cover_v2"
               lazy
               fit="cover">
             </el-image>
             <div class="right">
               <div class="title">
-                 {{ scope.row.module_name }}
+                 {{ scope.row.room.module_name }}
               </div>
-              <div class="date">
-                {{ scope.row.liveInfo.startDate + ' 至 ' + scope.row.liveInfo.endDate + ' 共' + scope.row.courses.length + '课' }}
+               <div class="date">
+                {{ scope.row.room.liveInfo.startDate + ' 至 ' + scope.row.room.liveInfo.endDate + ' 共 ' + scope.row.courses.length + ' 课' }}
               </div>
               <div class="time">
                 <span>每周</span>
-                <span v-for="(w, index) in scope.row.liveInfo.weekDays" :key="w">{{ liveRate[w] + ((index != scope.row.liveInfo.weekDays.length - 1) ? '、' : '') }}</span>
-                <span>{{ ' ' + scope.row.liveInfo.startTime.slice(0, 5) + ' - '  + scope.row.liveInfo.endTime.slice(0, 5)}}</span>
+                <span v-for="(w, index) in scope.row.room.liveInfo.weekDays" :key="w">{{ liveRate[w] + ((index != scope.row.room.liveInfo.weekDays.length - 1) ? '、' : '') }}</span>
+                <span>{{ ' ' + scope.row.room.liveInfo.startTime.slice(0, 5) + ' - '  + scope.row.room.liveInfo.endTime.slice(0, 5)}}</span>
               </div>
             </div>
           </div>
@@ -69,14 +60,14 @@
       <el-table-column
         label="进度">
         <template slot-scope="scope">
-          {{ '0课' + '/' +  scope.row.courses.length + '课'}}
+          {{ scope.row.courses.filter(item => {return item.state == -1 }).length + '课' + '/' +  scope.row.courses.length + '课'}}
         </template>
       </el-table-column>
       <el-table-column
         label="状态">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.published === 'N' ? 'primary' : 'success'">
-            {{ scope.row.published === 'N' ? '未上架' : '已上架'}}
+          <el-tag :type="scope.row.room.published === 'N' ? 'primary' : 'success'">
+            {{ scope.row.room.published === 'N' ? '未上架' : '已上架'}}
           </el-tag>
         </template>
       </el-table-column>
@@ -105,19 +96,20 @@
 </template>
 
 <script>
-// import moment from 'moment'
+import moment from 'moment'
 import {
-  getConfigInfo,
   getLiveList,
   onlineLive,
   offlineLive,
-  delLive
+  delLive,
+  onlineLiveCourse,
+  offlineLiveCourse
 } from '@/api/course'
+import { mapState } from 'vuex'
 
 export default {
   data () {
     return {
-      domain: '',
       rooms: [],
       liveRate: {
         '1': '一',
@@ -130,13 +122,13 @@ export default {
       }
     }
   },
-  created () {
-    getConfigInfo().then(res => {
-      this.domain = res.data.assetsDomain + '/'
-    })
-  },
   mounted () {
     this.initData()
+  },
+  computed: {
+    ...mapState({
+      assetsDomain: state => state.course.assetsDomain
+    })
   },
   methods: {
     initData () {
@@ -221,6 +213,48 @@ export default {
           message: '已取消下架'
         })
       })
+    },
+    formatCourseDate (item) {
+      let result = ''
+      if (item.state === 2) {
+        result += '上课时间'
+      } else {
+        result += '开始时间'
+      }
+      result += moment(new Date(item.date)).format('MM月DD日') + ' '
+      let startTime = moment(new Date(item.startTime)).format('HH:mm')
+      let endTime = moment(new Date(item.EndTime)).format('HH:mm')
+      result += startTime + '—' + endTime
+      return result
+    },
+    changeCourseState (course) {
+      console.log(course)
+      switch (course.state) {
+        // 上课中
+        case 1:
+          onlineLiveCourse({ uuid: course.uuid }).then(res => {
+            if (res.success) {
+              this.$message({
+                type: 'success',
+                message: '设置成功'
+              })
+            }
+          })
+          break
+        // 已下课
+        case -1:
+          offlineLiveCourse({ uuid: course.uuid }).then(res => {
+            if (res.success) {
+              this.$message({
+                type: 'success',
+                message: '设置成功'
+              })
+            }
+          })
+          break
+        default:
+          break
+      }
     }
   }
 }
@@ -261,16 +295,35 @@ export default {
   }
 }
 
-  .demo-table-expand {
-    font-size: 0;
+.live-courses {
+  display: flex;
+  flex-direction: column;
+  .course {
+    display: flex;
+    flex-direction: row;
+    color: #000000;
+    font-weight: 400;
+    font-size: 12px;
+    align-items: center;
+    justify-content: space-around;
+    margin: 10px 0;
+    .course-column {
+      &:nth-child(1) {
+        font-size: 13px;
+      }
+      &:nth-child(2) {
+        font-size: 14px;
+      }
+      &:nth-child(3) {
+        font-size: 12px;
+      }
+      &:nth-child(4) {
+        font-size: 14px;
+      }
+    }
   }
-  .demo-table-expand label {
-    width: 90px;
-    color: #99a9bf;
+  .disabled {
+    color: rgba(0, 0, 0, .6)
   }
-  .demo-table-expand .el-form-item {
-    margin-right: 0;
-    margin-bottom: 0;
-    width: 50%;
-  }
+}
 </style>

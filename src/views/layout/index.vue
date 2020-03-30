@@ -61,8 +61,14 @@ export default {
   components: {
     Aside
   },
+  created () {
+    this.getConfigInfo()
+  },
   methods: {
-    ...mapActions('user', ['LoginOut']),
+    ...mapActions({
+      LoginOut: 'user/LoginOut',
+      getConfigInfo: 'course/getConfigInfo'
+    }),
     totalCollapse () {
       this.isCollapse = !this.isCollapse
       this.$bus.emit('totalCollapse')

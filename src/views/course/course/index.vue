@@ -120,7 +120,6 @@ export default {
   },
   created () {
     this.getLangList({ 'pageNo': 0, 'pageSize': 999 })
-    this.getConfigInfo()
     this.getCourseTypes()
   },
   mounted () {
@@ -140,7 +139,6 @@ export default {
   methods: {
     ...mapActions({
       getLangList: 'course/getLangList',
-      getConfigInfo: 'course/getConfigInfo',
       getCourseTypes: 'course/getCourseTypes'
     }),
     async initData () {

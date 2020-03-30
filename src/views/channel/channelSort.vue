@@ -9,9 +9,15 @@
           <div class="item" v-for="item in groupChannels" :key="item.showPos">
             <el-divider>{{ item.showPos == "index" ? '发现首页排序' : '列表页排序' }}</el-divider>
             <div class="sort-container" :id="'sort-channel-' + item.showPos">
-              <el-tag v-for="c in item.data" :key="c.uuid">{{ c.title['' + locale + '']}}</el-tag>
+              <el-tag :data-id="index" v-for="(c, index) in item.data" :key="c.uuid">{{ c.title['' + locale + '']}}</el-tag>
             </div>
           </div>
+        </div>
+        <div class="btns">
+          <el-button
+            class="determine active"
+            type="primary"
+            @click="save" >确定</el-button>
         </div>
       </div>
     </div>
@@ -21,11 +27,17 @@
 <script>
 import Sortable from 'sortablejs'
 import { mapState } from 'vuex'
+import {
+  sortDisChannel
+} from '@/api/course'
+
 export default {
   data () {
     return {
       isShow: false,
-      groupChannels: []
+      sortable: {},
+      groupChannels: [],
+      sortContents: []
     }
   },
   computed: {
@@ -36,6 +48,7 @@ export default {
   methods: {
     show (params) {
       console.log(params)
+      this.sortContents = []
       let map = {}
       let dest = []
       for (let i = 0; i < params.length; i++) {
@@ -79,32 +92,39 @@ export default {
     resetSortable (showPos) {
       /* eslint-disable */
       let el = document.getElementById('sort-channel-' + showPos)
-      let sortable = new Sortable(el, {
+      this.sortable[showPos] = new Sortable(el, {
         animation: 150,
         onEnd: (evt) => {
-          console.log(evt)
-          let fromId = evt.from.id
           let toId = evt.to.id
           let showPos = toId.split('-').pop()
-          let group = this.groupChannels.find(item => {
+          let copyContents = this.groupChannels.find(item => {
             return item.showPos === showPos
+          }).data
+          console.log(copyContents)
+          let indexArr = this.sortable[showPos].toArray()
+          console.log(indexArr)
+          indexArr.forEach((item, index) => {
+            let obj = copyContents[parseInt(item)]
+            this.sortContents.push({
+              uuid: obj.uuid,
+              listOrder: index + 1
+            })
           })
-          let dragObj = group.data[evt.oldIndex]
-          let newOrder = dragObj.listOrder
-          let listOrder = group.data[evt.newIndex].listOrder
-          if (evt.newIndex < evt.oldIndex) {
-            newOrder = listOrder - 1
-          } else {
-            newOrder = listOrder + 1
-          }
-          dragObj.listOrder = newOrder
-          console.log(dragObj)
-          // editCatalog(obj).then(res => {
-          //   this.resetTrackData({ pUUID: pUUID, trackNum: trackNum })
-          // })
+          console.log(this.sortContents)
         }
       })
       /* eslint-enable */
+    },
+    save () {
+      sortDisChannel(this.sortContents).then(res => {
+        if (res.success) {
+          this.$message({
+            type: 'success',
+            message: res.msg
+          })
+          this.close()
+        }
+      })
     }
   }
 }
@@ -142,5 +162,9 @@ export default {
   .el-tag {
     margin: 20px;
   }
+}
+
+.btns {
+  margin-top: 30px;
 }
 </style>

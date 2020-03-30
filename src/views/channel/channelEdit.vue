@@ -152,6 +152,10 @@ export default {
             editDisChannel(this.form).then(res => {
               console.log(res)
               if (res.success) {
+                this.$message({
+                  type: 'success',
+                  message: '编辑成功!'
+                })
                 this.$emit('refresh')
                 this.close()
               }
@@ -160,6 +164,10 @@ export default {
             addDisChannel(this.form).then(res => {
               console.log(res)
               if (res.success) {
+                this.$message({
+                  type: 'success',
+                  message: '添加成功!'
+                })
                 this.$emit('refresh')
                 this.close()
               }

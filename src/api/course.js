@@ -795,6 +795,19 @@ export const delDisChannel = (data) => {
 }
 
 /**
+ * @Summary 频道排序
+ * @param {*} data
+ * @Router /dis/channel/listorder [post]
+ */
+export const sortDisChannel = (data) => {
+  return service({
+    url: '/dis/channel/listorder',
+    method: 'post',
+    data
+  })
+}
+
+/**
  * @Summary 添加直播
  * @param {*} data
  * @Router /live/add [post]
@@ -867,6 +880,32 @@ export const delLive = (data) => {
 export const getLiveList = (data) => {
   return service({
     url: '/live/list',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 直播开始上课
+ * @param {*} data
+ * @Router /live/course/online [post]
+ */
+export const onlineLiveCourse = (data) => {
+  return service({
+    url: '/live/course/online',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 直播开始下课
+ * @param {*} data
+ * @Router /live/course/offline [post]
+ */
+export const offlineLiveCourse = (data) => {
+  return service({
+    url: '/live/course/offline',
     method: 'post',
     data
   })

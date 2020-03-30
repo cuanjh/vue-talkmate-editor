@@ -61,7 +61,7 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex'
+import { mapState } from 'vuex'
 import {
   delDisChannel,
   getDisChannelList
@@ -82,7 +82,6 @@ export default {
     SortComp
   },
   created () {
-    this.getConfigInfo()
     this.initData()
   },
   computed: {
@@ -93,14 +92,12 @@ export default {
   mounted () {
   },
   methods: {
-    ...mapActions({
-      getConfigInfo: 'course/getConfigInfo'
-    }),
     async initData () {
       let res = await getDisChannelList()
-      this.allChannels = res.data.channels.sort((a, b) => {
-        return a.list_order - b.list_order
-      })
+      this.allChannels = res.data.channels
+      // .sort(this.sortPos).sort((a, b) => {
+      //   return a.listOrder - b.listOrder
+      // })
       this.channelList = this.allChannels.filter(item => {
         let flag = false
         this.langInfos.forEach(i => {

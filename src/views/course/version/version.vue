@@ -101,7 +101,6 @@ export default {
     RightMenu
   },
   created () {
-    this.getConfigInfo()
     this.getAuthorityUsers()
     this.getLangList({ 'pageNo': 0, 'pageSize': 999 })
     this.getCourseTypes()
@@ -191,7 +190,6 @@ export default {
       updateVersion: 'course/updateVersion'
     }),
     ...mapActions({
-      getConfigInfo: 'course/getConfigInfo',
       getLangList: 'course/getLangList',
       getCourseTypes: 'course/getCourseTypes',
       getCourseList: 'course/getCourseList'
