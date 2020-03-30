@@ -756,6 +756,45 @@ export const getDisChannelList = () => {
 }
 
 /**
+ * @Summary 添加发现频道
+ * @param {*} data
+ * @Router /dis/channel/add [post]
+ */
+export const addDisChannel = (data) => {
+  return service({
+    url: '/dis/channel/add',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 编辑发现频道
+ * @param {*} data
+ * @Router /dis/channel/edit [post]
+ */
+export const editDisChannel = (data) => {
+  return service({
+    url: '/dis/channel/edit',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 删除发现频道
+ * @param {*} data
+ * @Router /dis/channel/del [post]
+ */
+export const delDisChannel = (data) => {
+  return service({
+    url: '/dis/channel/del',
+    method: 'post',
+    data
+  })
+}
+
+/**
  * @Summary 添加直播
  * @param {*} data
  * @Router /live/add [post]
@@ -763,6 +802,71 @@ export const getDisChannelList = () => {
 export const addLive = (data) => {
   return service({
     url: '/live/add',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 编辑直播
+ * @param {*} data
+ * @Router /live/edit [post]
+ */
+export const editLive = (data) => {
+  return service({
+    url: '/live/edit',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 上架直播
+ * @param {*} data
+ * @Router /live/online [post]
+ */
+export const onlineLive = (data) => {
+  return service({
+    url: '/live/online',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 下架直播
+ * @param {*} data
+ * @Router /live/online [post]
+ */
+export const offlineLive = (data) => {
+  return service({
+    url: '/live/offline',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 删除直播
+ * @param {*} data
+ * @Router /live/del [post]
+ */
+export const delLive = (data) => {
+  return service({
+    url: '/live/del',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 直播房间列表
+ * @param {*} data
+ * @Router /live/list [post]
+ */
+export const getLiveList = (data) => {
+  return service({
+    url: '/live/list',
     method: 'post',
     data
   })

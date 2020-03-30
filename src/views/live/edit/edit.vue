@@ -109,6 +109,23 @@
             <el-button type="primary" icon="el-icon-upload" @click="setUploadField('image,videoUrl')">上传</el-button>
           </el-upload>
         </el-form-item>
+        <el-form-item label="视频封面" prop="videoCoverUrl"
+          :rules="[
+            { required: true, message: '请上传课程海报'}
+          ]">
+          <el-upload
+            class="avatar-uploader"
+            action="#"
+            accept="image/png,image/jpg,image/jpeg"
+            :on-change="uploadOnchange"
+            :show-file-list="false"
+            :auto-upload="false">
+            <div class="upload-area" @click="setUploadField('image,videoCoverUrl')">
+              <img v-if="form.videoCoverUrl" :src="assetsUrl + form.videoCoverUrl" class="cover">
+              <i v-else class="el-icon-plus cover-uploader-icon"></i>
+            </div>
+          </el-upload>
+        </el-form-item>
         <el-form-item label="课程海报" prop="posterUrl"
           :rules="[
             { required: true, message: '请上传课程海报'}
@@ -187,12 +204,16 @@ import {
   getLangList,
   getInfoToken,
   getDisChannelList,
-  addLive
+  addLive,
+  editLive
 } from '@/api/course'
 import { mapState } from 'vuex'
 export default {
   data () {
     return {
+      flag: '',
+      code: '',
+      roomInfo: {},
       langList: [],
       disChannels: [],
       uploadField: '',
@@ -201,16 +222,17 @@ export default {
       form: {
         moduleName: '',
         coverV2: '', // 大图
-        lanCode: 'all',
+        lanCode: 'ALL',
         money: 0,
         moneyDiscount: 0,
         teacherPhoto: '',
         teacherName: '',
         teacherDesc: '',
         videoUrl: '',
+        videoCoverUrl: '',
         posterUrl: '',
         date: [],
-        time: [ new Date(), new Date() ],
+        time: [],
         liveRate: [
           {
             id: '1',
@@ -255,6 +277,14 @@ export default {
     }
   },
   mounted () {
+    console.log(this.$route)
+    let newDate = new Date()
+    this.form.time.push(newDate)
+    this.form.time.push(newDate)
+    this.flag = this.$route.query.flag
+    if (this.flag === 'edit') {
+      this.initEditInfo()
+    }
     getInfoToken().then(res => {
       this.token = res.data.token
     })
@@ -267,7 +297,7 @@ export default {
       console.log(res)
       this.assetsUrl = res.data.assetsUrl
       this.langList.push({
-        lan_code: 'all',
+        lan_code: 'ALL',
         title: {
           'en': 'All',
           'zh-CN': '所有语种'
@@ -283,19 +313,58 @@ export default {
     })
   },
   methods: {
+    initEditInfo () {
+      this.code = this.$route.query.code
+      let liveRooms = localStorage.getItem('storage_liveRooms')
+      if (liveRooms) {
+        liveRooms = JSON.parse(liveRooms)
+        this.roomInfo = liveRooms.find(item => {
+          return item.code === this.code
+        })
+        this.form.moduleName = this.roomInfo.module_name
+        this.form.lanCode = this.roomInfo.lan_code
+        this.form.tagKeys = this.roomInfo.tag_keys
+        this.form.coverV2 = this.roomInfo.cover_v2
+        this.form.money = this.roomInfo.money
+        this.form.moneyDiscount = this.roomInfo.moneyDiscount
+        this.form.teacherPhoto = this.roomInfo.liveInfo.tech_photo
+        this.form.teacherName = this.roomInfo.liveInfo.tech_name
+        this.form.teacherDesc = this.roomInfo.liveInfo.tech_desc
+        this.form.videoUrl = this.roomInfo.liveInfo.videoUrl
+        this.form.videoCoverUrl = this.roomInfo.liveInfo.videoCoverUrl
+        this.form.posterUrl = this.roomInfo.liveInfo.posters[0]
+        this.form.date.push(this.roomInfo.liveInfo.startDate)
+        this.form.date.push(this.roomInfo.liveInfo.endDate)
+        this.form.time[0] = (new Date(this.roomInfo.liveInfo.startDate + ' ' + this.roomInfo.liveInfo.startTime))
+        this.form.time[1] = (new Date(this.roomInfo.liveInfo.startDate + ' ' + this.roomInfo.liveInfo.endTime))
+        if (this.roomInfo.liveInfo.weekDays && this.roomInfo.liveInfo.weekDays.length) {
+          this.roomInfo.liveInfo.weekDays.forEach(w => {
+            let index = this.form.liveRate.findIndex(r => {
+              return r.id === w
+            })
+            this.form.liveRate[index].selected = true
+          })
+        }
+        this.form.courses = this.roomInfo.courses
+        this.generateCourses()
+        console.log(this.roomInfo)
+      }
+    },
     onSubmit () {
       this.$refs['form'].validate((valid) => {
         if (valid) {
           let courses = []
           let listOrder = 1
           this.form.courses.slice(0, this.form.courseSlice).forEach(item => {
+            let startTime = (new Date(item.date + ' ' + moment(this.form.time[0]).format('HH:mm:ss'))).getTime()
+            let endTime = (new Date(item.date + ' ' + moment(this.form.time[1]).format('HH:mm:ss'))).getTime()
             let obj = {
-              EndTime: moment(this.form.time[1]).format('HH:mm:ss'),
+              EndTime: endTime,
               cover: this.form.coverV2,
               date: item.date,
               lanCode: this.form.lanCode,
               listOrder: listOrder,
-              startTime: moment(this.form.time[0]).format('HH:mm:ss'),
+              startTime: startTime,
               title: item.title,
               uuid: item.uuid
             }
@@ -311,7 +380,7 @@ export default {
           let params = {
             courses: courses,
             room: {
-              code: '',
+              code: this.code,
               course_type: 6,
               cover: this.form.teacherPhoto,
               cover_v2: this.form.coverV2,
@@ -328,6 +397,7 @@ export default {
                 tech_name: this.form.teacherName,
                 tech_photo: this.form.teacherPhoto,
                 videoUrl: this.form.videoUrl,
+                videoCoverUrl: this.form.videoCoverUrl,
                 weekDays: weekDays
               },
               module_name: this.form.moduleName,
@@ -338,15 +408,27 @@ export default {
             }
           }
           console.log(params)
-          addLive(params).then(res => {
-            if (res.success) {
-              this.$message({
-                type: 'success',
-                message: '添加成功!'
-              })
-              this.$router.push({ name: 'live-list' })
-            }
-          })
+          if (this.flag === 'add') {
+            addLive(params).then(res => {
+              if (res.success) {
+                this.$message({
+                  type: 'success',
+                  message: '添加成功!'
+                })
+                this.$router.push({ name: 'live-list' })
+              }
+            })
+          } else {
+            editLive(params).then(res => {
+              if (res.success) {
+                this.$message({
+                  type: 'success',
+                  message: '修改成功!'
+                })
+                this.$router.push({ name: 'live-list' })
+              }
+            })
+          }
         } else {
           console.log('error submit!!')
           return false
