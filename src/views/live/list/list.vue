@@ -5,11 +5,14 @@
     </div>
     <el-table
       :data="rooms"
+      :row-key="getRowKey"
+      :expand-row-keys="expandRowKeys"
+      @expand-change="expandChange"
       style="width: 100%">
       <el-table-column type="expand">
         <template slot-scope="props">
           <div class="live-courses">
-            <div class="course disabled" v-for="(c, index) in props.row.courses" :key="c.uuid">
+            <div :class="['course', { 'notStarted': props.row.courses[index].state == 0, 'inClass': props.row.courses[index].state == 1 }]" v-for="(c, index) in props.row.courses" :key="c.uuid">
               <div class="course-column">{{ '第' + (index + 1) + '课'}}</div>
               <div class="course-column">{{ c.title }}</div>
               <div class="course-column">{{ formatCourseDate(c) }}</div>
@@ -119,7 +122,11 @@ export default {
         '5': '五',
         '6': '六',
         '0': '日'
-      }
+      },
+      getRowKey (row) {
+        return row.room.code
+      },
+      expandRowKeys: []
     }
   },
   mounted () {
@@ -134,7 +141,6 @@ export default {
     initData () {
       getLiveList({ pageNo: 0, pageSize: 9999 }).then(res => {
         this.rooms = res.data.rooms
-        localStorage.setItem('storage_liveRooms', JSON.stringify(this.rooms))
       })
     },
     // 添加直播间路由跳转
@@ -143,7 +149,8 @@ export default {
     },
     // 编辑直播间路由跳转
     handleEdit (index, row) {
-      this.$router.push({ name: 'live-edit', query: { flag: 'edit', code: row.code } })
+      localStorage.setItem('storage_liveRooms', JSON.stringify(row))
+      this.$router.push({ name: 'live-edit', query: { flag: 'edit' } })
     },
     // 删除
     handleDelete (index, row) {
@@ -216,14 +223,20 @@ export default {
     },
     formatCourseDate (item) {
       let result = ''
-      if (item.state === 2) {
+      if (item.state === -1) {
         result += '上课时间'
       } else {
         result += '开始时间'
       }
       result += moment(new Date(item.date)).format('MM月DD日') + ' '
-      let startTime = moment(new Date(item.startTime)).format('HH:mm')
-      let endTime = moment(new Date(item.EndTime)).format('HH:mm')
+      let startTime = moment(new Date(item.startTime * 1000)).format('HH:mm')
+      let endTime = moment(new Date(item.EndTime * 1000)).format('HH:mm')
+      if (item.state === 1 || item.state === -1) {
+        startTime = moment(new Date(item.realStartTime * 1000)).format('HH:mm')
+      }
+      if (item.state === -1) {
+        endTime = moment(new Date(item.realEndTime * 1000)).format('HH:mm')
+      }
       result += startTime + '—' + endTime
       return result
     },
@@ -238,6 +251,7 @@ export default {
                 type: 'success',
                 message: '设置成功'
               })
+              this.initData()
             }
           })
           break
@@ -249,12 +263,19 @@ export default {
                 type: 'success',
                 message: '设置成功'
               })
+              this.initData()
             }
           })
           break
         default:
           break
       }
+    },
+    expandChange (row, expandedRows) {
+      this.expandChange = []
+      expandedRows.forEach(item => {
+        this.expandChange.push(item.room.code)
+      })
     }
   }
 }
@@ -305,7 +326,7 @@ export default {
     font-weight: 400;
     font-size: 12px;
     align-items: center;
-    justify-content: space-around;
+    justify-content: space-between;
     margin: 10px 0;
     .course-column {
       &:nth-child(1) {
@@ -322,8 +343,11 @@ export default {
       }
     }
   }
-  .disabled {
-    color: rgba(0, 0, 0, .6)
+  .notStarted {
+    color: rgba(0, 0, 0, .6);
+  }
+  .inClass {
+    color:rgba(218,72,116,1);
   }
 }
 </style>

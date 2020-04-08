@@ -910,3 +910,68 @@ export const offlineLiveCourse = (data) => {
     data
   })
 }
+
+/**
+ * @Summary 获取关键词列表
+ * @param {*} data
+ * @Router /editor/sword/list [post]
+ */
+export const getSearchWords = (data) => {
+  return service({
+    url: '/editor/sword/list',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 添加搜索关键词
+ * @param {*} data
+ * @Router /editor/sword/add [post]
+ */
+export const addSearchWord = (data) => {
+  return service({
+    url: '/editor/sword/add',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 编辑搜索关键词
+ * @param {*} data
+ * @Router /editor/sword/edit [post]
+ */
+export const editSearchWord = (data) => {
+  return service({
+    url: '/editor/sword/edit',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 排序搜索关键词
+ * @param {*} data
+ * @Router /editor/sword/listorder [post]
+ */
+export const sortSearchWord = (data) => {
+  return service({
+    url: '/editor/sword/listorder',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 删除搜索关键词
+ * @param {*} data
+ * @Router /editor/sword/del [post]
+ */
+export const delSearchWord = (data) => {
+  return service({
+    url: '/editor/sword/del',
+    method: 'post',
+    data
+  })
+}

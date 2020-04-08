@@ -24,6 +24,18 @@ export const regist = (data) => {
   })
 }
 
+// @Summary 用户重置密码
+// @Produce  application/json
+// @Param data body {username:"string",password:"string","newPassword": "string"}
+// @Router /user/changePassword [post]
+export const userChangePwd = (data) => {
+  return service({
+    url: '/user/changePassword',
+    method: 'post',
+    data: data
+  })
+}
+
 // @Tags User
 // @Summary 分页获取用户列表
 // @Security ApiKeyAuth

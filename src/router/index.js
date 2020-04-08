@@ -20,6 +20,11 @@ const routes = [
     name: 'login',
     component: () => import(/* webpackChunkName: "login" */ '../views/auth/login.vue')
   },
+  {
+    path: '/resetPwd',
+    name: 'resetPwd',
+    component: () => import(/* webpackChunkName: "resetPwd" */ '../views/auth/resetPwd.vue')
+  },
   // {
   //   path: '/layout',
   //   redirect: 'layout/dashbord',

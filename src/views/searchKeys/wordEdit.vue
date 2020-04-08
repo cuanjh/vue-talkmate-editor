@@ -7,59 +7,8 @@
       </div>
       <div class="content">
         <el-form ref="form" :model="form" label-width="100px">
-          <!-- <el-form-item label="uuid: " prop="uuid" :rules="[
-            { required: true, message: 'uuid不能为空', trigger: 'blur'},
-            {pattern: /^[1-9a-zA-Z_]{1,}$/, message: '只允许输入字母或下划线！'}
-          ]">
-            <el-input v-model="form.uuid" maxlength="30" show-word-limit :disabled="type == 'edit'"></el-input>
-          </el-form-item> -->
-          <el-form-item label="名称: " prop="title" :rules="{ required: true, message: '名称不能为空', trigger: 'blur'}">
-            <el-row v-for="l in langInfos" :key="'title' + l.langKey">
-              <el-form-item  class="input-box" :prop="'title.' + l.langKey"
-                :rules="[{required: true, message: '名称不能为空', trigger: 'blur'}]">
-                <el-input v-model="form.title[l.langKey]" maxlength="30" show-word-limit></el-input>
-                <span>{{'(' + l.name + ')'}}</span>
-              </el-form-item>
-            </el-row>
-          </el-form-item>
-          <el-form-item label="是否展示: " prop="isShow"
-            :rules="[
-              { required: true, message: '请选择是否展示', trigger: 'change' }
-            ]
-          ">
-            <el-select v-model="form.isShow"
-              placeholder="请选择...">
-              <el-option label="是" :value="true"></el-option>
-              <el-option label="否" :value="false"></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="展示位置: " prop="isShow"
-            :rules="[
-              { required: true, message: '请选择展示位置', trigger: 'change' }
-            ]
-          ">
-            <el-select v-model="form.showPos"
-              placeholder="请选择...">
-              <el-option label="发现首页" value="index"></el-option>
-              <el-option label="列表页" value="list"></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="图标: ">
-            <div class="img-box small-img-box">
-              <div class="img">
-                <img v-if="form.icon" :src="assetsDomain + form.icon" fit="cover" />
-              </div>
-              <el-upload
-                action="#"
-                accept="image/png,image/jpg,image/jpeg"
-                :on-change="uploadOnchange"
-                :show-file-list="false"
-                :auto-upload="false">
-                <div id="upload-btn">
-                  <i class="el-icon-plus avatar-uploader-icon"></i>
-                </div>
-              </el-upload>
-            </div>
+          <el-form-item label="关键词: " prop="word" :rules="{ required: true, message: '关键词不能为空', trigger: 'blur'}">
+            <el-input v-model="form.word" maxlength="30" show-word-limit></el-input>
           </el-form-item>
         </el-form>
         <div class="btns">
@@ -67,9 +16,9 @@
             class="cancel"
             @click="close()">取消</el-button>
           <el-button
-            class="determine active"
+            class="submit active"
             type="primary"
-            @click="determine()" >确定</el-button>
+            @click="submit()" >确定</el-button>
         </div>
       </div>
     </div>
@@ -79,12 +28,9 @@
 
 <script>
 import {
-  editDisChannel,
-  addDisChannel,
-  getInfoToken
+  editSearchWord,
+  addSearchWord
 } from '@/api/course'
-import { uploadQiniu } from '@/utils/uploadQiniu'
-import { mapState } from 'vuex'
 
 export default {
   props: ['tagTypes'],
@@ -95,60 +41,33 @@ export default {
       form: {
         uuid: '',
         listOrder: 0,
-        title: {},
-        isShow: true,
-        showPos: 'index',
-        icon: ''
+        word: ''
       },
       type: ''
     }
-  },
-  computed: {
-    ...mapState({
-      assetsDomain: state => state.course.assetsDomain,
-      langInfos: state => state.course.langInfos
-    })
-  },
-  created () {
   },
   methods: {
     show (params) {
       console.log(params)
       this.type = params.type
       this.showEdit = true
-      // 获取上传图片token
-      getInfoToken().then(res => {
-        this.token = res.data.token
-      })
       if (this.type === 'edit') {
         this.form = params.params
       } else {
         this.form = {
-          uuid: '',
-          listOrder: params.listOrder,
-          title: {},
-          isShow: true,
-          showPos: 'index',
-          icon: ''
+          word: ''
         }
       }
     },
     close () {
       this.showEdit = false
     },
-    async uploadOnchange (file, fileList) {
-      this.form.icon = ''
-      let ext = file.raw.name.split('.')[1]
-      let url = 'discovery/channel/images/' + file.uid + '.' + ext
-      let res = await uploadQiniu(file.raw, this.token, url)
-      this.form.icon = res.key
-    },
-    determine () {
+    submit () {
       console.log(this.form)
       this.$refs['form'].validate((valid) => {
         if (valid) {
           if (this.type === 'edit') {
-            editDisChannel(this.form).then(res => {
+            editSearchWord(this.form).then(res => {
               console.log(res)
               if (res.success) {
                 this.$message({
@@ -160,7 +79,7 @@ export default {
               }
             })
           } else {
-            addDisChannel(this.form).then(res => {
+            addSearchWord({ word: this.form.word }).then(res => {
               console.log(res)
               if (res.success) {
                 this.$message({
@@ -393,27 +312,4 @@ export default {
     margin-right: 20px;
   }
 }
-</style>
-<style>
-/* .channel-edit-container .el-input {
-  width: 80%;
-  margin-right: 10px;
-}
-.channel-edit-container .el-form-item {
-  display: flex;
-  width: 100%;
-}
-.channel-edit-container .el-form-item__content {
-  width: 90%;
-}
-.channel-edit-container .el-textarea {
-  width: 80%;
-  margin-right: 10px;
-}
-.channel-edit-container .el-form-item__label {
-  width: 60px;
-}
-.channel-edit-container .el-select {
-  width: 30%;
-} */
 </style>

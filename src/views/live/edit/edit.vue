@@ -60,8 +60,8 @@
                 <el-option v-for="item in livePrices" :key="item.value" :label="item.text" :value="item.value"></el-option>
               </el-select>
             </el-form-item>
-            <el-tag type="warning">注：折后价必须小于等于原价，折后价等于原价说明”不打折“，折后价等于0说明”0元限免“</el-tag>
           </div>
+          <el-tag type="warning">注：折后价必须小于等于原价，折后价等于原价说明”不打折“，折后价等于0说明”0元限免“</el-tag>
         </el-form-item>
         <el-form-item label="讲师照片" prop="teacherPhoto"
           :rules="[
@@ -91,7 +91,7 @@
           :rules="[
             { required: true, message: '讲师简介不能为空'}
           ]">
-          <el-input type="textarea" v-model="form.teacherDesc" maxlength="120" show-word-limit></el-input>
+          <el-input style="width: 600px" type="textarea" v-model="form.teacherDesc" maxlength="120" show-word-limit></el-input>
         </el-form-item>
         <el-form-item label="宣传视频" prop="videoUrl"
           :rules="[
@@ -150,6 +150,7 @@
           <el-date-picker
             v-model="form.date"
             @change="changeDate"
+            :disabled="form.courses.slice(0, form.courseSlice).filter(c => { return c.state === 0 || c.state === -1 }).length > 0"
             type="daterange"
             range-separator="至"
             start-placeholder="开始日期"
@@ -187,7 +188,7 @@
           :label="course.date + ' 周' + form.liveRate.find(item => { return item.id == course.week })['text'] + ' 第' + (index + 1) + '课'"
           v-for="(course, index) in form.courses.slice(0, form.courseSlice)"
           :key="'course' + index">
-          <el-input v-model="form.courses[index].title"></el-input>
+          <el-input :disabled="form.courses[index].state === -1" v-model="form.courses[index].title"></el-input>
         </el-form-item>
       </div>
       <el-form-item class="btn-area">
@@ -232,7 +233,10 @@ export default {
         videoCoverUrl: '',
         posterUrl: '',
         date: [],
-        time: [],
+        time: [
+          new Date(),
+          new Date()
+        ],
         liveRate: [
           {
             id: '1',
@@ -278,24 +282,29 @@ export default {
   },
   mounted () {
     console.log(this.$route)
-    let newDate = new Date()
-    this.form.time.push(newDate)
-    this.form.time.push(newDate)
-    this.flag = this.$route.query.flag
-    if (this.flag === 'edit') {
-      this.initEditInfo()
-    }
     getInfoToken().then(res => {
       this.token = res.data.token
     })
     getDisChannelList().then(res => {
       console.log(res)
-      this.disChannels = res.data.channels
+      this.disChannels = res.data.channels.filter(c => {
+        return c.title['zh-CN'].indexOf('直播') > -1
+      })
     })
     this.langList = []
     getLangList({ 'pageNo': 0, 'pageSize': 999 }).then(res => {
       console.log(res)
       this.assetsUrl = res.data.assetsUrl
+      let langs = res.data.langs
+      langs = langs.sort((a, b) => {
+        if (a.is_hot > b.is_hot) {
+          return -1
+        } else if (a.is_hot < b.is_hot) {
+          return 1
+        } else {
+          return 0
+        }
+      })
       this.langList.push({
         lan_code: 'ALL',
         title: {
@@ -303,8 +312,12 @@ export default {
           'zh-CN': '所有语种'
         }
       })
-      this.langList = [...this.langList, ...res.data.langs]
+      this.langList = [...this.langList, ...langs]
     })
+    this.flag = this.$route.query.flag
+    if (this.flag === 'edit') {
+      this.initEditInfo()
+    }
   },
   computed: {
     ...mapState({
@@ -314,13 +327,12 @@ export default {
   },
   methods: {
     initEditInfo () {
-      this.code = this.$route.query.code
       let liveRooms = localStorage.getItem('storage_liveRooms')
       if (liveRooms) {
         liveRooms = JSON.parse(liveRooms)
-        this.roomInfo = liveRooms.find(item => {
-          return item.code === this.code
-        })
+        console.log(liveRooms)
+        this.roomInfo = liveRooms.room
+        this.code = this.roomInfo.code
         this.form.moduleName = this.roomInfo.module_name
         this.form.lanCode = this.roomInfo.lan_code
         this.form.tagKeys = this.roomInfo.tag_keys
@@ -335,8 +347,11 @@ export default {
         this.form.posterUrl = this.roomInfo.liveInfo.posters[0]
         this.form.date.push(this.roomInfo.liveInfo.startDate)
         this.form.date.push(this.roomInfo.liveInfo.endDate)
-        this.form.time[0] = (new Date(this.roomInfo.liveInfo.startDate + ' ' + this.roomInfo.liveInfo.startTime))
-        this.form.time[1] = (new Date(this.roomInfo.liveInfo.startDate + ' ' + this.roomInfo.liveInfo.endTime))
+        this.form.time = []
+        let startTime = new Date(this.roomInfo.liveInfo.startDate + ' ' + this.roomInfo.liveInfo.startTime)
+        this.form.time[0] = this.isValidDate(startTime) ? startTime : new Date()
+        let endTime = new Date(this.roomInfo.liveInfo.startDate + ' ' + this.roomInfo.liveInfo.endTime)
+        this.form.time[1] = this.isValidDate(endTime) ? endTime : new Date()
         if (this.roomInfo.liveInfo.weekDays && this.roomInfo.liveInfo.weekDays.length) {
           this.roomInfo.liveInfo.weekDays.forEach(w => {
             let index = this.form.liveRate.findIndex(r => {
@@ -345,7 +360,7 @@ export default {
             this.form.liveRate[index].selected = true
           })
         }
-        this.form.courses = this.roomInfo.courses
+        this.form.courses = liveRooms.courses
         this.generateCourses()
         console.log(this.roomInfo)
       }
@@ -356,17 +371,19 @@ export default {
           let courses = []
           let listOrder = 1
           this.form.courses.slice(0, this.form.courseSlice).forEach(item => {
-            let startTime = (new Date(item.date + ' ' + moment(this.form.time[0]).format('HH:mm:ss'))).getTime()
-            let endTime = (new Date(item.date + ' ' + moment(this.form.time[1]).format('HH:mm:ss'))).getTime()
+            let startTime = (new Date(item.date + ' ' + moment(this.form.time[0]).format('HH:mm:ss'))).getTime() / 1000
+            let endTime = (new Date(item.date + ' ' + moment(this.form.time[1]).format('HH:mm:ss'))).getTime() / 1000
             let obj = {
-              EndTime: endTime,
+              EndTime: item.state === 0 ? endTime : item.EndTime,
+              courseCode: this.code,
               cover: this.form.coverV2,
               date: item.date,
               lanCode: this.form.lanCode,
               listOrder: listOrder,
-              startTime: startTime,
+              startTime: item.state === 0 ? startTime : item.startTime,
               title: item.title,
-              uuid: item.uuid
+              uuid: item.uuid,
+              state: item.state
             }
             courses.push(obj)
             listOrder++
@@ -436,8 +453,18 @@ export default {
       })
     },
     selLiveRate (item) {
+      if (this.form.courses.length && this.form.courses.filter(c => c.state === 0 || c.state === -1).length) {
+        this.$message({
+          type: 'warning',
+          message: '直播课程已经开始，不能调整直播频率！'
+        })
+        return false
+      }
       let index = parseInt(item.id)
       let selected = item.selected
+      if (index === 0) {
+        index = 7
+      }
       this.form.liveRate[index - 1].selected = !selected
       this.generateCourses()
     },
@@ -492,6 +519,9 @@ export default {
       }
       let res = await uploadQiniu(file.raw, this.token, url)
       this.$set(this.form, feild, res.key)
+    },
+    isValidDate (date) {
+      return date instanceof Date && !isNaN(date.getTime())
     }
   }
 }
@@ -525,7 +555,7 @@ export default {
 }
 
 .price-item {
-  margin: 10px;
+  margin: 20px;
   label {
     width: 60px;
     display: inline-block;
@@ -567,6 +597,9 @@ export default {
 .btn-area {
   margin: 80px 0;
   text-align: center;
+}
+.el-input {
+  width: 600px;
 }
 </style>
 

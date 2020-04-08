@@ -8,8 +8,8 @@
             <span class="desc-talkmate"></span>
             <span class="desc text">欢迎使用全球说编辑器系统</span>
           </div>
-          <el-main class="login-box" v-if="isLogin">
-            <div class="talkmate-log"></div>
+          <el-main class="login-box">
+            <h1>忘记密码</h1>
             <form>
               <div class="form-group text-group" id="text-icon" :class="{'active': addNameCls == true}">
                 <i class="font_family icon-accout" ></i>
@@ -17,76 +17,70 @@
                       :placeholder="'请输入用户名'"
                       @focus="onFocusName()"
                       @blur.prevent="blurTextFn()"
-                      v-model="loginForm.username">
+                      v-model="form.username">
               </div>
               <div class="form-group password-group" id="pwd-icon" :class="{'active': addPwdCls == true}">
                 <i class="font_family icon-password"></i>
-                <input type="password" id="password"
-                      :placeholder="'请输入密码'"
+                <input type="password" id="old-password"
+                      :placeholder="'请输入旧密码'"
                       @focus="onFocusPwd()"
                       @blur.prevent="blurTextFn()"
-                      v-model="loginForm.password"
-                      @keyup.enter="login()">
+                      v-model="form.password">
               </div>
-              <div class="forget">
-                <a href="javascript:;" @click="linkToForget()"><span>忘记密码了？</span></a>
+              <div class="form-group password-group" id="pwd-icon" :class="{'active': addNewPwdCls == true}">
+                <i class="font_family icon-password"></i>
+                <input type="password" id="new-password"
+                      :placeholder="'请输入新密码'"
+                      @focus="onFocusNewPwd()"
+                      @blur.prevent="blurTextFn()"
+                      v-model="form.newPassword"
+                      @keyup.enter="resetPwd()">
               </div>
               <div class="btn_login">
-                <button type="button" class="login-btn-panel" @click="login()">登 录</button>
+                <button type="button" class="login-btn-panel" @click="resetPwd()">重置</button>
                 <i class="box-shadow"></i>
               </div>
             </form>
-            <a class="go-register" href="javascript:;" @click="goRegister()"><span>去注册</span></a>
+            <a class="go-login" href="javascript:;" @click="goLogin()"><span>返回登录页</span></a>
           </el-main>
-          <register v-else @haveGoLogin="haveGoLogin"/>
         </section>
       </div>
-      <!-- <forget @goBack="goBack"/> -->
     </div>
   </el-container>
 </template>
 
 <script>
-import { mapActions } from 'vuex'
-import Register from './register'
-// import Forget from './forget'
-
+import {
+  userChangePwd
+} from '@/api/user'
 export default {
-  name: 'Login',
   data () {
     return {
-      isLogin: true,
       isSavePwd: false, // 记住密码
       addNameCls: false,
       addPwdCls: false,
-      loginForm: {
+      addNewPwdCls: false,
+      form: {
         username: '',
-        password: ''
+        password: '',
+        newPassword: ''
       }
     }
   },
-  components: {
-    Register
-  },
   methods: {
-    ...mapActions('user', ['LoginIn']),
-    async login () {
-      await this.LoginIn(this.loginForm)
+    goLogin () {
+      this.$router.push({ name: 'login' })
     },
-    // 去注册
-    goRegister () {
-      this.isLogin = false
-    },
-    // 登录
-    haveGoLogin () {
-      this.isLogin = true
-    },
-    // 忘记密码
-    linkToForget () {
-      this.$router.push({ name: 'resetPwd' })
-    },
-    goBack () {
-      this.isShowForget = false
+    // 用户重置密码
+    resetPwd () {
+      let params = {
+        newPassword: this.form.newPassword,
+        password: this.form.password,
+        username: this.form.username
+      }
+      userChangePwd(params).then(res => {
+        console.log(res)
+      })
     },
     onFocusName () {
       this.addNameCls = true
@@ -94,16 +88,24 @@ export default {
     onFocusPwd () {
       this.addPwdCls = true
     },
+    onFocusNewPwd () {
+      this.addNewPwdCls = true
+    },
     blurTextFn () {
-      if (this.loginForm.username !== '') {
+      if (this.form.username !== '') {
         this.addNameCls = true
       } else {
         this.addNameCls = false
       }
-      if (this.loginForm.password !== '') {
+      if (this.form.password !== '') {
         this.addPwdCls = true
       } else {
         this.addPwdCls = false
+      }
+      if (this.form.newPassword !== '') {
+        this.addNewPwdCls = true
+      } else {
+        this.addNewPwdCls = false
       }
     }
   }
@@ -111,44 +113,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.font_family {
-  font-size: 20px;
-}
-input {
-  width: 323px;
-  height: 38px;
-  background-color: #fff!important;
-  -webkit-appearance: textfield;
-  -webkit-rtl-ordering: logical;
-  padding: 0;
-  border: none;
-  outline: none!important;
-  color: #050505;
-  font-size: 14px;
-  border-radius: 0;
-  border-bottom: 1px solid #D2D2D2;
-  padding-left: 40px;
-  font-weight: 400;
-  ::placeholder {
-    font-size: 16px;
-    font-weight: 500;
-    color: #D2D2D2;
-  }
-}
-button:focus{outline:0;}
-input::-webkit-input-placeholder { /* WebKit browsers */
-  color: #D2D2D2;
-}
-input:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
-  color: #D2D2D2;
-}
-input::-moz-placeholder { /* Mozilla Firefox 19+ */
-  color: #D2D2D2;
-}
-input:-ms-input-placeholder { /* Internet Explorer 10+ */
-  color: #D2D2D2;
-}
-
 .login-regist-box {
   background: #F7F7F7;
   width:100%;
@@ -161,7 +125,7 @@ input:-ms-input-placeholder { /* Internet Explorer 10+ */
     width: 100%;
     height: 100%;
   }
-  .login_form {
+    .login_form {
     width: 100%;
     height: 100%;
   }
@@ -226,25 +190,62 @@ input:-ms-input-placeholder { /* Internet Explorer 10+ */
     }
   }
 }
+.font_family {
+  font-size: 20px;
+}
+input {
+  width: 323px;
+  height: 38px;
+  background-color: #fff!important;
+  -webkit-appearance: textfield;
+  -webkit-rtl-ordering: logical;
+  padding: 0;
+  border: none;
+  outline: none!important;
+  color: #050505;
+  font-size: 14px;
+  border-radius: 0;
+  border-bottom: 1px solid #D2D2D2;
+  padding-left: 40px;
+  font-weight: 400;
+  ::placeholder {
+    font-size: 16px;
+    font-weight: 500;
+    color: #D2D2D2;
+  }
+}
+button:focus{outline:0;}
+input::-webkit-input-placeholder { /* WebKit browsers */
+  color: #D2D2D2;
+}
+input:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+  color: #D2D2D2;
+}
+input::-moz-placeholder { /* Mozilla Firefox 19+ */
+  color: #D2D2D2;
+}
+input:-ms-input-placeholder { /* Internet Explorer 10+ */
+  color: #D2D2D2;
+}
 .login-box {
   position: relative;
   padding: 48px 74px 0;
+  h1 {
+    font-size:24px;
+    font-weight:600;
+    color:rgba(0,0,0,1);
+    line-height:33px;
+    margin-bottom: 60px;
+  }
   form {
     margin-bottom: 20px;
-  }
-  .talkmate-log {
-    width:217px;
-    height:41px;
-    background: url('../../assets/images/login/icon-talkmate-logo.png') no-repeat center;
-    background-size: cover;
-    margin: 0 auto 50px;
   }
   .btn_login {
     position: relative;
   }
   .form-group {
     position: relative;
-    margin-bottom: 36px;
+    margin-bottom: 16px;
     outline:none;
     i {
       color: #D2D2D2;
@@ -262,14 +263,10 @@ input:-ms-input-placeholder { /* Internet Explorer 10+ */
       }
     }
   }
-  .form-group.password-group {
-    position: relative;
-    margin-bottom: 14px;
-  }
 }
 button {
   position: relative;
-  margin-top: 85px;
+  margin-top: 48px;
   line-height: 50px;
   font-size: 16px;
   font-weight: 400;
@@ -305,7 +302,7 @@ button {
     color: #5B5B5B;
   }
 }
-.go-register {
+.go-login {
   font-size:16px;
   font-weight:400;
   color:rgba(0,0,0,1);

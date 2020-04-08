@@ -27,6 +27,7 @@
                   </span>
                 </el-dropdown-item>
                 <el-dropdown-item @click.native="toPerson" icon="el-icon-s-custom">个人信息</el-dropdown-item>
+                <el-dropdown-item @click.native="toChangePwd" icon="el-icon-edit">修改密码</el-dropdown-item>
                 <el-dropdown-item @click.native="LoginOut" icon="el-icon-table-lamp">退 出</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
@@ -75,6 +76,9 @@ export default {
     },
     toPerson () {
       this.$router.push({ name: 'person' })
+    },
+    toChangePwd () {
+      this.$router.push({ name: 'changePwd' })
     }
   },
   computed: {

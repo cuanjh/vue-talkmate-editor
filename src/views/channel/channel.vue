@@ -120,7 +120,6 @@ export default {
         }
         return flag
       })
-      this.handleCurrentChange(1)
     },
     // 添加
     addChannel () {

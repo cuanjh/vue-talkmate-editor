@@ -6,10 +6,9 @@
           <i class="el-icon-close"></i>
         </div>
         <div class="content">
-          <div class="item" v-for="item in groupChannels" :key="item.showPos">
-            <el-divider>{{ item.showPos == "index" ? '发现首页排序' : '列表页排序' }}</el-divider>
-            <div class="sort-container" :id="'sort-channel-' + item.showPos">
-              <el-tag :data-id="index" v-for="(c, index) in item.data" :key="c.uuid">{{ c.title['' + locale + '']}}</el-tag>
+          <div class="item">
+            <div class="sort-container" id="sort-words">
+              <el-tag :data-id="index" v-for="(item, index) in allWords" :key="item.uuid">{{ item.word }}</el-tag>
             </div>
           </div>
         </div>
@@ -28,7 +27,7 @@
 import Sortable from 'sortablejs'
 import { mapState } from 'vuex'
 import {
-  sortDisChannel
+  sortSearchWord
 } from '@/api/course'
 
 export default {
@@ -36,8 +35,8 @@ export default {
     return {
       isShow: false,
       sortable: {},
-      groupChannels: [],
-      sortContents: {}
+      allWords: [],
+      sortContents: []
     }
   },
   computed: {
@@ -48,68 +47,38 @@ export default {
   methods: {
     show (params) {
       console.log(params)
-      this.sortContents = {}
-      let map = {}
-      let dest = []
-      for (let i = 0; i < params.length; i++) {
-        let ai = params[i]
-        if (!map[ai.showPos]) {
-          dest.push({
-            showPos: ai.showPos,
-            data: [ai]
-          })
-          map[ai.showPos] = ai
-        } else {
-          for (let j = 0; j < dest.length; j++) {
-            var dj = dest[j]
-            if (dj.showPos === ai.showPos) {
-              dj.data.push(ai)
-              break
-            }
-          }
-        }
+      this.sortContents = []
+      this.allWords = params.allWords
+      if (this.allWords.length) {
+        setTimeout(() => {
+          this.resetSortable()
+        }, 100)
       }
-      this.groupChannels = []
-      if (dest.length) {
-        dest.forEach(d => {
-          let obj = d
-          obj.data = obj.data.sort((a, b) => {
-            return a.listOrder - b.listOrder
-          })
-          this.groupChannels.push(obj)
-          setTimeout(() => {
-            this.sortContents[obj.showPos] = []
-            this.resetSortable(obj.showPos)
-          }, 100)
-        })
-      }
-      console.log(this.groupChannels)
       this.isShow = true
     },
     close () {
       this.isShow = false
       this.$emit('refresh')
     },
-    resetSortable (showPos) {
+    resetSortable () {
       /* eslint-disable */
-      let el = document.getElementById('sort-channel-' + showPos)
-      this.sortable[showPos] = new Sortable(el, {
+      let el = document.getElementById('sort-words')
+      this.sortable = new Sortable(el, {
         animation: 150,
         onEnd: (evt) => {
+          this.sortContents = []
           let toId = evt.to.id
-          let showPos = toId.split('-').pop()
-          this.sortContents[showPos] = []
-          let copyContents = this.groupChannels.find(item => {
-            return item.showPos === showPos
-          }).data
+          let copyContents = this.allWords
           console.log(copyContents)
-          let indexArr = this.sortable[showPos].toArray()
+          let indexArr = this.sortable.toArray()
           console.log(indexArr)
+          let time = parseInt((new Date()).getTime() / 1000)
           indexArr.forEach((item, index) => {
             let obj = copyContents[parseInt(item)]
-            this.sortContents[showPos].push({
+            this.sortContents.push({
               uuid: obj.uuid,
-              listOrder: index + 1
+              word: obj.word,
+              listOrder: time--
             })
           })
           console.log(this.sortContents)
@@ -118,11 +87,7 @@ export default {
       /* eslint-enable */
     },
     save () {
-      let arr = []
-      Object.keys(this.sortContents).forEach(key => {
-        arr = [...arr, ...this.sortContents['' + key + '']]
-      })
-      sortDisChannel(arr).then(res => {
+      sortSearchWord(this.sortContents).then(res => {
         if (res.success) {
           this.$message({
             type: 'success',
