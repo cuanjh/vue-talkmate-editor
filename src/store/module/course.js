@@ -23,6 +23,7 @@ export const course = {
     },
     locale: 'zh-CN',
     assetsDomain: '',
+    uploadfileDomain: '',
     langInfos: [],
     langList: [],
     selLangState: '',
@@ -79,6 +80,7 @@ export const course = {
     updateConfigInfo (state, configInfo) {
       state.langInfos = configInfo.langInfos
       state.assetsDomain = configInfo.assetsDomain + '/'
+      state.uploadfileDomain = configInfo.uploadfileDomain + '/'
     },
     updateLangList (state, langs) {
       state.langList = langs

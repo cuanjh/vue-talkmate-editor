@@ -34,7 +34,7 @@
             :show-file-list="false"
             :auto-upload="false">
             <div class="upload-area" @click="setUploadField('image,coverV2')">
-              <img v-if="form.coverV2" :src="assetsUrl + form.coverV2" class="cover">
+              <img v-if="form.coverV2" :src="uploadfileDomain + form.coverV2" class="cover">
               <i v-else class="el-icon-plus cover-uploader-icon"></i>
             </div>
           </el-upload>
@@ -75,7 +75,7 @@
             :show-file-list="false"
             :auto-upload="false">
             <div class="upload-area" @click="setUploadField('image,teacherPhoto')">
-              <img v-if="form.teacherPhoto" :src="assetsUrl + form.teacherPhoto" class="teacher">
+              <img v-if="form.teacherPhoto" :src="uploadfileDomain + form.teacherPhoto" class="teacher">
               <i v-else class="el-icon-plus teacher-uploader-icon"></i>
             </div>
           </el-upload>
@@ -98,7 +98,7 @@
             { required: true, message: '请上传宣传视频'}
           ]">
           <div class="video" v-if="form.videoUrl">
-            <video :src="assetsUrl + form.videoUrl" controls></video>
+            <video :src="uploadfileDomain + form.videoUrl" controls></video>
           </div>
           <el-upload
             action="#"
@@ -121,7 +121,7 @@
             :show-file-list="false"
             :auto-upload="false">
             <div class="upload-area" @click="setUploadField('image,videoCoverUrl')">
-              <img v-if="form.videoCoverUrl" :src="assetsUrl + form.videoCoverUrl" class="cover">
+              <img v-if="form.videoCoverUrl" :src="uploadfileDomain + form.videoCoverUrl" class="cover">
               <i v-else class="el-icon-plus cover-uploader-icon"></i>
             </div>
           </el-upload>
@@ -138,7 +138,7 @@
             :show-file-list="false"
             :auto-upload="false">
             <div class="upload-area" @click="setUploadField('image,posterUrl')">
-              <img v-if="form.posterUrl" :src="assetsUrl + form.posterUrl" class="cover">
+              <img v-if="form.posterUrl" :src="uploadfileDomain + form.posterUrl" class="cover">
               <i v-else class="el-icon-plus cover-uploader-icon"></i>
             </div>
           </el-upload>
@@ -203,7 +203,7 @@ import moment from 'moment'
 import { uploadQiniu } from '@/utils/uploadQiniu'
 import {
   getLangList,
-  getInfoToken,
+  getInfoTokenUploadFile,
   getDisChannelList,
   addLive,
   editLive
@@ -218,7 +218,6 @@ export default {
       langList: [],
       disChannels: [],
       uploadField: '',
-      assetsUrl: '',
       token: '',
       form: {
         moduleName: '',
@@ -282,7 +281,8 @@ export default {
   },
   mounted () {
     console.log(this.$route)
-    getInfoToken().then(res => {
+    getInfoTokenUploadFile().then(res => {
+      console.log(res)
       this.token = res.data.token
     })
     getDisChannelList().then(res => {
@@ -294,7 +294,6 @@ export default {
     this.langList = []
     getLangList({ 'pageNo': 0, 'pageSize': 999 }).then(res => {
       console.log(res)
-      this.assetsUrl = res.data.assetsUrl
       let langs = res.data.langs
       langs = langs.sort((a, b) => {
         if (a.is_hot > b.is_hot) {
@@ -322,7 +321,8 @@ export default {
   computed: {
     ...mapState({
       locale: state => state.course.locale,
-      livePrices: state => state.course.livePrices
+      livePrices: state => state.course.livePrices,
+      uploadfileDomain: state => state.course.uploadfileDomain
     })
   },
   methods: {

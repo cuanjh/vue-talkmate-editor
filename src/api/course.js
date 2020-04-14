@@ -22,6 +22,17 @@ export const getInfoToken = () => {
   })
 }
 
+// @Summary 获取上传课程资料的七牛Token(uploadfile bucket)
+// @Produce  application/json
+// @Param none
+// @Router /editor/info/token/uploadfile [get]
+export const getInfoTokenUploadFile = () => {
+  return service({
+    url: '/editor/info/token/uploadfile',
+    method: 'get'
+  })
+}
+
 // @Summary 获取语种列表
 // @Produce  application/json
 // @Param { \"pageNo\": 0, \"pageSize\": 100}

@@ -40,7 +40,7 @@
             <el-image
               v-show="scope.row.room.cover_v2"
               style="width: 157px; height: 88px"
-              :src="assetsDomain + scope.row.room.cover_v2"
+              :src="uploadfileDomain + scope.row.room.cover_v2"
               lazy
               fit="cover">
             </el-image>
@@ -134,7 +134,7 @@ export default {
   },
   computed: {
     ...mapState({
-      assetsDomain: state => state.course.assetsDomain
+      uploadfileDomain: state => state.course.uploadfileDomain
     })
   },
   methods: {
