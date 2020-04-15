@@ -305,6 +305,7 @@ export default {
         this.form.content_model = folder.content_model
         this.form.type = folder.type
         this.form.list_order = folder.list_order
+        this.changeAttrTag()
       }
     },
     onSubmit () {

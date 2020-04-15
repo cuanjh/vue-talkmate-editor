@@ -272,9 +272,8 @@ export default {
       if (!this.isHideCatalog1 && !this.isShowEditFile) {
         width = '97%'
       } else {
-        width = this.tracks.length > 1 ? '401px' : (this.tracks.length > 2 ? '602px' : 'auto')
+        width = this.tracks.length < 3 ? '401px' : (this.tracks.length > 2 ? '602px' : 'auto')
       }
-      console.log(width)
       return width
     },
     versions () {
