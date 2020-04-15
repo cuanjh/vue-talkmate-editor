@@ -395,6 +395,7 @@ export default {
         uuid: '',
         name: '',
         title: {},
+        goalTitle: '',
         desc: {},
         is_show: true,
         flag: [],

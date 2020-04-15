@@ -287,6 +287,7 @@ export default {
         this.tags = folder.tags ? folder.tags : []
         this.form.name = folder.name
         this.form.title = folder.title
+        this.form.goalTitle = folder.goalTitle
         this.form.desc = folder.desc
         this.form.flag = folder.flag
         this.form.cover = folder.cover
@@ -389,6 +390,7 @@ export default {
         uuid: '',
         name: '',
         title: {},
+        goalTitle: '',
         desc: {},
         is_show: true,
         flag: [],
