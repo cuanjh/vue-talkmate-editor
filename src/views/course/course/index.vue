@@ -6,6 +6,8 @@
         default-first-option
         placeholder="请选择语种"
         @change="curCourse">
+        <el-option label="所有语种" value="">
+        </el-option>
         <el-option
           v-for="item in langList"
           :key="item['lan_code']"
@@ -13,17 +15,31 @@
           :value="item['lan_code']">
         </el-option>
       </el-select>
-      <el-button v-show="userInfo.authority.authorityId == '1' || userInfo.authority.authorityId == '2'"
-        style="outline:none;"
-        type="primary"
-        class="btnAdd"
-        :disabled="courseList && courseList.length == 2"
-        @click="addCourse">添加</el-button>
+      <div class="right">
+        <el-button v-show="userInfo.authority.authorityId == '1' || userInfo.authority.authorityId == '2'"
+          style="outline:none;"
+          type="primary"
+          class="btnAdd"
+          :disabled="courseList && courseList.length == 2"
+          @click="addCourse">添加</el-button>
+        <el-button v-show="userInfo.authority.authorityId == '1' || userInfo.authority.authorityId == '2'"
+          style="outline:none;"
+          type="success"
+          class="btnOnline"
+          :disabled="courseList && courseList.length == 2"
+          @click="onlineCourse">批量上线</el-button>
+      </div>
     </div>
     <el-table
       class="course-table"
       :data="courseList"
+      @select="select"
+      @select-all="selectAll"
       style="width: 100%;">
+      <el-table-column
+        type="selection"
+        width="55">
+      </el-table-column>
       <el-table-column
         width="60"
         label="序号"
@@ -104,7 +120,8 @@ import { mapGetters, mapActions, mapState } from 'vuex'
 import {
   getCourseList,
   courseEdit,
-  courseDel
+  courseDel,
+  onlineCourses
 } from '@/api/course'
 import EditComp from './edit'
 
@@ -112,6 +129,7 @@ export default {
   data () {
     return {
       courseList: [],
+      selCourseList: [],
       isShow: false
     }
   },
@@ -180,6 +198,13 @@ export default {
     },
     addCourse () {
       console.log(this.courseList)
+      if (this.version.selLang === '') {
+        this.$message({
+          type: 'info',
+          message: '请选择语种！'
+        })
+        return false
+      }
       let obj = {
         type: 'add',
         selLang: this.version.selLang
@@ -200,7 +225,6 @@ export default {
               message: '删除成功!'
             })
             this.initData()
-            this.getCourseTypes()
           }
         })
       }).catch(() => {
@@ -210,14 +234,49 @@ export default {
         })
       })
     },
+    onlineCourse (id) {
+      console.log(id)
+      this.$confirm('确定要上线吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        let arr = []
+        if (this.selCourseList.length) {
+          this.selCourseList.forEach(item => {
+            arr.push(item.code)
+          })
+        }
+        onlineCourses(arr).then(res => {
+          if (res.success) {
+            this.$message({
+              type: 'success',
+              message: '上线成功!'
+            })
+            this.selCourseList = []
+            this.initData()
+          }
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消上线'
+        })
+      })
+    },
     curCourse () {
       console.log(this.version.selLang)
       this.initData()
-      this.getCourseTypes()
     },
     imageUrl (image) {
       let url = this.assetsDomain + image
       return url
+    },
+    select (selection, row) {
+      this.selCourseList = selection
+    },
+    selectAll (selection) {
+      this.selCourseList = selection
     }
   }
 }
@@ -231,10 +290,17 @@ export default {
     margin-top: 20px;
   }
 
-  .btnAdd {
+  .right {
     float: right;
+  }
+  .btnAdd {
     width: 100px;
   }
+
+  .btnOnline {
+    width: 100px;
+  }
+
   .course-list {
     display: flex;
     flex-direction: row;

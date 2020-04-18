@@ -693,6 +693,19 @@ export const examin = (data) => {
 /**
  * @Summary 添加上线任务
  * @param {*} data
+ * @Router /editor/online/courseInfo [post]
+ */
+export const onlineCourses = (data) => {
+  return service({
+    url: '/editor/online/courseInfo',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 添加上线任务
+ * @param {*} data
  * @Router /editor/online/job [post]
  */
 export const addOnlineJob = (data) => {
