@@ -189,11 +189,11 @@ export default {
       if (Object.keys(this.bigFileRaw).length === 0) {
         return false // 如果为空,返回false
       }
-      console.log(this.bigFileRaw)
       let res1 = await getInfoToken()
       let token = res1.data.token
-      let url = 'course/coversV2/' + this.bigFileRaw.name
-      console.log(token, url, this.bigFileRaw.raw)
+      let arr = this.bigFileRaw.name.split('.')
+      let filename = arr[0] + '_' + this.bigFileRaw.uid + '.' + arr[1]
+      let url = 'course/coversV2/' + filename
       let res2 = await uploadQiniu(this.bigFileRaw.raw, token, url)
       console.log(res1, url, res2)
       if (this.type === 'add') {
@@ -220,8 +220,9 @@ export default {
       }
       let res1 = await getInfoToken()
       let token = res1.data.token
-      let url = 'course/icons/' + this.smlFileRaw.name
-      console.log(token, url, this.smlFileRaw.raw)
+      let arr = this.smlFileRaw.name.split('.')
+      let filename = arr[0] + '_' + this.smlFileRaw.uid + '.' + arr[1]
+      let url = 'course/icons/' + filename
       let res2 = await uploadQiniu(this.smlFileRaw.raw, token, url)
       console.log(res1, url, res2)
       if (this.type === 'add') {

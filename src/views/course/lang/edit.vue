@@ -162,8 +162,9 @@ export default {
       }
       let res1 = await getInfoToken()
       let token = res1.data.token
-      let url = 'course/icons/' + this.fileRaw.name
-      console.log(token, url, this.fileRaw.raw)
+      let arr = this.fileRaw.name.split('.')
+      let filename = arr[0] + '_' + this.fileRaw.uid + '.' + arr[1]
+      let url = 'course/icons/' + filename
       let res2 = await uploadQiniu(this.fileRaw.raw, token, url)
       console.log(res1, url, res2)
       if (this.type === 'add') {
