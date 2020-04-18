@@ -26,7 +26,6 @@
           style="outline:none;"
           type="success"
           class="btnOnline"
-          :disabled="courseList && courseList.length == 2"
           @click="onlineCourse">批量上线</el-button>
       </div>
     </div>
@@ -285,6 +284,7 @@ export default {
 <style scoped lang="scss">
   .course-manage {
     padding: 20px;
+    overflow: auto;
   }
   .el-table {
     margin-top: 20px;
