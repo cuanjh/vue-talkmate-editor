@@ -23,6 +23,11 @@
                   <el-option :label="'已下课'" :disabled="props.row.courses[index].state == 0" :value="-1"></el-option>
                 </el-select>
               </div>
+              <div class="course-column">
+                <el-tooltip class="item" effect="dark" :content="c.livePushUrl" placement="top">
+                  <el-button type="primary" :disabled="c.livePushUrl == ''" class="btnPushLink" @click="copyLink(c)">复制推流链接</el-button>
+                </el-tooltip>
+              </div>
             </div>
           </div>
         </template>
@@ -100,6 +105,8 @@
 
 <script>
 import moment from 'moment'
+import Clipboard from 'clipboard'
+
 import {
   getLiveList,
   onlineLive,
@@ -182,7 +189,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        onlineLive({ code: row.code }).then(res => {
+        onlineLive({ code: row.room.code }).then(res => {
           if (res.success) {
             this.$message({
               type: 'success',
@@ -205,7 +212,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        offlineLive({ code: row.code }).then(res => {
+        offlineLive({ code: row.room.code }).then(res => {
           if (res.success) {
             this.$message({
               type: 'success',
@@ -275,6 +282,28 @@ export default {
       this.expandChange = []
       expandedRows.forEach(item => {
         this.expandChange.push(item.room.code)
+      })
+    },
+    // 复制推流链接
+    copyLink (c) {
+      let url = c.livePushUrl
+      let clipboard = new Clipboard('.btnPushLink', {
+        text: () => {
+          return url
+        }
+      })
+      clipboard.on('success', e => {
+        this.$message({
+          type: 'success',
+          message: '复制成功'
+        })
+      })
+      clipboard.on('error', e => {
+        this.$message({
+          type: 'error',
+          message: '复制失败'
+        })
+        clipboard.destroy()
       })
     }
   }
