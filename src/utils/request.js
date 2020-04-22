@@ -35,10 +35,24 @@ const closeLoading = () => {
 service.interceptors.request.use(
   config => {
     showLoading()
+    let contentType = 'application/json'
+    if (config.headers['Content-Type'] && config.headers['Content-Type'] === 'multipart/form-data') {
+      contentType = 'multipart/form-data'
+      let form = new FormData()
+      if (config.data) {
+        let keys = Object.keys(config.data)
+        keys.forEach(key => {
+          form.append(key, config.data[key])
+        })
+        config.data = form
+      }
+    } else {
+      config.data = JSON.stringify(config.data)
+    }
+
     const token = store.getters['user/token']
-    config.data = JSON.stringify(config.data)
     config.headers = {
-      'Content-Type': 'application/json',
+      'Content-Type': contentType,
       'x-token': token
     }
     return config

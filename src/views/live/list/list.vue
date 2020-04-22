@@ -79,7 +79,7 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="280" fixed="right">
+      <el-table-column label="操作" width="380" fixed="right">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -97,15 +97,21 @@
             size="mini"
             type="warning"
             @click="handleOffline(scope.$index, scope.row)">下架</el-button>
+          <el-button
+            size="mini"
+            type="primary"
+            @click="handleShare(scope.$index, scope.row)">分享海报</el-button>
         </template>
       </el-table-column>
     </el-table>
+    <share ref="share" />
   </div>
 </template>
 
 <script>
 import moment from 'moment'
 import Clipboard from 'clipboard'
+import Share from './share'
 
 import {
   getLiveList,
@@ -135,6 +141,9 @@ export default {
       },
       expandRowKeys: []
     }
+  },
+  components: {
+    Share
   },
   mounted () {
     this.initData()
@@ -227,6 +236,10 @@ export default {
           message: '已取消下架'
         })
       })
+    },
+    // 分享海报
+    handleShare (index, row) {
+      this.$refs['share'].show(row)
     },
     formatCourseDate (item) {
       let result = ''

@@ -897,6 +897,22 @@ export const delLive = (data) => {
 }
 
 /**
+ * @Summary 分享直播海报制作
+ * @param {*} data
+ * @Router /live/shareinfo [post]
+ */
+export const sharePosterLive = (data) => {
+  return service({
+    url: '/live/shareinfo',
+    method: 'post',
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    },
+    data
+  })
+}
+
+/**
  * @Summary 直播房间列表
  * @param {*} data
  * @Router /live/list [post]
