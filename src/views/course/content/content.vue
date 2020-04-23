@@ -393,7 +393,6 @@ export default {
               if (authority && authority['auth']) {
                 flag = true
               }
-              flag = true
             } else if (item.copyAuthorities) {
               authority = item.copyAuthorities.find(a => { return a.user_uuid === this.userInfo.uuid })
               if (authority && authority['auth']) {
@@ -597,7 +596,6 @@ export default {
           auth = obj['auth']
         }
       }
-      auth = 'rw'
       if (this.userInfo.authorityId === '1' || auth === 'rw') {
         this.$refs['rightMenu'].show(params)
       }

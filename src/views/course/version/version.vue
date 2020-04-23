@@ -46,7 +46,7 @@
             <el-button type="primary" v-show="isHaveAuthority" :disabled="(userInfo.authorityId !== '1' && item.curUserAuth['auth'] == 'r')" icon="el-icon-setting" circle @click="editVersion(item)"></el-button>
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="复制" placement="top">
-            <el-button type="info" icon="el-icon-document-copy" :disabled="(userInfo.authorityId !== '1' && item.curUserAuth['auth'] == 'r')" circle @click="copyVersion(item)"></el-button>
+            <el-button type="info" v-show="isHaveAuthority" icon="el-icon-document-copy" :disabled="(userInfo.authorityId !== '1' && item.curUserAuth['auth'] == 'r')" circle @click="copyVersion(item)"></el-button>
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="上线" placement="top">
             <el-button type="success" v-show="isHaveAuthority" :disabled="!item.has_changed || (userInfo.authorityId !== '1' && item.curUserAuth['auth'] == 'r')" icon="el-icon-check" circle @click="onlineJob(item)"></el-button>

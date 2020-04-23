@@ -210,7 +210,7 @@ export default {
         this.authorities = []
         if (this.authorityUsers && this.authorityUsers.length) {
           this.authorityUsers.forEach(item => {
-            let auth = ''
+            let auth = '-1'
             if (params.folder.authorities) {
               let a = params.folder.authorities.find(i => {
                 return i.user_uuid === item.uuid
@@ -315,6 +315,9 @@ export default {
     // 权限设置
     authoritySetFn () {
       console.log(this.authorities)
+      this.authorities = this.authorities.filter(item => {
+        return item.authority !== '-1'
+      })
       let obj = {
         authorities: this.authorities,
         type: 'catalog',
