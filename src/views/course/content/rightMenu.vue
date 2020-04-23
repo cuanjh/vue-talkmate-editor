@@ -225,6 +225,10 @@ export default {
             }
             this.authorities.push(obj)
           })
+          this.authorities.push({
+            authority: 'rw',
+            user_uuid: this.userInfo.uuid
+          })
         }
 
         if (params.folder.authorities) {
