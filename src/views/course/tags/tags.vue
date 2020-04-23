@@ -3,7 +3,14 @@
     <div class="tags-content">
       <div class="top-bar">
         <el-input v-model="searchKey" @input="search" clearable placeholder="请输入要查找的key或名称"></el-input>
-        <el-button style="outline:none;" type="primary" class="btnAdd" @click="addTags()">添加</el-button>
+        <div class="right">
+          <el-button style="outline:none;" type="primary" class="btnAdd" @click="addTags()">添加</el-button>
+          <el-button
+            style="outline:none;"
+            type="success"
+            class="btnOnline"
+            @click="onlineCourse">上线</el-button>
+        </div>
       </div>
       <el-table
         :data="showTableData"
@@ -70,7 +77,8 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import {
-  delTags
+  delTags,
+  onlineCourses
 } from '@/api/course'
 import EditComp from './edit'
 import CropperDialog from '../../../components/common/cropper'
@@ -194,6 +202,29 @@ export default {
         this.$message({
           type: 'info',
           message: '已取消删除'
+        })
+      })
+    },
+    onlineCourse () {
+      this.$confirm('确定要上线吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        let arr = []
+        onlineCourses(arr).then(res => {
+          if (res.success) {
+            this.$message({
+              type: 'success',
+              message: '上线成功!'
+            })
+            this.initData()
+          }
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消上线'
         })
       })
     }
