@@ -275,7 +275,7 @@ export default {
         ],
         courses: [],
         courseSlice: 0,
-        tagKeys: []
+        tagKeys: ['course_listLive']
       }
     }
   },
@@ -288,7 +288,7 @@ export default {
     getDisChannelList().then(res => {
       console.log(res)
       this.disChannels = res.data.channels.filter(c => {
-        return c.title['zh-CN'].indexOf('直播') > -1
+        return c.uuid.toLowerCase().indexOf('live') > -1
       })
     })
     this.langList = []

@@ -192,15 +192,16 @@ export default {
       let res1 = await getInfoToken()
       let token = res1.data.token
       let arr = this.bigFileRaw.name.split('.')
-      let filename = arr[0] + '_' + this.bigFileRaw.uid + '.' + arr[1]
+      let filename = this.bigFileRaw.uid + '.' + arr[1]
       let url = 'course/coversV2/' + filename
       let res2 = await uploadQiniu(this.bigFileRaw.raw, token, url)
-      console.log(res1, url, res2)
-      if (this.type === 'add') {
-        this.form.cover.push(res2.key)
-      } else {
-        this.form.cover.unshift(res2.key)
-      }
+      this.form.cover = [res2.key]
+      // console.log(res1, url, res2)
+      // if (this.type === 'add') {
+      //   this.form.cover.push(res2.key)
+      // } else {
+      //   this.form.cover.unshift(res2.key)
+      // }
     },
     bigFileChange (file, fileList) {
       console.log(file)
@@ -221,15 +222,16 @@ export default {
       let res1 = await getInfoToken()
       let token = res1.data.token
       let arr = this.smlFileRaw.name.split('.')
-      let filename = arr[0] + '_' + this.smlFileRaw.uid + '.' + arr[1]
+      let filename = this.smlFileRaw.uid + '.' + arr[1]
       let url = 'course/icons/' + filename
       let res2 = await uploadQiniu(this.smlFileRaw.raw, token, url)
       console.log(res1, url, res2)
-      if (this.type === 'add') {
-        this.form.flag.push(res2.key)
-      } else {
-        this.form.flag.unshift(res2.key)
-      }
+      this.form.flag = [res2.key]
+      // if (this.type === 'add') {
+      //   this.form.flag.push(res2.key)
+      // } else {
+      //   this.form.flag.unshift(res2.key)
+      // }
     },
     smlFileChange (file, fileList) {
       console.log(file)
