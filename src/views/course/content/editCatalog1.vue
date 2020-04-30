@@ -133,7 +133,7 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item>
-          <div class="handler">
+          <div class="handler" v-show="!lowerRoleUser">
             <el-button type="primary" @click="onSubmit">保存</el-button>
             <el-button @click="close">取消</el-button>
           </div>
@@ -201,7 +201,8 @@ export default {
       modelList: state => state.course.modelList,
       contentTags: state => state.course.contentTags,
       version: state => state.course.version,
-      userInfo: state => state.user.userInfo
+      userInfo: state => state.user.userInfo,
+      lowerRoleUser: state => state.user.lowerRoleUser
     }),
     flagUrl () {
       let url = ''

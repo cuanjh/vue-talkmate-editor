@@ -952,6 +952,45 @@ export const offlineLiveCourse = (data) => {
 }
 
 /**
+ * @Summary 发送直播间聊天室消息
+ * @param {*} data
+ * @Router /live/chatroom/sendmsg [post]
+ */
+export const liveSendMsg = (data) => {
+  return service({
+    url: '/live/chatroom/sendmsg',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 获取直播间课程聊天室消息
+ * @param {*} data
+ * @Router /live/chatroom/comments [post]
+ */
+export const getChartroomComments = (data) => {
+  return service({
+    url: '/live/chatroom/comments',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 获取马甲用户
+ * @param {*} data
+ * @Router /live/chatroom/majia [get]
+ */
+export const getMajiaUsers = (data) => {
+  return service({
+    url: '/live/chatroom/majia',
+    method: 'get',
+    data
+  })
+}
+
+/**
  * @Summary 获取关键词列表
  * @param {*} data
  * @Router /editor/sword/list [post]

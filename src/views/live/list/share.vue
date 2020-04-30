@@ -1,9 +1,9 @@
 <template>
-  <el-dialog width="70%" title="制作分享海报" :visible.sync="dialogFormVisible">
+  <el-dialog width="70%" title="制作分享海报" :visible.sync="dialogFormVisible" @close="close">
     <el-row>
       <el-col :span="12">
         <el-form :model="form" :rules="rules" ref="form" label-width="120px">
-          <el-form-item label="分享网址" prop="jumpUrl">
+          <el-form-item label="分享网址">
             <el-input v-model="form.jumpUrl" placeholder="http://"></el-input>
           </el-form-item>
           <el-form-item label="背景图" prop="bgImg">
@@ -35,9 +35,12 @@
       </el-col>
       <el-col :span="12">
         <div class="qrcodePoster">
-          <el-image v-if="shareImageUrl" :src="shareImageUrl" fit="cover"></el-image>
+          <el-image v-if="shareImageUrl" :src="shareImageUrl" fit="cover" :preview-src-list="srcList"></el-image>
           <div v-else>此处为生成含二维码的海报</div>
         </div>
+        <el-dialog :visible.sync="dialogVisible" append-to-body>
+          <img width="100%" :src="dialogImageUrl" alt="">
+        </el-dialog>
       </el-col>
     </el-row>
     <div slot="footer" class="dialog-footer">
@@ -55,19 +58,19 @@ export default {
   data () {
     return {
       dialogFormVisible: false,
+      dialogImageUrl: '',
+      dialogVisible: false,
+      srcList: [],
       form: {
         courseCode: '',
-        jumpUrl: 'http://dev.api.talkmate.com:82/courseContent/indexKid.html?device_id=&user_id=&verify=&chapterCode=&chapterTitle=&isVip=&lang=&timestamp=',
+        jumpUrl: 'http://test-learn.talkmate.com:82/liveShare/index.html',
         bgImg: null,
-        qrCodeX: 176,
-        qrCodeY: 176,
+        qrCodeX: 170,
+        qrCodeY: 170,
         scaleX: 506,
         scaleY: 964
       },
       rules: {
-        jumpUrl: [
-          { required: true, message: '请输入分享网址', trigger: 'blur' }
-        ],
         bgImg: [
           { required: true, message: '请上传背景图', trigger: 'change' }
         ],
@@ -88,11 +91,17 @@ export default {
       fileList: []
     }
   },
+  computed: {
+    jumpUrl () {
+      return 'http://test-learn.talkmate.com:82/liveShare/index.html'
+    }
+  },
   methods: {
     show (params) {
       this.resetForm()
       this.form.courseCode = params.room.code
       this.shareImageUrl = params.room.liveInfo.shareBgUrl
+      this.srcList = [this.shareImageUrl]
       this.dialogFormVisible = true
     },
     changebgImag (file, fileList) {
@@ -102,10 +111,10 @@ export default {
       this.fileList = []
       this.form = {
         courseCode: '',
-        jumpUrl: 'http://dev.api.talkmate.com:82/courseContent/indexKid.html?device_id=&user_id=&verify=&chapterCode=&chapterTitle=&isVip=&lang=&timestamp=',
+        jumpUrl: 'http://test-learn.talkmate.com:82/liveShare/index.html',
         bgImg: null,
-        qrCodeX: 176,
-        qrCodeY: 176,
+        qrCodeX: 174,
+        qrCodeY: 174,
         scaleX: 506,
         scaleY: 964
       }
@@ -113,7 +122,6 @@ export default {
     submitForm () {
       this.$refs['form'].validate((valid) => {
         if (valid) {
-          console.log(this.form)
           sharePosterLive(this.form).then(res => {
             if (res.success) {
               this.$message({
@@ -121,10 +129,18 @@ export default {
                 message: '生成成功'
               })
               this.shareImageUrl = res.data.shareBgUrl
+              this.srcList = [this.shareImageUrl]
             }
           })
         }
       })
+    },
+    handlePictureCardPreview () {
+      this.dialogImageUrl = this.shareImageUrl
+      this.dialogVisible = true
+    },
+    close () {
+      this.$emit('initData')
     }
   }
 }

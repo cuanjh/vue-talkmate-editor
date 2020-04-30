@@ -126,22 +126,29 @@
             </div>
           </el-upload>
         </el-form-item>
-        <el-form-item label="课程海报" prop="posterUrl"
+        <el-form-item label="课程海报" prop=""
           :rules="[
             { required: true, message: '请上传课程海报'}
           ]">
+          <el-tag type="warning">第一张图为移动端海报，第二张图为分享H5课程介绍，第三张图为分享H5课程海报</el-tag>
           <el-upload
             class="avatar-uploader"
             action="#"
+            list-type="picture-card"
             accept="image/png,image/jpg,image/jpeg"
+            :on-preview="handlePictureCardPreview"
             :on-change="uploadOnchange"
-            :show-file-list="false"
+            :on-remove="handleRemove"
+            :file-list="form.posters"
+            :show-file-list="true"
             :auto-upload="false">
-            <div class="upload-area" @click="setUploadField('image,posterUrl')">
-              <img v-if="form.posterUrl" :src="uploadfileDomain + form.posterUrl" class="cover">
-              <i v-else class="el-icon-plus cover-uploader-icon"></i>
+            <div class="upload-area" @click="setUploadField('image,posters')">
+              <i class="el-icon-plus"></i>
             </div>
           </el-upload>
+          <el-dialog :visible.sync="dialogVisible">
+            <img width="100%" :src="dialogImageUrl" alt="">
+          </el-dialog>
         </el-form-item>
         <el-form-item label="直播日期" prop="date"
           :rules="[
@@ -219,6 +226,8 @@ export default {
       disChannels: [],
       uploadField: '',
       token: '',
+      dialogImageUrl: '',
+      dialogVisible: false,
       form: {
         moduleName: '',
         coverV2: '', // 大图
@@ -230,7 +239,8 @@ export default {
         teacherDesc: '',
         videoUrl: '',
         videoCoverUrl: '',
-        posterUrl: '',
+        shareBgUrl: '',
+        posters: [],
         date: [],
         time: [
           new Date(),
@@ -344,7 +354,15 @@ export default {
         this.form.teacherDesc = this.roomInfo.liveInfo.tech_desc
         this.form.videoUrl = this.roomInfo.liveInfo.videoUrl
         this.form.videoCoverUrl = this.roomInfo.liveInfo.videoCoverUrl
-        this.form.posterUrl = this.roomInfo.liveInfo.posters[0]
+        this.form.shareBgUrl = this.roomInfo.liveInfo.shareBgUrl
+        let posters = []
+        this.roomInfo.liveInfo.posters.forEach(item => {
+          posters.push({
+            name: item,
+            url: this.uploadfileDomain + item
+          })
+        })
+        this.form.posters = posters
         this.form.date.push(this.roomInfo.liveInfo.startDate)
         this.form.date.push(this.roomInfo.liveInfo.endDate)
         this.form.time = []
@@ -366,7 +384,7 @@ export default {
       }
     },
     onSubmit () {
-      this.$refs['form'].validate((valid) => {
+      this.$refs['form'].validate(async (valid) => {
         if (valid) {
           let courses = []
           let listOrder = 1
@@ -394,6 +412,19 @@ export default {
               weekDays.push(item.id)
             }
           })
+          let posters = []
+          for (let i = 0; i < this.form.posters.length; i++) {
+            let p = this.form.posters[i]
+            if (p.raw) {
+              let date = moment(new Date()).format('YYYY/MM/DD')
+              let ext = p.name.split('.')[1]
+              let url = 'live/images/' + date + '/' + p.uid + '.' + ext
+              let res = await uploadQiniu(p.raw, this.token, url)
+              posters.push(res.key)
+            } else {
+              posters.push(p.name)
+            }
+          }
           let params = {
             courses: courses,
             room: {
@@ -405,9 +436,7 @@ export default {
               liveInfo: {
                 endDate: moment(this.form.date[1]).format('YYYY-MM-DD'),
                 endTime: moment(this.form.time[1]).format('HH:mm:ss'),
-                posters: [
-                  this.form.posterUrl
-                ],
+                posters: posters,
                 startDate: moment(this.form.date[0]).format('YYYY-MM-DD'),
                 startTime: moment(this.form.time[0]).format('HH:mm:ss'),
                 tech_desc: this.form.teacherDesc,
@@ -415,6 +444,7 @@ export default {
                 tech_photo: this.form.teacherPhoto,
                 videoUrl: this.form.videoUrl,
                 videoCoverUrl: this.form.videoCoverUrl,
+                shareBgUrl: this.form.shareBgUrl,
                 weekDays: weekDays
               },
               module_name: this.form.moduleName,
@@ -503,7 +533,7 @@ export default {
     setUploadField (name) {
       this.uploadField = name
     },
-    async uploadOnchange (file) {
+    async uploadOnchange (file, fileList) {
       let uploadIndexArr = this.uploadField.split(',')
       let dataFrom = uploadIndexArr[0]
       let feild = uploadIndexArr[1]
@@ -517,11 +547,25 @@ export default {
       } else if (dataFrom === 'video') {
         url = 'live/videos/' + date + '/' + file.uid + '.' + ext
       }
+
+      if (feild === 'posters') {
+        this.form.posters = fileList
+        return false
+      }
       let res = await uploadQiniu(file.raw, this.token, url)
       this.$set(this.form, feild, res.key)
     },
     isValidDate (date) {
       return date instanceof Date && !isNaN(date.getTime())
+    },
+    handlePictureCardPreview (file) {
+      this.dialogImageUrl = file.url
+      this.dialogVisible = true
+    },
+    handleRemove (file, fileList) {
+      this.form.posters = this.form.posters.filter(f => {
+        return f.name !== file.name
+      })
     }
   }
 }

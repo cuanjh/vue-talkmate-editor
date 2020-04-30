@@ -5,7 +5,7 @@
         路径：{{ pathDesc }}
       </div>
       <div class="right">
-        <el-button type="text" @click="addForm">新增</el-button>
+        <el-button v-show="!lowerRoleUser" type="text" @click="addForm">新增</el-button>
         <el-button type="text" @click="lookPreview">预览</el-button>
       </div>
     </div>
@@ -118,6 +118,16 @@
             <el-radio :label="true">是</el-radio>
             <el-radio :label="false">否</el-radio>
           </el-radio-group>
+          <!-- 打标记 radio_ -->
+          <div class="self-sign" v-if="f.feild == 'self_sign'">
+            <el-tag
+              :effect="contents[activeFormIndex]['' + f.feild + ''] == sign.key ? 'dark' : 'plain'"
+              v-for="(sign, index) in selfSigns"
+              :key="sign.type + index"
+              :type="sign.type" @click="selOneSign(sign)">
+              {{ sign.desc }}
+            </el-tag>
+          </div>
           <!-- 图片声音-->
           <div class="form-sound" v-if="f.data_from.indexOf('upload_') === -1 && f.type == 'string' && (f.feild == 'sound' || f.feild == 'image' || f.feild == 'cover' || f.feild == 'video')">
             <el-input v-model="contents[activeFormIndex]['' + f.feild + '']" :placeholder="f.feild == 'sound' ? '请上传mp3格式的音频' : ''">
@@ -320,7 +330,9 @@ export default {
       contentTypes: state => state.course.contentTypes,
       contentTags: state => state.course.contentTags,
       assetsDomain: state => state.course.assetsDomain,
-      version: state => state.course.version
+      selfSigns: state => state.course.selfSigns,
+      version: state => state.course.version,
+      lowerRoleUser: state => state.user.lowerRoleUser
     }),
     selfContentTypes () {
       return this.contentTypes.filter(item => {
@@ -554,6 +566,9 @@ export default {
     },
     // form区域右键菜单
     contentmenu (ev) {
+      if (this.lowerRoleUser) {
+        return false
+      }
       this.$refs['rightMenuForm'].show(ev)
     },
     paste () {
@@ -680,6 +695,9 @@ export default {
           }
         }
       }
+    },
+    selOneSign (sign) {
+      this.contents[this.activeFormIndex]['self_sign'] = sign.key
     }
   }
 }
@@ -810,6 +828,12 @@ export default {
       width: 200px;
       margin: 0 20px 0 10px;
     }
+  }
+}
+
+.self-sign {
+  .el-tag {
+    margin: 0 10px;
   }
 }
 </style>

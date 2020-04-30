@@ -58,7 +58,8 @@ export default {
   computed: {
     ...mapState({
       assetsDomain: state => state.course.assetsDomain,
-      userInfo: state => state.user.userInfo
+      userInfo: state => state.user.userInfo,
+      lowerRoleUser: state => state.user.lowerRoleUser
     }),
     folderFlagUrl () {
       let url = ''
@@ -76,6 +77,9 @@ export default {
       }, 300)
     },
     dblclickFolder () {
+      if (this.lowerRoleUser) {
+        return false
+      }
       clearTimeout(timer)
       this.title = this.name
       this.isShow = false

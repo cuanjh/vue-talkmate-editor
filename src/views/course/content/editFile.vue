@@ -41,8 +41,15 @@ export default {
         baseFormData[item.feild] = val
       })
       baseFormData['uuid'] = ''
+      this.contents = []
       if (params.contents && params.contents.length) {
-        this.contents = params.contents
+        params.contents.forEach(item => {
+          let obj = item
+          if (!obj['self_sign']) {
+            obj['self_sign'] = ''
+          }
+          this.contents.push(obj)
+        })
       } else {
         this.contents.push(baseFormData)
       }

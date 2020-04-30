@@ -1,13 +1,14 @@
 <template>
   <div class="form-container" @click="switchForm">
     <div class="form-type">
-      <span>{{ typeName }}</span>
+      <el-tag v-show="form.self_sign" size="small" effect="dark" :type="tagType">{{ typeName }}</el-tag>
+      <span v-show="!form.self_sign">{{ typeName }}</span>
       <div class="icons">
         <el-tooltip effect="dark" content="复制" placement="top">
-          <i class="el-icon-document-copy" @click="copyForm"></i>
+          <i v-show="!lowerRoleUser" class="el-icon-document-copy" @click="copyForm"></i>
         </el-tooltip>
         <el-tooltip effect="dark" content="删除" placement="top">
-          <i class="el-icon-delete" @click="delForm"></i>
+          <i v-show="!lowerRoleUser" class="el-icon-delete" @click="delForm"></i>
         </el-tooltip>
       </div>
     </div>
@@ -33,8 +34,20 @@ export default {
   computed: {
     ...mapState({
       contentTypes: state => state.course.contentTypes,
-      assetsDomain: state => state.course.assetsDomain
+      assetsDomain: state => state.course.assetsDomain,
+      selfSigns: state => state.course.selfSigns,
+      lowerRoleUser: state => state.user.lowerRoleUser
     }),
+    tagType () {
+      let obj = this.selfSigns.find(item => {
+        return item.key === this.form.self_sign
+      })
+      let name = ''
+      if (obj) {
+        name = obj.type
+      }
+      return name
+    },
     typeName () {
       console.log(this.contentTypes)
       let obj = this.contentTypes.find(item => {

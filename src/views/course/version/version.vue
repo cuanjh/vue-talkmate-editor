@@ -106,13 +106,15 @@ export default {
     this.getCourseTypes()
   },
   mounted () {
-    let el = document.getElementById('version-container')
-    el.oncontextmenu = (e) => {
-      e.preventDefault()
-    }
-    el.onclick = () => {
-      if (this.$refs['rightMenu']) {
-        this.$refs['rightMenu'].hide()
+    if (!this.lowerRoleUser) {
+      let el = document.getElementById('version-container')
+      el.oncontextmenu = (e) => {
+        e.preventDefault()
+      }
+      el.onclick = () => {
+        if (this.$refs['rightMenu']) {
+          this.$refs['rightMenu'].hide()
+        }
       }
     }
     if (this.version) {
@@ -130,7 +132,8 @@ export default {
       langList: state => state.course.langList,
       courseTypes: state => state.course.courseTypes,
       version: state => state.course.version,
-      userInfo: state => state.user.userInfo
+      userInfo: state => state.user.userInfo,
+      lowerRoleUser: state => state.user.lowerRoleUser
     }),
     versions () {
       let arr = []
@@ -357,6 +360,9 @@ export default {
     },
     // form区域右键菜单
     contentmenu (ev) {
+      if (this.lowerRoleUser) {
+        return false
+      }
       this.$refs['rightMenu'].show(ev)
     },
     // 复制版本

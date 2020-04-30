@@ -12,6 +12,7 @@ import {
   tagTypes
 } from '@/api/course'
 import moment from 'moment'
+import { getMajiaUsers } from '../../api/course'
 
 export const course = {
   namespaced: true,
@@ -74,6 +75,14 @@ export const course = {
       { value: 1998, text: '¥ 1998' },
       { value: 3298, text: '¥ 3298' },
       { value: 6498, text: '¥ 6498' }
+    ],
+    majia: [],
+    // 红色代表改动过还不确定准确度；黄色代表修改完毕；绿色代表审核完毕确认没问题
+    selfSigns: [
+      { key: '', type: 'info', desc: '重置' },
+      { key: '0', type: 'danger', desc: '红色（改动过还不确定准确度）' },
+      { key: '1', type: 'warning', desc: '黄色（修改完毕）' },
+      { key: '2', type: 'success', desc: '绿色（审核完毕确认没问题）' }
     ]
   },
   mutations: {
@@ -108,6 +117,9 @@ export const course = {
     },
     updateTagsTypes (state, types) {
       state.tagTypes = types
+    },
+    updateMajia (state, data) {
+      state.majia = data
     }
   },
   actions: {
@@ -226,6 +238,13 @@ export const course = {
         let tags = res.data.types
         console.log(tags)
         commit('updateTagsTypes', tags)
+      }
+    },
+    async getMajia ({ commit }, data) {
+      const res = await getMajiaUsers(data)
+      if (res.success) {
+        console.log(res)
+        commit('updateMajia', res.data.userInfos)
       }
     }
   },

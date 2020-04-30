@@ -24,6 +24,12 @@
                 </el-select>
               </div>
               <div class="course-column">
+                <el-button type="primary" :disabled="props.row.courses[index].state !== 1" class="btnPushLink" @click="publishComment(c)">发表评论</el-button>
+              </div>
+              <div class="course-column">
+                <el-button type="primary" :disabled="props.row.courses[index].state === 0" class="btnPushLink" @click="getComments(c)">评论列表</el-button>
+              </div>
+              <div class="course-column">
                 <el-tooltip class="item" effect="dark" :content="c.livePushUrl" placement="top">
                   <el-button type="primary" :disabled="c.livePushUrl == ''" class="btnPushLink" @click="copyLink(c)">复制推流链接</el-button>
                 </el-tooltip>
@@ -104,7 +110,9 @@
         </template>
       </el-table-column>
     </el-table>
-    <share ref="share" />
+    <share ref="share" @initData="initData" />
+    <comment ref="comment" />
+    <comment-list ref="commentList" />
   </div>
 </template>
 
@@ -112,6 +120,8 @@
 import moment from 'moment'
 import Clipboard from 'clipboard'
 import Share from './share'
+import Comment from './comment'
+import CommentList from './commentList'
 
 import {
   getLiveList,
@@ -121,7 +131,7 @@ import {
   onlineLiveCourse,
   offlineLiveCourse
 } from '@/api/course'
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 
 export default {
   data () {
@@ -143,9 +153,12 @@ export default {
     }
   },
   components: {
-    Share
+    Share,
+    Comment,
+    CommentList
   },
   mounted () {
+    this.getMajia()
     this.initData()
   },
   computed: {
@@ -154,6 +167,9 @@ export default {
     })
   },
   methods: {
+    ...mapActions({
+      getMajia: 'course/getMajia'
+    }),
     initData () {
       getLiveList({ pageNo: 0, pageSize: 9999 }).then(res => {
         this.rooms = res.data.rooms
@@ -318,6 +334,13 @@ export default {
         })
         clipboard.destroy()
       })
+    },
+    // 发表评论
+    publishComment (c) {
+      this.$refs['comment'].show(c)
+    },
+    getComments (c) {
+      this.$refs['commentList'].show(c)
     }
   }
 }

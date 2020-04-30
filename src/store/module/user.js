@@ -11,6 +11,7 @@ export const user = {
       headerImg: '',
       authority: ''
     },
+    lowerRoleUser: false,
     token: '',
     expiresAt: ''
   },
@@ -23,6 +24,9 @@ export const user = {
         uuid: userInfo.uuid
       }
       window.zhuge.identify(userInfo.uuid, obj)
+      if (userInfo.authorityId === '111' || userInfo.authorityId === '121' || userInfo.authorityId === '131') {
+        state.lowerRoleUser = true
+      }
       state.userInfo = userInfo
     },
     setToken (state, token) {
