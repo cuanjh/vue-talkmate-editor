@@ -26,6 +26,8 @@ export const user = {
       window.zhuge.identify(userInfo.uuid, obj)
       if (userInfo.authorityId === '111' || userInfo.authorityId === '121' || userInfo.authorityId === '131') {
         state.lowerRoleUser = true
+      } else {
+        state.lowerRoleUser = false
       }
       state.userInfo = userInfo
     },
