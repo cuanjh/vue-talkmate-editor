@@ -78,6 +78,8 @@
               <el-button type="text" @click="upload(f, -1)">上传</el-button>
             </el-upload>
           </el-input>
+          <el-button v-if="f.data_from == 'upload_audio'" type="text" @click="toggleRecorder">在线录音</el-button>
+          <audio-recorder ref="recorder" @saveRecorder="saveRecorder" v-if="f.data_from == 'upload_audio'"/>
           <!-- text -->
           <el-input
             v-if="f.type == 'text'"
@@ -274,6 +276,7 @@ import FormLevelGrade from './levelGrade/levelGrade'
 import LookImage from './lookImage'
 import LookContent from './lookContent'
 import RightMenuForm from './rightMenuForm'
+
 import { mapState } from 'vuex'
 import {
   editContent,
@@ -597,6 +600,24 @@ export default {
         }
       }
     },
+    // 保存录音
+    async saveRecorder (mp3BlobData) {
+      console.log(mp3BlobData)
+      let date = moment(new Date()).format('YYYY/MM/DD')
+      let ext = 'mp3'
+      let url = 'course/sounds/' + this.version.selLang.toLowerCase() + '/' + date + '/' + (new Date()).getTime() + '.' + ext
+      console.log(url)
+      let res = await uploadQiniu(mp3BlobData, this.token, url)
+      this.$set(this.contents[this.activeFormIndex], 'sound', res.key)
+      // 计算声音时长
+      if (typeof this.contents[this.activeFormIndex]['sound_time'] !== 'undefined') {
+        let mySound = new Audio()
+        mySound.src = this.assetsDomain + res.key
+        mySound.oncanplay = () => {
+          this.$set(this.contents[this.activeFormIndex], 'sound_time', mySound.duration)
+        }
+      }
+    },
     // 上传图片
     async uploadImageOnchange (file) {
       console.log(file)
@@ -698,6 +719,9 @@ export default {
     },
     selOneSign (sign) {
       this.contents[this.activeFormIndex]['self_sign'] = sign.key
+    },
+    toggleRecorder () {
+      this.$refs['recorder'][0].toggle()
     }
   }
 }
