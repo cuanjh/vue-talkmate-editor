@@ -19,17 +19,53 @@
               <div slot="tip" class="el-upload__tip">只能上传jpg文件，且不超过500kb</div>
             </el-upload>
           </el-form-item>
-          <el-form-item label="二维码宽" prop="qrCodeX">
-            <el-input v-model.number="form.qrCodeX"></el-input>
-          </el-form-item>
-          <el-form-item label="二维码高" prop="qrCodeY">
-            <el-input v-model.number="form.qrCodeY"></el-input>
-          </el-form-item>
-          <el-form-item label="二维码距左" prop="scaleX">
-            <el-input v-model.number="form.scaleX"></el-input>
-          </el-form-item>
-          <el-form-item label="二维码距顶" prop="scaleY">
-            <el-input v-model.number="form.scaleY"></el-input>
+          <el-row>
+            <el-col :span="12">
+              <el-form-item label="二维码宽" prop="qrCodeX">
+                <el-input v-model.number="form.qrCodeX"></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="二维码高" prop="qrCodeY">
+                <el-input v-model.number="form.qrCodeY"></el-input>
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row>
+            <el-col :span="12">
+              <el-form-item label="二维码距左" prop="scaleX">
+                <el-input v-model.number="form.scaleX"></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="二维码距顶" prop="scaleY">
+                <el-input v-model.number="form.scaleY"></el-input>
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-form-item label="海报" prop=""
+            :rules="[
+              { required: true, message: '请上传课程海报'}
+            ]">
+            <el-tag type="warning">第一张图为分享H5课程介绍，第二张图为分享H5课程海报</el-tag>
+            <el-upload
+              class="avatar-uploader"
+              action="#"
+              list-type="picture-card"
+              accept="image/png,image/jpg,image/jpeg"
+              :on-preview="handlePictureCardPreview1"
+              :on-change="uploadOnchange"
+              :on-remove="handleRemove"
+              :file-list="sharePoster"
+              :show-file-list="true"
+              :auto-upload="false">
+              <div class="upload-area">
+                <i class="el-icon-plus"></i>
+              </div>
+            </el-upload>
+            <el-dialog :visible.sync="dialogVisible">
+              <img width="100%" :src="dialogImageUrl" alt="">
+            </el-dialog>
           </el-form-item>
         </el-form>
       </el-col>
@@ -51,9 +87,13 @@
 </template>
 
 <script>
+import moment from 'moment'
 import {
-  sharePosterLive
+  sharePosterLive,
+  getInfoTokenUploadFile
 } from '@/api/course'
+import { mapState } from 'vuex'
+import { uploadQiniu } from '@/utils/uploadQiniu'
 export default {
   data () {
     return {
@@ -61,6 +101,10 @@ export default {
       dialogImageUrl: '',
       dialogVisible: false,
       srcList: [],
+      dialogImageUrl1: '',
+      dialogVisible1: false,
+      token: '',
+      sharePoster: [],
       form: {
         courseCode: '',
         jumpUrl: 'http://test-learn.talkmate.com:82/liveShare/index.html',
@@ -68,7 +112,8 @@ export default {
         qrCodeX: 170,
         qrCodeY: 170,
         scaleX: 506,
-        scaleY: 964
+        scaleY: 964,
+        'sharePoster[]': ''
       },
       rules: {
         bgImg: [
@@ -91,7 +136,15 @@ export default {
       fileList: []
     }
   },
+  mounted () {
+    getInfoTokenUploadFile().then(res => {
+      this.token = res.data.token
+    })
+  },
   computed: {
+    ...mapState({
+      uploadfileDomain: state => state.course.uploadfileDomain
+    }),
     jumpUrl () {
       return 'http://test-learn.talkmate.com:82/liveShare/index.html'
     }
@@ -99,6 +152,16 @@ export default {
   methods: {
     show (params) {
       this.resetForm()
+      let posters = []
+      if (params.room.liveInfo.sharePoster && params.room.liveInfo.sharePoster.length) {
+        params.room.liveInfo.sharePoster.forEach(item => {
+          posters.push({
+            name: item,
+            url: this.uploadfileDomain + item
+          })
+        })
+      }
+      this.sharePoster = posters
       this.form.courseCode = params.room.code
       this.shareImageUrl = params.room.liveInfo.shareBgUrl
       this.srcList = [this.shareImageUrl]
@@ -120,8 +183,22 @@ export default {
       }
     },
     submitForm () {
-      this.$refs['form'].validate((valid) => {
+      this.$refs['form'].validate(async (valid) => {
         if (valid) {
+          let posters = []
+          for (let i = 0; i < this.sharePoster.length; i++) {
+            let p = this.sharePoster[i]
+            if (p.raw) {
+              let date = moment(new Date()).format('YYYY/MM/DD')
+              let ext = p.name.split('.')[1]
+              let url = 'live/images/' + date + '/' + p.uid + '.' + ext
+              let res = await uploadQiniu(p.raw, this.token, url)
+              posters.push(res.key)
+            } else {
+              posters.push(p.name)
+            }
+          }
+          this.form['sharePoster[]'] = posters.join(',')
           sharePosterLive(this.form).then(res => {
             if (res.success) {
               this.$message({
@@ -141,6 +218,18 @@ export default {
     },
     close () {
       this.$emit('initData')
+    },
+    async uploadOnchange (file, fileList) {
+      this.sharePoster = fileList
+    },
+    handlePictureCardPreview1 (file) {
+      this.dialogImageUrl1 = file.url
+      this.dialogVisible1 = true
+    },
+    handleRemove (file, fileList) {
+      this.sharePoster = this.sharePoster.filter(f => {
+        return f.name !== file.name
+      })
     }
   }
 }

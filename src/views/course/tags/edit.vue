@@ -59,38 +59,13 @@
             </div>
           </el-form-item>
           <el-form-item label="封面: ">
-            <!-- <div class="img-box big-img-box">
-              <div class="img">
-                <div
-                  class="block"
-                  v-for="(cover, index) in form.cover"
-                  :key="'cover' + index">
-                  <span>{{ cover.split('/')[cover.split('/').length - 2]}}</span>
-                  <el-image
-                    lazy
-                    :src="assetsDomain + cover"
-                    :preview-src-list="[cover]"
-                    fit="cover">
-                  </el-image>
-                  <el-button round size="small" @click="cropperImage(assetsDomain + cover)">裁剪</el-button>
-                </div>
-              </div>
-              <el-upload
-                action="#"
-                accept="image/png,image/jpg,image/jpeg"
-                :on-change="uploadCoverOnchange"
-                :show-file-list="false"
-                :auto-upload="false">
-                <div id="upload-btn">
-                  <i class="el-icon-plus avatar-uploader-icon"></i>
-                </div>
-              </el-upload>
-            </div> -->
+            <el-tag type="warning">第一张图为课程列表封面，第二张图为学习首页课程封面，第三张图为课程列表宝贝作品封面</el-tag>
             <div class="img-box big-img-box">
-              <div class="img" v-if="form.cover.length">
+              <div class="img" id="cover-sort" v-if="form.cover.length">
                 <div
                   class="block"
                   v-for="(cover, index) in form.cover"
+                  :data-id="index"
                   :key="'cover' + index">
                   <span>{{ cover.split('/')[cover.split('/').length - 2]}}</span>
                   <el-image
@@ -104,7 +79,7 @@
                     <el-button round plain type="danger" size="small" @click="delImage('cover', index)">删除</el-button>
                   </div>
                 </div>
-                <div class="block">
+                <div class="block" data-id="99">
                   <el-upload
                     action="#"
                     accept="image/png,image/jpg,image/jpeg"
@@ -150,7 +125,7 @@
 </template>
 
 <script>
-// editTags
+import Sortable from 'sortablejs'
 import {
   editTags,
   addTags,
@@ -165,6 +140,7 @@ export default {
     return {
       token: '',
       showEdit: false,
+      sortable: null,
       form: {
         cover: [],
         desc: {},
@@ -235,6 +211,9 @@ export default {
         }
         this.form = obj
       }
+      setTimeout(() => {
+        this.resetSortable()
+      }, 0)
     },
     close () {
       this.showEdit = false
@@ -299,6 +278,25 @@ export default {
     },
     delImage (flag, index) {
       this.form[flag].splice(index, 1)
+    },
+    resetSortable () {
+      let el = document.getElementById('cover-sort')
+      this.sortable = new Sortable(el, {
+        animation: 150,
+        onEnd: (evt) => {
+          console.log(this.sortable.toArray())
+          let arr = []
+          let indexArr = this.sortable.toArray()
+          indexArr = indexArr.filter(id => {
+            return id !== '99'
+          })
+          indexArr.forEach((item, index) => {
+            arr.push(this.form.cover[parseInt(item)])
+          })
+          this.form.cover = arr
+          console.log(this.form.cover)
+        }
+      })
     }
   },
   destroyed () {
@@ -322,7 +320,7 @@ export default {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width:800px;
+  width:870px;
   background:rgba(245,246,250,1);
   border-radius:4px;
   padding: 50px 30px 40px;

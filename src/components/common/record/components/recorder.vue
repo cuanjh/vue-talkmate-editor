@@ -1,8 +1,8 @@
 <template>
   <div class="record-container" v-if="showRecorder">
     <div class="recorder-handler">
-      <el-button type="primary" size="small" @click="startRecorder">开始录音</el-button>
-      <el-button type="primary" size="small" @click="stopRecorder">结束录音</el-button>
+      <el-button type="primary" size="small" :disabled="isRecording" @click="startRecorder">开始录音</el-button>
+      <el-button type="primary" size="small" :disabled="!isRecording" @click="stopRecorder">结束录音</el-button>
     </div>
     <div class="record-duration">{{ recordedTime }}</div>
     <div class="player">
@@ -25,6 +25,7 @@ export default {
     return {
       recorder: null,
       isHaveRecorderPermission: false,
+      isRecording: false,
       time: 2, // 限制录音时长 minuts
       recorderUrl: '',
       // mp3: '/demo/example.mp3',
@@ -35,7 +36,6 @@ export default {
     }
   },
   mounted () {
-    this.getPermission()
     this.recorder = new Recorder()
   },
   computed: {
@@ -56,14 +56,22 @@ export default {
       }, (error) => {
         console.log(`${error.name} : ${error.message}`)
         this.isHaveRecorderPermission = false
-        this.$message({
-          type: 'warning',
-          message: '请打开使用你的麦克风'
-        })
+        // this.$message({
+        //   type: 'warning',
+        //   message: '请打开使用你的麦克风'
+        // })
       })
     },
     // 开始录音
     startRecorder () {
+      if (!this.isHaveRecorderPermission) {
+        this.$message({
+          type: 'warning',
+          message: '请打开使用你的麦克风'
+        })
+        return false
+      }
+      this.isRecording = true
       this.recorder.start().then(() => {
         // 开始录音
       }, (error) => {
@@ -72,24 +80,54 @@ export default {
     },
     // 暂停录音
     pauseRecorder () {
+      if (!this.isHaveRecorderPermission) {
+        this.$message({
+          type: 'warning',
+          message: '请打开使用你的麦克风'
+        })
+        return false
+      }
       this.recorder.pause()
     },
     // 继续录音
     resumeRecorder () {
+      if (!this.isHaveRecorderPermission) {
+        this.$message({
+          type: 'warning',
+          message: '请打开使用你的麦克风'
+        })
+        return false
+      }
       this.recorder.resume()
     },
     // 结束录音
     stopRecorder () {
+      if (!this.isHaveRecorderPermission) {
+        this.$message({
+          type: 'warning',
+          message: '请打开使用你的麦克风'
+        })
+        return false
+      }
+      this.isRecording = false
       this.recorder.stop()
       let blob = this.recorder.getWAVBlob()
       this.recorderUrl = window.URL.createObjectURL(blob)
     },
     destroyRecorder () {
+      if (!this.isHaveRecorderPermission) {
+        this.$message({
+          type: 'warning',
+          message: '请打开使用你的麦克风'
+        })
+        return false
+      }
       this.recorder.destroy().then(() => {
         this.recorder = null
       })
     },
     toggle () {
+      this.getPermission()
       this.showRecorder = !this.showRecorder
     },
     resetRecorder () {
@@ -97,10 +135,24 @@ export default {
       this.recorderUrl = ''
     },
     downloadRecorder () {
+      if (!this.isHaveRecorderPermission) {
+        this.$message({
+          type: 'warning',
+          message: '请打开使用你的麦克风'
+        })
+        return false
+      }
       let filename = (new Date()).getTime()
       this.recorder.downloadWAV(filename)
     },
     saveRecorder () {
+      if (!this.isHaveRecorderPermission) {
+        this.$message({
+          type: 'warning',
+          message: '请打开使用你的麦克风'
+        })
+        return false
+      }
       const reader = new FileReader()
       reader.onload = () => {
         let wavDataView = new DataView(reader.result)

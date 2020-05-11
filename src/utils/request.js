@@ -42,7 +42,14 @@ service.interceptors.request.use(
       if (config.data) {
         let keys = Object.keys(config.data)
         keys.forEach(key => {
-          form.append(key, config.data[key])
+          if (key.indexOf('[]') > -1) {
+            let val = config.data[key]
+            val.split(',').forEach(v => {
+              form.append(key.replace('[]', ''), v)
+            })
+          } else {
+            form.append(key, config.data[key])
+          }
         })
         config.data = form
       }

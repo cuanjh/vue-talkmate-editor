@@ -93,10 +93,7 @@
           ]">
           <el-input style="width: 600px" type="textarea" v-model="form.teacherDesc" maxlength="120" show-word-limit></el-input>
         </el-form-item>
-        <el-form-item label="宣传视频" prop="videoUrl"
-          :rules="[
-            { required: true, message: '请上传宣传视频'}
-          ]">
+        <el-form-item label="宣传视频" prop="videoUrl">
           <div class="video" v-if="form.videoUrl">
             <video :src="uploadfileDomain + form.videoUrl" controls></video>
           </div>
@@ -109,10 +106,7 @@
             <el-button type="primary" icon="el-icon-upload" @click="setUploadField('image,videoUrl')">上传</el-button>
           </el-upload>
         </el-form-item>
-        <el-form-item label="视频封面" prop="videoCoverUrl"
-          :rules="[
-            { required: true, message: '请上传课程海报'}
-          ]">
+        <el-form-item label="视频封面" prop="videoCoverUrl">
           <el-upload
             class="avatar-uploader"
             action="#"
@@ -130,7 +124,6 @@
           :rules="[
             { required: true, message: '请上传课程海报'}
           ]">
-          <el-tag type="warning">第一张图为移动端海报，第二张图为分享H5课程介绍，第三张图为分享H5课程海报</el-tag>
           <el-upload
             class="avatar-uploader"
             action="#"
@@ -425,6 +418,16 @@ export default {
               posters.push(p.name)
             }
           }
+          // 同步获取图片宽和高
+          for (let j = 0; j < posters.length; j++) {
+            let url = posters[j]
+            if (url.indexOf('?') > -1) {
+              url = url.split('?')[0]
+            }
+            let img = await this.imgOnload(url)
+            url += '?w=' + img.width + '&h=' + img.height
+            posters[j] = url
+          }
           let params = {
             courses: courses,
             room: {
@@ -565,6 +568,18 @@ export default {
     handleRemove (file, fileList) {
       this.form.posters = this.form.posters.filter(f => {
         return f.name !== file.name
+      })
+    },
+    imgOnload (url) {
+      return new Promise((resolve, reject) => {
+        let img = new Image()
+        img.src = this.uploadfileDomain + url
+        img.onload = () => {
+          resolve(img)
+        }
+        img.onerror = () => {
+          reject(new Error('图片加载失败'))
+        }
       })
     }
   }
