@@ -12,29 +12,29 @@
       <el-table-column type="expand">
         <template slot-scope="props">
           <div class="live-courses">
-            <div :class="['course', { 'notStarted': props.row.courses[index].state == 0, 'inClass': props.row.courses[index].state == 1 }]" v-for="(c, index) in props.row.courses" :key="c.uuid">
-              <div class="course-column">{{ '第' + (index + 1) + '课'}}</div>
-              <div class="course-column">{{ c.title }}</div>
-              <div class="course-column">{{ formatCourseDate(c) }}</div>
-              <div class="course-column">
+            <el-row :gutter="5" :class="['course', { 'notStarted': props.row.courses[index].state == 0, 'inClass': props.row.courses[index].state == 1 }]" v-for="(c, index) in props.row.courses" :key="c.uuid">
+              <el-col :span="1" class="course-column">{{ '第' + (index + 1) + '课'}}</el-col>
+              <el-col :span="6" class="course-column">{{ c.title }}</el-col>
+              <el-col :span="4" class="course-column">{{ formatCourseDate(c) }}</el-col>
+              <el-col :span="4" class="course-column">
                 <el-select size="small" :disabled="props.row.courses[index].state == -1" v-model="props.row.courses[index].state" placeholder="请选择..." @change="changeCourseState(c)">
                   <el-option :label="'未开始'" :disabled="props.row.courses[index].state == 1" :value="0"></el-option>
                   <el-option :label="'上课中'" :value="1"></el-option>
                   <el-option :label="'已下课'" :disabled="props.row.courses[index].state == 0" :value="-1"></el-option>
                 </el-select>
-              </div>
-              <div class="course-column">
+              </el-col>
+              <el-col :span="3" class="course-column">
                 <el-button type="primary" :disabled="props.row.courses[index].state !== 1" class="btnPushLink" @click="publishComment(c)">发表评论</el-button>
-              </div>
-              <div class="course-column">
+              </el-col>
+              <el-col :span="3" class="course-column">
                 <el-button type="primary" :disabled="props.row.courses[index].state === 0" class="btnPushLink" @click="getComments(c)">评论列表</el-button>
-              </div>
-              <div class="course-column">
+              </el-col>
+              <el-col :span="3" class="course-column">
                 <el-tooltip class="item" effect="dark" :content="c.livePushUrl" placement="top">
                   <el-button type="primary" :disabled="c.livePushUrl == ''" class="btnPushLink" @click="copyLink(c)">复制推流链接</el-button>
                 </el-tooltip>
-              </div>
-            </div>
+              </el-col>
+            </el-row>
           </div>
         </template>
       </el-table-column>
@@ -50,7 +50,7 @@
           <div class="room-info">
             <el-image
               v-show="scope.row.room.cover_v2"
-              style="width: 157px; height: 88px"
+              style="width: 157px; height: 88px; border-radius: 5px;"
               :src="uploadfileDomain + scope.row.room.cover_v2"
               lazy
               fit="cover">
@@ -391,7 +391,7 @@ export default {
     font-weight: 400;
     font-size: 12px;
     align-items: center;
-    justify-content: space-between;
+    // justify-content: space-between;
     margin: 10px 0;
     .course-column {
       &:nth-child(1) {

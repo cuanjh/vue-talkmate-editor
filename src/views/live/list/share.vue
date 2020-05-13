@@ -12,7 +12,7 @@
               action="#"
               accept="image/jpeg"
               :auto-upload="false"
-              :on-change="changebgImag"
+              :on-change="changebgImage"
               :file-list="fileList"
               >
               <el-button size="small" type="primary">点击上传</el-button>
@@ -167,7 +167,7 @@ export default {
       this.srcList = [this.shareImageUrl]
       this.dialogFormVisible = true
     },
-    changebgImag (file, fileList) {
+    changebgImage (file, fileList) {
       this.form.bgImg = file.raw
     },
     resetForm () {

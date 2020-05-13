@@ -7,7 +7,7 @@
       <el-table-column label="头像" min-width="50">
         <template slot-scope="scope">
           <div :style="{'textAlign':'center'}">
-            <img :src="scope.row.headerImg" height="50" width="50" />
+            <img class="photo" :src="scope.row.headerImg" height="50" width="50" />
           </div>
         </template>
       </el-table-column>
@@ -28,6 +28,11 @@
               v-for="item in authOptions"
             ></el-option>
           </el-select>
+        </template>
+      </el-table-column>
+      <el-table-column fixed="right" label="操作" width="100">
+        <template slot-scope="scope">
+          <el-button @click="deleteUser(scope.row)" size="small" type="text">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -86,7 +91,7 @@
 </template>
 
 <script>
-import { getUserList, setUserAuthority, regist } from '@/api/user'
+import { getUserList, setUserAuthority, regist, removeUser } from '@/api/user'
 import { getAuthorityList } from '@/api/authority'
 import infoList from '@/components/mixins/infoList'
 import { mapGetters } from 'vuex'
@@ -364,6 +369,25 @@ export default {
           }
         })
       }
+    },
+    deleteUser (row) {
+      console.log(row)
+      this.$confirm('确认要删除吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        const res = await removeUser({ uuid: row.uuid })
+        if (res.success) {
+          this.$message({ type: 'success', message: '用户删除成功' })
+          await this.getTableData()
+        }
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
     }
   },
   async created () {
@@ -410,5 +434,10 @@ export default {
 .el-dialog__wrapper {
   overflow: hidden;
   height: 100%;
+}
+
+.photo {
+  object-fit: cover;
+  border-radius: 4px;
 }
 </style>

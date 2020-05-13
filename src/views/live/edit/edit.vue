@@ -233,6 +233,7 @@ export default {
         videoUrl: '',
         videoCoverUrl: '',
         shareBgUrl: '',
+        sharePoster: [],
         posters: [],
         date: [],
         time: [
@@ -348,6 +349,7 @@ export default {
         this.form.videoUrl = this.roomInfo.liveInfo.videoUrl
         this.form.videoCoverUrl = this.roomInfo.liveInfo.videoCoverUrl
         this.form.shareBgUrl = this.roomInfo.liveInfo.shareBgUrl
+        this.form.sharePoster = this.roomInfo.liveInfo.sharePoster
         let posters = []
         this.roomInfo.liveInfo.posters.forEach(item => {
           posters.push({
@@ -384,17 +386,25 @@ export default {
           this.form.courses.slice(0, this.form.courseSlice).forEach(item => {
             let startTime = (new Date(item.date + ' ' + moment(this.form.time[0]).format('HH:mm:ss'))).getTime() / 1000
             let endTime = (new Date(item.date + ' ' + moment(this.form.time[1]).format('HH:mm:ss'))).getTime() / 1000
+            let state = 0
+            if (typeof item.state !== 'undefined') {
+              state = item.state
+            }
             let obj = {
-              EndTime: item.state === 0 ? endTime : item.EndTime,
+              EndTime: state === 0 ? endTime : item.EndTime,
               courseCode: this.code,
               cover: this.form.coverV2,
               date: item.date,
               lanCode: this.form.lanCode,
               listOrder: listOrder,
-              startTime: item.state === 0 ? startTime : item.startTime,
+              livePullUrl: item.livePullUrl ? item.livePullUrl : '',
+              livePushUrl: item.livePushUrl ? item.livePushUrl : '',
+              realEndTime: item.realEndTime ? item.realEndTime : 0,
+              realStartTime: item.realStartTime ? item.realStartTime : 0,
+              startTime: state === 0 ? startTime : item.startTime,
               title: item.title,
               uuid: item.uuid,
-              state: item.state
+              state: state
             }
             courses.push(obj)
             listOrder++
@@ -448,6 +458,7 @@ export default {
                 videoUrl: this.form.videoUrl,
                 videoCoverUrl: this.form.videoCoverUrl,
                 shareBgUrl: this.form.shareBgUrl,
+                sharePoster: this.form.sharePoster,
                 weekDays: weekDays
               },
               module_name: this.form.moduleName,

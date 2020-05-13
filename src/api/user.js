@@ -36,6 +36,18 @@ export const userChangePwd = (data) => {
   })
 }
 
+// @Summary 删除用户
+// @Produce  application/json
+// @Param data body {username:"string"}
+// @Router user/remove [post]
+export const removeUser = (data) => {
+  return service({
+    url: '/user/remove',
+    method: 'post',
+    data: data
+  })
+}
+
 // @Tags User
 // @Summary 分页获取用户列表
 // @Security ApiKeyAuth
