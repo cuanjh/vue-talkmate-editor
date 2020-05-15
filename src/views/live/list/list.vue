@@ -191,7 +191,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        delLive({ code: row.code }).then(res => {
+        delLive({ code: row.room.code }).then(res => {
           if (res.success) {
             this.$message({
               type: 'success',

@@ -1,6 +1,6 @@
 <template>
   <el-dialog title="评论列表" :visible.sync="dialogTableVisible" width="70%">
-    <el-table :data="comments">
+    <el-table :data="comments" height="500">
       <el-table-column type="index"></el-table-column>
       <el-table-column label="用户头像" width="80">
         <template slot-scope="scope">

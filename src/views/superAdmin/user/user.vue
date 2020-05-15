@@ -32,7 +32,7 @@
       </el-table-column>
       <el-table-column fixed="right" label="操作" width="100">
         <template slot-scope="scope">
-          <el-button @click="deleteUser(scope.row)" size="small" type="text">删除</el-button>
+          <el-button :disabled="scope.row.authorityId == '1'" @click="deleteUser(scope.row)" size="small" type="text">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
