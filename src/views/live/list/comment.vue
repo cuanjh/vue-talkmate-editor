@@ -1,6 +1,22 @@
 <template>
   <el-dialog width="70%" title="发表评论" :visible.sync="dialogFormVisible" @close="close">
     <el-form :model="form" :rules="rules" ref="form" label-width="120px">
+      <el-form-item label="昵称" prop="user_id">
+          <el-select v-model="form.user_id" filterable placeholder="请选择">
+            <el-option
+              v-for="item in majia"
+              :key="item.user_id"
+              :label="item.nickname"
+              :value="item.user_id">
+            </el-option>
+          </el-select>
+      </el-form-item>
+      <el-form-item label="角色">
+        <el-radio-group v-model="form.role">
+          <el-radio label="student">学生</el-radio>
+          <el-radio label="teacher">老师</el-radio>
+        </el-radio-group>
+      </el-form-item>
        <el-form-item label="打赏金币">
         <el-radio-group v-model="form.coins">
           <el-radio :label="0">无</el-radio>
@@ -38,6 +54,9 @@ export default {
         uuid: ''
       },
       rules: {
+        user_id: [
+          { required: true, message: '请选择一个马甲', trigger: 'change' }
+        ],
         content: [
           { required: true, message: '评论内容不能为空', trigger: 'blur' }
         ]

@@ -17,7 +17,7 @@
               <el-col :span="6" class="course-column">{{ c.title }}</el-col>
               <el-col :span="4" class="course-column">{{ formatCourseDate(c) }}</el-col>
               <el-col :span="4" class="course-column">
-                <el-select size="small" :disabled="props.row.courses[index].state == -1" v-model="props.row.courses[index].state" placeholder="请选择..." @change="changeCourseState(c)">
+                <el-select size="small" :disabled="props.row.courses[index].state == -1" v-model="props.row.courses[index].state" placeholder="请选择..." @change="changeCourseState(c, props.row.courses, props.row, index)">
                   <el-option :label="'未开始'" :disabled="props.row.courses[index].state == 1" :value="0"></el-option>
                   <el-option :label="'上课中'" :value="1"></el-option>
                   <el-option :label="'已下课'" :disabled="props.row.courses[index].state == 0" :value="-1"></el-option>
@@ -276,11 +276,24 @@ export default {
       result += startTime + '—' + endTime
       return result
     },
-    changeCourseState (course) {
-      console.log(course)
+    changeCourseState (course, courses, row, index) {
       switch (course.state) {
         // 上课中
         case 1:
+          let rowIndex = this.rooms.findIndex(r => {
+            return r.room.code === course.courseCode
+          })
+          let arr = courses.filter(item => {
+            return item.state === 1
+          })
+          if (arr.length) {
+            this.$message({
+              type: 'warning',
+              message: '请先设置该直播间其他课程为已下课状态，再设置该课程'
+            })
+            this.rooms[rowIndex].courses[index].state = 0
+            return false
+          }
           onlineLiveCourse({ uuid: course.uuid }).then(res => {
             if (res.success) {
               this.$message({
