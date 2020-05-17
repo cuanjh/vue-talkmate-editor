@@ -88,9 +88,9 @@ export default {
     submitForm () {
       this.$refs['form'].validate((valid) => {
         if (valid) {
-          let rNum = Math.floor(Math.random() * this.majia.length)
-          console.log(rNum)
-          this.form.user_id = this.majia[rNum]['user_id']
+          // let rNum = Math.floor(Math.random() * this.majia.length)
+          // console.log(rNum)
+          // this.form.user_id = this.majia[rNum]['user_id']
           console.log(this.form)
           liveSendMsg(this.form).then(res => {
             if (res.success) {
