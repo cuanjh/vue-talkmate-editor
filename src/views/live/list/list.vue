@@ -286,7 +286,7 @@ export default {
           let arr = courses.filter(item => {
             return item.state === 1
           })
-          if (arr.length) {
+          if (arr.length >= 2) {
             this.$message({
               type: 'warning',
               message: '请先设置该直播间其他课程为已下课状态，再设置该课程'
