@@ -3,6 +3,7 @@
     <el-form :model="form" :rules="rules" ref="form" label-width="120px">
        <el-form-item label="打赏金币">
         <el-radio-group v-model="form.coins">
+          <el-radio :label="0">无</el-radio>
           <el-radio :label="1000">1000</el-radio>
           <el-radio :label="2000">2000</el-radio>
           <el-radio :label="3000">3000</el-radio>

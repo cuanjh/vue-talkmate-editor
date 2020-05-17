@@ -4,7 +4,7 @@
       <el-table-column type="index"></el-table-column>
       <el-table-column label="用户头像" width="80">
         <template slot-scope="scope">
-          <el-image style="width: 50px; height: 50px; border-radius: 50%" lazy :src="scope.row.photo" fit="cover">
+          <el-image style="width: 50px; height: 50px; border-radius: 50%" :src="scope.row.photo.indexOf('http') > -1 ? scope.row.photo : ('https://uploadfile1.talkmate.com/' + scope.row.photo)" fit="cover">
           </el-image>
         </template>
       </el-table-column>
