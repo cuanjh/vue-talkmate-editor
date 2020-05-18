@@ -38,6 +38,7 @@
           </el-tooltip>
           <ul>
             <li>版本：{{ item.version }}</li>
+            <li>版本描述：{{ Object.keys(item.desc).length ? item.desc['zh-CN'] : '' }}</li>
             <li>最后修改时间：{{ item.update_time | formatDate('YYYY年MM月DD日') }}</li>
           </ul>
         </div>
@@ -532,6 +533,10 @@ export default {
         font-weight: 400;
         color: #000;
         padding-top: 13px;
+        &:nth-child(2) {
+          max-height: 50px;
+          overflow: hidden;
+        }
       }
     }
   }

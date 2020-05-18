@@ -10,6 +10,11 @@
           <el-form-item label="名称：">
             <el-input v-model="form.name" maxlength="25" show-word-limit></el-input>
           </el-form-item>
+          <el-form-item label="版本描述：">
+            <div class="input-box" v-for="l in langInfos.filter(item => {return item.langKey == 'zh-CN'})" :key="'desc' + l.langKey">
+              <el-input type="textarea" v-model="form.desc[l.langKey]"></el-input>
+            </div>
+          </el-form-item>
           <!-- <el-form-item label="版本号：">
             <el-input v-model="form.version" :disabled="true"></el-input>
           </el-form-item> -->
@@ -76,6 +81,7 @@ export default {
     return {
       showEdit: false,
       versions: [],
+      versionDesc: '',
       form: {
         cover: [],
         desc: {},
@@ -404,45 +410,8 @@ export default {
     color: #000;
   }
 }
-</style>
-<style>
-.course-content .el-input {
-  width: 400px!important;
-  margin-right: 10px;
-}
-.course-content .name .el-input {
-  width: 300px!important;
-}
-.course-content .desc .el-input {
-  width: 360px!important;
-}
-.course-content .el-form label {
-  width: 90px;
-}
-.course-content .el-form .el-form-item {
-  display: flex;
-}
-.course-content .el-form .flex-class {
-  align-items: center;
-}
-.course-content .el-form-item__content {
-  display: flex!important;
-  flex-direction: column;
-}
-.course-content .input-box .el-input {
-  margin-bottom: 10px;
-}
-.course-content .desc .input-box {
-  display: flex;
-  align-items: center;
-}
-.course-content .desc .el-textarea {
-  width: auto!important;
-  margin-right: 10px;
-  margin-bottom: 20px;
-}
-.course-content .desc .el-textarea textarea{
-  width: 500px!important;
-  min-height: 80px!important;
+
+.input-box {
+  width: 500px;
 }
 </style>
