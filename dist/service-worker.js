@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/precache-manifest.25d4722c2884f9558657ae24a42c1956.js"
+  "/precache-manifest.e5d152224ae546271e32b7712bf9fdce.js"
 );
 
 workbox.core.setCacheNameDetails({prefix: "vue-talkmate-editor"});

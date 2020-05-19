@@ -192,7 +192,7 @@
         </el-form-item>
       </div>
       <el-form-item class="btn-area">
-        <el-button type="primary" @click="onSubmit" :disabled="form.courses.length == 0">保存</el-button>
+        <el-button type="primary" @click="onSubmit" :disabled="form.courses.length == 0 || isDoubleHit">保存</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -221,6 +221,7 @@ export default {
       token: '',
       dialogImageUrl: '',
       dialogVisible: false,
+      isDoubleHit: false,
       form: {
         moduleName: '',
         coverV2: '', // 大图
@@ -381,6 +382,12 @@ export default {
     onSubmit () {
       this.$refs['form'].validate(async (valid) => {
         if (valid) {
+          if (this.flag === 'add') {
+            this.isDoubleHit = true
+            setTimeout(() => {
+              this.isDoubleHit = false
+            }, 2000)
+          }
           let courses = []
           let listOrder = 1
           this.form.courses.slice(0, this.form.courseSlice).forEach(item => {
@@ -470,6 +477,10 @@ export default {
           }
           console.log(params)
           if (this.flag === 'add') {
+            this.isDoubleHit = true
+            setTimeout(() => {
+              this.isDoubleHit = false
+            }, 2000)
             addLive(params).then(res => {
               if (res.success) {
                 this.$message({
