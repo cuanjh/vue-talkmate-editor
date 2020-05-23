@@ -9,12 +9,19 @@
       :data="itemLine"
       style="width: 100%">
       <el-table-column
-        prop="time"
+        prop="created_time"
         label="日期"
+        :formatter="formatterDate"
+        width="180">
+      </el-table-column>
+      <el-table-column
+        prop="job_name"
+        label="上线任务名称"
         width="180">
       </el-table-column>
       <el-table-column
         prop="online_type"
+        :formatter="formatterType"
         label="类型"
         width="180">
       </el-table-column>
@@ -219,15 +226,13 @@ export default {
         console.log(time, type)
         this.itemLine = this.onlineList.filter(item => {
           return item.time === time && item.online_type === type
+        }).sort((a, b) => {
+          return b.created_time - a.created_time
         })
         // this.itemLine = list[0]
         console.log(this.itemLine)
         this.dialogVisible = true
       })
-    },
-    timeMoment (time) {
-      let t = time * 1000
-      return moment(t).format('YYYY/MM/DD')
     },
     getDays (now, days) {
       let list = []
@@ -243,7 +248,7 @@ export default {
       return list
     },
     initData () {
-      this.getOnlineList({ pageNo: 0, pageSize: 0 })
+      this.getOnlineList({ pageNo: 0, pageSize: 999999 })
     },
     formant (nowDate) {
       let year = nowDate.getFullYear()
@@ -254,6 +259,16 @@ export default {
     addDate (date, days) {
       date.setDate(date.getDate() + days)
       return date
+    },
+    formatterDate (row, column, cellValue, index) {
+      return moment(new Date(parseInt(cellValue) * 1000)).format('YYYY-MM-DD HH:mm')
+    },
+    formatterType (row, column, cellValue, index) {
+      if (cellValue === 'catalog') {
+        return '课程目录'
+      } else {
+        return '课程版本'
+      }
     }
   }
 }

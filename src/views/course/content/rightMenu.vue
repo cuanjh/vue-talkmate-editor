@@ -315,11 +315,11 @@ export default {
     // 权限设置
     authoritySetFn () {
       console.log(this.authorities)
-      this.authorities = this.authorities.filter(item => {
+      let authorities = this.authorities.filter(item => {
         return item.authority !== '-1'
       })
       let obj = {
-        authorities: this.authorities,
+        authorities: authorities,
         type: 'catalog',
         uuid: this.folder.uuid
       }

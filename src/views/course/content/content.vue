@@ -389,12 +389,12 @@ export default {
           catalogs = catalogs.filter(item => {
             let flag = false
             let authority = null
-            if (item.authorities) {
+            if (item.authorities && item.authorities.length) {
               authority = item.authorities.find(a => { return a.user_uuid === this.userInfo.uuid })
               if (authority && authority['auth']) {
                 flag = true
               }
-            } else if (item.copyAuthorities) {
+            } else if (item.copyAuthorities && item.copyAuthorities.length) {
               authority = item.copyAuthorities.find(a => { return a.user_uuid === this.userInfo.uuid })
               if (authority && authority['auth']) {
                 flag = true
