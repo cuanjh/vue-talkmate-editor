@@ -91,7 +91,7 @@
           :rules="[
             { required: true, message: '讲师简介不能为空'}
           ]">
-          <el-input style="width: 600px" type="textarea" v-model="form.teacherDesc" maxlength="120" show-word-limit></el-input>
+          <el-input style="width: 600px" type="textarea" v-model="form.teacherDesc" maxlength="500" show-word-limit></el-input>
         </el-form-item>
         <el-form-item label="宣传视频" prop="videoUrl">
           <div class="video" v-if="form.videoUrl">
