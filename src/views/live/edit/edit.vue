@@ -150,7 +150,7 @@
           <el-date-picker
             v-model="form.date"
             @change="changeDate"
-            :disabled="form.courses.slice(0, form.courseSlice).filter(c => { return c.state === 0 || c.state === -1 }).length > 0"
+            :disabled="flag == 'edit' && published == 'Y'"
             type="daterange"
             range-separator="至"
             start-placeholder="开始日期"
@@ -222,6 +222,7 @@ export default {
       dialogImageUrl: '',
       dialogVisible: false,
       isDoubleHit: false,
+      published: 'N',
       form: {
         moduleName: '',
         coverV2: '', // 大图
@@ -337,6 +338,7 @@ export default {
         liveRooms = JSON.parse(liveRooms)
         console.log(liveRooms)
         this.roomInfo = liveRooms.room
+        this.published = this.roomInfo.published
         this.code = this.roomInfo.code
         this.form.moduleName = this.roomInfo.module_name
         this.form.lanCode = this.roomInfo.lan_code
