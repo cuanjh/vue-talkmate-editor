@@ -150,7 +150,7 @@
           <el-date-picker
             v-model="form.date"
             @change="changeDate"
-            :disabled="flag == 'edit' && published == 'Y'"
+            :disabled="flag == 'edit' && published == 'Y' && (form.courses.length > 0 && form.courses.filter(c => c.state === 1 || c.state === -1).length > 0)"
             type="daterange"
             range-separator="至"
             start-placeholder="开始日期"
@@ -510,7 +510,7 @@ export default {
       })
     },
     selLiveRate (item) {
-      if (this.form.courses.length && this.form.courses.filter(c => c.state === 0 || c.state === -1).length) {
+      if (this.form.courses.length && this.form.courses.filter(c => c.state === 1 || c.state === -1).length) {
         this.$message({
           type: 'warning',
           message: '直播课程已经开始，不能调整直播频率！'
