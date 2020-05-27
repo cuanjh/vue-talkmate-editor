@@ -694,7 +694,7 @@ export default {
     // 删除目录(文件)
     del (params) {
       console.log(params)
-      this.$confirm('确认要删除吗?', '提示', {
+      this.$confirm('确认要删除吗? 删除后果可能很严重哦', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'

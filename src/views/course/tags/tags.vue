@@ -9,6 +9,7 @@
             style="outline:none;"
             type="success"
             class="btnOnline"
+            v-show="userInfo.authorityId == '1'"
             @click="onlineCourse">上线</el-button>
         </div>
       </div>
@@ -107,7 +108,8 @@ export default {
   computed: {
     ...mapState({
       tagTypes: state => state.course.tagTypes,
-      contentTags: state => state.course.contentTags
+      contentTags: state => state.course.contentTags,
+      userInfo: state => state.user.userInfo
     })
   },
   mounted () {

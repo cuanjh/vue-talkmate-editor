@@ -9,6 +9,7 @@
             style="outline:none;"
             type="success"
             class="btnOnline"
+            v-show="userInfo.authorityId == '1'"
             @click="onlineCourse">上线</el-button>
       </div>
     </div>
@@ -158,7 +159,8 @@ export default {
   computed: {
     ...mapState({
       assetsDomain: state => state.course.assetsDomain,
-      langInfos: state => state.course.langInfos
+      langInfos: state => state.course.langInfos,
+      userInfo: state => state.user.userInfo
     })
   },
   methods: {
