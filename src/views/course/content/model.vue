@@ -61,13 +61,13 @@
         <el-form-item label-width="140px" :label="f.name" v-if="(f.data_from !== 'content_types' && f.feild !== 'list_order' && f.feild !== 'options' && f.type !== 'array' && f.type !== 'template' && f.type !== 'templateArray' && f.feild !== 'sentence_phoneticize' && f.feild !== 'options_phoneticize') || (f.type == 'template' && contents[activeFormIndex]['' + f.feild + '']) || (version['selLang'] == 'JPN' && (f.feild == 'sentence_phoneticize' || f.feild == 'options_phoneticize')) || (f.feild === 'options' && (contents[activeFormIndex]['type'] == 'makeSentence' || contents[activeFormIndex]['type'] == 'fillGap'  || contents[activeFormIndex]['type'] == 'kid_pattern_words_3' || contents[activeFormIndex]['type'] == 'kid_pattern_sentences_3') || (f.type == 'array' && contents[activeFormIndex][f.feild]))">
           <!-- string 或 int -->
           <el-input
-            :maxlength="120" show-word-limit
+            :maxlength="150" show-word-limit
             v-if="(f.type == 'string' && f.data_from == '') || f.type == 'int' || f.type == 'template'"
             v-model="contents[activeFormIndex]['' + f.feild + '']"
             :disabled="f.feild == 'list_order' || f.type == 'template'">
           </el-input>
           <!-- string && upload -->
-          <el-input placeholder="请输入内容" v-if="f.type == 'string' && f.data_from.indexOf('upload_') > -1" :maxlength="100" show-word-limit  v-model="contents[activeFormIndex]['' + f.feild + '']">
+          <el-input placeholder="请输入内容" v-if="f.type == 'string' && f.data_from.indexOf('upload_') > -1" :maxlength="150" show-word-limit  v-model="contents[activeFormIndex]['' + f.feild + '']">
             <el-upload slot="prepend"
               v-if="f.data_from.indexOf('upload_') > -1"
               action="#"
@@ -190,7 +190,7 @@
           <div class="array-string" v-if="f.type == 'array' && (f.data_from == '' || f.data_from.indexOf('upload_') > -1) ">
             <div class="list" v-if="contents[activeFormIndex]['' + f.feild + ''].length">
               <el-input placeholder="请输入内容"
-                :maxlength="f.data_from ? '' : (f.feild == 'options' ? 50 : 100)"
+                :maxlength="f.data_from ? '' : (f.feild == 'options' ? 50 : 150)"
                 show-word-limit
                 v-for="(item, index) in contents[activeFormIndex]['' + f.feild + '']" :key="f.feild + index" v-model="contents[activeFormIndex]['' + f.feild + ''][index]">
                 <el-upload slot="prepend"
@@ -215,8 +215,8 @@
           <div class="array-object" v-if="f.type == 'arrayObject'">
             <div class="list" v-if="contents[activeFormIndex]['' + f.feild + ''].length">
               <div class="object-item" v-for="(item, index) in contents[activeFormIndex]['' + f.feild + '']" :key="index">
-                key: <el-input v-model="contents[activeFormIndex]['' + f.feild + ''][index]['key']" :maxlength="20" show-word-limit></el-input>
-                value: <el-input v-model="contents[activeFormIndex]['' + f.feild + ''][index]['val']" :maxlength="20" show-word-limit></el-input>
+                key: <el-input v-model="contents[activeFormIndex]['' + f.feild + ''][index]['key']" :maxlength="50" show-word-limit></el-input>
+                value: <el-input v-model="contents[activeFormIndex]['' + f.feild + ''][index]['val']" :maxlength="50" show-word-limit></el-input>
                 <el-button type="info" plain icon="el-icon-minus" @click="minus(index, f.feild)"></el-button>
                 <el-button v-show="index == contents[activeFormIndex]['' + f.feild + ''].length - 1" type="info" plain icon="el-icon-plus" @click="plus('object', f.feild)"></el-button>
               </div>
