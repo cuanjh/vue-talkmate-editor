@@ -235,6 +235,8 @@ export default {
         videoUrl: '',
         videoCoverUrl: '',
         shareBgUrl: '',
+        shareTitle: '',
+        shareDesc: '',
         sharePoster: [],
         posters: [],
         date: [],
@@ -352,6 +354,8 @@ export default {
         this.form.videoUrl = this.roomInfo.liveInfo.videoUrl
         this.form.videoCoverUrl = this.roomInfo.liveInfo.videoCoverUrl
         this.form.shareBgUrl = this.roomInfo.liveInfo.shareBgUrl
+        this.form.shareTitle = this.roomInfo.liveInfo.shareTitle
+        this.form.shareDesc = this.roomInfo.liveInfo.shareDesc
         this.form.sharePoster = this.roomInfo.liveInfo.sharePoster
         let posters = []
         this.roomInfo.liveInfo.posters.forEach(item => {
@@ -467,6 +471,8 @@ export default {
                 videoUrl: this.form.videoUrl,
                 videoCoverUrl: this.form.videoCoverUrl,
                 shareBgUrl: this.form.shareBgUrl,
+                shareTitle: this.form.shareTitle,
+                shareDesc: this.form.shareDesc,
                 sharePoster: this.form.sharePoster,
                 weekDays: weekDays
               },

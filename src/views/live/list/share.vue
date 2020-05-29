@@ -177,8 +177,8 @@ export default {
       }
       this.sharePoster = posters
       this.form.courseCode = params.room.code
-      this.form.shareTitle = params.room.shareTitle
-      this.form.shareDesc = params.room.shareDesc
+      this.form.shareTitle = params.room.liveInfo.shareTitle
+      this.form.shareDesc = params.room.liveInfo.shareDesc
       this.shareImageUrl = params.room.liveInfo.shareBgUrl
       this.srcList = [this.shareImageUrl]
       this.dialogFormVisible = true
