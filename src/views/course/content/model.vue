@@ -71,7 +71,7 @@
             <el-upload slot="prepend"
               v-if="f.data_from.indexOf('upload_') > -1"
               action="#"
-              :accept="f.data_from == 'upload_audio' ? 'audio/mp3' : (f.data_from == 'upload_video' ? 'video/mp4' : 'image/png,image/jpg,image/jpeg')"
+              :accept="f.data_from == 'upload_audio' ? 'audio/mp3' : (f.data_from == 'upload_video' ? 'video/mp4' : 'image/png,image/jpg,image/jpeg,image/webp')"
               :on-change="uploadOnchange"
               :show-file-list="false"
               :auto-upload="false">
@@ -159,7 +159,7 @@
               <el-upload
                 v-if="f.feild == 'image'"
                 action="#"
-                accept="image/png,image/jpg,image/jpeg"
+                accept="image/png,image/jpg,image/jpeg,image/webp"
                 :on-change="uploadImageOnchange"
                 :show-file-list="false"
                 :auto-upload="false">
@@ -168,7 +168,7 @@
               <el-upload
                 v-if="f.feild == 'cover'"
                 action="#"
-                accept="image/png,image/jpg,image/jpeg"
+                accept="image/png,image/jpg,image/jpeg,image/webp"
                 :on-change="uploadCoverOnchange"
                 :show-file-list="false"
                 :auto-upload="false">
@@ -196,7 +196,7 @@
                 <el-upload slot="prepend"
                   v-if="f.data_from.indexOf('upload_') > -1"
                   action="#"
-                  :accept="f.data_from == 'upload_audio' ? 'audio/mp3' : 'image/png,image/jpg,image/jpeg'"
+                  :accept="f.data_from == 'upload_audio' ? 'audio/mp3' : 'image/png,image/jpg,image/jpeg,image/webp'"
                   :on-change="uploadOnchange"
                   :show-file-list="false"
                   :auto-upload="false">
