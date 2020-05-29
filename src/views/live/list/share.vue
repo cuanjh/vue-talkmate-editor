@@ -6,6 +6,12 @@
           <el-form-item label="分享网址">
             <el-input v-model="form.jumpUrl" placeholder="http://"></el-input>
           </el-form-item>
+          <el-form-item label="标题">
+            <el-input v-model="form.shareTitle" maxlength="25" show-word-limit></el-input>
+          </el-form-item>
+          <el-form-item label="描述">
+            <el-input type="textarea" v-model="form.shareDesc" maxlength="50" show-word-limit></el-input>
+          </el-form-item>
           <el-form-item label="背景图" prop="bgImg">
             <el-upload
               class="upload-demo"
@@ -108,6 +114,8 @@ export default {
       form: {
         courseCode: '',
         jumpUrl: 'http://test-learn.talkmate.com:82/liveShare/index.html',
+        shareTitle: '',
+        shareDesc: '',
         bgImg: null,
         qrCodeX: 170,
         qrCodeY: 170,
@@ -116,6 +124,12 @@ export default {
         'sharePoster[]': ''
       },
       rules: {
+        shareTitle: [
+          { required: true, message: '请输入分享标题', trigger: 'blur' }
+        ],
+        shareDesc: [
+          { required: true, message: '请输入分享描述', trigger: 'blur' }
+        ],
         bgImg: [
           { required: true, message: '请上传背景图', trigger: 'change' }
         ],
@@ -163,6 +177,8 @@ export default {
       }
       this.sharePoster = posters
       this.form.courseCode = params.room.code
+      this.form.shareTitle = params.room.shareTitle
+      this.form.shareDesc = params.room.shareDesc
       this.shareImageUrl = params.room.liveInfo.shareBgUrl
       this.srcList = [this.shareImageUrl]
       this.dialogFormVisible = true
@@ -174,6 +190,8 @@ export default {
       this.fileList = []
       this.form = {
         courseCode: '',
+        shareTitle: '',
+        shareDesc: '',
         jumpUrl: 'http://test-learn.talkmate.com:82/liveShare/index.html',
         bgImg: null,
         qrCodeX: 174,
