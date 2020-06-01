@@ -160,7 +160,7 @@
         <el-form-item label="排除日期">
           <el-date-picker
             type="dates"
-            v-model="form.exclude_dates"
+            v-model="excludeDates"
             @change="changeExcludeDates"
             placeholder="请选择要排除掉的日期">
           </el-date-picker>
@@ -231,6 +231,7 @@ export default {
       dialogVisible: false,
       isDoubleHit: false,
       published: 'N',
+      excludeDates: [],
       form: {
         moduleName: '',
         coverV2: '', // 大图
@@ -376,7 +377,12 @@ export default {
         this.form.posters = posters
         this.form.date.push(this.roomInfo.liveInfo.startDate)
         this.form.date.push(this.roomInfo.liveInfo.endDate)
-        this.form.exclude_dates = this.roomInfo.liveInfo.exclude_dates
+        this.excludeDates = []
+        if (this.roomInfo.liveInfo.exclude_dates && this.roomInfo.liveInfo.exclude_dates.length > 0) {
+          this.roomInfo.liveInfo.exclude_dates.forEach(d => {
+            this.excludeDates.push(new Date(d))
+          })
+        }
         this.form.time = []
         let startTime = new Date(this.roomInfo.liveInfo.startDate + ' ' + this.roomInfo.liveInfo.startTime)
         this.form.time[0] = this.isValidDate(startTime) ? startTime : new Date()
@@ -461,6 +467,12 @@ export default {
             url += '?w=' + img.width + '&h=' + img.height
             posters[j] = url
           }
+          let excludeDates = []
+          if (this.excludeDates) {
+            this.excludeDates.forEach(d => {
+              excludeDates.push(moment(d).format('YYYY-MM-DD'))
+            })
+          }
           let params = {
             courses: courses,
             room: {
@@ -475,7 +487,7 @@ export default {
                 posters: posters,
                 startDate: moment(this.form.date[0]).format('YYYY-MM-DD'),
                 startTime: moment(this.form.time[0]).format('HH:mm:ss'),
-                exclude_dates: this.form.exclude_dates,
+                exclude_dates: excludeDates,
                 tech_desc: this.form.teacherDesc,
                 tech_name: this.form.teacherName,
                 tech_photo: this.form.teacherPhoto,
@@ -552,10 +564,10 @@ export default {
         let endDate = new Date(this.form.date[1]).getTime()
         let count = 0
         let excludeDs = ''
-        if (this.form.exclude_dates && this.form.exclude_dates.length > 0) {
-          this.form.exclude_dates.forEach((d, index) => {
+        if (this.excludeDates && this.excludeDates.length > 0) {
+          this.excludeDates.forEach((d, index) => {
             excludeDs += moment(d).format('YYYY-MM-DD')
-            if (this.form.exclude_dates.length - 1 !== index) {
+            if (this.excludeDates.length - 1 !== index) {
               excludeDs += ','
             }
           })
@@ -644,6 +656,7 @@ export default {
       })
     },
     changeExcludeDates () {
+      console.log(this.excludeDates)
       this.generateCourses()
     }
   }
