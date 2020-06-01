@@ -130,9 +130,9 @@ export default {
         shareDesc: [
           { required: true, message: '请输入分享描述', trigger: 'blur' }
         ],
-        bgImg: [
-          { required: true, message: '请上传背景图', trigger: 'change' }
-        ],
+        // bgImg: [
+        //   { required: true, message: '请上传背景图', trigger: 'change' }
+        // ],
         qrCodeX: [
           { type: 'number', message: '二维码宽必须为数字值' }
         ],
@@ -223,8 +223,10 @@ export default {
                 type: 'success',
                 message: '生成成功'
               })
-              this.shareImageUrl = res.data.shareBgUrl
-              this.srcList = [this.shareImageUrl]
+              if (this.bgImg) {
+                this.shareImageUrl = res.data.shareBgUrl
+                this.srcList = [this.shareImageUrl]
+              }
             }
           })
         }

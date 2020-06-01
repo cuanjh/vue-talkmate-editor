@@ -468,7 +468,7 @@ export default {
             posters[j] = url
           }
           let excludeDates = []
-          if (this.excludeDates) {
+          if (this.excludeDates && this.excludeDates.length > 0) {
             this.excludeDates.forEach(d => {
               excludeDates.push(moment(d).format('YYYY-MM-DD HH:mm:ss'))
             })
