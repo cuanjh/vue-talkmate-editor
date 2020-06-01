@@ -72,7 +72,10 @@ export const course = {
       { value: 328, text: '¥ 328' },
       { value: 588, text: '¥ 588' },
       { value: 998, text: '¥ 998' },
+      { value: 1398, text: '¥ 1398' },
+      { value: 1698, text: '¥ 1698' },
       { value: 1998, text: '¥ 1998' },
+      { value: 2298, text: '¥ 2298' },
       { value: 3298, text: '¥ 3298' },
       { value: 6498, text: '¥ 6498' }
     ],
