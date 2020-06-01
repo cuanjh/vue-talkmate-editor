@@ -952,6 +952,19 @@ export const offlineLiveCourse = (data) => {
 }
 
 /**
+ * @Summary 获取推流地址
+ * @param {*} data
+ * @Router /live/pushurl [post]
+ */
+export const getLivePushUrl = (data) => {
+  return service({
+    url: '/live/pushurl',
+    method: 'post',
+    data
+  })
+}
+
+/**
  * @Summary 发送直播间聊天室消息
  * @param {*} data
  * @Router /live/chatroom/sendmsg [post]

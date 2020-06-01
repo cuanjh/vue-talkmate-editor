@@ -157,6 +157,14 @@
             end-placeholder="结束日期">
           </el-date-picker>
         </el-form-item>
+        <el-form-item label="排除日期">
+          <el-date-picker
+            type="dates"
+            v-model="form.exclude_dates"
+            @change="changeExcludeDates"
+            placeholder="请选择要排除掉的日期">
+          </el-date-picker>
+        </el-form-item>
         <el-form-item label="直播时间" prop="time"
           :rules="[
             {type: 'array', required: true, message: '请选择直播时间', trigger: 'change'}
@@ -240,6 +248,7 @@ export default {
         sharePoster: [],
         posters: [],
         date: [],
+        exclude_dates: [],
         time: [
           new Date(),
           new Date()
@@ -367,6 +376,7 @@ export default {
         this.form.posters = posters
         this.form.date.push(this.roomInfo.liveInfo.startDate)
         this.form.date.push(this.roomInfo.liveInfo.endDate)
+        this.form.exclude_dates = this.roomInfo.liveInfo.exclude_dates
         this.form.time = []
         let startTime = new Date(this.roomInfo.liveInfo.startDate + ' ' + this.roomInfo.liveInfo.startTime)
         this.form.time[0] = this.isValidDate(startTime) ? startTime : new Date()
@@ -465,6 +475,7 @@ export default {
                 posters: posters,
                 startDate: moment(this.form.date[0]).format('YYYY-MM-DD'),
                 startTime: moment(this.form.time[0]).format('HH:mm:ss'),
+                exclude_dates: this.form.exclude_dates,
                 tech_desc: this.form.teacherDesc,
                 tech_name: this.form.teacherName,
                 tech_photo: this.form.teacherPhoto,
@@ -540,12 +551,30 @@ export default {
         let startDate = new Date(this.form.date[0]).getTime()
         let endDate = new Date(this.form.date[1]).getTime()
         let count = 0
+        let excludeDs = ''
+        if (this.form.exclude_dates && this.form.exclude_dates.length > 0) {
+          this.form.exclude_dates.forEach((d, index) => {
+            excludeDs += moment(d).format('YYYY-MM-DD')
+            if (this.form.exclude_dates.length - 1 !== index) {
+              excludeDs += ','
+            }
+          })
+        }
         for (let i = startDate; i <= endDate;) {
           console.log(moment(i).format('YYYY-MM-DD'), moment(i).day())
           if (this.form.liveRate.filter(item => { return item.selected && item.id === moment(i).day() + '' }).length) {
             if (this.form.courses.length > count) {
-              this.form.courses[count].date = moment(i).format('YYYY-MM-DD')
-              this.form.courses[count].week = moment(i).day()
+              if (excludeDs && excludeDs.indexOf(moment(i).format('YYYY-MM-DD')) > -1) {
+                let fIndex = this.form.courses.findIndex(item => item.date === moment(i).format('YYYY-MM-DD'))
+                console.log(this.form.courses)
+                if (fIndex > -1) {
+                  this.form.courses.splice(fIndex, 1)
+                }
+              } else {
+                this.form.courses[count].date = moment(i).format('YYYY-MM-DD')
+                this.form.courses[count].week = moment(i).day()
+                count++
+              }
             } else {
               let obj = {
                 date: moment(i).format('YYYY-MM-DD'),
@@ -553,9 +582,11 @@ export default {
                 title: '',
                 uuid: ''
               }
-              this.form.courses.push(obj)
+              if (excludeDs === '' || excludeDs.indexOf(moment(i).format('YYYY-MM-DD')) === -1) {
+                this.form.courses.push(obj)
+                count++
+              }
             }
-            count++
           }
           i += 24 * 60 * 60 * 1000
         }
@@ -611,6 +642,9 @@ export default {
           reject(new Error('图片加载失败'))
         }
       })
+    },
+    changeExcludeDates () {
+      this.generateCourses()
     }
   }
 }

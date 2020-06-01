@@ -69,8 +69,8 @@
                 <i class="el-icon-plus"></i>
               </div>
             </el-upload>
-            <el-dialog :visible.sync="dialogVisible">
-              <img width="100%" :src="dialogImageUrl" alt="">
+            <el-dialog :visible.sync="dialogVisible1" append-to-body>
+              <img width="100%" :src="dialogImageUrl1" alt="">
             </el-dialog>
           </el-form-item>
         </el-form>

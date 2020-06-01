@@ -4,7 +4,7 @@
       <el-button type="primary" icon="el-icon-plus" @click="add">添加直播间</el-button>
     </div>
     <el-table
-      :data="rooms"
+      :data="rooms.filter(data => !search || data.room.module_name.toLowerCase().includes(search.toLowerCase()))"
       :row-key="getRowKey"
       :expand-row-keys="expandRowKeys"
       @expand-change="expandChange"
@@ -14,7 +14,7 @@
           <div class="live-courses">
             <el-row :gutter="5" :class="['course', { 'notStarted': props.row.courses[index].state == 0, 'inClass': props.row.courses[index].state == 1 }]" v-for="(c, index) in props.row.courses" :key="c.uuid">
               <el-col :span="1" class="course-column">{{ '第' + (index + 1) + '课'}}</el-col>
-              <el-col :span="6" class="course-column">{{ c.title }}</el-col>
+              <el-col :span="5" class="course-column">{{ c.title }}</el-col>
               <el-col :span="4" class="course-column">{{ formatCourseDate(c) }}</el-col>
               <el-col :span="4" class="course-column">
                 <el-select size="small" :disabled="props.row.courses[index].state == -1" v-model="props.row.courses[index].state" placeholder="请选择..." @change="changeCourseState(c, props.row.courses, props.row, index)">
@@ -23,16 +23,15 @@
                   <el-option :label="'已下课'" :disabled="props.row.courses[index].state == 0" :value="-1"></el-option>
                 </el-select>
               </el-col>
-              <el-col :span="3" class="course-column">
-                <el-button type="primary" :disabled="props.row.courses[index].state !== 1" class="btnPushLink" @click="publishComment(c)">发表评论</el-button>
-              </el-col>
-              <el-col :span="3" class="course-column">
-                <el-button type="primary" :disabled="props.row.courses[index].state === 0" class="btnPushLink" @click="getComments(c)">评论列表</el-button>
-              </el-col>
-              <el-col :span="3" class="course-column">
-                <el-tooltip class="item" effect="dark" :content="c.livePushUrl" placement="top">
-                  <el-button type="primary" :disabled="c.livePushUrl == ''" class="btnPushLink" @click="copyLink(c)">复制推流链接</el-button>
-                </el-tooltip>
+              <el-col :span="10" class="course-column">
+                <el-row>
+                  <el-button type="primary" size="small" :disabled="props.row.courses[index].state !== 1" class="btnPushLink" @click="publishComment(c)">发表评论</el-button>
+                  <el-button type="primary" size="small" :disabled="props.row.courses[index].state === 0" class="btnPushLink" @click="getComments(c)">评论列表</el-button>
+                  <el-button type="primary" size="small" :disabled="props.row.courses[index].state == -1" class="btnPushLink" @click="refreshLink(c)">刷新推流链接</el-button>
+                  <el-tooltip class="item" effect="dark" :content="c.livePushUrl" placement="top">
+                    <el-button type="primary" size="small" :disabled="c.livePushUrl == '' || props.row.courses[index].state == -1" class="btnPushLink" @click="copyLink(c)">复制推流链接</el-button>
+                  </el-tooltip>
+                </el-row>
               </el-col>
             </el-row>
           </div>
@@ -86,6 +85,12 @@
         </template>
       </el-table-column>
       <el-table-column label="操作" width="380" fixed="right">
+        <template slot="header" slot-scope="scope">
+          <el-input
+            v-model="search"
+            size="mini"
+            placeholder="输入关键字搜索" :data-scope="scope"/>
+        </template>
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -129,7 +134,8 @@ import {
   offlineLive,
   delLive,
   onlineLiveCourse,
-  offlineLiveCourse
+  offlineLiveCourse,
+  getLivePushUrl
 } from '@/api/course'
 import { mapState, mapActions } from 'vuex'
 
@@ -137,6 +143,7 @@ export default {
   data () {
     return {
       rooms: [],
+      search: '',
       liveRate: {
         '1': '一',
         '2': '二',
@@ -324,6 +331,14 @@ export default {
       this.expandChange = []
       expandedRows.forEach(item => {
         this.expandChange.push(item.room.code)
+      })
+    },
+    // 刷新推流链接
+    refreshLink (c) {
+      getLivePushUrl({ uuid: c.uuid }).then(res => {
+        if (res.success) {
+          this.initData()
+        }
       })
     },
     // 复制推流链接
