@@ -47,7 +47,7 @@
                 { required: true, message: '原价不能为空'}
               ]">
               <el-select v-model="form.money" filterable>
-                <el-option v-for="item in livePrices" :key="item.value" :label="item.text" :value="item.value"></el-option>
+                <el-option v-for="item in livePrices" :key="'money-' + item.value" :label="item.text" :value="item.value"></el-option>
               </el-select>
             </el-form-item>
           </div>
@@ -57,7 +57,7 @@
                 { required: true, message: '折后价不能为空'}
               ]">
               <el-select v-model="form.moneyDiscount" filterable>
-                <el-option v-for="item in livePrices" :key="item.value" :label="item.text" :value="item.value"></el-option>
+                <el-option v-for="item in livePrices" :key="'moneyDiscount-' + item.value" :label="item.text" :value="item.value"></el-option>
               </el-select>
             </el-form-item>
           </div>
