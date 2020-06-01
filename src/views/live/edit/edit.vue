@@ -470,7 +470,7 @@ export default {
           let excludeDates = []
           if (this.excludeDates) {
             this.excludeDates.forEach(d => {
-              excludeDates.push(moment(d).format('YYYY-MM-DD'))
+              excludeDates.push(moment(d).format('YYYY-MM-DD HH:mm:ss'))
             })
           }
           let params = {
