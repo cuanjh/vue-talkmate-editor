@@ -31,6 +31,7 @@
                   <el-tooltip class="item" effect="dark" :content="c.livePushUrl" placement="top">
                     <el-button type="primary" size="small" :disabled="c.livePushUrl == '' || props.row.courses[index].state == -1" class="btnPushLink" @click="copyLink(c)">复制推流链接</el-button>
                   </el-tooltip>
+                  <el-button type="primary" size="small" class="btnPushLink" @click="editLiveCourse(c)">编辑</el-button>
                 </el-row>
               </el-col>
             </el-row>
@@ -116,8 +117,9 @@
       </el-table-column>
     </el-table>
     <share ref="share" @initData="initData" />
-    <comment ref="comment" />
+    <comment ref="comment" @initData="initData" />
     <comment-list ref="commentList" />
+    <edit-course ref="editCourse" @initData="initData"  />
   </div>
 </template>
 
@@ -127,6 +129,7 @@ import Clipboard from 'clipboard'
 import Share from './share'
 import Comment from './comment'
 import CommentList from './commentList'
+import EditCourse from './editCourse'
 
 import {
   getLiveList,
@@ -162,7 +165,8 @@ export default {
   components: {
     Share,
     Comment,
-    CommentList
+    CommentList,
+    EditCourse
   },
   mounted () {
     this.getMajia()
@@ -369,6 +373,10 @@ export default {
     },
     getComments (c) {
       this.$refs['commentList'].show(c)
+    },
+    editLiveCourse (c) {
+      console.log(c)
+      this.$refs['editCourse'].show(c)
     }
   }
 }

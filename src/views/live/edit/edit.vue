@@ -103,7 +103,7 @@
             :on-change="uploadOnchange"
             :show-file-list="false"
             :auto-upload="false">
-            <el-button type="primary" icon="el-icon-upload" @click="setUploadField('image,videoUrl')">上传</el-button>
+            <el-button type="primary" icon="el-icon-upload" @click="setUploadField('video,videoUrl')">上传</el-button>
           </el-upload>
         </el-form-item>
         <el-form-item label="视频封面" prop="videoCoverUrl">

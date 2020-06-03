@@ -952,6 +952,19 @@ export const offlineLiveCourse = (data) => {
 }
 
 /**
+ * @Summary 编辑直播课程
+ * @param {*} data
+ * @Router /live/course/edit [post]
+ */
+export const editLiveCourse = (data) => {
+  return service({
+    url: '/live/course/edit',
+    method: 'post',
+    data
+  })
+}
+
+/**
  * @Summary 获取推流地址
  * @param {*} data
  * @Router /live/pushurl [post]
