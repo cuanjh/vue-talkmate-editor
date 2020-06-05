@@ -15,6 +15,7 @@
         <el-radio-group v-model="form.role">
           <el-radio label="student">学生</el-radio>
           <el-radio label="teacher">老师</el-radio>
+          <el-radio label="admin">管理员</el-radio>
         </el-radio-group>
       </el-form-item>
        <el-form-item label="打赏金币">

@@ -1,6 +1,9 @@
 <template>
   <el-dialog width="70%" title="课程编辑" :visible.sync="dialogFormVisible" @close="close">
     <el-form :model="form" :rules="rules" ref="form" label-width="120px">
+      <el-form-item label="标题">
+        <label>{{title}}</label>
+      </el-form-item>
       <el-form-item label="视频地址" prop="videoUrl">
         <el-input v-model="form.videoUrl" placeholder="https://"></el-input>
       </el-form-item>
@@ -26,6 +29,7 @@ export default {
       dialogFormVisible: false,
       dialogVisible: false,
       uploadField: '',
+      title: '',
       token: '',
       form: {
         uuid: '',
@@ -52,6 +56,7 @@ export default {
     show (params) {
       console.log(params)
       this.resetForm()
+      this.title = params.title
       this.form.uuid = params.uuid
       this.dialogFormVisible = true
     },
