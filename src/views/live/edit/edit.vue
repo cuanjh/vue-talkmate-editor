@@ -85,13 +85,31 @@
           :rules="[
             { required: true, message: '讲师姓名不能为空'}
           ]">
-          <el-input v-model="form.teacherName" maxlength="10" show-word-limit></el-input>
+          <el-input v-model="form.teacherName" maxlength="20" show-word-limit></el-input>
         </el-form-item>
         <el-form-item label="讲师简介" prop="teacherDesc"
           :rules="[
             { required: true, message: '讲师简介不能为空'}
           ]">
           <el-input style="width: 600px" type="textarea" v-model="form.teacherDesc" maxlength="500" show-word-limit></el-input>
+        </el-form-item>
+        <el-form-item label="微信号" prop="weixinNo"
+          :rules="[
+            { required: true, message: '微信号不能为空'}
+          ]">
+          <el-input v-model="form.weixinNo" maxlength="20" show-word-limit></el-input>
+        </el-form-item>
+        <el-form-item label="结束标题" prop="finishTitle"
+          :rules="[
+            { required: true, message: '结束标题不能为空'}
+          ]">
+          <el-input v-model="form.finishTitle" maxlength="12" show-word-limit></el-input>
+        </el-form-item>
+        <el-form-item label="结束通知" prop="finishInfo"
+          :rules="[
+            { required: true, message: '结束通知不能为空' }
+          ]">
+          <el-input style="width: 600px" type="textarea" v-model="form.finishInfo" maxlength="90" show-word-limit></el-input>
         </el-form-item>
         <el-form-item label="宣传视频" prop="videoUrl">
           <div class="video" v-if="form.videoUrl">
@@ -241,6 +259,9 @@ export default {
         teacherPhoto: '',
         teacherName: '',
         teacherDesc: '',
+        finishTitle: '',
+        finishInfo: '',
+        weixinNo: '',
         videoUrl: '',
         videoCoverUrl: '',
         shareBgUrl: '',
@@ -361,6 +382,9 @@ export default {
         this.form.teacherPhoto = this.roomInfo.liveInfo.tech_photo
         this.form.teacherName = this.roomInfo.liveInfo.tech_name
         this.form.teacherDesc = this.roomInfo.liveInfo.tech_desc
+        this.form.weixinNo = this.roomInfo.liveInfo.weixinNo
+        this.form.finishTitle = this.roomInfo.liveInfo.finishTitle
+        this.form.finishInfo = this.roomInfo.liveInfo.finishInfo
         this.form.videoUrl = this.roomInfo.liveInfo.videoUrl
         this.form.videoCoverUrl = this.roomInfo.liveInfo.videoCoverUrl
         this.form.shareBgUrl = this.roomInfo.liveInfo.shareBgUrl
@@ -431,6 +455,9 @@ export default {
               realEndTime: item.realEndTime ? item.realEndTime : 0,
               realStartTime: item.realStartTime ? item.realStartTime : 0,
               startTime: state === 0 ? startTime : item.startTime,
+              finishTitle: item.finishTitle ? item.finishTitle : '',
+              finishInfo: item.finishInfo ? item.finishInfo : '',
+              weixinNo: item.weixinNo ? item.weixinNo : '',
               title: item.title,
               uuid: item.uuid,
               state: state
@@ -491,6 +518,9 @@ export default {
                 tech_desc: this.form.teacherDesc,
                 tech_name: this.form.teacherName,
                 tech_photo: this.form.teacherPhoto,
+                weixinNo: this.form.weixinNo,
+                finishTitle: this.form.finishTitle,
+                finishInfo: this.form.finishInfo,
                 videoUrl: this.form.videoUrl,
                 videoCoverUrl: this.form.videoCoverUrl,
                 shareBgUrl: this.form.shareBgUrl,

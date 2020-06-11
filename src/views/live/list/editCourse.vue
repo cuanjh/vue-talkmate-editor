@@ -7,6 +7,15 @@
       <el-form-item label="视频地址" prop="videoUrl">
         <el-input v-model="form.videoUrl" placeholder="https://"></el-input>
       </el-form-item>
+      <el-form-item label="微信号">
+        <el-input v-model="form.weixinNo" maxlength="20" show-word-limit></el-input>
+      </el-form-item>
+      <el-form-item label="结束标题">
+        <el-input v-model="form.finishTitle" maxlength="12" show-word-limit></el-input>
+      </el-form-item>
+      <el-form-item label="结束通知">
+        <el-input type="textarea" v-model="form.finishInfo" maxlength="90" show-word-limit></el-input>
+      </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
       <el-button @click="dialogFormVisible = false">取消</el-button>
@@ -33,12 +42,15 @@ export default {
       token: '',
       form: {
         uuid: '',
-        videoUrl: ''
+        videoUrl: '',
+        finishTitle: '',
+        finishInfo: '',
+        weixinNo: ''
       },
       rules: {
-        videoUrl: [
-          { required: true, message: '请填写课程视频地址', trigger: 'blur' }
-        ]
+        // videoUrl: [
+        //   { required: true, message: '请填写课程视频地址', trigger: 'blur' }
+        // ]
       }
     }
   },
@@ -57,12 +69,18 @@ export default {
       console.log(params)
       this.resetForm()
       this.title = params.title
+      this.form.finishTitle = params.finishTitle
+      this.form.finishInfo = params.finishInfo
+      this.form.weixinNo = params.weixinNo
       this.form.uuid = params.uuid
       this.dialogFormVisible = true
     },
     resetForm () {
       this.form = {
-        videoUrl: ''
+        videoUrl: '',
+        finishTitle: '',
+        finishInfo: '',
+        weixinNo: ''
       }
     },
     async uploadOnchange (file, fileList) {

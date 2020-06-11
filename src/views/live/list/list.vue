@@ -14,7 +14,7 @@
           <div class="live-courses">
             <el-row :gutter="5" :class="['course', { 'notStarted': props.row.courses[index].state == 0, 'inClass': props.row.courses[index].state == 1 }]" v-for="(c, index) in props.row.courses" :key="c.uuid">
               <el-col :span="1" class="course-column">{{ '第' + (index + 1) + '课'}}</el-col>
-              <el-col :span="5" class="course-column">{{ c.title }}</el-col>
+              <el-col :span="4" class="course-column">{{ c.title }}</el-col>
               <el-col :span="4" class="course-column">{{ formatCourseDate(c) }}</el-col>
               <el-col :span="4" class="course-column">
                 <el-select size="small" :disabled="props.row.courses[index].state == -1" v-model="props.row.courses[index].state" placeholder="请选择..." @change="changeCourseState(c, props.row.courses, props.row, index)">
@@ -23,7 +23,7 @@
                   <el-option :label="'已下课'" :disabled="props.row.courses[index].state == 0" :value="-1"></el-option>
                 </el-select>
               </el-col>
-              <el-col :span="10" class="course-column">
+              <el-col :span="11" class="course-column">
                 <el-row>
                   <el-button type="primary" size="small" :disabled="props.row.courses[index].state !== 1" class="btnPushLink" @click="publishComment(c)">发表评论</el-button>
                   <el-button type="primary" size="small" :disabled="props.row.courses[index].state === 0" class="btnPushLink" @click="getComments(c)">评论列表</el-button>
