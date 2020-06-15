@@ -1004,6 +1004,32 @@ export const getChartroomComments = (data) => {
 }
 
 /**
+ * @Summary 添加禁言聊天室成员
+ * @param {*} data
+ * @Router /live/gagadd [post]
+ */
+export const addLiveGag = (data) => {
+  return service({
+    url: '/live/gagadd',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 移除禁言聊天室成员
+ * @param {*} data
+ * @Router /live/gagremove [post]
+ */
+export const removeLiveGag = (data) => {
+  return service({
+    url: '/live/gagremove',
+    method: 'post',
+    data
+  })
+}
+
+/**
  * @Summary 获取马甲用户
  * @param {*} data
  * @Router /live/chatroom/majia [get]
