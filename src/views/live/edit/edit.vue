@@ -426,6 +426,25 @@ export default {
       }
     },
     onSubmit () {
+      let message = ''
+      if (this.form.videoUrl !== '' && this.form.videoCoverUrl === '') {
+        message = '请上传视频封面'
+      }
+      if (this.form.videoUrl === '' && this.form.videoCoverUrl !== '') {
+        message = '请上传宣传视频'
+      }
+      if (this.form.courses.slice(0, this.form.courseSlice).filter(item => {
+        return item.title === ''
+      }).length > 0) {
+        message = '请完善课程信息'
+      }
+      if (message !== '') {
+        this.$message({
+          type: 'warning',
+          message: message
+        })
+        return false
+      }
       this.$refs['form'].validate(async (valid) => {
         if (valid) {
           if (this.flag === 'add') {
