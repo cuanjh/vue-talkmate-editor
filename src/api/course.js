@@ -626,6 +626,45 @@ export const searchImages = (data) => {
 }
 
 /**
+ * @Summary 图片库标签列表
+ * @param {*} data
+ * @Router /editor/image/tags [post]
+ */
+export const imagesTags = (data) => {
+  return service({
+    url: '/editor/image/tags',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 添加图片库标签
+ * @param {*} data
+ * @Router /editor/image/tag/add [post]
+ */
+export const addImageTag = (data) => {
+  return service({
+    url: '/editor/image/tag/add',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 删除图片库标签
+ * @param {*} data
+ * @Router /editor/image/tag/del [post]
+ */
+export const delImageTag = (data) => {
+  return service({
+    url: '/editor/image/tag/del',
+    method: 'post',
+    data
+  })
+}
+
+/**
  * @Summary 搜索内容
  * @param {*} data
  * @Router /editor/content/search [post]
@@ -764,6 +803,58 @@ export const getOnlineList = (data) => {
   return service({
     url: '/editor/online/list',
     method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 课堂微信群列表
+ * @param {*} data
+ * @Router /editor/class_weixin/list [post]
+ */
+export const getClassWXList = (data) => {
+  return service({
+    url: '/editor/class_weixin/list',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 添加课堂微信群
+ * @param {*} data
+ * @Router /editor/class_weixin/add [post]
+ */
+export const addClassWX = (data) => {
+  return service({
+    url: '/editor/class_weixin/add',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 编辑课堂微信群
+ * @param {*} data
+ * @Router /editor/class_weixin/edit [put]
+ */
+export const editClassWX = (data) => {
+  return service({
+    url: '/editor/class_weixin/edit',
+    method: 'put',
+    data
+  })
+}
+
+/**
+ * @Summary 删除课堂微信群
+ * @param {*} data
+ * @Router /editor/class_weixin/del [delete]
+ */
+export const delClassWX = (data) => {
+  return service({
+    url: '/editor/class_weixin/del',
+    method: 'delete',
     data
   })
 }

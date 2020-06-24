@@ -20,7 +20,7 @@
           style="outline:none;"
           type="primary"
           class="btnAdd"
-          :disabled="courseList && courseList.length == 2"
+          :disabled="courseList && courseList.length == 3"
           @click="addCourse">添加</el-button>
         <el-button v-show="userInfo.authority.authorityId == '1' || userInfo.authority.authorityId == '2'"
           style="outline:none;"
@@ -46,10 +46,8 @@
       </el-table-column>
       <el-table-column
         width="100"
-        label="课程分类">
-        <template slot-scope="scope">
-          {{scope.row.course_type == 0 ? 'PRO' : 'KID'}}
-        </template>
+        label="课程分类"
+        :formatter="formatterCourseType">
       </el-table-column>
       <el-table-column
         width="120"
@@ -90,7 +88,7 @@
           {{scope.row.is_show ? '是' : '否'}}
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="250px">
+      <el-table-column label="操作" width="290px">
         <template slot-scope="scope">
           <el-button
             v-show="userInfo.authority.authorityId == '1' || userInfo.authority.authorityId == '2'"
@@ -104,6 +102,11 @@
             type="danger"
             plain
             @click="deleteCourse(scope.row.uuid)">删除</el-button>
+          <el-button
+            size="mini"
+            type="primary"
+            plain
+            @click="classGroup(scope.row)">班级群</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -111,6 +114,7 @@
       :courseTypes="courseTypes"
       :courseList="courseList"
       @addNewCourse="initData"/>
+    <class-group ref="classGroup" />
   </div>
 </template>
 
@@ -123,6 +127,7 @@ import {
   onlineCourses
 } from '@/api/course'
 import EditComp from './edit'
+import ClassGroup from './classGroup'
 
 export default {
   data () {
@@ -133,7 +138,8 @@ export default {
     }
   },
   components: {
-    EditComp
+    EditComp,
+    ClassGroup
   },
   created () {
     this.getLangList({ 'pageNo': 0, 'pageSize': 999 })
@@ -276,6 +282,27 @@ export default {
     },
     selectAll (selection) {
       this.selCourseList = selection
+    },
+    formatterCourseType (obj) {
+      let desc = ''
+      switch (obj.course_type) {
+        case 0:
+          desc = 'PRO'
+          break
+        case 3:
+          desc = 'KID'
+          break
+        case 5:
+          desc = 'PRI'
+          break
+        default:
+          desc = 'PRO'
+          break
+      }
+      return desc
+    },
+    classGroup (row) {
+      this.$refs['classGroup'].show(row)
     }
   }
 }

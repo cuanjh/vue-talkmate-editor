@@ -223,7 +223,7 @@ export default {
                 type: 'success',
                 message: '生成成功'
               })
-              if (this.bgImg) {
+              if (this.form.bgImg) {
                 this.shareImageUrl = res.data.shareBgUrl
                 this.srcList = [this.shareImageUrl]
               }

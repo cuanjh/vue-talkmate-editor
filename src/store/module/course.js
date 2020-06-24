@@ -181,11 +181,13 @@ export const course = {
     // 获取课程版本
     async getCourseVersions ({ commit }, data) {
       const res = await getCourseVersionList(data)
-      if (res.success) {
+      if (res.success && res.data.contents) {
         let versions = res.data.contents.sort((a, b) => {
           return b['update_time'] - a['update_time']
         })
         commit('updateVersion', { key: 'versions', val: versions })
+      } else {
+        commit('updateVersion', { key: 'versions', val: [] })
       }
     },
     // 获取内容模型列表

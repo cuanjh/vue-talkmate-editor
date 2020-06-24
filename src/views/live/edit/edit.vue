@@ -9,10 +9,69 @@
           ]">
           <el-input v-model="form.moduleName" maxlength="30" show-word-limit></el-input>
         </el-form-item>
+        <el-form-item label="定级" prop="level"
+          :rules="[
+            { required: true, message: '请选择定级'}
+          ]">
+          <el-select v-model="form.level" filterable placeholder="请选择定级">
+            <el-option label="无" :value="0"></el-option>
+            <el-option label="1级" :value="1"></el-option>
+            <el-option label="2级" :value="2"></el-option>
+            <el-option label="3级" :value="3"></el-option>
+          </el-select>
+          <br>
+          <el-tag type="warning">1级（全球说官方、签约大V、知名学者等）、2级（网红小V、兼职教师等）、3级（其他）</el-tag>
+        </el-form-item>
         <el-form-item label="所属语种">
-          <el-select v-model="form.lanCode" filterable placeholder="请选择所属语种">
+          <el-select v-model="form.lanCode" filterable placeholder="请选择所属语种" @change="changeLangCode">
             <el-option v-for="lang in langList" :key="lang.lan_key" :label="lang.title['' + locale + '']" :value="lang.lan_code"></el-option>
           </el-select>
+        </el-form-item>
+        <el-form-item label="官方课程">
+          <el-select v-model="form.basicCourseCode" filterable @change="changeBasicCourse">
+            <el-option v-for="item in basicCourses" :key="item.code" :label="item.title['' + locale + '']" :value="item.code"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="课程级别">
+          <el-select v-model="form.basicContentLevel" filterable placeholder="请选择课程级别">
+            <el-option label="无" value=""></el-option>
+            <el-option label="L1" value="L1"></el-option>
+            <el-option label="L2" value="L2"></el-option>
+            <el-option label="L3" value="L3"></el-option>
+            <el-option label="L4" value="L4"></el-option>
+            <el-option label="L5" value="L5"></el-option>
+            <el-option label="L6" value="L6"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="首页封面">
+          <el-upload
+            class="avatar-uploader"
+            action="#"
+            accept="image/png,image/jpg,image/jpeg"
+            :on-change="uploadOnchange"
+            :show-file-list="false"
+            :auto-upload="false">
+            <div class="upload-area" @click="setUploadField('image,basicChapterCover')">
+              <img v-if="form.basicChapterCover" :src="uploadfileDomain + form.basicChapterCover" class="cover">
+              <i v-else class="el-icon-plus cover-uploader-icon"></i>
+            </div>
+          </el-upload>
+          <el-tag type="warning">注：直播跟官方课程相关，需要在学习首页展示</el-tag>
+        </el-form-item>
+        <el-form-item label="学习结束页头像">
+          <el-upload
+            class="avatar-uploader"
+            action="#"
+            accept="image/png,image/jpg,image/jpeg"
+            :on-change="uploadOnchange"
+            :show-file-list="false"
+            :auto-upload="false">
+            <div class="upload-area" @click="setUploadField('image,basicProfilePhoto')">
+              <img v-if="form.basicProfilePhoto" :src="uploadfileDomain + form.basicProfilePhoto" class="cover">
+              <i v-else class="el-icon-plus cover-uploader-icon"></i>
+            </div>
+          </el-upload>
+          <el-tag type="warning">注：直播跟官方课程相关，需要在学习结束页展示</el-tag>
         </el-form-item>
         <el-form-item label="发现频道" prop="tagKeys"
           :rules="[
@@ -229,6 +288,7 @@ import moment from 'moment'
 import { uploadQiniu } from '@/utils/uploadQiniu'
 import {
   getLangList,
+  getCourseList,
   getInfoTokenUploadFile,
   getDisChannelList,
   addLive,
@@ -250,8 +310,14 @@ export default {
       isDoubleHit: false,
       published: 'N',
       excludeDates: [],
+      basicCourses: [],
       form: {
         moduleName: '',
+        level: 0,
+        basicContentLevel: '',
+        basicCourseCode: '',
+        basicChapterCover: '',
+        basicProfilePhoto: '',
         coverV2: '', // 大图
         lanCode: 'ALL',
         money: 0,
@@ -379,6 +445,11 @@ export default {
         this.form.coverV2 = this.roomInfo.cover_v2
         this.form.money = this.roomInfo.money
         this.form.moneyDiscount = this.roomInfo.moneyDiscount
+        this.form.level = this.roomInfo.liveInfo.level
+        this.form.basicCourseCode = this.roomInfo.liveInfo.basicCourseCode
+        this.form.basicContentLevel = this.roomInfo.liveInfo.basicContentLevel
+        this.form.basicChapterCover = this.roomInfo.liveInfo.basicChapterCover
+        this.form.basicProfilePhoto = this.roomInfo.liveInfo.basicProfilePhoto
         this.form.teacherPhoto = this.roomInfo.liveInfo.tech_photo
         this.form.teacherName = this.roomInfo.liveInfo.tech_name
         this.form.teacherDesc = this.roomInfo.liveInfo.tech_desc
@@ -424,16 +495,62 @@ export default {
         this.generateCourses()
         console.log(this.roomInfo)
       }
+      this.loadBasicCourses()
+    },
+    async loadBasicCourses () {
+      if (this.form.lanCode !== 'ALL') {
+        const res = await getCourseList({ lan_code: this.form.lanCode, pageNo: 0, pageSize: 0 })
+        if (res.success) {
+          this.basicCourses = []
+          this.basicCourses.push({
+            code: '',
+            title: {
+              'en': 'NONE',
+              'zh-CN': '无'
+            }
+          })
+          this.basicCourses = [...this.basicCourses, ...res.data.courses]
+        }
+      } else {
+        this.form.basicCourseCode = ''
+        this.form.basicContentLevel = ''
+        this.form.basicChapterCover = ''
+        this.form.basicProfilePhoto = ''
+        this.basicCourses = []
+      }
     },
     onSubmit () {
       let message = ''
-      if (this.form.videoUrl !== '' && this.form.videoCoverUrl === '') {
+      if (message === '' && this.form.level === 0) {
+        message = '请选择定级'
+      }
+      if (this.form.basicCourseCode !== '') {
+        if (message === '' && this.form.basicContentLevel === '') {
+          message = '请选择课程级别'
+        }
+
+        if (message === '' && this.form.basicChapterCover === '') {
+          message = '请上传首页封面'
+        }
+
+        if (message === '' && this.form.basicProfilePhoto === '') {
+          message = '请上传结束页头像'
+        }
+      } else {
+        if (message === '' && this.form.date.length === 0) {
+          message = '请选择直播日期'
+        }
+        if (message === '' && this.form.time.length === 0) {
+          message = '请选择直播时间'
+        }
+      }
+      if (message === '' && this.form.videoUrl !== '' && this.form.videoCoverUrl === '') {
         message = '请上传视频封面'
       }
-      if (this.form.videoUrl === '' && this.form.videoCoverUrl !== '') {
+      if (message === '' && this.form.videoUrl === '' && this.form.videoCoverUrl !== '') {
         message = '请上传宣传视频'
       }
-      if (this.form.courses.slice(0, this.form.courseSlice).filter(item => {
+      if (message === '' && this.form.courses.slice(0, this.form.courseSlice).filter(item => {
         return item.title === ''
       }).length > 0) {
         message = '请完善课程信息'
@@ -546,7 +663,12 @@ export default {
                 shareTitle: this.form.shareTitle,
                 shareDesc: this.form.shareDesc,
                 sharePoster: this.form.sharePoster,
-                weekDays: weekDays
+                weekDays: weekDays,
+                level: this.form.level,
+                basicCourseCode: this.form.basicCourseCode,
+                basicContentLevel: this.form.basicContentLevel,
+                basicChapterCover: this.form.basicChapterCover,
+                basicProfilePhoto: this.form.basicProfilePhoto
               },
               module_name: this.form.moduleName,
               money: this.form.money,
@@ -707,6 +829,16 @@ export default {
     changeExcludeDates () {
       console.log(this.excludeDates)
       this.generateCourses()
+    },
+    changeLangCode () {
+      this.loadBasicCourses()
+    },
+    changeBasicCourse () {
+      if (this.form.basicCourseCode === '') {
+        this.form.basicContentLevel = ''
+        this.form.basicChapterCover = ''
+        this.form.basicProfilePhoto = ''
+      }
     }
   }
 }

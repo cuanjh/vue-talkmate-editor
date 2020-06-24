@@ -16,6 +16,24 @@
       <el-form-item label="结束通知">
         <el-input type="textarea" v-model="form.finishInfo" maxlength="90" show-word-limit></el-input>
       </el-form-item>
+      <el-form-item label="直播时间">
+        <el-date-picker
+          :disabled="state == -1"
+          v-model="date"
+          type="date"
+          placeholder="选择日期">
+        </el-date-picker>
+        <el-time-picker
+          class="time-picker"
+          :disabled="state == -1"
+          is-range
+          v-model="times"
+          range-separator="至"
+          start-placeholder="开始时间"
+          end-placeholder="结束时间"
+          placeholder="选择时间范围">
+        </el-time-picker>
+      </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
       <el-button @click="dialogFormVisible = false">取消</el-button>
@@ -40,12 +58,20 @@ export default {
       uploadField: '',
       title: '',
       token: '',
+      state: 0,
+      date: new Date(),
+      times: [
+        new Date(), new Date()
+      ],
       form: {
         uuid: '',
         videoUrl: '',
         finishTitle: '',
         finishInfo: '',
-        weixinNo: ''
+        weixinNo: '',
+        date: '',
+        startTime: '',
+        EndTime: ''
       },
       rules: {
         // videoUrl: [
@@ -69,10 +95,18 @@ export default {
       console.log(params)
       this.resetForm()
       this.title = params.title
+      this.state = params.state
       this.form.finishTitle = params.finishTitle
       this.form.finishInfo = params.finishInfo
       this.form.weixinNo = params.weixinNo
       this.form.uuid = params.uuid
+      this.date = params.date
+      let st = params.state === -1 ? params.realStartTime : params.startTime
+      let et = params.state === -1 ? params.realEndTime : params.EndTime
+      this.times = [
+        new Date(st * 1000),
+        new Date(et * 1000)
+      ]
       this.dialogFormVisible = true
     },
     resetForm () {
@@ -80,7 +114,10 @@ export default {
         videoUrl: '',
         finishTitle: '',
         finishInfo: '',
-        weixinNo: ''
+        weixinNo: '',
+        date: '',
+        startTime: '',
+        EndTime: ''
       }
     },
     async uploadOnchange (file, fileList) {
@@ -106,7 +143,11 @@ export default {
     submitForm () {
       this.$refs['form'].validate((valid) => {
         if (valid) {
-          console.log(this.form)
+          let startTime = (new Date(this.date + ' ' + moment(this.times[0]).format('HH:mm:ss'))).getTime() / 1000
+          let endTime = (new Date(this.date + ' ' + moment(this.times[1]).format('HH:mm:ss'))).getTime() / 1000
+          this.form.date = this.date
+          this.form.startTime = startTime
+          this.form.EndTime = endTime
           editLiveCourse(this.form).then(res => {
             if (res.success) {
               this.$message({
@@ -140,5 +181,9 @@ export default {
 }
 .dialog-footer {
   text-align: center;
+}
+
+.time-picker {
+  margin-left: 20px;
 }
 </style>

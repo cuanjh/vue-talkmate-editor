@@ -11,7 +11,7 @@
             { required: true, message: '编码不能为空', trigger: 'blur' },
             { pattern: /^[a-zA-Z-]+$/, message: '只允许输入字母！' }
           ]">
-            <el-input v-model="form.code" maxlength="20" show-word-limit :disabled="type == 'edit'">
+            <el-input v-model="form.code" maxlength="20" placeholder="AAA" show-word-limit :disabled="type == 'edit'">
             </el-input>
           </el-form-item>
           <el-form-item label="分类：" prop="course_type" :rules="[
