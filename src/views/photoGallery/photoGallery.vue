@@ -55,8 +55,8 @@
       </el-col>
     </el-row>
     <edit-tags ref="editTags" @loadTags="loadTags"/>
-    <edit-picture ref="editPicture" />
-    <upload ref="upload" />
+    <edit-picture ref="editPicture" @closeEditImage="loadData"/>
+    <upload ref="upload" @closeLoad="loadData"/>
   </div>
 </template>
 
@@ -64,7 +64,8 @@
 import { mapState } from 'vuex'
 import {
   searchImages,
-  imagesTags
+  imagesTags,
+  getInfoToken
 } from '@/api/course'
 
 import EditTags from './editTags'
@@ -82,7 +83,8 @@ export default {
       showPicData: [],
       page: 1,
       pageSize: 12,
-      isExpand: false
+      isExpand: false,
+      token: ''
     }
   },
   components: {
@@ -96,6 +98,10 @@ export default {
       this.scroll(e)
     })
     this.loadTags()
+    // 获取上传图片token
+    getInfoToken().then(res => {
+      this.token = res.data.token
+    })
   },
   computed: {
     ...mapState({
@@ -149,8 +155,13 @@ export default {
       let src = this.assetsDomain + picture.image_url
       this.$refs['editPicture'].show({ 'picture': picture, 'src': src, 'tags': this.tags })
     },
+    loadData () {
+      this.loadTags()
+      this.pictures = []
+      this.search()
+    },
     upload () {
-      this.$refs['upload'].show()
+      this.$refs['upload'].show({ tags: this.tags, token: this.token })
     },
     scroll (e) {
       let scrollHeight = e.target.scrollHeight

@@ -56,7 +56,7 @@
           @switchForm="switchForm"/>
       </div>
     </div>
-    <el-form ref="form" :model="contents[activeFormIndex]" label-width="80px">
+    <el-form id="form-model" ref="form" :model="contents[activeFormIndex]" label-width="80px">
       <div class="item" v-for="f in feilds" :key="f.feild">
         <el-form-item label-width="140px" :label="f.name" v-if="(f.data_from !== 'content_types' && f.feild !== 'list_order' && f.feild !== 'options' && f.type !== 'array' && f.type !== 'template' && f.type !== 'templateArray' && f.feild !== 'sentence_phoneticize' && f.feild !== 'options_phoneticize') || (f.type == 'template' && contents[activeFormIndex]['' + f.feild + '']) || ((version['selLang'] == 'JPN' || version['selLang'] == 'CHI') && (f.feild == 'sentence_phoneticize' || f.feild == 'options_phoneticize')) || (f.feild === 'options' && (contents[activeFormIndex]['type'] == 'makeSentence' || contents[activeFormIndex]['type'] == 'fillGap'  || contents[activeFormIndex]['type'] == 'kid_pattern_words_3' || contents[activeFormIndex]['type'] == 'kid_pattern_sentences_3') || (f.type == 'array' && contents[activeFormIndex][f.feild]))">
           <!-- string 或 int -->
@@ -371,6 +371,7 @@ export default {
       this.copyBaseFormDataSelf = params.baseFormData
       this.$set(this.$data, 'feilds', params.feilds.sort((a, b) => { return a.list_order - b.list_order }))
       this.$set(this.$data, 'contentModel', params.contentModel)
+      this.$bus.$emit('curContentForm', params.contents[this.activeFormIndex])
       this.formHeight = 220
       if (this.version.selCourseType === 0) {
         this.formHeight = 385
@@ -393,7 +394,9 @@ export default {
             obj['list_order'] = (index + 1) * 10
             newContents.push(obj)
           })
-          this.$set(this.$data, 'contents', newContents)
+          
+          this.$set(this, 'contents', [])
+          this.$set(this, 'contents', newContents)
           this.activeFormIndex = evt.newIndex
           let obj = {
             content_model: this.contentModel,
@@ -425,6 +428,7 @@ export default {
     switchForm (params) {
       this.activeFormIndex = params.formIndex
       this.$set(this.contents, this.activeFormIndex, params.content)
+      this.$bus.$emit('curContentForm', this.contents[this.activeFormIndex])
     },
     async onSubmit () {
       this.$refs['form'].validate((valid) => {

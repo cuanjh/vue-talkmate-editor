@@ -626,6 +626,32 @@ export const searchImages = (data) => {
 }
 
 /**
+ * @Summary 批量添加图片
+ * @param {*} data
+ * @Router /editor/image/add/more [post]
+ */
+export const addMoreImages = (data) => {
+  return service({
+    url: '/editor/image/add/more',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 编辑图片
+ * @param {*} data
+ * @Router /editor/image/edit [post]
+ */
+export const editImage = (data) => {
+  return service({
+    url: '/editor/image/edit',
+    method: 'post',
+    data
+  })
+}
+
+/**
  * @Summary 图片库标签列表
  * @param {*} data
  * @Router /editor/image/tags [post]

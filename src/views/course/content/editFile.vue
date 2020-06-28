@@ -1,11 +1,13 @@
 <template>
-  <div class="edit-file">
+  <div class="edit-file" id="edit-file">
     <model-comp ref="model"/>
+    <form-thumb ref="thumb"/>
   </div>
 </template>
 
 <script>
 import ModelComp from './model'
+import FormThumb from './formThumb'
 
 export default {
   data () {
@@ -16,7 +18,18 @@ export default {
     }
   },
   components: {
-    ModelComp
+    ModelComp,
+    FormThumb
+  },
+  mounted () {
+    document.getElementById('edit-file').addEventListener('scroll', (e) => {
+      let formModelEL = document.getElementById('form-model')
+      if (e.target.offsetTop + e.target.scrollTop + 100 > formModelEL.offsetTop) {
+        this.$refs['thumb'].show({ top: e.target.offsetTop + 10 })
+      } else {
+        this.$refs['thumb'].hide()
+      }
+    })
   },
   methods: {
     show (params) {

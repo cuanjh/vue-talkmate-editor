@@ -40,7 +40,11 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import {
+  addImageTag,
+  editImage
+} from '@/api/course'
+
 export default {
   data () {
     return {
@@ -59,10 +63,6 @@ export default {
   components: {
   },
   methods: {
-    ...mapActions([
-      'updateOnePicture',
-      'getAllTags'
-    ]),
     reset () {
       this.selTagKeys = []
       this.newTag = ''
@@ -76,8 +76,8 @@ export default {
       this.picture = preload.picture
       this.desc = this.picture.desc
       this.picDesc = this.picture.desc
-      if (this.picture.Tags) {
-        this.selTagKeys = this.picture.Tags
+      if (this.picture.tagKeys) {
+        this.selTagKeys = this.picture.tagKeys
       }
       this.tags = preload.tags
       this.src = preload.src
@@ -114,37 +114,35 @@ export default {
     save () {
       console.log(this.newTag, this.desc)
       let i = this.tags.findIndex(item => {
-        return item.TagName === this.newTag
+        return item === this.newTag
       })
       if (i > -1) {
-        this.$notify({
-          title: '警告',
+        this.$message({
           message: '已存在分类',
           type: 'warning'
         })
         return false
+      } else if (this.newTag) {
+        this.selTagKeys.push(this.newTag)
+        addImageTag({ tagKey: this.newTag })
       }
       let params = {
-        id: this.picture.ID,
-        tags: this.selTagKeys.join(','),
-        desc: this.desc,
-        newTag: this.newTag
+        image_id: this.picture.image_id,
+        image_url: this.picture.image_url,
+        tagKeys: this.selTagKeys,
+        desc: this.desc
       }
       console.log(params)
-      // this.updateOnePicture(params).then(res => {
-      //   if (res.success) {
-      //     if (this.newTag.trim('')) {
-      //       this.getAllTags()
-      //     }
-      //     this.$bus.emit('initPictureList')
-      //     this.$notify({
-      //       title: '成功',
-      //       message: '保存成功',
-      //       type: 'success'
-      //     })
-      //     this.$refs['modal'].hide()
-      //   }
-      // })
+      editImage(params).then(res => {
+        if (res.success) {
+          this.$message({
+            message: '保存成功',
+            type: 'success'
+          })
+          this.$emit('closeEditImage')
+          this.dialogVisible = false
+        }
+      })
     },
     close () {
       this.dialogVisible = false

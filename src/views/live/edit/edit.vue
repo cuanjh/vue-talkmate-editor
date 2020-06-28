@@ -227,7 +227,6 @@
           <el-date-picker
             v-model="form.date"
             @change="changeDate"
-            :disabled="flag == 'edit' && published == 'Y' && (form.courses.length > 0 && form.courses.filter(c => c.state === 1 || c.state === -1).length > 0)"
             type="daterange"
             range-separator="至"
             start-placeholder="开始日期"
@@ -266,15 +265,51 @@
           </div>
         </el-form-item>
       </div>
-      <div class="course-info" v-show="form.date && form.liveRate.filter(item => {return item.selected === true}).length">
+      <div class="course-info">
         <div class="title">课程信息</div>
-        <el-form-item
+        <!-- <el-form-item
           label-width="200px"
           :label="course.date + ' 周' + form.liveRate.find(item => { return item.id == course.week })['text'] + ' 第' + (index + 1) + '课'"
           v-for="(course, index) in form.courses.slice(0, form.courseSlice)"
           :key="'course' + index">
           <el-input :disabled="form.courses[index].state === -1" v-model="form.courses[index].title"></el-input>
-        </el-form-item>
+        </el-form-item> -->
+        <div class="course-list" id="course-list">
+          <div class="course-item" v-for="(course, index) in form.courses" :data-id="index" :key="index">
+            <div class="course-item-column">{{ '第' + (index + 1) + '课 周' + form.liveRate.find(item => { return item.id === (new Date(course.date)).getDay() + '' })['text'] }}</div>
+            <div class="course-item-column">
+              <div>
+                <el-date-picker
+                  class="date-picker"
+                  :disabled="form.courses[index].state === -1"
+                  size="small"
+                  v-model="course.date"
+                  type="date"
+                  placeholder="选择日期">
+                </el-date-picker>
+                <el-time-picker
+                  is-range
+                  :disabled="form.courses[index].state === -1"
+                  size="small"
+                  v-model="course.times"
+                  range-separator="至"
+                  start-placeholder="开始时间"
+                  end-placeholder="结束时间"
+                  placeholder="选择时间范围">
+                </el-time-picker>
+              </div>
+              <div class="course-title">
+                <el-input size="small" v-model="form.courses[index].title"></el-input>
+              </div>
+            </div>
+            <div class="course-item-column">
+              <el-button type="primary" icon="el-icon-minus" plain @click="minusCourse(index)"></el-button>
+            </div>
+          </div>
+        </div>
+        <div class="btn-plus-course">
+          <el-button type="primary" icon="el-icon-plus" plain @click="plusCourse"></el-button>
+        </div>
       </div>
       <el-form-item class="btn-area">
         <el-button type="primary" @click="onSubmit" :disabled="form.courses.length == 0 || isDoubleHit">保存</el-button>
@@ -285,6 +320,7 @@
 
 <script>
 import moment from 'moment'
+import Sortable from 'sortablejs'
 import { uploadQiniu } from '@/utils/uploadQiniu'
 import {
   getLangList,
@@ -491,11 +527,26 @@ export default {
             this.form.liveRate[index].selected = true
           })
         }
-        this.form.courses = liveRooms.courses
-        this.generateCourses()
+        this.form.courses = []
+        liveRooms.courses.forEach(c => {
+          let obj = c
+          let st = c.state === -1 ? c.realStartTime : c.startTime
+          let et = c.state === -1 ? c.realEndTime : c.EndTime
+          obj['times'] = [
+            new Date(st * 1000),
+            new Date(et * 1000)
+          ]
+          obj['week'] = this.form.liveRate.find(item => { return item.id === moment(new Date(c.date)).day() + '' })['text']
+          this.form.courses.push(obj)
+          this.form.courses = this.form.courses.sort((a, b) => {
+            return a.listOrder - b.listOrder
+          })
+        })
+        // this.generateCourses()
         console.log(this.roomInfo)
       }
       this.loadBasicCourses()
+      this.sortCourses()
     },
     async loadBasicCourses () {
       if (this.form.lanCode !== 'ALL') {
@@ -550,7 +601,7 @@ export default {
       if (message === '' && this.form.videoUrl === '' && this.form.videoCoverUrl !== '') {
         message = '请上传宣传视频'
       }
-      if (message === '' && this.form.courses.slice(0, this.form.courseSlice).filter(item => {
+      if (message === '' && this.form.courses.filter(item => {
         return item.title === ''
       }).length > 0) {
         message = '请完善课程信息'
@@ -571,35 +622,33 @@ export default {
             }, 2000)
           }
           let courses = []
-          let listOrder = 1
-          this.form.courses.slice(0, this.form.courseSlice).forEach(item => {
-            let startTime = (new Date(item.date + ' ' + moment(this.form.time[0]).format('HH:mm:ss'))).getTime() / 1000
-            let endTime = (new Date(item.date + ' ' + moment(this.form.time[1]).format('HH:mm:ss'))).getTime() / 1000
-            let state = 0
-            if (typeof item.state !== 'undefined') {
-              state = item.state
-            }
+          this.form.courses.forEach(item => {
+            // let startTime = (new Date(item.date + ' ' + moment(this.form.time[0]).format('HH:mm:ss'))).getTime() / 1000
+            // let endTime = (new Date(item.date + ' ' + moment(this.form.time[1]).format('HH:mm:ss'))).getTime() / 1000
+            // let state = 0
+            // if (typeof item.state !== 'undefined') {
+            //   state = item.state
+            // }
             let obj = {
-              EndTime: state === 0 ? endTime : item.EndTime,
+              EndTime: item.EndTime,
               courseCode: this.code,
               cover: this.form.coverV2,
               date: item.date,
               lanCode: this.form.lanCode,
-              listOrder: listOrder,
+              listOrder: item.listOrder,
               livePullUrl: item.livePullUrl ? item.livePullUrl : '',
               livePushUrl: item.livePushUrl ? item.livePushUrl : '',
               realEndTime: item.realEndTime ? item.realEndTime : 0,
               realStartTime: item.realStartTime ? item.realStartTime : 0,
-              startTime: state === 0 ? startTime : item.startTime,
+              startTime: item.startTime,
               finishTitle: item.finishTitle ? item.finishTitle : '',
               finishInfo: item.finishInfo ? item.finishInfo : '',
               weixinNo: item.weixinNo ? item.weixinNo : '',
               title: item.title,
               uuid: item.uuid,
-              state: state
+              state: item.state
             }
             courses.push(obj)
-            listOrder++
           })
           let weekDays = []
           this.form.liveRate.forEach(item => {
@@ -723,11 +772,11 @@ export default {
         index = 7
       }
       this.form.liveRate[index - 1].selected = !selected
-      this.generateCourses()
+      // this.generateCourses()
     },
     changeDate () {
       console.log(this.form.date)
-      this.generateCourses()
+      // this.generateCourses()
     },
     generateCourses () {
       if (this.form.date.length && this.form.liveRate.filter(item => { return item.selected }).length) {
@@ -828,7 +877,7 @@ export default {
     },
     changeExcludeDates () {
       console.log(this.excludeDates)
-      this.generateCourses()
+      // this.generateCourses()
     },
     changeLangCode () {
       this.loadBasicCourses()
@@ -839,6 +888,52 @@ export default {
         this.form.basicChapterCover = ''
         this.form.basicProfilePhoto = ''
       }
+    },
+    minusCourse (index) {
+      this.form.courses.splice(index, 1)
+    },
+    plusCourse () {
+      let st = (this.flag === 'add') ? moment(new Date()).format('YYYY-MM-DD') + ' ' + moment(this.form.time[0]).format('HH:mm:ss') : moment(new Date()).format('YYYY-MM-DD') + ' ' + this.roomInfo.liveInfo.startTime
+      let et = (this.flag === 'add') ? moment(new Date()).format('YYYY-MM-DD') + ' ' + moment(this.form.time[1]).format('HH:mm:ss') : moment(new Date()).format('YYYY-MM-DD') + ' ' + this.roomInfo.liveInfo.endTime
+      let obj = {
+        EndTime: (new Date(et)).getTime() / 1000,
+        date: moment(new Date()).format('YYYY-MM-DD'),
+        startTime: (new Date(st)).getTime() / 1000,
+        listOrder: this.form.courses.length + 1,
+        state: 0,
+        title: '',
+        uuid: ''
+      }
+
+      obj['times'] = [
+        new Date(st),
+        new Date(et)
+      ]
+      // obj['week'] = this.form.liveRate.find(item => { return item.id === moment(new Date(obj.date)).day() + '' })['text']
+      this.form.courses.push(obj)
+    },
+    sortCourses () {
+      let el = document.getElementById('course-list')
+      let sortable = new Sortable(el, {
+        animation: 150,
+        onEnd: (evt) => {
+          let newCourses = []
+          let copyCourses = this.form.courses
+          let indexArr = sortable.toArray()
+          console.log(indexArr)
+          indexArr.forEach((item, index) => {
+            let obj = copyCourses[parseInt(item)]
+            obj['listOrder'] = index + 1
+            newCourses.push(obj)
+          })
+          console.log(this.form.courses)
+          console.log(newCourses)
+          this.form.courses = []
+          setTimeout(() => {
+            this.$set(this.form, 'courses', newCourses)
+          }, 0)
+        }
+      })
     }
   }
 }
@@ -915,8 +1010,35 @@ export default {
   margin: 80px 0;
   text-align: center;
 }
-.el-input {
-  width: 600px;
+.el-form-item {
+  .el-input {
+    width: 600px;
+  }
+}
+
+.course-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid rgba(0, 0, 0, .1)
+}
+
+.course-item-column {
+  padding-right: 10px;
+}
+
+.date-picker {
+  margin-right: 10px;
+}
+
+.course-title {
+  margin-top: 5px;
+}
+
+.btn-plus-course {
+  padding: 10px;
+  text-align: right;
 }
 </style>
 

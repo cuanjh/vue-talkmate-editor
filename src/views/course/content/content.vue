@@ -163,7 +163,8 @@ export default {
       userList: [],
       authorityList: [],
       copyAuthorityList: [],
-      authorityUsers: []
+      authorityUsers: [],
+      courseContentPath: ''
     }
   },
   components: {
@@ -413,6 +414,20 @@ export default {
           this.tracks.push(catalogs)
         }
         this.$set(this.tracks, num, catalogs)
+        if (this.courseContentPath === '') {
+          this.courseContentPath = localStorage.getItem('courseContentPath')
+        }
+        if (this.courseContentPath) {
+          let arr = this.courseContentPath.split('/')
+          let fIndex = this.tracks[num].findIndex(item => {
+            return item.uuid === arr[num]
+          })
+          if (fIndex === -1) {
+            this.courseContentPath = ''
+          } else {
+            this.clickFolder({ folder: this.tracks[num][fIndex], trackNum: num })
+          }
+        }
         setTimeout(() => {
           var scrollDom = document.getElementById('track-wrap')
           scrollDom.scrollLeft = scrollDom.scrollWidth
@@ -562,7 +577,8 @@ export default {
       })
       let puuid = folder.parent_uuid
       this.path = uuid + '/' + this.path
-      // console.log(this.path)
+      console.log(this.path)
+      localStorage.setItem('courseContentPath', this.path)
       if (tracks.length > 0) {
         this.getPath(tracks, puuid)
       }

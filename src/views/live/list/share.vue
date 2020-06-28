@@ -1,5 +1,5 @@
 <template>
-  <el-dialog width="70%" title="制作分享海报" :visible.sync="dialogFormVisible" @close="close">
+  <el-dialog width="80%" title="制作分享海报" :visible.sync="dialogFormVisible" @close="close">
     <el-row>
       <el-col :span="12">
         <el-form :model="form" :rules="rules" ref="form" label-width="120px">

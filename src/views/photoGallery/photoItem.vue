@@ -35,7 +35,7 @@
         <div class="bottom clearfix">
           <el-button type="text" class="button" @click="showEditPicture()">编辑</el-button>
           <el-button type="text" class="button" @click="download" v-show="false">下载</el-button>
-          <el-button type="text" class="button btnLink" @click="copyLink">复制链接</el-button>
+          <el-button type="text" class="button btnLink" :id="'btnLink-' + picture._id" @click="copyLink">复制链接</el-button>
         </div>
       </div>
     </el-card>
@@ -71,7 +71,7 @@ export default {
     // 复制图片链接
     copyLink () {
       let url = this.picture.image_url
-      let clipboard = new Clipboard('.btnLink', {
+      let clipboard = new Clipboard('#btnLink-' + this.picture._id, {
         text: () => {
           return url
         }
