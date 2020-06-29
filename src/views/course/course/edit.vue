@@ -180,7 +180,9 @@ export default {
         this.smlImgUrl = ''
         // this.$refs.form.resetFields()
       } else if (this.type === 'edit') {
+        this.lang = params.form.code.split('-')[0]
         this.form = params.form
+        this.form.code = params.form.code.split('-').slice(1).join('-')
         this.bigImgUrl = this.assetsDomain + '/' + params.form.cover[0]
         this.smlImgUrl = this.assetsDomain + '/' + params.form.flag[0]
       }

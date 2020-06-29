@@ -75,16 +75,19 @@ export default {
       }
       console.log(uploadFiles)
       let imageUrls = []
+      let names = []
       let date = moment(new Date()).format('YYYY/MM/DD')
       uploadFiles.forEach(file => {
         let ext = file.name.split('.')[1]
         let url = 'course/images/common/' + date + '/' + file.uid + '.' + ext
         imageUrls.push(url)
+        names.push(file.name.split('.')[0])
         uploadQiniu(file.raw, this.token, url)
       })
       let obj = {
         image_urls: imageUrls,
-        tagKeys: this.checkTags
+        tagKeys: this.checkTags,
+        names: names
       }
       addMoreImages(obj).then(res => {
         if (res.success) {
