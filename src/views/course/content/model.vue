@@ -56,7 +56,7 @@
           @switchForm="switchForm"/>
       </div>
     </div>
-    <el-form id="form-model" ref="form" :model="contents[activeFormIndex]" label-width="80px">
+    <el-form id="form-model" ref="form" v-if="contents && contents.length" :model="contents[activeFormIndex]" label-width="80px">
       <div class="item" v-for="f in feilds" :key="f.feild">
         <el-form-item label-width="140px" :label="f.name" v-if="(f.data_from !== 'content_types' && f.feild !== 'list_order' && f.feild !== 'options' && f.type !== 'array' && f.type !== 'template' && f.type !== 'templateArray' && f.feild !== 'sentence_phoneticize' && f.feild !== 'options_phoneticize') || (f.type == 'template' && contents[activeFormIndex]['' + f.feild + '']) || ((version['selLang'] == 'JPN' || version['selLang'] == 'CHI') && (f.feild == 'sentence_phoneticize' || f.feild == 'options_phoneticize')) || (f.feild === 'options' && (contents[activeFormIndex]['type'] == 'makeSentence' || contents[activeFormIndex]['type'] == 'fillGap'  || contents[activeFormIndex]['type'] == 'kid_pattern_words_3' || contents[activeFormIndex]['type'] == 'kid_pattern_sentences_3') || (f.type == 'array' && contents[activeFormIndex][f.feild]))">
           <!-- string 或 int -->
@@ -281,8 +281,9 @@ import { mapState } from 'vuex'
 import {
   editContent,
   delContent,
-  getInfoToken,
-  getContent
+  getInfoToken
+  // ,
+  // getContent
 } from '@/api/course'
 import {
   uploadQiniu
@@ -394,23 +395,24 @@ export default {
             obj['list_order'] = (index + 1) * 10
             newContents.push(obj)
           })
-          
-          this.$set(this, 'contents', [])
-          this.$set(this, 'contents', newContents)
-          this.activeFormIndex = evt.newIndex
-          let obj = {
-            content_model: this.contentModel,
-            contents: this.contents,
-            parent_uuid: this.pUUID
-          }
-          console.log(obj)
-          editContent(obj).then(() => {
-            getContent({ 'content_model': this.contentModel, 'parent_uuid': this.pUUID }).then(res => {
-              this.$set(this, 'contents', res.data.contents.sort((a, b) => {
-                return a.list_order - b.list_order
-              }))
+          this.contents = []
+          setTimeout(() => {
+            this.$set(this, 'contents', newContents)
+            this.activeFormIndex = evt.newIndex
+            let obj = {
+              content_model: this.contentModel,
+              contents: this.contents,
+              parent_uuid: this.pUUID
+            }
+            console.log(obj)
+            editContent(obj).then(() => {
+              // getContent({ 'content_model': this.contentModel, 'parent_uuid': this.pUUID }).then(res => {
+              //   this.$set(this, 'contents', res.data.contents.sort((a, b) => {
+              //     return a.list_order - b.list_order
+              //   }))
+              // })
             })
-          })
+          }, 0)
         }
       })
       /* eslint-enable */

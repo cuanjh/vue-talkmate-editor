@@ -61,6 +61,9 @@
           <el-tooltip class="item" effect="dark" content="编辑课程内容" placement="top">
             <el-button type="primary" icon="el-icon-edit" :disabled="(userInfo.authorityId !== '1' && item.curUserAuth['auth'] == 'r')" circle @click="courseContent(item)"></el-button>
           </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="上传模板数据" placement="top">
+            <el-button type="primary" icon="el-icon-upload2" :disabled="(userInfo.authorityId !== '1' && item.curUserAuth['auth'] == 'r')" circle @click="upload(item)"></el-button>
+          </el-tooltip>
         </div>
       </div>
     </div>
@@ -439,7 +442,9 @@ export default {
         localStorage.removeItem('copyVersion')
         this.$refs['rightMenu'].hide()
       }
-    }
+    },
+    // 上传
+    upload (item) {}
   }
 }
 </script>
@@ -462,7 +467,7 @@ export default {
     display: flex;
     flex-direction: column;
     width: 280px;
-    height: 240px;
+    // height: 240px;
     background: rgba($color: #000000, $alpha: 0.05);
     border-radius: 4px;
     margin: 15px;
@@ -541,11 +546,17 @@ export default {
     }
   }
   .operate {
-    height: 100%;
+    // height: 100%;
     display: flex;
     flex-direction: row;
+    align-content: flex-start;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    padding: 5px 15px;
+    .el-button {
+      margin: 5px;
+    }
     // transition: all .3s ease;
     // cursor: pointer;
     // &:hover {

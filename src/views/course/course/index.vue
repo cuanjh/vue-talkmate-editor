@@ -20,7 +20,6 @@
           style="outline:none;"
           type="primary"
           class="btnAdd"
-          :disabled="courseList && courseList.length == 3"
           @click="addCourse">添加</el-button>
         <el-button v-show="userInfo.authority.authorityId == '1' || userInfo.authority.authorityId == '2'"
           style="outline:none;"

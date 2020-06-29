@@ -85,7 +85,7 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="380" fixed="right">
+      <el-table-column label="操作" width="430" fixed="right">
         <template slot="header" slot-scope="scope">
           <el-input
             v-model="search"
@@ -113,6 +113,10 @@
             size="mini"
             type="primary"
             @click="handleShare(scope.$index, scope.row)">分享海报</el-button>
+          <el-button
+            size="mini"
+            type="primary"
+            @click="handleSubscribe(scope.$index, scope.row)">订阅</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -120,6 +124,7 @@
     <comment ref="comment" @initData="initData" />
     <comment-list ref="commentList" />
     <edit-course ref="editCourse" @initData="initData"  />
+    <subscribe ref="subscribe" />
   </div>
 </template>
 
@@ -130,6 +135,7 @@ import Share from './share'
 import Comment from './comment'
 import CommentList from './commentList'
 import EditCourse from './editCourse'
+import Subscribe from './subscribe'
 
 import {
   getLiveList,
@@ -166,7 +172,8 @@ export default {
     Share,
     Comment,
     CommentList,
-    EditCourse
+    EditCourse,
+    Subscribe
   },
   mounted () {
     this.getMajia()
@@ -377,6 +384,9 @@ export default {
     editLiveCourse (c) {
       console.log(c)
       this.$refs['editCourse'].show(c)
+    },
+    handleSubscribe (index, row) {
+      this.$refs['subscribe'].show(row)
     }
   }
 }

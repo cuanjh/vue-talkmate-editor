@@ -1082,6 +1082,19 @@ export const editLiveCourse = (data) => {
 }
 
 /**
+ * @Summary 订阅直播课程
+ * @param {*} data
+ * @Router /live/sub [post]
+ */
+export const subLiveCourse = (data) => {
+  return service({
+    url: '/live/sub',
+    method: 'post',
+    data
+  })
+}
+
+/**
  * @Summary 获取推流地址
  * @param {*} data
  * @Router /live/pushurl [post]

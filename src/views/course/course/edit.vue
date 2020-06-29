@@ -12,6 +12,7 @@
             { pattern: /^[a-zA-Z-]+$/, message: '只允许输入字母！' }
           ]">
             <el-input v-model="form.code" maxlength="20" placeholder="AAA" show-word-limit :disabled="type == 'edit'">
+              <template slot="prepend">{{ lang + '-' }}</template>
             </el-input>
           </el-form-item>
           <el-form-item label="分类：" prop="course_type" :rules="[
@@ -124,6 +125,7 @@ export default {
   data () {
     return {
       showEdit: false,
+      lang: '',
       form: {
         code: '',
         course_type: '', // 课程分类
@@ -161,6 +163,7 @@ export default {
       this.type = params.type
       this.showEdit = true
       if (this.type === 'add') {
+        this.lang = params.selLang
         let obj = {
           code: '',
           course_type: '', // 课程分类
@@ -266,7 +269,7 @@ export default {
         if (valid) {
           console.log(this.form)
           if (this.type === 'add') {
-            this.form.code = this.form.code + '-Basic'
+            this.form.code = this.lang + '-' + this.form.code
             addCourse(this.form).then(res => {
               console.log(res)
               if (res.success) {
