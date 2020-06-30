@@ -44,17 +44,17 @@
         type="index">
       </el-table-column>
       <el-table-column
-        width="100"
+        width="120"
         label="课程分类"
         :formatter="formatterCourseType">
       </el-table-column>
       <el-table-column
-        width="120"
+        width="140"
         label="课程编码"
         prop="code">
       </el-table-column>
       <el-table-column
-        width="150"
+        width="180"
         label="课程名称">
         <template slot-scope="scope">
           <div v-for="l in langInfos" :key="l.langKey">{{ l.name + ': ' +  (scope.row.title['' + l.langKey + ''] ? scope.row.title['' + l.langKey + ''] : '') + ' ' }}</div>
@@ -284,19 +284,11 @@ export default {
     },
     formatterCourseType (obj) {
       let desc = ''
-      switch (obj.course_type) {
-        case 0:
-          desc = 'PRO'
-          break
-        case 3:
-          desc = 'KID'
-          break
-        case 5:
-          desc = 'PRI'
-          break
-        default:
-          desc = 'PRO'
-          break
+      let ct = this.courseTypes.find(item => {
+        return item.type === obj.course_type
+      })
+      if (ct) {
+        desc = ct.name
       }
       return desc
     },

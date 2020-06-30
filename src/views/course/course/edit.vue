@@ -132,7 +132,7 @@ export default {
         cover: [], // 大图标
         desc: {}, // 描述
         flag: [], // 小图标
-        is_show: false, // 是否上线
+        is_show: true, // 是否上线
         lan_code: '', // 语种的编码
         tags: [],
         title: {} // 名称
@@ -170,7 +170,7 @@ export default {
           cover: [], // 大图标
           desc: {}, // 描述
           flag: [], // 小图标
-          is_show: false, // 是否上线
+          is_show: true, // 是否上线
           lan_code: params.selLang, // 语种的编码
           tags: [],
           title: {} // 名称
@@ -462,7 +462,7 @@ export default {
   padding: 0 44px 0 10px;
 }
 .course-content .el-input {
-  width: 200px!important;
+  /* width: 200px!important; */
   margin-right: 10px;
 }
 .course-content .name .el-input {

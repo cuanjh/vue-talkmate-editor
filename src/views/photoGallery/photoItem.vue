@@ -34,6 +34,7 @@
         </el-popover> -->
         <div class="bottom clearfix">
           <el-button type="text" class="button" @click="showEditPicture()">编辑</el-button>
+          <el-button type="text" class="button" @click="delPicture()">删除</el-button>
           <el-button type="text" class="button" @click="download" v-show="false">下载</el-button>
           <el-button type="text" class="button btnLink" :id="'btnLink-' + picture._id" @click="copyLink">复制链接</el-button>
         </div>
@@ -44,6 +45,9 @@
 
 <script>
 import Clipboard from 'clipboard'
+import {
+  delEditorImage
+} from '@/api/course'
 export default {
   props: ['picture', 'domain'],
   data () {
@@ -67,6 +71,29 @@ export default {
     // 下载图片
     download () {
       window.location.href = this.domain + this.picture.image_url
+    },
+    // 删除图片
+    delPicture () {
+      this.$confirm('此操作将永久删除该图片信息, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        delEditorImage({ image_id: this.picture.image_id }).then(res => {
+          if (res.success) {
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            })
+            this.$emit('loadData')
+          }
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
     },
     // 复制图片链接
     copyLink () {

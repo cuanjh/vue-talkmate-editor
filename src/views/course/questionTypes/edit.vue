@@ -60,6 +60,7 @@ export default {
         name: '',
         desc: '',
         model_key: '',
+        model_keys: [],
         has_del: true
       }
     }

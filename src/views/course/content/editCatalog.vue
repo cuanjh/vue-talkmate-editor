@@ -386,6 +386,7 @@ export default {
       let h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
       this.height = h - 2
       this.pathDesc = ''
+      this.attr_tag = ''
       this.form = {
         parent_uuid: '',
         uuid: '',
@@ -444,10 +445,17 @@ export default {
           return item.key === this.attr_tag
         })
         console.log(attr)
-        this.form.title = attr.title
-        this.form.desc = attr.desc
-        this.form.cover = attr.cover
-        this.form.flag = attr.flag
+        if (attr) {
+          this.form.title = attr.title ? attr.title : {}
+          this.form.desc = attr.desc ? attr.desc : {}
+          this.form.cover = attr.cover
+          this.form.flag = attr.flag
+        } else {
+          this.form.title = {}
+          this.form.desc = {}
+          this.form.cover = ''
+          this.form.flag = ''
+        }
       } else {
         if (this.handler === 'edit') {
           this.form.title = this.folder.title

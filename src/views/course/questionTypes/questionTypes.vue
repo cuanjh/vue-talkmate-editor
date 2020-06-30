@@ -12,6 +12,7 @@
           </el-option>
         </el-select>
         <el-button style="outline:none;" type="primary" class="btnAdd" @click="addType()">添加</el-button>
+        <el-button style="outline:none;" type="primary" class="btnAdd" @click="sortType()">排序</el-button>
       </div>
       <el-table
         :data="showTableData"
@@ -107,12 +108,17 @@ export default {
       modelList: state => state.course.modelList
     }),
     filterContentTypeList () {
+      let list = this.contentTypeList
       if (this.selModel) {
-        return this.contentTypeList.filter(item => {
+        return list.filter(item => {
           return item.model_key === this.selModel
+        }).sort((a, b) => {
+          return a.list_order - b.list_order
         })
       }
-      return this.contentTypeList
+      return list.sort((a, b) => {
+        return a.list_order - b.list_order
+      })
     }
   },
   methods: {
@@ -139,6 +145,7 @@ export default {
     addType () {
       this.$refs.contentTypeEdit.show()
     },
+    sortType () {},
     delType (type) {
       console.log(type)
       this.$confirm('此操作将永久删除该类型, 是否继续?', '提示', {

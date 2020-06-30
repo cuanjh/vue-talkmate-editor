@@ -34,6 +34,7 @@ export const course = {
       selCourseType: '',
       selCourse: null,
       selVersion: '',
+      courseList: [],
       versions: [],
       uuid: '',
       copyForm: ''
@@ -159,9 +160,14 @@ export const course = {
       if (res.success) {
         let courses = res.data.courses
         if (courses) {
-          let selCourse = courses.find(item => {
-            return item.course_type === state.version.selCourseType
-          })
+          commit('updateVersion', { key: 'courseList', val: courses })
+          // let selCourse = courses.find(item => {
+          //   return item.course_type === state.version.selCourseType
+          // })
+          let selCourse = state.version.selCourse
+          if (!selCourse) {
+            selCourse = courses[0]
+          }
           commit('updateVersion', { key: 'selCourse', val: selCourse })
           if (selCourse) {
             let uuid = selCourse.uuid
@@ -172,6 +178,7 @@ export const course = {
           }
         } else {
           commit('updateVersion', { key: 'selCourse', val: {} })
+          commit('updateVersion', { key: 'courseList', val: [] })
           commit('updateVersion', { key: 'selVersion', val: '' })
           commit('updateVersion', { key: 'uuid', val: '' })
           commit('updateVersion', { key: 'versions', val: [] })

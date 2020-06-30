@@ -626,6 +626,19 @@ export const searchImages = (data) => {
 }
 
 /**
+ * @Summary 删除图片
+ * @param {*} data
+ * @Router /editor/image/del [post]
+ */
+export const delEditorImage = (data) => {
+  return service({
+    url: '/editor/image/del',
+    method: 'post',
+    data
+  })
+}
+
+/**
  * @Summary 批量添加图片
  * @param {*} data
  * @Router /editor/image/add/more [post]

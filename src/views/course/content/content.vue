@@ -10,7 +10,7 @@
             filterable
             default-first-option
             placeholder="请选择语言"
-            @change="initCourseVersionList(1)">
+            @change="changLang">
             <el-option
               v-for="item in langList"
               :key="item['lan_code']"
@@ -18,7 +18,7 @@
               :value="item['lan_code']">
             </el-option>
           </el-select>
-          <el-select v-model="selCourseType" size="small" placeholder="请选择项目" @change="initCourseVersionList(2)">
+          <el-select v-show="false" v-model="selCourseType" size="small" placeholder="请选择项目" @change="initCourseVersionList(2)">
             <el-option
               v-for="item in courseTypes"
               :key="item.type"
@@ -26,7 +26,15 @@
               :value="item.type">
             </el-option>
           </el-select>
-          <el-select v-model="selVersion" size="small" placeholder="请选择版本" @change="initCourseVersionList(3)">
+          <el-select v-model="selCourseUUID" filterable  size="small" placeholder="请选择课程"  @change="changeCourse">
+            <el-option
+              v-for="item in version.courseList"
+              :key="item.uuid"
+              :label="'(' + courseTypes.find(i => { return i.type == item.course_type})['name'] + ') ' + item.title['zh-CN']"
+              :value="item.uuid">
+            </el-option>
+          </el-select>
+          <el-select v-model="selVersion" size="small" placeholder="请选择版本" @change="changeVersion">
             <el-option
               v-for="item in versions"
               :key="item.uuid"
@@ -147,6 +155,7 @@ export default {
       isShow: true,
       isShowEditFile: false,
       selLang: 'ENG',
+      selCourseUUID: '',
       selCourseType: 0,
       selVersion: '',
       selSlide: '1',
@@ -188,9 +197,10 @@ export default {
     if (this.version) {
       console.log(this.version)
       this.selLang = this.version.selLang
-      this.selCourseType = this.version.selCourseType
+      // this.selCourseType = this.version.selCourseType
       this.selVersion = this.version.selVersion
       this.uuid = this.version.uuid
+      this.selCourseUUID = this.version.selCourse.uuid
     }
     let h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
     this.slideHeight = h - 130
@@ -257,6 +267,9 @@ export default {
         var scrollDom = document.getElementById('track-wrap')
         scrollDom.scrollLeft = scrollDom.scrollWidth
       }, 0)
+    },
+    'version.selCourse' (newVal, oldVal) {
+      this.selCourseUUID = newVal.uuid
     }
   },
   computed: {
@@ -302,7 +315,8 @@ export default {
       getCourseList: 'course/getCourseList',
       getModelList: 'course/getModelList',
       getContentTypes: 'course/getContentTypes',
-      getContentTags: 'course/getContentTags'
+      getContentTags: 'course/getContentTags',
+      getCourseVersions: 'course/getCourseVersions'
     }),
     hideCatalog1 (type) {
       console.log(type)
@@ -310,7 +324,7 @@ export default {
     },
     initCourseVersionList (flag) {
       this.updateVersion({ key: 'selLang', val: this.selLang })
-      this.updateVersion({ key: 'selCourseType', val: this.selCourseType })
+      // this.updateVersion({ key: 'selCourseType', val: this.selCourseType })
       this.getCourseList({ 'lan_code': this.selLang, 'pageNo': 0, 'pageSize': 0 })
       setTimeout(() => {
         if (this.version.versions.length) {
@@ -343,6 +357,43 @@ export default {
         }
         this.isShowEditFile = false
       }, 300)
+    },
+    changLang () {
+      this.getCourseList({ 'lan_code': this.selLang, 'pageNo': 0, 'pageSize': 0 })
+      this.updateVersion({ key: 'selVersion', val: '' })
+      this.updateVersion({ key: 'uuid', val: '' })
+      this.selVersion = ''
+      this.uuid = ''
+      this.initData(0)
+      this.isShowEditFile = false
+    },
+    changeCourse () {
+      let selCourse = this.version.courseList.find(f => {
+        return f.uuid === this.selCourseUUID
+      })
+      this.updateVersion({ key: 'selCourse', val: selCourse })
+      this.getCourseVersions({ 'pageNo': 0, 'pageSize': 0, 'parent_uuid': selCourse.uuid })
+      this.updateVersion({ key: 'selVersion', val: '' })
+      this.updateVersion({ key: 'uuid', val: '' })
+      this.selVersion = ''
+      this.uuid = ''
+      this.initData(0)
+      this.isShowEditFile = false
+    },
+    changeVersion () {
+      let curVersion = this.version.versions.find(v => {
+        return v.uuid === this.selVersion
+      })
+      this.updateVersion({ key: 'selVersion', val: this.selVersion })
+      if (curVersion && curVersion.uuid) {
+        this.updateVersion({ key: 'uuid', val: curVersion.uuid })
+        this.uuid = curVersion.uuid
+      } else {
+        this.updateVersion({ key: 'uuid', val: '' })
+        this.uuid = ''
+      }
+      this.initData(0)
+      this.isShowEditFile = false
     },
     show (params) {
       console.log(params)

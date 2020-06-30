@@ -37,6 +37,7 @@
                 :key="item._id"
                 :picture="item"
                 :domain="assetsDomain"
+                @loadData="loadData"
                 @showEditPicture="showEditPicture"/>
             </div>
             <!-- <el-pagination v-if="pictures.length > 0"
@@ -162,6 +163,7 @@ export default {
     loadData () {
       this.loadTags()
       this.pictures = []
+      this.page = 1
       this.search()
     },
     upload () {

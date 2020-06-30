@@ -14,12 +14,20 @@
           :value="item['lan_code']">
         </el-option>
       </el-select>
-      <el-select v-model="selCourseType" filterable placeholder="请选择课程分类"  @change="initCourseVersionList">
+      <el-select v-show="false" v-model="selCourseType" filterable placeholder="请选择课程分类"  @change="initCourseVersionList">
         <el-option
           v-for="item in courseTypes"
           :key="item.type"
           :label="item.name"
           :value="item.type">
+        </el-option>
+      </el-select>
+      <el-select v-model="selCourseUUID" filterable placeholder="请选择课程"  @change="changeCourse">
+        <el-option
+          v-for="item in version.courseList"
+          :key="item.uuid"
+          :label="'(' + courseTypes.find(i => { return i.type == item.course_type})['name'] + ') ' + item.title['zh-CN']"
+          :value="item.uuid">
         </el-option>
       </el-select>
     </div>
@@ -62,7 +70,19 @@
             <el-button type="primary" icon="el-icon-edit" :disabled="(userInfo.authorityId !== '1' && item.curUserAuth['auth'] == 'r')" circle @click="courseContent(item)"></el-button>
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="上传模板数据" placement="top">
-            <el-button type="primary" icon="el-icon-upload2" :disabled="(userInfo.authorityId !== '1' && item.curUserAuth['auth'] == 'r')" circle @click="upload(item)"></el-button>
+            <el-upload
+              class="upload-demo"
+              :data="{
+                parent_uuid: item.uuid
+              }"
+              :headers="{
+                'x-token': token
+              }"
+              :action="'/api/editor/content/import'"
+              :show-file-list="false"
+              :on-success="uploadSuccess">
+              <el-button v-show="version.selCourse.course_type == 5" type="primary" icon="el-icon-upload2" :disabled="(userInfo.authorityId !== '1' && item.curUserAuth['auth'] == 'r')" circle></el-button>
+            </el-upload>
           </el-tooltip>
         </div>
       </div>
@@ -81,7 +101,7 @@
 // import AddVersion from './add'
 // import CourseContent from '../content/content'
 import editComp from './edit'
-import { mapState, mapActions, mapMutations } from 'vuex'
+import { mapState, mapActions, mapMutations, mapGetters } from 'vuex'
 import { addCourseVersion, delCourseVersion, editCourseVersion, addOnlineJob, setAuthority } from '@/api/course'
 import { getAuthorityList } from '@/api/authority'
 import { getUserList } from '@/api/user'
@@ -91,7 +111,9 @@ export default {
     return {
       selLang: 'ENG',
       selCourseType: '',
+      selCourseUUID: '',
       contents: [],
+      api: process.env.VUE_APP_BASE_API,
       authorityList: [],
       copyAuthorityList: [],
       authorityUsers: [],
@@ -125,11 +147,20 @@ export default {
       this.selLang = this.version.selLang
     }
     if (this.version) {
-      this.selCourseType = this.version.selCourseType
+      // this.selCourseType = this.version.selCourseType
+      this.selCourseUUID = this.version.selCourse.uuid
     }
     this.initCourseVersionList()
   },
+  watch: {
+    'version.selCourse' (newVal, oldVal) {
+      this.selCourseUUID = newVal.uuid
+    }
+  },
   computed: {
+    ...mapGetters({
+      token: 'user/token'
+    }),
     ...mapState({
       assetsDomain: state => state.course.assetsDomain,
       locale: state => state.course.locale,
@@ -199,12 +230,20 @@ export default {
     ...mapActions({
       getLangList: 'course/getLangList',
       getCourseTypes: 'course/getCourseTypes',
-      getCourseList: 'course/getCourseList'
+      getCourseList: 'course/getCourseList',
+      getCourseVersions: 'course/getCourseVersions'
     }),
     initCourseVersionList () {
       this.updateVersion({ key: 'selLang', val: this.selLang })
-      this.updateVersion({ key: 'selCourseType', val: this.selCourseType })
+      // this.updateVersion({ key: 'selCourseType', val: this.selCourseType })
       this.getCourseList({ 'lan_code': this.selLang, 'pageNo': 0, 'pageSize': 0 })
+    },
+    changeCourse () {
+      let selCourse = this.version.courseList.find(f => {
+        return f.uuid === this.selCourseUUID
+      })
+      this.updateVersion({ key: 'selCourse', val: selCourse })
+      this.getCourseVersions({ 'pageNo': 0, 'pageSize': 0, 'parent_uuid': selCourse.uuid })
     },
     // 添加版本
     addVersion () {
@@ -377,7 +416,7 @@ export default {
       })
       let obj = {
         selLang: this.selLang,
-        selCourseType: this.selCourseType,
+        selCourseType: this.version.selCourse.course_type,
         version: item
       }
       localStorage.setItem('copyVersion', JSON.stringify(obj))
@@ -402,7 +441,7 @@ export default {
         })
         return false
       }
-      if (copy.selCourseType !== this.selCourseType) {
+      if (copy.selCourseType !== this.selCourse.course_type) {
         this.$message({
           type: 'warning',
           message: '请选择相同的课程分类再粘贴'
@@ -444,7 +483,12 @@ export default {
       }
     },
     // 上传
-    upload (item) {}
+    uploadSuccess () {
+      this.$message({
+        type: 'success',
+        message: '上传成功'
+      })
+    }
   }
 }
 </script>
@@ -485,6 +529,7 @@ export default {
     text-align: center;
     display: flex;
     flex-direction: column;
+    min-height: 250px;
     cursor: pointer;
     i {
       margin-top: 88px;
