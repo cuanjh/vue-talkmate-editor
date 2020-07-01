@@ -359,6 +359,7 @@ export default {
       }, 300)
     },
     changLang () {
+      this.updateVersion({ key: 'selLang', val: this.selLang })
       this.getCourseList({ 'lan_code': this.selLang, 'pageNo': 0, 'pageSize': 0 })
       this.updateVersion({ key: 'selVersion', val: '' })
       this.updateVersion({ key: 'uuid', val: '' })

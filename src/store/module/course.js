@@ -161,10 +161,9 @@ export const course = {
         let courses = res.data.courses
         if (courses) {
           commit('updateVersion', { key: 'courseList', val: courses })
-          // let selCourse = courses.find(item => {
-          //   return item.course_type === state.version.selCourseType
-          // })
-          let selCourse = state.version.selCourse
+          let selCourse = courses.find(item => {
+            return state.version.selCourse && item.uuid === state.version.selCourse.uuid
+          })
           if (!selCourse) {
             selCourse = courses[0]
           }
