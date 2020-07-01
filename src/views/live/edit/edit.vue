@@ -633,7 +633,7 @@ export default {
               EndTime: item.EndTime,
               courseCode: this.code,
               cover: this.form.coverV2,
-              date: item.date,
+              date: moment(item.date).format('YYYY-MM-DD'),
               lanCode: this.form.lanCode,
               listOrder: item.listOrder,
               livePullUrl: item.livePullUrl ? item.livePullUrl : '',

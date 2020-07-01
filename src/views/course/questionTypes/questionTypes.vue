@@ -3,7 +3,7 @@
     <div class="question-content">
       <div class="top-bar">
         <el-select v-model="selModel" placeholder="请选择文件类型" @change="changeModel()">
-          <!-- <el-option value="" label="全部"></el-option> -->
+          <el-option value="" label="全部"></el-option>
           <el-option
             v-for="item in modelList"
             :key="item.model_key"
@@ -56,6 +56,7 @@
           fixed="right"
           label="操作">
           <template slot-scope="scope">
+            <el-button type="primary" size="small" @click="editType(scope.row)">编辑</el-button>
             <el-button type="danger" size="small" @click="delType(scope.row.type)">删除</el-button>
           </template>
         </el-table-column>
@@ -73,6 +74,7 @@
       </div>
     </div>
     <edit-comp ref="contentTypeEdit" @addContentType="initData"/>
+    <sort-question ref="sortQuestion" @initData="initData"/>
   </div>
 </template>
 
@@ -82,6 +84,7 @@ import {
   delContentType
 } from '@/api/course'
 import EditComp from './edit'
+import SortQuestion from './sortQuestion'
 
 export default {
   data () {
@@ -100,7 +103,8 @@ export default {
     this.initData()
   },
   components: {
-    EditComp
+    EditComp,
+    SortQuestion
   },
   computed: {
     ...mapState({
@@ -111,7 +115,7 @@ export default {
       let list = this.contentTypeList
       if (this.selModel) {
         return list.filter(item => {
-          return item.model_key === this.selModel
+          return item.model_keys && item.model_keys.findIndex(m => { return m === this.selModel }) > -1
         }).sort((a, b) => {
           return a.list_order - b.list_order
         })
@@ -143,9 +147,14 @@ export default {
       this.showTableData = this.filterContentTypeList.slice(starNum, endNum)
     },
     addType () {
-      this.$refs.contentTypeEdit.show()
+      this.$refs.contentTypeEdit.show({ flag: 'add' })
     },
-    sortType () {},
+    editType (row) {
+      this.$refs.contentTypeEdit.show({ flag: 'edit', data: row })
+    },
+    sortType () {
+      this.$refs['sortQuestion'].show(this.contentTypeList)
+    },
     delType (type) {
       console.log(type)
       this.$confirm('此操作将永久删除该类型, 是否继续?', '提示', {

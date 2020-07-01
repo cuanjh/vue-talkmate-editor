@@ -21,11 +21,12 @@
           :file-list="fileList"
           list-type="picture"
           :limit="10"
+          :on-exceed="handleExceed"
           :multiple="true"
           :auto-upload="false">
           <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
           <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传并保存</el-button>
-          <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+          <div v-show="false" slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
         </el-upload>
       </el-form-item>
     </el-form>
@@ -107,6 +108,9 @@ export default {
     },
     handlePreview (file) {
       console.log(file)
+    },
+    handleExceed (files, fileList) {
+      this.$message.warning(`当前限制选择 10 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`)
     }
   }
 }

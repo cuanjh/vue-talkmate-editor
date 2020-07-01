@@ -11,12 +11,12 @@
             { required: true, message: 'key不能为空', trigger: 'blur'},
             {pattern: /^[1-9a-zA-Z_]{1,}$/, message: '只允许输入字母或下划线！'}
           ]">
-            <el-input v-model="form.type" maxlength="30" show-word-limit></el-input>
+            <el-input :disabled="flag == 'edit'" v-model="form.type" maxlength="30" show-word-limit></el-input>
           </el-form-item>
           <el-form-item label="名称: " prop="name"  :rules="{ required: true, message: '名称不能为空', trigger: 'blur'}">
             <el-input v-model="form.name" maxlength="25" show-word-limit></el-input>
           </el-form-item>
-          <el-form-item label="文件类型: " prop="model_key"  :rules="{ required: true, message: '文件类型为空', trigger: 'blur'}">
+          <el-form-item v-show="false" label="文件类型: " prop="model_key"  :rules="{ required: true, message: '请选择文件类型', trigger: 'change'}">
             <el-select v-model="form.model_key" placeholder="请选择">
               <el-option
                 v-for="item in modelList"
@@ -26,8 +26,13 @@
               </el-option>
             </el-select>
           </el-form-item>
+          <el-form-item label="文件类型: " prop="model_keys" :rules="{ required: true, message: '请选择文件类型', trigger: 'blur'}">
+            <el-checkbox-group v-model="form.model_keys">
+              <el-checkbox v-for="item in modelList" :key="item.model_key" :label="item.model_key">{{ item.name }}</el-checkbox>
+            </el-checkbox-group>
+          </el-form-item>
           <el-form-item label="描述: " prop="desc"  :rules="{ required: true, message: '描述不能为空', trigger: 'blur'}">
-            <el-input type="textarea" rows="3" v-model="form.desc" maxlength="50" show-word-limit></el-input>
+            <el-input type="textarea" rows="4" v-model="form.desc" maxlength="150" show-word-limit></el-input>
           </el-form-item>
         </el-form>
         <div class="btns">
@@ -47,7 +52,8 @@
 
 <script>
 import {
-  addContentType
+  addContentType,
+  editContentType
 } from '@/api/course'
 import { mapState } from 'vuex'
 
@@ -55,13 +61,14 @@ export default {
   data () {
     return {
       showEdit: false,
+      flag: '',
       form: {
         type: '',
         name: '',
         desc: '',
+        list_order: 0,
         model_key: '',
-        model_keys: [],
-        has_del: true
+        model_keys: []
       }
     }
   },
@@ -71,7 +78,20 @@ export default {
     })
   },
   methods: {
-    show () {
+    show (params) {
+      console.log(params)
+      this.flag = params.flag
+      if (params.flag === 'edit') {
+        let data = params.data
+        this.form = {
+          type: data.type,
+          name: data.name,
+          desc: data.desc,
+          model_key: data.model_key,
+          model_keys: data.model_keys ? data.model_keys : [],
+          list_order: data.list_order
+        }
+      }
       this.showEdit = true
     },
     close () {
@@ -79,7 +99,8 @@ export default {
       this.form.type = ''
       this.form.name = ''
       this.form.desc = ''
-      this.model_key = ''
+      this.form.model_key = ''
+      this.form.model_keys = []
       this.$refs.form.resetFields()
       this.$emit('addContentType')
     },
@@ -87,12 +108,29 @@ export default {
       console.log(this.form)
       this.$refs['form'].validate((valid) => {
         if (valid) {
-          addContentType(this.form).then(res => {
-            console.log(res)
-            if (res.success) {
-              this.close()
-            }
-          })
+          if (this.flag === 'add') {
+            addContentType(this.form).then(res => {
+              console.log(res)
+              if (res.success) {
+                this.$message({
+                  type: 'success',
+                  message: '添加成功'
+                })
+                this.close()
+              }
+            })
+          } else {
+            editContentType(this.form).then(res => {
+              console.log(res)
+              if (res.success) {
+                this.$message({
+                  type: 'success',
+                  message: '修改成功'
+                })
+                this.close()
+              }
+            })
+          }
         }
       })
     }
@@ -115,7 +153,7 @@ export default {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width:400px;
+  width:600px;
   background:rgba(245,246,250,1);
   border-radius:4px;
   padding: 50px 30px 40px;

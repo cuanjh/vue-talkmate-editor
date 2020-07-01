@@ -77,8 +77,9 @@
               :auto-upload="false">
               <el-button type="text" @click="upload(f, -1)">上传</el-button>
             </el-upload>
+            <el-button slot="append" v-if="f.data_from == 'upload_audio' && f.feild == 'motherSound'" @click="motherSoundPlay(contents[activeFormIndex]['' + f.feild + ''])">试听</el-button>
           </el-input>
-          <el-button v-if="f.data_from == 'upload_audio'" type="text" @click="toggleRecorder">在线录音</el-button>
+          <el-button v-if="f.data_from == 'upload_audio' && f.feild == 'sound'" type="text" @click="toggleRecorder">在线录音</el-button>
           <audio-recorder ref="recorder" @saveRecorder="saveRecorder" v-if="f.data_from == 'upload_audio'"/>
           <!-- text -->
           <el-input
@@ -306,7 +307,8 @@ export default {
       activeFeild: '',
       baseFormDataSelf: '',
       copyBaseFormDataSelf: '',
-      uploadIndex: ''
+      uploadIndex: '',
+      audio: new Audio()
     }
   },
   components: {
@@ -339,8 +341,11 @@ export default {
       lowerRoleUser: state => state.user.lowerRoleUser
     }),
     selfContentTypes () {
+      // return this.contentTypes.filter(item => {
+      //   return item.model_key === this.contentModel
+      // })
       return this.contentTypes.filter(item => {
-        return item.model_key === this.contentModel
+        return item.model_keys && item.model_keys.findIndex(m => { return m === this.contentModel }) > -1
       })
     },
     selfContentTags () {
@@ -728,6 +733,12 @@ export default {
     },
     toggleRecorder () {
       this.$refs['recorder'][0].toggle()
+    },
+    motherSoundPlay (url) {
+      this.audio.src = this.assetsDomain + url
+      this.audio.oncanplay = () => {
+        this.audio.play()
+      }
     }
   }
 }

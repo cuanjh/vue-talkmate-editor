@@ -808,6 +808,32 @@ export const getContentTypeList = (data) => {
 }
 
 /**
+ * @Summary 题型排序
+ * @param {*} data
+ * @Router /editor/contenttype/listorder [post]
+ */
+export const sortContentType = (data) => {
+  return service({
+    url: '/editor/contenttype/listorder',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 编辑内容类型
+ * @param {*} data
+ * @Router /editor/contenttype/edit [post]
+ */
+export const editContentType = (data) => {
+  return service({
+    url: '/editor/contenttype/edit',
+    method: 'post',
+    data
+  })
+}
+
+/**
  * @Summary 删除内容类型
  * @param {*} data
  * @Router /editor/contenttype/del [post]

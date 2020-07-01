@@ -5,7 +5,28 @@
         <label>{{title}}</label>
       </el-form-item>
       <el-form-item label="视频地址" prop="videoUrl">
-        <el-input v-model="form.videoUrl" placeholder="https://"></el-input>
+        <el-input v-model="form.videoUrl" placeholder="https://">
+          <el-upload slot="prepend"
+            action="#"
+            accept="video/mp4"
+            :on-change="uploadOnchange"
+            :show-file-list="false"
+            :auto-upload="false">
+            <el-button type="text" @click="setUploadField('video,videoUrl')">上传</el-button>
+          </el-upload>
+        </el-input>
+      </el-form-item>
+      <el-form-item label="视频封面" prop="videoCover">
+        <el-input v-model="form.videoCover" placeholder="https://">
+          <el-upload slot="prepend"
+            action="#"
+            accept="image/png,image/jpg,image/jpeg,image/webp"
+            :on-change="uploadOnchange"
+            :show-file-list="false"
+            :auto-upload="false">
+            <el-button type="text" @click="setUploadField('image,videoCover')">上传</el-button>
+          </el-upload>
+        </el-input>
       </el-form-item>
       <el-form-item label="微信号">
         <el-input v-model="form.weixinNo" maxlength="20" show-word-limit></el-input>
@@ -66,6 +87,7 @@ export default {
       form: {
         uuid: '',
         videoUrl: '',
+        videoCover: '',
         finishTitle: '',
         finishInfo: '',
         weixinNo: '',
@@ -96,6 +118,8 @@ export default {
       this.resetForm()
       this.title = params.title
       this.state = params.state
+      this.form.videoUrl = params.videoUrl
+      this.form.videoCover = params.videoCover
       this.form.finishTitle = params.finishTitle
       this.form.finishInfo = params.finishInfo
       this.form.weixinNo = params.weixinNo
@@ -112,6 +136,7 @@ export default {
     resetForm () {
       this.form = {
         videoUrl: '',
+        videoCover: '',
         finishTitle: '',
         finishInfo: '',
         weixinNo: '',
@@ -135,7 +160,7 @@ export default {
         url = 'live/videos/' + date + '/' + file.uid + '.' + ext
       }
       let res = await uploadQiniu(file.raw, this.token, url)
-      this.$set(this.form, feild, res.key)
+      this.$set(this.form, feild, this.uploadfileDomain + res.key)
     },
     setUploadField (name) {
       this.uploadField = name

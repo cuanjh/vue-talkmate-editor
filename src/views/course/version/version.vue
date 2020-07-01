@@ -72,14 +72,16 @@
           <el-tooltip class="item" effect="dark" content="上传模板数据" placement="top">
             <el-upload
               class="upload-demo"
+              accept=".xls,.xlsx"
               :data="{
                 parent_uuid: item.uuid
               }"
               :headers="{
                 'x-token': token
               }"
-              :action="'/api/editor/content/import'"
+              :action="api + '/editor/content/import'"
               :show-file-list="false"
+              :before-upload="beforeUpload"
               :on-success="uploadSuccess">
               <el-button v-show="version.selCourse.course_type == 5" type="primary" icon="el-icon-upload2" :disabled="(userInfo.authorityId !== '1' && item.curUserAuth['auth'] == 'r')" circle></el-button>
             </el-upload>
@@ -117,7 +119,8 @@ export default {
       authorityList: [],
       copyAuthorityList: [],
       authorityUsers: [],
-      copyAuthorities: []
+      copyAuthorities: [],
+      loading: null
     }
   },
   components: {
@@ -482,12 +485,29 @@ export default {
         this.$refs['rightMenu'].hide()
       }
     },
-    // 上传
-    uploadSuccess () {
-      this.$message({
-        type: 'success',
-        message: '上传成功'
+    beforeUpload (file) {
+      this.loading = this.$loading({
+        lock: true,
+        text: 'Loading',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
       })
+    },
+    // 上传
+    uploadSuccess (res, file, fileList) {
+      this.loading.close()
+      console.log(res)
+      if (res.success) {
+        this.$message({
+          type: 'success',
+          message: res.msg
+        })
+      } else {
+        this.$message({
+          type: 'error',
+          message: res.data.err
+        })
+      }
     }
   }
 }
