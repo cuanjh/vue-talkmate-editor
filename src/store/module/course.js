@@ -22,6 +22,18 @@ export const course = {
       'repeatSpeak': '跟读',
       'sentenceToImg': '听句子选图片'
     },
+    partOfSpeech: [
+      { key: 'n.', name: '名词' },
+      { key: 'v.', name: '动词' },
+      { key: 'pron.', name: '代词' },
+      { key: 'adj.', name: '形容词' },
+      { key: 'adv.', name: '副词' },
+      { key: 'num.', name: '数词' },
+      { key: 'art.', name: '冠词' },
+      { key: 'prep.', name: '介词' },
+      { key: 'conj.', name: '连词' },
+      { key: 'interj.', name: '感叹词' }
+    ],
     locale: 'zh-CN',
     assetsDomain: '',
     uploadfileDomain: '',

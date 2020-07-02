@@ -235,7 +235,7 @@ export default {
             versionNum = arr.length
           }
         }
-        this.form.version = 'V' + (versionNum + 1)
+        this.form.version = 'v' + (versionNum + 1)
         let res = await addCourseVersion(this.form)
         console.log(res)
         if (res.success) {

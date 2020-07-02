@@ -44,6 +44,17 @@
           @delForm="delForm"
           @switchForm="switchForm"/>
       </div>
+      <div class="list" id="sort-form" v-else-if="contentModel == 'content_model_listen_spelling'">
+        <form-listen-spelling
+          :data-id="index"
+          :class="{'active': activeFormIndex == index}"
+          v-for="(content, index) in contents"
+          :key="index"
+          :form="content"
+          :formIndex="index"
+          @delForm="delForm"
+          @switchForm="switchForm"/>
+      </div>
       <div class="list" id="sort-form" v-else>
         <form-comp
           :data-id="index"
@@ -58,7 +69,7 @@
     </div>
     <el-form id="form-model" ref="form" v-if="contents && contents.length" :model="contents[activeFormIndex]" label-width="80px">
       <div class="item" v-for="f in feilds" :key="f.feild">
-        <el-form-item label-width="140px" :label="f.name" v-if="(f.data_from !== 'content_types' && f.feild !== 'list_order' && f.feild !== 'options' && f.type !== 'array' && f.type !== 'template' && f.type !== 'templateArray' && f.feild !== 'sentence_phoneticize' && f.feild !== 'options_phoneticize') || (f.type == 'template' && contents[activeFormIndex]['' + f.feild + '']) || ((version['selLang'] == 'JPN' || version['selLang'] == 'CHI') && (f.feild == 'sentence_phoneticize' || f.feild == 'options_phoneticize')) || (f.feild === 'options' && (contents[activeFormIndex]['type'] == 'makeSentence' || contents[activeFormIndex]['type'] == 'fillGap'  || contents[activeFormIndex]['type'] == 'kid_pattern_words_3' || contents[activeFormIndex]['type'] == 'kid_pattern_sentences_3') || (f.type == 'array' && contents[activeFormIndex][f.feild]))">
+        <el-form-item label-width="140px" :label="f.name" v-if="(f.data_from !== 'part_of_speech' && f.data_from !== 'content_types' && f.feild !== 'list_order' && f.feild !== 'options' && f.type !== 'array' && f.type !== 'template' && f.type !== 'templateArray' && f.feild !== 'sentence_phoneticize' && f.feild !== 'options_phoneticize') || (f.type == 'template' && contents[activeFormIndex]['' + f.feild + '']) || ((version['selLang'] == 'JPN' || version['selLang'] == 'CHI') && (f.feild == 'sentence_phoneticize' || f.feild == 'options_phoneticize')) || (f.feild === 'options' && (contents[activeFormIndex]['type'] == 'makeSentence' || contents[activeFormIndex]['type'] == 'fillGap'  || contents[activeFormIndex]['type'] == 'kid_pattern_words_3' || contents[activeFormIndex]['type'] == 'kid_pattern_sentences_3') || (f.type == 'array' && contents[activeFormIndex][f.feild]))">
           <!-- string 或 int -->
           <el-input
             :maxlength="150" show-word-limit
@@ -89,17 +100,6 @@
             placeholder="请输入内容"
             v-model="contents[activeFormIndex]['' + f.feild + '']">
           </el-input>
-          <!-- <el-select
-            v-if="f.data_from == 'content_types'"
-            v-model="contents[activeFormIndex]['' + f.feild + '']"
-            placeholder="请选择">
-            <el-option
-              v-for="item in selfContentTypes"
-              :key="item.type"
-              :label="item.name"
-              :value="item.type">
-            </el-option>
-          </el-select> -->
           <!-- 标签 -->
           <el-checkbox-group v-if="f.data_from == 'content_tags'" v-model="contents[activeFormIndex]['' + f.feild + '']">
             <el-checkbox v-for="item in selfContentTags" :key="item.key" :label="item.key">{{ item.name }}</el-checkbox>
@@ -229,6 +229,22 @@
         </el-form-item>
         <el-form-item
           label-width="140px"
+          label="词性"
+          v-if="f.feild == 'POS'">
+          <el-select
+            v-if="f.data_from == 'part_of_speech'"
+            v-model="contents[activeFormIndex]['' + f.feild + '']"
+            placeholder="请选择">
+            <el-option
+              v-for="(item, index) in partOfSpeech"
+              :key="item.key + index"
+              :label="item.name + '( '+ item.key +' )'"
+              :value="item.key">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item
+          label-width="140px"
           label="题型"
           v-if="f.data_from == 'content_types'"
           :prop="f.feild"
@@ -274,6 +290,7 @@ import FormComp from './form'
 import FormVideo from './formVideo'
 import FormKidTest from './kidTest/kidTest'
 import FormLevelGrade from './levelGrade/levelGrade'
+import FormListenSpelling from './listenSpelling/listenSpelling'
 import LookImage from './lookImage'
 import LookContent from './lookContent'
 import RightMenuForm from './rightMenuForm'
@@ -316,6 +333,7 @@ export default {
     FormVideo,
     FormKidTest,
     FormLevelGrade,
+    FormListenSpelling,
     LookImage,
     LookContent,
     RightMenuForm
@@ -338,6 +356,7 @@ export default {
       assetsDomain: state => state.course.assetsDomain,
       selfSigns: state => state.course.selfSigns,
       version: state => state.course.version,
+      partOfSpeech: state => state.course.partOfSpeech,
       lowerRoleUser: state => state.user.lowerRoleUser
     }),
     selfContentTypes () {
