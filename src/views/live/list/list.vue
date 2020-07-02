@@ -62,7 +62,10 @@
                <div class="date">
                 {{ scope.row.room.liveInfo.startDate + ' 至 ' + scope.row.room.liveInfo.endDate + ' 共 ' + scope.row.courses.length + ' 课' }}
               </div>
-              <div class="time">
+              <div class="time" v-if="scope.row.room.liveInfo.dateNotice">
+                <span>{{ scope.row.room.liveInfo.dateNotice }}</span>
+              </div>
+              <div class="time" v-else>
                 <span>每周</span>
                 <span v-for="(w, index) in scope.row.room.liveInfo.weekDays" :key="w">{{ liveRate[w] + ((index != scope.row.room.liveInfo.weekDays.length - 1) ? '、' : '') }}</span>
                 <span>{{ ' ' + scope.row.room.liveInfo.startTime.slice(0, 5) + ' - '  + scope.row.room.liveInfo.endTime.slice(0, 5)}}</span>
@@ -85,7 +88,7 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="430" fixed="right">
+      <el-table-column label="操作" width="280" fixed="right">
         <template slot="header" slot-scope="scope">
           <el-input
             v-model="search"
@@ -108,7 +111,7 @@
           <el-button
             size="mini"
             type="warning"
-            @click="handleOffline(scope.$index, scope.row)">下架</el-button>
+            @click="handleOffline(scope.$index, scope.row)">下架</el-button><br/><br/>
           <el-button
             size="mini"
             type="primary"

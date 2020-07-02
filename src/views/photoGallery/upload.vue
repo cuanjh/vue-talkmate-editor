@@ -52,6 +52,7 @@ export default {
   methods: {
     show (params) {
       console.log(params)
+      this.fileList = []
       this.tags = params.tags
       this.token = params.token
       this.dialogVisible = true

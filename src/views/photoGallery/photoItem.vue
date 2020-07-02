@@ -15,7 +15,7 @@
     </el-popover>
     <p class="desc" v-show="picture.desc" v-popover:popover1 >{{picture.desc.split('\r\n')[0]}}</p> -->
     <el-card :body-style="{ padding: '0px' }">
-      <el-image :src="(domain + picture.image_url) | urlFix('imageView2/1/format/jpg')" fit="cover" :preview-src-list="[domain + picture.image_url]">
+      <el-image :src="(domain + picture.image_url) | urlFix('imageView2/1/format/jpg')" fit="cover" :preview-src-list="[domain + picture.image_url]" @load="loadImg">
         <div slot="error" class="image-slot">
           <i class="el-icon-picture-outline"></i>
         </div>
@@ -33,6 +33,7 @@
           <div class="popover-content" v-html="picture.desc.replace(/(\r\n)|(\n)/g,'<br>')"></div>
         </el-popover> -->
         <div class="bottom clearfix">
+          <div class="size">{{ '宽高: ' + width + ' x ' + height}}</div>
           <el-button type="text" class="button" @click="showEditPicture()">编辑</el-button>
           <el-button type="text" class="button" @click="delPicture()">删除</el-button>
           <el-button type="text" class="button" @click="download" v-show="false">下载</el-button>
@@ -53,7 +54,9 @@ export default {
   data () {
     return {
       currentDate: new Date(),
-      isShow: false
+      isShow: false,
+      height: 0,
+      width: 0
     }
   },
   methods: {
@@ -116,6 +119,15 @@ export default {
         })
         clipboard.destroy()
       })
+    },
+    loadImg (e) {
+      console.log(e)
+      let img = new Image()
+      img.src = this.domain + this.picture.image_url
+      img.onload = () => {
+        this.height = img.height
+        this.width = img.width
+      }
     }
   }
 }
@@ -191,6 +203,12 @@ export default {
   margin-top: 10px;
   line-height: 12px;
   text-align: right;
+  .size {
+    float: left;
+    margin-top: 14px;
+    font-size: 12px;
+    color: #409EFF;
+  }
 }
 
 .clearfix:before,

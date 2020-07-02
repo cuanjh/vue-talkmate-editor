@@ -82,7 +82,6 @@ export default {
       activeTag: -1,
       pictures: [],
       showPicData: [],
-      searchType: 'word',
       page: 1,
       pageSize: 12,
       isExpand: false,
@@ -116,9 +115,7 @@ export default {
   methods: {
     changeSearchKey () {
       this.page = 1
-      this.searchType = 'word'
       this.pictures = []
-      this.activeTag = ''
       this.search()
     },
     loadTags () {
@@ -132,8 +129,8 @@ export default {
       let obj = {
         page: this.page,
         pageSize: this.pageSize,
-        searchType: this.searchType,
-        words: this.searchType === 'tag' ? this.activeTag : this.searchKey
+        tagKey: this.activeTag,
+        words: this.searchKey
       }
       searchImages(obj).then(res => {
         console.log(res)
@@ -146,8 +143,6 @@ export default {
     },
     selOneTag (item) {
       this.activeTag = item.TagKey
-      this.searchKey = ''
-      this.searchType = 'tag'
       this.page = 1
       this.pictures = []
       this.search()

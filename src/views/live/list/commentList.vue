@@ -96,7 +96,13 @@ export default {
       })
     },
     formatDate (row, column, cellValue, index) {
-      return moment(new Date(cellValue * 1000)).format('YYYY-MM-DD HH:mm:ss')
+      let val = ''
+      if ((cellValue + '').length === 19) {
+        val = cellValue / 1000000
+      } else {
+        val = cellValue * 1000
+      }
+      return moment(new Date(val)).format('YYYY-MM-DD HH:mm:ss')
     },
     filterTag (value, row) {
       return row.isMajia === value

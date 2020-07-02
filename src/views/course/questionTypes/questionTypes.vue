@@ -73,7 +73,7 @@
         </el-pagination>
       </div>
     </div>
-    <edit-comp ref="contentTypeEdit" @addContentType="initData"/>
+    <edit-question ref="contentTypeEdit" @addContentType="initData"/>
     <sort-question ref="sortQuestion" @initData="initData"/>
   </div>
 </template>
@@ -83,7 +83,7 @@ import { mapState, mapActions } from 'vuex'
 import {
   delContentType
 } from '@/api/course'
-import EditComp from './edit'
+import EditQuestion from './editQuestion'
 import SortQuestion from './sortQuestion'
 
 export default {
@@ -103,7 +103,7 @@ export default {
     this.initData()
   },
   components: {
-    EditComp,
+    EditQuestion,
     SortQuestion
   },
   computed: {

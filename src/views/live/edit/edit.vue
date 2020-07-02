@@ -264,6 +264,9 @@
               v-text="item.text"></div>
           </div>
         </el-form-item>
+        <el-form-item label="日期描述">
+          <el-input v-model="form.dateNotice" maxlength="100" show-word-limit></el-input>
+        </el-form-item>
       </div>
       <div class="course-info">
         <div class="title">课程信息</div>
@@ -354,6 +357,7 @@ export default {
         basicCourseCode: '',
         basicChapterCover: '',
         basicProfilePhoto: '',
+        dateNotice: '',
         coverV2: '', // 大图
         lanCode: 'ALL',
         money: 0,
@@ -486,6 +490,7 @@ export default {
         this.form.basicContentLevel = this.roomInfo.liveInfo.basicContentLevel
         this.form.basicChapterCover = this.roomInfo.liveInfo.basicChapterCover
         this.form.basicProfilePhoto = this.roomInfo.liveInfo.basicProfilePhoto
+        this.form.dateNotice = this.roomInfo.liveInfo.dateNotice
         this.form.teacherPhoto = this.roomInfo.liveInfo.tech_photo
         this.form.teacherName = this.roomInfo.liveInfo.tech_name
         this.form.teacherDesc = this.roomInfo.liveInfo.tech_desc
@@ -623,14 +628,14 @@ export default {
           }
           let courses = []
           this.form.courses.forEach(item => {
-            // let startTime = (new Date(item.date + ' ' + moment(this.form.time[0]).format('HH:mm:ss'))).getTime() / 1000
-            // let endTime = (new Date(item.date + ' ' + moment(this.form.time[1]).format('HH:mm:ss'))).getTime() / 1000
+            let startTime = (new Date(moment(item.date).format('YYYY-MM-DD') + ' ' + moment(item.times[0]).format('HH:mm:ss'))).getTime() / 1000
+            let endTime = (new Date(moment(item.date).format('YYYY-MM-DD') + ' ' + moment(item.times[1]).format('HH:mm:ss'))).getTime() / 1000
             // let state = 0
             // if (typeof item.state !== 'undefined') {
             //   state = item.state
             // }
             let obj = {
-              EndTime: item.EndTime,
+              EndTime: endTime,
               courseCode: this.code,
               cover: this.form.coverV2,
               date: moment(item.date).format('YYYY-MM-DD'),
@@ -640,7 +645,7 @@ export default {
               livePushUrl: item.livePushUrl ? item.livePushUrl : '',
               realEndTime: item.realEndTime ? item.realEndTime : 0,
               realStartTime: item.realStartTime ? item.realStartTime : 0,
-              startTime: item.startTime,
+              startTime: startTime,
               finishTitle: item.finishTitle ? item.finishTitle : '',
               finishInfo: item.finishInfo ? item.finishInfo : '',
               weixinNo: item.weixinNo ? item.weixinNo : '',
@@ -717,7 +722,8 @@ export default {
                 basicCourseCode: this.form.basicCourseCode,
                 basicContentLevel: this.form.basicContentLevel,
                 basicChapterCover: this.form.basicChapterCover,
-                basicProfilePhoto: this.form.basicProfilePhoto
+                basicProfilePhoto: this.form.basicProfilePhoto,
+                dateNotice: this.form.dateNotice
               },
               module_name: this.form.moduleName,
               money: this.form.money,
