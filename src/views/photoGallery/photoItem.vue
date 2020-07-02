@@ -120,8 +120,7 @@ export default {
         clipboard.destroy()
       })
     },
-    loadImg (e) {
-      console.log(e)
+    loadImg () {
       let img = new Image()
       img.src = this.domain + this.picture.image_url
       img.onload = () => {

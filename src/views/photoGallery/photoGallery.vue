@@ -6,7 +6,8 @@
           <el-button slot="append" icon="el-icon-search" @click="changeSearchKey"></el-button>
         </el-input>
       </el-col>
-      <el-col :span="2" :offset="10">
+      <el-col :span="4" :offset="8">
+        <el-button type="primary" @click="reset">重置</el-button>
         <el-button type="primary" @click="upload">上传</el-button>
       </el-col>
     </el-row>
@@ -79,7 +80,7 @@ export default {
     return {
       searchKey: '',
       tags: [],
-      activeTag: -1,
+      activeTag: '',
       pictures: [],
       showPicData: [],
       page: 1,
@@ -172,6 +173,11 @@ export default {
         this.page++
         this.search()
       }
+    },
+    reset () {
+      this.activeTag = ''
+      this.pictures = []
+      this.search()
     }
   }
 }
