@@ -32,7 +32,7 @@
             </el-checkbox-group>
           </el-form-item>
           <el-form-item label="描述: " prop="desc"  :rules="{ required: true, message: '描述不能为空', trigger: 'blur'}">
-            <el-input type="textarea" rows="4" v-model="form.desc" maxlength="150" show-word-limit></el-input>
+            <el-input type="textarea" rows="4" v-model="form.desc" maxlength="350" show-word-limit></el-input>
           </el-form-item>
         </el-form>
         <div class="btns">

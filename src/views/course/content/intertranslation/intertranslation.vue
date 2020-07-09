@@ -12,15 +12,11 @@
       </div>
     </div>
     <div class="form">
-      <!-- 听音拼写 -->
       <div class="form-wrap">
-        <div class="correct-area">
-          <div class="wrap">
-            <span>{{ form.pos + ' ' + form.translate }}</span>
-            <i @click="play(form.sound)"></i>
-          </div>
-          <div class="word">
-            {{ form.word }}
+        <div class="list">
+          <div class="item" v-for="(item, index) in form.radar" :key="index">
+            <div class="content">{{ item.key }}</div>
+            <div class="content">{{ item.val }}</div>
           </div>
         </div>
       </div>
@@ -217,35 +213,24 @@ export default {
 }
 
 .form-wrap {
-  height: 100%;
-  vertical-align: middle;
-  .correct-area {
-    text-align: center;
-    width: 100%;
-    padding: 20px 0 10px;
-    .wrap {
-      span {
-        margin-right: 5px;
+  .list {
+    display: flex;
+    flex-direction: column;
+    padding-top: 30px;
+    .item {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-around;
+      margin: 5px;
+      .content {
+        width: 80px;
+        height: 50px;
+        line-height: 50px;
+        text-align: center;
+        background: #FFFFFF;
+        border-radius: 4px;
       }
-      i {
-        width: 15px;
-        min-width: 15px;
-        margin-right: 10px;
-        vertical-align: middle;
-        height: 15px;
-        display: inline-block;
-        background-image: url('../../../../assets/images/course/icon-voice.png');
-        background-repeat: no-repeat;
-        background-size: cover;
-        cursor: pointer;
-      }
-      display: inline-block;
-      padding: 10px 20px;
-      border-radius: 20px;
     }
-  }
-  .word {
-    letter-spacing: 6px;
   }
 }
 </style>

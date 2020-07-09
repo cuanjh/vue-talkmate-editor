@@ -70,7 +70,13 @@
             <el-button type="primary" icon="el-icon-edit" :disabled="(userInfo.authorityId !== '1' && item.curUserAuth['auth'] == 'r')" circle @click="courseContent(item)"></el-button>
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="上传模板数据" placement="top">
+            <div>
+            <el-button
+              v-show="version.selCourse.course_type == 5"
+              type="primary" icon="el-icon-upload2"
+              :disabled="(userInfo.authorityId !== '1' && item.curUserAuth['auth'] == 'r')" circle @click="clickUpload"></el-button>
             <el-upload
+              ref="upload"
               class="upload-demo"
               accept=".xls,.xlsx"
               :data="{
@@ -83,8 +89,7 @@
               :show-file-list="false"
               :before-upload="beforeUpload"
               :on-success="uploadSuccess">
-              <el-button v-show="version.selCourse.course_type == 5" type="primary" icon="el-icon-upload2" :disabled="(userInfo.authorityId !== '1' && item.curUserAuth['auth'] == 'r')" circle></el-button>
-            </el-upload>
+            </el-upload></div>
           </el-tooltip>
         </div>
       </div>
@@ -149,7 +154,7 @@ export default {
     if (this.version) {
       this.selLang = this.version.selLang
     }
-    if (this.version) {
+    if (this.version && this.version.selCourse) {
       // this.selCourseType = this.version.selCourseType
       this.selCourseUUID = this.version.selCourse.uuid
     }
@@ -485,6 +490,22 @@ export default {
         this.$refs['rightMenu'].hide()
       }
     },
+    clickUpload () {
+      console.log(this.$refs['upload'][0].$refs['upload-inner'])
+      const uploadInner = this.$refs['upload'][0].$refs['upload-inner']
+      this.$confirm('确定要上传吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        uploadInner.handleClick()
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消上传'
+        })
+      })
+    },
     beforeUpload (file) {
       this.loading = this.$loading({
         lock: true,
@@ -639,6 +660,10 @@ export default {
     //   color: #007AFF;
     //   line-height: 20px;
     // }
+  }
+
+  .upload-demo {
+    position: absolute;
   }
   .operate-shade {
     position: absolute;

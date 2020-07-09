@@ -12,15 +12,26 @@
       </div>
     </div>
     <div class="form">
-      <!-- 听音拼写 -->
-      <div class="form-wrap">
+      <div class="form-wrap chapter" v-if="form.type == 'listeningChoice_chapter'">
         <div class="correct-area">
           <div class="wrap">
-            <span>{{ form.pos + ' ' + form.translate }}</span>
             <i @click="play(form.sound)"></i>
           </div>
-          <div class="word">
-            {{ form.word }}
+        </div>
+        <div class="options">
+          <div class="text" v-html="form.text ? form.text.replace(new RegExp(/\n/, 'g'), '<br />') : ''"></div>
+        </div>
+      </div>
+      <div class="form-wrap question" v-if="form.type == 'listeningChoice_question'">
+        <div class="correct-area">
+          <div class="wrap">
+            <i @click="play(form.sound_question)"></i>
+            <span>{{ form.question }}</span>
+          </div>
+        </div>
+        <div class="options" v-show="form.options.length">
+          <div class="option" v-for="(item, index) in form.options" :key="index">
+            {{ item }}
           </div>
         </div>
       </div>
@@ -82,8 +93,8 @@ export default {
     switchForm () {
       this.$emit('switchForm', { content: this.form, formIndex: this.formIndex })
     },
-    play (item) {
-      this.myAudio.src = this.assetsDomain + item.sound
+    play (url) {
+      this.myAudio.src = this.assetsDomain + url
       this.myAudio.oncanplay = () => {
         this.myAudio.play()
       }
@@ -201,22 +212,22 @@ export default {
   .options {
     display: flex;
     flex-direction: row;
-    .option {
-      background: #FFF;
-      width: 100px;
-      height: 50px;
-      margin: 10px;
-      padding: 5px;
-      border-radius: 4px;
-      cursor: pointer;
-      .el-image {
-        border-radius: 4px;
-      }
-    }
+    // .option {
+    //   background: #FFF;
+    //   width: 100px;
+    //   height: 50px;
+    //   margin: 10px;
+    //   padding: 5px;
+    //   border-radius: 4px;
+    //   cursor: pointer;
+    //   .el-image {
+    //     border-radius: 4px;
+    //   }
+    // }
   }
 }
 
-.form-wrap {
+.chapter {
   height: 100%;
   vertical-align: middle;
   .correct-area {
@@ -245,7 +256,54 @@ export default {
     }
   }
   .word {
-    letter-spacing: 6px;
+    padding: 10px;
+    text-align: left;
+  }
+}
+
+.question {
+  .correct-area {
+    text-align: center;
+    width: 100%;
+    padding: 20px 0 10px;
+    .wrap {
+      i {
+        width: 15px;
+        min-width: 15px;
+        margin-right: 10px;
+        vertical-align: middle;
+        height: 15px;
+        display: inline-block;
+        background-image: url('../../../../assets/images/course/icon-voice.png');
+        background-repeat: no-repeat;
+        background-size: cover;
+        cursor: pointer;
+      }
+      background: #FFF;
+      display: inline-block;
+      padding: 10px 20px;
+      border-radius: 20px;
+    }
+  }
+  .options {
+    display: flex;
+    flex-direction: column;
+    justify-content:space-around;
+    // align-items: center;
+    text-align: center;
+    margin: 0 10px;
+    .option {
+      background: #FFF;
+      margin-top: 10px;
+      padding: 7px;
+      border-radius: 4px;
+      cursor: pointer;
+      .el-image {
+        width: 100px;
+        height: 50px;
+        border-radius: 4px;
+      }
+    }
   }
 }
 </style>

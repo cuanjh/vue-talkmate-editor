@@ -13,9 +13,10 @@
         <template slot-scope="props">
           <div class="live-courses">
             <el-row :gutter="5" :class="['course', { 'notStarted': props.row.courses[index].state == 0, 'inClass': props.row.courses[index].state == 1 }]" v-for="(c, index) in props.row.courses" :key="c.uuid">
-              <el-col :span="1" class="course-column">{{ '第' + (index + 1) + '课'}}</el-col>
-              <el-col :span="4" class="course-column">{{ c.title }}</el-col>
-              <el-col :span="4" class="course-column">{{ formatCourseDate(c) }}</el-col>
+              <el-col :span="2" class="course-column">{{ '第' + (index + 1) + '课'}}</el-col>
+              <el-col :span="5" class="course-column">{{ c.title }}</el-col>
+              <el-col :span="5" class="course-column">{{ formatCourseDate(c) }}</el-col>
+              <el-col :span="1" class="course-column">{{ ' (' + c.online_number + ') ' }}</el-col>
               <el-col :span="4" class="course-column">
                 <el-select size="small" :disabled="props.row.courses[index].state == -1" v-model="props.row.courses[index].state" placeholder="请选择..." @change="changeCourseState(c, props.row.courses, props.row, index)">
                   <el-option :label="'未开始'" :disabled="props.row.courses[index].state == 1" :value="0"></el-option>
@@ -23,15 +24,17 @@
                   <el-option :label="'已下课'" :disabled="props.row.courses[index].state == 0" :value="-1"></el-option>
                 </el-select>
               </el-col>
-              <el-col :span="11" class="course-column">
+              <el-col :span="7" class="course-column">
                 <el-row>
                   <el-button type="primary" size="small" :disabled="props.row.courses[index].state !== 1" class="btnPushLink" @click="publishComment(c)">发表评论</el-button>
                   <el-button type="primary" size="small" :disabled="props.row.courses[index].state === 0" class="btnPushLink" @click="getComments(c)">评论列表</el-button>
                   <el-button type="primary" size="small" :disabled="props.row.courses[index].state == -1" class="btnPushLink" @click="refreshLink(c)">刷新推流</el-button>
+                  <br><br>
                   <el-tooltip class="item" effect="dark" :content="c.livePushUrl" placement="top">
                     <el-button type="primary" size="small" :disabled="c.livePushUrl == '' || props.row.courses[index].state == -1" class="btnPushLink" @click="copyLink(c)">复制推流</el-button>
                   </el-tooltip>
                   <el-button type="primary" size="small" class="btnPushLink" @click="editLiveCourse(c)">编辑</el-button>
+                  <el-button type="primary" size="small" class="btnPushLink" @click="onlinePerson(c)">在线统计</el-button>
                 </el-row>
               </el-col>
             </el-row>
@@ -128,6 +131,7 @@
     <comment-list ref="commentList" />
     <edit-course ref="editCourse" @initData="initData"  />
     <subscribe ref="subscribe" />
+    <online-persons ref="onlinePersons" />
   </div>
 </template>
 
@@ -139,6 +143,7 @@ import Comment from './comment'
 import CommentList from './commentList'
 import EditCourse from './editCourse'
 import Subscribe from './subscribe'
+import OnlinePersons from './onlinePersons'
 
 import {
   getLiveList,
@@ -176,7 +181,8 @@ export default {
     Comment,
     CommentList,
     EditCourse,
-    Subscribe
+    Subscribe,
+    OnlinePersons
   },
   mounted () {
     this.getMajia()
@@ -390,6 +396,9 @@ export default {
     },
     handleSubscribe (index, row) {
       this.$refs['subscribe'].show(row)
+    },
+    onlinePerson (c) {
+      this.$refs['onlinePersons'].show(c)
     }
   }
 }

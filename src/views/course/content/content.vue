@@ -537,12 +537,23 @@ export default {
             let newOrder = dragObj.list_order
             let pUUID = track[0]['parent_uuid']
             let listOrder = track[evt.newIndex].list_order
+            
             if (evt.newIndex < evt.oldIndex) {
               // 向上拖拽
-              newOrder = listOrder - 1
+              let preListOrder = 0
+              if (evt.newIndex !== 0) {
+                preListOrder = track[evt.newIndex - 1].list_order
+              }
+              newOrder = parseInt((listOrder + preListOrder) / 2)
             } else {
               // 向下拖拽
-              newOrder = listOrder + 1
+              let nextListOrder = 0
+              if (evt.newIndex + 1 !== track.length) {
+                nextListOrder = track[evt.newIndex + 1].list_order
+                newOrder = parseInt((listOrder + nextListOrder) / 2)
+              } else {
+                newOrder = listOrder + 10
+              }
             }
             let obj = {
               catalog_info: {

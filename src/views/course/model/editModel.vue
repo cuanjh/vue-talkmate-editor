@@ -11,7 +11,7 @@
             {required: true, message: 'model_key不能为空', trigger: 'blur'},
             {pattern: /^[a-zA-Z_]{1,}$/, message: '只允许输入字母或下划线！'}
           ]">
-            <el-input v-model="form.model_key" maxlength="30" show-word-limit :disabled="type == 'edit'"></el-input>
+            <el-input v-model="form.model_key" maxlength="50" show-word-limit :disabled="type == 'edit'"></el-input>
           </el-form-item>
           <el-form-item label="名称: " prop="name" :rules="{
             required: true, message: '名称不能为空', trigger: 'blur'
@@ -54,6 +54,40 @@
                     :value="item">
                   </el-option>
                 </el-select>
+                <el-button v-show="feild.type == 'arrayObject'" @click="addSubFeilds(feild)" class="icon-plus-sub-fields" icon="el-icon-plus" circle></el-button>
+              </el-form-item>
+              <div class="sub-feilds-list" v-if="feild.type === 'arrayObject' && feild.sub_feilds && feild.sub_feilds.length">
+                <div class="feilds-item"
+                  :data-id="index"
+                  v-for="(f, i) in feild.sub_feilds"
+                  :key="i">
+                  <div class="del" @click="delSubFeild(index, i)"><i class="el-icon-circle-close"></i></div>
+                  <el-form-item label="data_from: ">
+                    <el-input v-model="f.data_from" size="small"></el-input>
+                  </el-form-item>
+                  <el-form-item label="feild: ">
+                    <el-input v-model="f.feild" size="small"></el-input>
+                  </el-form-item>
+                  <el-form-item label="name: ">
+                    <el-input v-model="f.name" size="small"></el-input>
+                  </el-form-item>
+                  <el-form-item label="type: ">
+                    <el-select v-model="f.type" placeholder="请选择字段类型" size="small">
+                      <el-option
+                        v-for="item in feildTypes"
+                        :key="item"
+                        :label="item"
+                        :value="item">
+                      </el-option>
+                    </el-select>
+                  </el-form-item>
+                  <el-form-item class="desc" label="备注: ">
+                    <el-input style="width: 512px" type="textarea" v-model="f.desc" size="small"></el-input>
+                  </el-form-item>
+                </div>
+              </div>
+              <el-form-item class="desc" label="备注: ">
+                <el-input style="width:570px" type="textarea" v-model="feild.desc" ></el-input>
               </el-form-item>
             </div>
           </div>
@@ -94,7 +128,9 @@ export default {
             feild: '',
             name: '',
             type: '',
-            list_order: 1
+            list_order: 1,
+            desc: '',
+            sub_feilds: []
           }
         ]
       },
@@ -104,7 +140,10 @@ export default {
         'int',
         'bool',
         'string',
+        'stringOptions',
         'text',
+        'textOptions',
+        'textRadar',
         'richText',
         'template',
         'templateArray',
@@ -155,6 +194,7 @@ export default {
             feild: '',
             name: '',
             type: '',
+            desc: '',
             list_order: 1
           }
         ]
@@ -167,6 +207,7 @@ export default {
         feild: '',
         name: '',
         type: '',
+        desc: '',
         list_order: this.form.feilds.length + 1
       }
       this.form.feilds.push(feild)
@@ -191,6 +232,33 @@ export default {
       })
       this.form.feilds.splice(feild, 1)
       console.log(feild, this.form.feilds)
+    },
+    // arrayObject添加子项
+    addSubFeilds (f) {
+      let i = this.form.feilds.findIndex(item => {
+        return item.feild === f.feild
+      })
+      let listOrder = 1
+      if (this.form.feilds[i]['sub_feilds'] && this.form.feilds[i]['sub_feilds'].length) {
+        listOrder = this.form.feilds[i]['sub_feilds'].length + 1
+      }
+      let feild = {
+        data_from: '',
+        feild: '',
+        name: '',
+        type: '',
+        desc: '',
+        list_order: listOrder
+      }
+      if (this.form.feilds[i]['sub_feilds'] && this.form.feilds[i]['sub_feilds'].length) {
+        this.form.feilds[i]['sub_feilds'].push(feild)
+      } else {
+        this.$set(this.form.feilds[i], 'sub_feilds', [])
+        this.form.feilds[i]['sub_feilds'].push(feild)
+      }
+    },
+    delSubFeild (bigIndex, index) {
+      this.form.feilds[bigIndex]['sub_feilds'].splice(index, 1)
     },
     close () {
       this.$emit('editModel')
@@ -377,6 +445,31 @@ export default {
     .el-input {
       width: 595px;
     }
+  }
+}
+
+.icon-plus-sub-fields {
+  font-size: 12px;
+  margin-left: 5px;
+}
+
+.sub-feilds-list {
+  border: 1px solid rgba(0, 0, 0, .1);
+  width: 95%;
+  margin-left: 20px;
+  margin-bottom: 10px;
+  .el-form-item {
+    margin-bottom: 0px;
+  }
+  .el-input {
+    width: 200px;
+  }
+}
+
+.form-item-desc {
+  width: 100% !important;
+  .el-input {
+    width: 400px;
   }
 }
 </style>

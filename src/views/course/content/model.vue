@@ -55,6 +55,105 @@
           @delForm="delForm"
           @switchForm="switchForm"/>
       </div>
+      <div class="list" id="sort-form" v-else-if="contentModel == 'content_model_intertranslation'">
+        <form-intertranslation
+          :data-id="index"
+          :class="{'active': activeFormIndex == index}"
+          v-for="(content, index) in contents"
+          :key="index"
+          :form="content"
+          :formIndex="index"
+          @delForm="delForm"
+          @switchForm="switchForm"/>
+      </div>
+      <div class="list" id="sort-form" v-else-if="contentModel == 'content_model_writing_training'">
+        <form-writing-training
+          :data-id="index"
+          :class="{'active': activeFormIndex == index}"
+          v-for="(content, index) in contents"
+          :key="index"
+          :form="content"
+          :formIndex="index"
+          @delForm="delForm"
+          @switchForm="switchForm"/>
+      </div>
+      <div class="list" id="sort-form" v-else-if="contentModel == 'content_model_vocabulary_comprehension'">
+        <form-vocabulary-comprehension
+          :data-id="index"
+          :class="{'active': activeFormIndex == index}"
+          v-for="(content, index) in contents"
+          :key="index"
+          :form="content"
+          :formIndex="index"
+          @delForm="delForm"
+          @switchForm="switchForm"/>
+      </div>
+      <div class="list" id="sort-form" v-else-if="contentModel == 'content_model_reading_comprehension'">
+        <form-reading-comprehension
+          :data-id="index"
+          :class="{'active': activeFormIndex == index}"
+          v-for="(content, index) in contents"
+          :key="index"
+          :form="content"
+          :formIndex="index"
+          @delForm="delForm"
+          @switchForm="switchForm"/>
+      </div>
+      <div class="list" id="sort-form" v-else-if="contentModel == 'content_model_read_in_role'">
+        <form-read-role
+          :data-id="index"
+          :class="{'active': activeFormIndex == index}"
+          v-for="(content, index) in contents"
+          :key="index"
+          :form="content"
+          :formIndex="index"
+          @delForm="delForm"
+          @switchForm="switchForm"/>
+      </div>
+      <div class="list" id="sort-form" v-else-if="contentModel == 'content_model_listening_choice'">
+        <form-listening-choice
+          :data-id="index"
+          :class="{'active': activeFormIndex == index}"
+          v-for="(content, index) in contents"
+          :key="index"
+          :form="content"
+          :formIndex="index"
+          @delForm="delForm"
+          @switchForm="switchForm"/>
+      </div>
+      <div class="list" id="sort-form" v-else-if="contentModel == 'content_model_dubbing_repeat'">
+        <form-dubbing-repeat
+          :data-id="index"
+          :class="{'active': activeFormIndex == index}"
+          v-for="(content, index) in contents"
+          :key="index"
+          :form="content"
+          :formIndex="index"
+          @delForm="delForm"
+          @switchForm="switchForm"/>
+      </div>
+      <div class="list" id="sort-form" v-else-if="contentModel == 'content_model_rubbing_ear'">
+        <form-rubbing-ear
+          :data-id="index"
+          :class="{'active': activeFormIndex == index}"
+          v-for="(content, index) in contents"
+          :key="index"
+          :form="content"
+          :formIndex="index"
+          @delForm="delForm"
+          @switchForm="switchForm"/>
+      </div>
+      <div class="list" id="sort-form" v-else-if="contentModel == 'content_model_listen_read'">
+        <form-listen-read
+          :data-id="index"
+          :class="{'active': activeFormIndex == index}"
+          v-for="(content, index) in contents"
+          :key="index"
+          :form="content"
+          :formIndex="index"
+          @delForm="delForm"
+          @switchForm="switchForm"/>
+      </div>
       <div class="list" id="sort-form" v-else>
         <form-comp
           :data-id="index"
@@ -77,6 +176,13 @@
             v-model="contents[activeFormIndex]['' + f.feild + '']"
             :disabled="f.feild == 'list_order' || f.type == 'template'">
           </el-input>
+          <!-- stringOptions -->
+          <el-input
+            :maxlength="150" show-word-limit
+            v-if="f.type == 'stringOptions'"
+            @change="changeStringOptions(f.feild)"
+            v-model="contents[activeFormIndex]['' + f.feild + '']">
+          </el-input>
           <!-- string && upload -->
           <el-input placeholder="请输入内容" v-if="f.type == 'string' && f.data_from.indexOf('upload_') > -1" :maxlength="150" show-word-limit  v-model="contents[activeFormIndex]['' + f.feild + '']">
             <el-upload slot="prepend"
@@ -95,6 +201,24 @@
           <!-- text -->
           <el-input
             v-if="f.type == 'text'"
+            type="textarea"
+            :rows="3"
+            placeholder="请输入内容"
+            v-model="contents[activeFormIndex]['' + f.feild + '']">
+          </el-input>
+          <!-- textOptions -->
+          <el-input
+            v-if="f.type == 'textOptions'"
+            @change="changeTextOptions(f.feild)"
+            type="textarea"
+            :rows="3"
+            placeholder="请输入内容"
+            v-model="contents[activeFormIndex]['' + f.feild + '']">
+          </el-input>
+          <!-- textRadar -->
+          <el-input
+            v-if="f.type == 'textRadar'"
+            @change="changeTextRadar(f.feild)"
             type="textarea"
             :rows="3"
             placeholder="请输入内容"
@@ -191,7 +315,7 @@
           <div class="array-string" v-if="f.type == 'array' && (f.data_from == '' || f.data_from.indexOf('upload_') > -1) ">
             <div class="list" v-if="contents[activeFormIndex]['' + f.feild + ''].length">
               <el-input placeholder="请输入内容"
-                :maxlength="f.data_from ? '' : (f.feild == 'options' ? 50 : 150)"
+                :maxlength="150"
                 show-word-limit
                 v-for="(item, index) in contents[activeFormIndex]['' + f.feild + '']" :key="f.feild + index" v-model="contents[activeFormIndex]['' + f.feild + ''][index]">
                 <el-upload slot="prepend"
@@ -204,33 +328,97 @@
                   <el-button type="text" @click="upload(f, index)">上传</el-button>
                 </el-upload>
                 <el-button slot="append" icon="el-icon-minus" @click="minus(index, f.feild)"></el-button>
-                <el-button v-show="index == contents[activeFormIndex]['' + f.feild + ''].length - 1" slot="append" icon="el-icon-plus" @click="plus('string', f.feild)"></el-button>
+                <el-button v-show="index == contents[activeFormIndex]['' + f.feild + ''].length - 1" slot="append" icon="el-icon-plus" @click="plus('string', f)"></el-button>
               </el-input>
               <el-tag type="warning" v-show="f.feild == 'options' && contents[activeFormIndex]['type'] == 'fillGap'">注：第一个输入项为正确选项，其他为错误选项。</el-tag>
             </div>
             <div class="list" v-else>
-              <el-button type="info" plain @click="plus('string', f.feild)">添加一条内容</el-button>
+              <el-button type="info" plain @click="plus('string', f)">添加一条内容</el-button>
             </div>
           </div>
           <!-- 对象数组 -->
           <div class="array-object" v-if="f.type == 'arrayObject'">
-            <div class="list" v-if="contents[activeFormIndex]['' + f.feild + ''].length">
+            <div class="list" v-if="contents[activeFormIndex]['' + f.feild + ''] && contents[activeFormIndex]['' + f.feild + ''].length">
               <div class="object-item" v-for="(item, index) in contents[activeFormIndex]['' + f.feild + '']" :key="index">
-                key: <el-input v-model="contents[activeFormIndex]['' + f.feild + ''][index]['key']" :maxlength="50" show-word-limit></el-input>
-                value: <el-input v-model="contents[activeFormIndex]['' + f.feild + ''][index]['val']" :maxlength="50" show-word-limit></el-input>
-                <el-button type="info" plain icon="el-icon-minus" @click="minus(index, f.feild)"></el-button>
-                <el-button v-show="index == contents[activeFormIndex]['' + f.feild + ''].length - 1" type="info" plain icon="el-icon-plus" @click="plus('object', f.feild)"></el-button>
+                <div class="num">
+                  <el-badge :value="index + 1" class="item" type="primary">
+                  </el-badge>
+                </div>
+                <div class="left" v-if="f.sub_feilds && f.sub_feilds.length > 0">
+                  <div class="sub-item" v-for="(subItem, i) in f.sub_feilds" :key="'subItem' + i">
+                    <el-form-item size="small" :label="subItem.name" v-if="subItem.type == 'string' || subItem.type == 'text'">
+                      <!-- string -->
+                      <el-input  v-if="!subItem.data_from && subItem.type == 'string'" v-model="contents[activeFormIndex]['' + f.feild + ''][index]['' + subItem.feild + '']"></el-input>
+                      <!-- textarea -->
+                      <el-input  v-if="!subItem.data_from && subItem.type == 'text'" type="textarea" v-model="contents[activeFormIndex]['' + f.feild + ''][index]['' + subItem.feild + '']"></el-input>
+                      <!-- upload -->
+                      <el-input placeholder="请输入内容" v-if="subItem.data_from && subItem.data_from.indexOf('upload_') > -1" :maxlength="150" show-word-limit  v-model="contents[activeFormIndex]['' + f.feild + ''][index]['' + subItem.feild + '']">
+                        <el-upload slot="prepend"
+                          v-if="subItem.data_from.indexOf('upload_') > -1"
+                          action="#"
+                          :accept="subItem.data_from == 'upload_audio' ? 'audio/mp3' : (subItem.data_from == 'upload_video' ? 'video/mp4' : 'image/png,image/jpg,image/jpeg,image/webp')"
+                          :on-change="uploadOnchangeSub"
+                          :show-file-list="false"
+                          :auto-upload="false">
+                          <el-button type="text" @click="uploadSub(f, -1, index, subItem)">上传</el-button>
+                        </el-upload>
+                        <el-button slot="append" v-if="subItem.data_from == 'upload_audio'" @click="motherSoundPlay(contents[activeFormIndex]['' + f.feild + ''][index]['' + subItem.feild + ''])">试听</el-button>
+                      </el-input>
+                    </el-form-item>
+                    <!-- array options -->
+                    <el-form-item size="small" :label="subItem.name" v-if="subItem.type == 'array'">
+                      <div class="sub-item-options" v-if="contents[activeFormIndex]['' + f.feild + ''][index]['' + subItem.feild + ''] && contents[activeFormIndex]['' + f.feild + ''][index]['' + subItem.feild + ''].length > 0">
+                        <div class="sub-item-option" v-for="(o, oi) in contents[activeFormIndex]['' + f.feild + ''][index]['' + subItem.feild + '']" :key="oi">
+                          <div class="sub-item-input">
+                            <el-input v-model="contents[activeFormIndex]['' + f.feild + ''][index]['' + subItem.feild + ''][oi]"></el-input>
+                          </div>
+                          <div class="sub-item-operate">
+                            <el-button icon="el-icon-minus" @click="minusSubItem(f, subItem, index, oi)" circle></el-button>
+                            <el-button icon="el-icon-plus" v-if="contents[activeFormIndex]['' + f.feild + ''][index]['' + subItem.feild + ''].length - 1 == oi" circle @click="addSubItem(f, subItem, index)"></el-button>
+                          </div>
+                        </div>
+                      </div>
+                      <div v-else>
+                        <el-button @click="addSubItem(f, subItem, index)" round>添加</el-button>
+                      </div>
+                    </el-form-item>
+                  </div>
+                </div>
+                <div class="left" v-else>
+                  <div class="row">
+                    <div class="text">{{f.data_from ? f.data_from.split(',')[0].split('_')[0] + '：' : 'key：' }}</div>
+                    <div class="text-input">
+                      <el-input :type="(f.data_from && f.data_from.split(',')[0].indexOf('_1') > -1) ? 'textarea': 'text'" v-model="contents[activeFormIndex]['' + f.feild + ''][index]['key']" size="small"></el-input>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="text">{{f.data_from ? f.data_from.split(',')[1].split('_')[0] + '：' : 'val：' }}</div>
+                    <div class="text-input">
+                      <el-input :type="(f.data_from && f.data_from.split(',')[1].indexOf('_1') > -1) ? 'textarea': 'text'" v-model="contents[activeFormIndex]['' + f.feild + ''][index]['val']" size="small"></el-input>
+                    </div>
+                  </div>
+                </div>
+                <div class="right">
+                  <el-button size="small" type="info" plain icon="el-icon-minus" @click="minus(index, f.feild)"></el-button>
+                  <el-button size="small" v-show="index == contents[activeFormIndex]['' + f.feild + ''].length - 1" type="info" plain icon="el-icon-plus" @click="plus('object', f)"></el-button>
+                </div>
               </div>
             </div>
             <div class="list" v-else>
-              <el-button type="info" plain @click="plus('object', f.feild)">添加一条k/v的内容</el-button>
+              <el-button type="info" plain @click="plus('object', f)">添加一条{{contents[activeFormIndex]['' + f.data_from + ''] == 1 ? 'k/v的' : '' }}内容</el-button>
             </div>
           </div>
+          <!-- 备注 -->
+          <el-tag type="warning" v-if="f.desc">注：{{ f.desc }}</el-tag>
+          <div class="text-radar-sound" v-if="f.type == 'textRadar'">
+            <audio :src="assetsDomain + contents[activeFormIndex]['sound']" controls></audio>
+          </div>
+          <el-tag type="warning" v-if="f.type == 'textOptions'">注：用”[”和“]“标识文章中所要选择的词，进行填空。</el-tag>
         </el-form-item>
         <el-form-item
           label-width="140px"
           label="词性"
-          v-if="f.feild == 'POS'">
+          v-if="f.feild == 'pos'">
           <el-select
             v-if="f.data_from == 'part_of_speech'"
             v-model="contents[activeFormIndex]['' + f.feild + '']"
@@ -291,6 +479,15 @@ import FormVideo from './formVideo'
 import FormKidTest from './kidTest/kidTest'
 import FormLevelGrade from './levelGrade/levelGrade'
 import FormListenSpelling from './listenSpelling/listenSpelling'
+import FormIntertranslation from './intertranslation/intertranslation'
+import FormWritingTraining from './writingTraining/writingTraining'
+import FormVocabularyComprehension from './vocabularyComprehension/vocabularyComprehension'
+import FormReadingComprehension from './readingComprehension/readingComprehension'
+import FormReadRole from './readRole/readRole'
+import FormListeningChoice from './listeningChoice/listeningChoice'
+import FormDubbingRepeat from './dubbingRepeat/dubbingRepeat'
+import FormRubbingEar from './rubbingEar/rubbingEar'
+import FormListenRead from './listenRead/listenRead'
 import LookImage from './lookImage'
 import LookContent from './lookContent'
 import RightMenuForm from './rightMenuForm'
@@ -334,6 +531,15 @@ export default {
     FormKidTest,
     FormLevelGrade,
     FormListenSpelling,
+    FormIntertranslation,
+    FormWritingTraining,
+    FormVocabularyComprehension,
+    FormReadingComprehension,
+    FormReadRole,
+    FormListeningChoice,
+    FormDubbingRepeat,
+    FormRubbingEar,
+    FormListenRead,
     LookImage,
     LookContent,
     RightMenuForm
@@ -690,13 +896,34 @@ export default {
       this.copyBaseFormDataSelf = JSON.stringify(this.contents[this.activeFormIndex])
     },
     // 增加输入框
-    plus (flag, feild) {
+    plus (flag, f) {
+      let feild = f.feild
       this.copyBaseFormDataSelf = JSON.stringify(this.contents[this.activeFormIndex])
       let obj = JSON.parse(this.copyBaseFormDataSelf)
+      if (!obj['' + feild + '']) {
+        obj['' + feild + ''] = []
+      }
       if (flag === 'string') {
         obj['' + feild + ''].push('')
       } else {
-        obj['' + feild + ''].push({ key: '', val: '' })
+        if (f.sub_feilds && f.sub_feilds.length > 0) {
+          let o = {}
+          f.sub_feilds.forEach(sf => {
+            let k = sf.feild
+            let v = ''
+            if (sf.type === 'string' || sf.type === 'text') {
+              v = ''
+            } else if (sf.type === 'int') {
+              v = 0
+            } else if (sf.type === 'array') {
+              v = ['']
+            }
+            o['' + k + ''] = v
+          })
+          obj['' + feild + ''].push(o)
+        } else {
+          obj['' + feild + ''].push({ key: '', val: '' })
+        }
       }
       this.$set(this.contents, this.activeFormIndex, obj)
       this.copyBaseFormDataSelf = JSON.stringify(obj)
@@ -747,6 +974,54 @@ export default {
         }
       }
     },
+    uploadSub (f, index, subIndex, sf) {
+      this.uploadIndex = sf.data_from + ',' + f.feild + ',' + index + ',' + subIndex + ',' + sf.feild
+      console.log(this.uploadIndex)
+    },
+    async uploadOnchangeSub (file) {
+      let uploadIndexArr = this.uploadIndex.split(',')
+      let dataFrom = uploadIndexArr[0]
+      let feild = uploadIndexArr[1]
+      let index = uploadIndexArr[2]
+      let subIndex = parseInt(uploadIndexArr[3])
+      let subFeild = uploadIndexArr[4]
+      let date = moment(new Date()).format('YYYY/MM/DD')
+      let ext = file.name.split('.')[1]
+      let url = ''
+      if (dataFrom === 'upload_audio') {
+        url = 'course/sounds/' + this.version.selLang + '/' + date + '/' + file.uid + '.' + ext
+      } else if (dataFrom === 'upload_image') {
+        url = 'course/images/' + this.version.selLang + '/' + date + '/' + file.uid + '.' + ext
+      } else if (dataFrom === 'upload_video') {
+        url = 'course/videos/' + this.version.selLang + '/' + date + '/' + file.uid + '.' + ext
+      }
+      let res = await uploadQiniu(file.raw, this.token, url)
+      if (index === '-1') {
+        this.$set(this.contents[this.activeFormIndex]['' + feild + ''][subIndex], subFeild, res.key)
+        this.copyBaseFormDataSelf = JSON.stringify(this.contents[this.activeFormIndex])
+        // 计算声音时长
+        if (typeof this.contents[this.activeFormIndex]['' + feild + ''][subIndex][feild + '_time'] !== 'undefined') {
+          let mySound = new Audio()
+          mySound.src = this.assetsDomain + res.key
+          mySound.oncanplay = () => {
+            this.$set(this.contents[this.activeFormIndex]['' + feild + ''][subIndex], feild + '_time', mySound.duration)
+            this.copyBaseFormDataSelf = JSON.stringify(this.contents[this.activeFormIndex])
+          }
+        }
+      } else {
+        this.$set(this.contents[this.activeFormIndex][feild][index]['' + subFeild + ''], subIndex, res.key)
+        this.copyBaseFormDataSelf = JSON.stringify(this.contents[this.activeFormIndex])
+        // 计算声音时长
+        if (typeof this.contents[this.activeFormIndex][feild][index][feild + '_time'] !== 'undefined' && typeof this.contents[this.activeFormIndex][feild][index][feild + '_time'].length > 0) {
+          let mySound = new Audio()
+          mySound.src = this.assetsDomain + res.key
+          mySound.oncanplay = () => {
+            this.$set(this.contents[this.activeFormIndex][feild][index][feild + '_time'], subIndex, mySound.duration)
+            this.copyBaseFormDataSelf = JSON.stringify(this.contents[this.activeFormIndex])
+          }
+        }
+      }
+    },
     selOneSign (sign) {
       this.contents[this.activeFormIndex]['self_sign'] = sign.key
     },
@@ -758,6 +1033,47 @@ export default {
       this.audio.oncanplay = () => {
         this.audio.play()
       }
+    },
+    changeStringOptions (feild) {
+      let text = this.contents[this.activeFormIndex]['' + feild + '']
+      if (text) {
+        this.contents[this.activeFormIndex]['options'] = text.split('')
+      }
+    },
+    changeTextOptions (feild) {
+      console.log(this.contents[this.activeFormIndex]['' + feild + ''])
+      let text = this.contents[this.activeFormIndex]['' + feild + '']
+      if (text) {
+        let re = /\[(.*?)\]/g
+        let array = []
+        let temp = re.exec(text)
+        while (temp) {
+          array.push(temp[1])
+          temp = re.exec(text)
+        }
+        this.contents[this.activeFormIndex]['options'] = array
+      }
+    },
+    changeTextRadar (feild) {
+      console.log(this.contents[this.activeFormIndex]['' + feild + ''])
+      let text = this.contents[this.activeFormIndex]['' + feild + '']
+      if (text) {
+        let radar = []
+        let array = text.split('/')
+        array.forEach(i => {
+          radar.push({
+            key: i,
+            val: ''
+          })
+        })
+        this.contents[this.activeFormIndex]['radar'] = radar
+      }
+    },
+    addSubItem (f, sf, i) {
+      this.contents[this.activeFormIndex]['' + f.feild + ''][i]['' + sf.feild + ''].push('')
+    },
+    minusSubItem (f, sf, i, oi) {
+      this.contents[this.activeFormIndex]['' + f.feild + ''][i]['' + sf.feild + ''].splice(oi, 1)
     }
   }
 }
@@ -883,10 +1199,33 @@ export default {
     display: flex;
     flex-direction: row;
     align-items: center;
-    margin-bottom: 5px;
+    border-bottom: 1px solid rgba(0, 0, 0, .1);
+    padding-top: 5px;
+    .num {
+      padding: 0 10px;
+    }
+    .left {
+      width: 70%;
+      border-left: 1px solid rgba(0, 0, 0, .1);
+      border-right: 1px solid rgba(0, 0, 0, .1);
+      padding:0 10px;
+      .row {
+        display: flex;
+        flex-direction: row;
+        .text {
+          font-size: 12px;
+        }
+        .text-input {
+          flex-grow: 1;
+        }
+      }
+    }
+    .right {
+      padding-left: 20px;
+    }
     .el-input {
-      width: 200px;
-      margin: 0 20px 0 10px;
+      width: 100%;
+      margin: 0 20px 0 0;
     }
   }
 }
@@ -894,6 +1233,29 @@ export default {
 .self-sign {
   .el-tag {
     margin: 0 10px;
+  }
+}
+
+.text-radar-sound {
+  margin-top: 20px;
+  audio {
+    width: 100%;
+  }
+}
+
+.sub-item {
+  .el-form-item {
+    margin: 5px;
+  }
+}
+
+.sub-item-option {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 2px;
+  .sub-item-input {
+    width: 80%;
+    margin-right: 10px;
   }
 }
 </style>

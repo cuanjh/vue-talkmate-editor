@@ -24,7 +24,7 @@ export default {
   mounted () {
     document.getElementById('edit-file').addEventListener('scroll', (e) => {
       let formModelEL = document.getElementById('form-model')
-      if (e.target.offsetTop + e.target.scrollTop + 100 > formModelEL.offsetTop) {
+      if (formModelEL && e.target.offsetTop + e.target.scrollTop + 100 > formModelEL.offsetTop) {
         this.$refs['thumb'].show({ top: e.target.offsetTop + 10 })
       } else {
         this.$refs['thumb'].hide()
@@ -42,14 +42,29 @@ export default {
         let val
         if (item.type === 'int') {
           val = 0
-        } else if (item.type === 'string' || item.type === 'template') {
+        } else if (item.type === 'string' || item.type === 'text' || item.type === 'template') {
           val = ''
         } else if (item.type === 'templateArray') {
           val = []
         } else if (item.type === 'array') {
-          val = []
+          val = ['']
         } else if (item.type === 'arrayObject') {
           val = []
+          if (item.sub_feilds && item.sub_feilds.length) {
+            let obj = {}
+            item.sub_feilds.forEach(si => {
+              let sv
+              if (si.type === 'int') {
+                sv = 0
+              } else if (si.type === 'string' || si.type === 'text') {
+                sv = ''
+              } else if (si.type === 'array') {
+                sv = ['']
+              }
+              obj[si.feild] = sv
+            })
+            val.push(obj)
+          }
         }
         baseFormData[item.feild] = val
       })

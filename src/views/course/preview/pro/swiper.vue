@@ -3,7 +3,7 @@
     <div class="swiper-wrapper">
       <div class="swiper-slide"
         v-for="(form, index) in slideForms"
-        :key="form.code">
+        :key="form.code + index">
         <h2>{{typeName(form.type)}}</h2>
         <keep-alive>
           <component

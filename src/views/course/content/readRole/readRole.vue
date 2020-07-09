@@ -16,11 +16,10 @@
       <div class="form-wrap">
         <div class="correct-area">
           <div class="wrap">
-            <span>{{ form.pos + ' ' + form.translate }}</span>
             <i @click="play(form.sound)"></i>
           </div>
           <div class="word">
-            {{ form.word }}
+            {{ form.sentence }}
           </div>
         </div>
       </div>
@@ -245,7 +244,8 @@ export default {
     }
   }
   .word {
-    letter-spacing: 6px;
+    padding: 10px;
+    text-align: left;
   }
 }
 </style>

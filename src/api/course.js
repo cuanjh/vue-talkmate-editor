@@ -151,6 +151,18 @@ export const getCourseList = (data) => {
   })
 }
 
+// @Summary 获取课程详情
+// @Produce  application/json
+// @Param data
+// @Router /editor/course/detail [post]
+export const getCourseDetail = (data) => {
+  return service({
+    url: '/editor/course/detail',
+    method: 'post',
+    data
+  })
+}
+
 // @Summary 添加课程
 // @Produce  application/json
 // @Param
@@ -1027,6 +1039,19 @@ export const onlineLive = (data) => {
 }
 
 /**
+ * @Summary 直播在线人数实时统计
+ * @param {*} data
+ * @Router /live/usercount [post]
+ */
+export const onlineLiveUserCount = (data) => {
+  return service({
+    url: '/live/usercount',
+    method: 'post',
+    data
+  })
+}
+
+/**
  * @Summary 下架直播
  * @param {*} data
  * @Router /live/online [post]
@@ -1271,6 +1296,45 @@ export const sortSearchWord = (data) => {
 export const delSearchWord = (data) => {
   return service({
     url: '/editor/sword/del',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 查找操作日志
+ * @param {*} data
+ * @Router /editor/operate_log/list [post]
+ */
+export const findOperateLogList = (data) => {
+  return service({
+    url: '/editor/operate_log/list',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 查找日志详情
+ * @param {*} data
+ * @Router /editor/operate_log/details [post]
+ */
+export const findOperateLogDetails = (data) => {
+  return service({
+    url: '/editor/operate_log/details',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 日志回滚
+ * @param {*} data
+ * @Router /editor/operate_log/rollback [post]
+ */
+export const rollbackOperateLog = (data) => {
+  return service({
+    url: '/editor/operate_log/rollback',
     method: 'post',
     data
   })

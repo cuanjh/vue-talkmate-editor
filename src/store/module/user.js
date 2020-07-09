@@ -18,12 +18,12 @@ export const user = {
   mutations: {
     setUserInfo (state, userInfo) {
       console.log('userInfo', userInfo)
-      let obj = {
-        name: userInfo.userName,
-        avatar: userInfo.headerImg,
-        uuid: userInfo.uuid
-      }
-      window.zhuge.identify(userInfo.uuid, obj)
+      // let obj = {
+      //   name: userInfo.userName,
+      //   avatar: userInfo.headerImg,
+      //   uuid: userInfo.uuid
+      // }
+      // window.zhuge.identify(userInfo.uuid, obj)
       if (userInfo.authorityId === '111' || userInfo.authorityId === '121' || userInfo.authorityId === '131') {
         state.lowerRoleUser = true
       } else {

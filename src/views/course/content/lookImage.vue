@@ -1,7 +1,15 @@
 <template>
   <div class="look-image-container">
     <div class="search">
-      <input type="text" v-model="words" @input="search" clearable placeholder="请输入...">
+      <input v-if="false" type="text" v-model="words" @input="search" clearable placeholder="请输入...">
+      <el-autocomplete
+        class="inline-input"
+        v-model="words"
+        :fetch-suggestions="querySearch"
+        @change="search"
+        placeholder="请输入内容"
+        @select="handleSelect"
+      ></el-autocomplete>
       <span @click="search">搜索</span>
       <i class="el-icon-close" @click="close"></i>
     </div>
@@ -25,7 +33,8 @@ export default {
   data () {
     return {
       words: '',
-      searchResult: []
+      searchResult: [],
+      searchHistory: []
     }
   },
   components: {
@@ -36,11 +45,25 @@ export default {
       this.close()
     })
   },
+  mounted () {
+  },
   methods: {
     async search () {
       if (this.words === '') {
         return false
       }
+      let history = []
+      if (localStorage.getItem('searchCourseImgsHistory')) {
+        history = JSON.parse(localStorage.getItem('searchCourseImgsHistory'))
+      }
+      if (history.length > 9) {
+        history.splice(0, 1)
+        history.push({ value: this.words })
+      } else {
+        history.push({ value: this.words })
+      }
+      localStorage.setItem('searchCourseImgsHistory', JSON.stringify(history))
+
       let res = await searchImages({ words: this.words })
       this.searchResult = res.data.images
       console.log(this.searchResult)
@@ -59,6 +82,24 @@ export default {
     reset () {
       this.words = ''
       this.searchResult = []
+    },
+    querySearch (queryString, cb) {
+      this.searchHistory = []
+      if (localStorage.getItem('searchCourseImgsHistory')) {
+        this.searchHistory = JSON.parse(localStorage.getItem('searchCourseImgsHistory'))
+      }
+      var results = queryString ? this.searchHistory.filter(this.createFilter(queryString)) : this.searchHistory
+      // 调用 callback 返回建议列表的数据
+      results = results.reverse()
+      cb(results)
+    },
+    createFilter (queryString) {
+      return (item) => {
+        return (item.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0)
+      }
+    },
+    handleSelect (item) {
+      this.search()
     }
   }
 }
@@ -99,5 +140,9 @@ export default {
     flex-wrap: wrap;
     align-items: flex-start;
   }
+}
+.inline-input {
+  width: 400px;
+  margin-right: 20px;
 }
 </style>

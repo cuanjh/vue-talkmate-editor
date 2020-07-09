@@ -95,7 +95,7 @@ export default {
     resetAll () {
       this.audio.pause()
       this.isPlay = false
-      let allWords = this.form.sentence.split(' ')
+      let allWords = this.form.options
       console.log(allWords)
       this.words = allWords
       this.options = []

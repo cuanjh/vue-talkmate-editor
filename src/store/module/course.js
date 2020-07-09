@@ -34,6 +34,18 @@ export const course = {
       { key: 'conj.', name: '连词' },
       { key: 'interj.', name: '感叹词' }
     ],
+    courseOperateLogs: [
+      { key: 11, name: '内容新建' },
+      { key: 12, name: '内容编辑' },
+      { key: 13, name: '内容删除' },
+      { key: 14, name: '内容回滚' },
+      { key: 20, name: '目录新建' },
+      { key: 21, name: '目录编辑' },
+      { key: 22, name: '目录删除' },
+      { key: 23, name: '目录移动' },
+      { key: 24, name: '目录重命名' },
+      { key: 25, name: '目录回滚' }
+    ],
     locale: 'zh-CN',
     assetsDomain: '',
     uploadfileDomain: '',

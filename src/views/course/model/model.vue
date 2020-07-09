@@ -69,7 +69,7 @@ import { mapActions, mapState } from 'vuex'
 import {
   delModel
 } from '@/api/course'
-import EditComp from './edit'
+import EditComp from './editModel'
 
 export default {
   data () {

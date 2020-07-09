@@ -87,7 +87,7 @@
           {{scope.row.is_show ? '是' : '否'}}
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="290px">
+      <el-table-column label="操作" fixed="right" width="290px">
         <template slot-scope="scope">
           <el-button
             v-show="userInfo.authority.authorityId == '1' || userInfo.authority.authorityId == '2'"
@@ -101,11 +101,17 @@
             type="danger"
             plain
             @click="deleteCourse(scope.row.uuid)">删除</el-button>
+          <br><br>
           <el-button
             size="mini"
             type="primary"
             plain
             @click="classGroup(scope.row)">班级群</el-button>
+          <el-button
+            size="mini"
+            type="primary"
+            plain
+            @click="addDetail(scope.row)">添加详情</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -114,6 +120,7 @@
       :courseList="courseList"
       @addNewCourse="initData"/>
     <class-group ref="classGroup" />
+    <course-detail ref="courseDetail" />
   </div>
 </template>
 
@@ -127,6 +134,7 @@ import {
 } from '@/api/course'
 import EditComp from './edit'
 import ClassGroup from './classGroup'
+import CourseDetail from './editCourseDetail'
 
 export default {
   data () {
@@ -138,14 +146,14 @@ export default {
   },
   components: {
     EditComp,
-    ClassGroup
+    ClassGroup,
+    CourseDetail
   },
   created () {
-    this.getLangList({ 'pageNo': 0, 'pageSize': 999 })
+    this.getLangList({ 'pageNo': 0, 'pageSize': 999 }).then(() => {
+      this.initData()
+    })
     this.getCourseTypes()
-  },
-  mounted () {
-    this.initData()
   },
   computed: {
     ...mapGetters('user', ['userInfo']),
@@ -294,6 +302,9 @@ export default {
     },
     classGroup (row) {
       this.$refs['classGroup'].show(row)
+    },
+    addDetail (row) {
+      this.$refs['courseDetail'].show(row)
     }
   }
 }
