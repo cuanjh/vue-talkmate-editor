@@ -154,8 +154,11 @@ export default {
       this.allTags = this.contentTags
       // console.log(this.contentTags, this.allTags)
       this.tagsLists = this.allTags.filter(item => {
-        let res = item.name.indexOf(this.searchKey) > -1 || item.key.indexOf(this.searchKey) > -1
-        return res
+        if (this.type) {
+          return (item.name.indexOf(this.searchKey) > -1 || item.key.indexOf(this.searchKey) > -1) && (item.type === this.type)
+        } else {
+          return item.name.indexOf(this.searchKey) > -1 || item.key.indexOf(this.searchKey) > -1
+        }
       })
       this.handleCurrentChange(this.pageRequest.pageNum)
     },

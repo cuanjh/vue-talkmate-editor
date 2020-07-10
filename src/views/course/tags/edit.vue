@@ -61,7 +61,7 @@
           <el-form-item label="封面: ">
             <el-tag type="warning">第一张图为课程列表封面，第二张图为学习首页课程封面，第三张图为课程列表宝贝作品封面</el-tag>
             <div class="img-box big-img-box">
-              <div class="img" id="cover-sort" v-if="form.cover.length">
+              <div class="img" id="cover-sort" v-if="form.cover.length > 0">
                 <div
                   class="block"
                   v-for="(cover, index) in form.cover"
@@ -212,7 +212,9 @@ export default {
         this.form = obj
       }
       setTimeout(() => {
-        this.resetSortable()
+        if (this.form.cover.length > 0) {
+          this.resetSortable()
+        }
       }, 0)
     },
     close () {
@@ -243,6 +245,9 @@ export default {
           let url = 'course/images/icon/' + width + '*' + height + '/' + file.uid + '.' + ext
           uploadQiniu(file.raw, this.token, url).then(res => {
             this.form.cover.push(res.key)
+            setTimeout(() => {
+              this.resetSortable()
+            }, 100)
           })
         }
         image.src = data
@@ -293,8 +298,10 @@ export default {
           indexArr.forEach((item, index) => {
             arr.push(this.form.cover[parseInt(item)])
           })
-          this.form.cover = arr
-          console.log(this.form.cover)
+          this.form.cover = []
+          setTimeout(() => {
+            this.form.cover = arr
+          }, 0)
         }
       })
     }
