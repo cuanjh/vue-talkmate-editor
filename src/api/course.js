@@ -163,6 +163,18 @@ export const getCourseDetail = (data) => {
   })
 }
 
+// @Summary 编辑课程详情
+// @Produce  application/json
+// @Param data
+// @Router /editor/course/detail/edit [post]
+export const editCourseDetail = (data) => {
+  return service({
+    url: '/editor/course/detail/edit',
+    method: 'post',
+    data
+  })
+}
+
 // @Summary 添加课程
 // @Produce  application/json
 // @Param
