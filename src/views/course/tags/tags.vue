@@ -2,7 +2,21 @@
   <div class="tags-container">
     <div class="tags-content">
       <div class="top-bar">
-        <el-input v-model="searchKey" @input="search" clearable placeholder="请输入要查找的key或名称"></el-input>
+        <div class="left">
+          <el-input v-model="searchKey" @input="search" clearable placeholder="请输入要查找的key或名称"></el-input>
+          &nbsp;
+          <el-select v-model="type"
+            placeholder="请选择分类"
+            @change="search">
+            <el-option value="" label="全部"></el-option>
+            <el-option
+              v-for="item in tagTypes"
+              :key="item.name"
+              :label="item.name"
+              :value="item.type">
+            </el-option>
+          </el-select>
+        </div>
         <div class="right">
           <el-button style="outline:none;" type="primary" class="btnAdd" @click="addTags()">添加</el-button>
           <el-button
@@ -89,6 +103,7 @@ export default {
     return {
       searchKey: '',
       showTableData: [],
+      type: '',
       // 分页信息
       pageRequest: {
         pageNum: 1,
@@ -133,7 +148,7 @@ export default {
       return obj.name
     },
     async initData () {
-      await this.getContentTags({ pageNo: 0, pageSize: 0 })
+      await this.getContentTags({ pageNo: 0, pageSize: 99999 })
       console.log('initData')
       this.tagsLists = this.contentTags
       this.allTags = this.contentTags
@@ -149,8 +164,11 @@ export default {
       let _this = this
       console.log(_this.searchKey)
       this.tagsLists = this.allTags.filter(item => {
-        let res = item.name.indexOf(this.searchKey) > -1 || item.key.indexOf(this.searchKey) > -1
-        return res
+        if (this.type) {
+          return (item.name.indexOf(this.searchKey) > -1 || item.key.indexOf(this.searchKey) > -1) && (item.type === this.type)
+        } else {
+          return item.name.indexOf(this.searchKey) > -1 || item.key.indexOf(this.searchKey) > -1
+        }
       })
       // console.log(this.tagsLists)
       // console.log(this.showTableData)
@@ -229,7 +247,8 @@ export default {
           message: '已取消上线'
         })
       })
-    }
+    },
+    changeType () {}
   }
 }
 </script>

@@ -413,7 +413,6 @@
           <div class="text-radar-sound" v-if="f.type == 'textRadar'">
             <audio :src="assetsDomain + contents[activeFormIndex]['sound']" controls></audio>
           </div>
-          <el-tag type="warning" v-if="f.type == 'textOptions'">注：用”[”和“]“标识文章中所要选择的词，进行填空。</el-tag>
         </el-form-item>
         <el-form-item
           label-width="140px"

@@ -407,7 +407,8 @@ export default {
     },
     back () {
       // this.isShow = false
-      this.$router.back()
+      // this.$router.back()
+      this.$router.push({ path: '/layout/course/version' })
     },
     switchSlide (num) {
       this.selSlide = num

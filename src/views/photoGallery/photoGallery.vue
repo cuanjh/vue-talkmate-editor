@@ -1,12 +1,17 @@
 <template>
   <div id="photo-gallery">
     <el-row>
-      <el-col :span="12">
+      <el-col :span="14">
         <el-input placeholder="请输入要查找的内容" v-model="searchKey" @change="changeSearchKey" class="input-with-select">
-          <el-button slot="append" icon="el-icon-search" @click="changeSearchKey"></el-button>
+          <el-switch slot="append"
+            v-model="searchType"
+            @change="changeSearchKey"
+            active-text="精确搜索"
+            inactive-text="模糊搜索">
+          </el-switch>
         </el-input>
       </el-col>
-      <el-col :span="4" :offset="8">
+      <el-col :span="4" :offset="6">
         <el-button type="primary" @click="reset">重置</el-button>
         <el-button type="primary" @click="upload">上传</el-button>
       </el-col>
@@ -34,24 +39,13 @@
           <div class="picture-wrap">
             <div class="picture-list">
               <photo-item
-                v-for="item in pictures"
-                :key="item._id"
+                v-for="(item, index) in pictures"
+                :key="item._id + index"
                 :picture="item"
                 :domain="assetsDomain"
                 @loadData="loadData"
                 @showEditPicture="showEditPicture"/>
             </div>
-            <!-- <el-pagination v-if="pictures.length > 0"
-              background
-              layout="sizes, prev, pager, next, jumper"
-              @size-change="handleSizeChange"
-              :current-page="pageRequest.pageNum"
-              :page-sizes="[30, 90, 120, 180, 300, 600, 900]"
-              :page-size="pageRequest.pageSize"
-              @current-change="refreshPageRequest"
-              :total="pictures.length"
-              >
-            </el-pagination> -->
           </div>
         </div>
       </el-col>
@@ -86,7 +80,8 @@ export default {
       page: 1,
       pageSize: 12,
       isExpand: false,
-      token: ''
+      token: '',
+      searchType: 0
     }
   },
   components: {
@@ -131,7 +126,8 @@ export default {
         page: this.page,
         pageSize: this.pageSize,
         tagKey: this.activeTag,
-        words: this.searchKey
+        words: this.searchKey,
+        searchType: this.searchType ? 1 : 0
       }
       searchImages(obj).then(res => {
         console.log(res)

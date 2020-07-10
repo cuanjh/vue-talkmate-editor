@@ -117,7 +117,6 @@
     </el-table>
     <edit-comp ref="edit"
       :courseTypes="courseTypes"
-      :courseList="courseList"
       @addNewCourse="initData"/>
     <class-group ref="classGroup" />
     <course-detail ref="courseDetail" />

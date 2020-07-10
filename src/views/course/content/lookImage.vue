@@ -10,7 +10,12 @@
         placeholder="请输入内容"
         @select="handleSelect"
       ></el-autocomplete>
-      <span @click="search">搜索</span>
+      <el-switch
+        v-model="searchType"
+        @change="search"
+        active-text="精确搜索"
+        inactive-text="模糊搜索">
+      </el-switch>
       <i class="el-icon-close" @click="close"></i>
     </div>
     <div class="result">
@@ -34,7 +39,8 @@ export default {
     return {
       words: '',
       searchResult: [],
-      searchHistory: []
+      searchHistory: [],
+      searchType: 0
     }
   },
   components: {
@@ -64,7 +70,7 @@ export default {
       }
       localStorage.setItem('searchCourseImgsHistory', JSON.stringify(history))
 
-      let res = await searchImages({ words: this.words })
+      let res = await searchImages({ words: this.words, searchType: this.searchType ? 1 : 0 })
       this.searchResult = res.data.images
       console.log(this.searchResult)
     },

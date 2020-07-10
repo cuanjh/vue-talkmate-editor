@@ -11,7 +11,7 @@
             { required: true, message: '编码不能为空', trigger: 'blur' },
             { pattern: /^[a-zA-Z-]+$/, message: '只允许输入字母！' }
           ]">
-            <el-input v-model="form.code" maxlength="20" placeholder="AAA" show-word-limit :disabled="type == 'edit'">
+            <el-input v-model="codePend" maxlength="20" placeholder="AAA" show-word-limit :disabled="type == 'edit'">
               <template slot="prepend">{{ lang + '-' }}</template>
             </el-input>
           </el-form-item>
@@ -121,11 +121,12 @@ import { mapState } from 'vuex'
 import { uploadQiniu } from '@/utils/uploadQiniu'
 
 export default {
-  props: ['courseTypes', 'courseList'],
+  props: ['courseTypes'],
   data () {
     return {
       showEdit: false,
       lang: '',
+      codePend: '',
       form: {
         code: '',
         course_type: '', // 课程分类
@@ -147,7 +148,6 @@ export default {
   components: {
   },
   created () {
-    console.log(this.courseTypes, this.courseList)
   },
   computed: {
     ...mapState({
@@ -164,6 +164,7 @@ export default {
       this.showEdit = true
       if (this.type === 'add') {
         this.lang = params.selLang
+        this.codePend = ''
         let obj = {
           code: '',
           course_type: '', // 课程分类
@@ -182,7 +183,7 @@ export default {
       } else if (this.type === 'edit') {
         this.lang = params.form.code.split('-')[0]
         this.form = params.form
-        this.form.code = params.form.code.split('-').slice(1).join('-')
+        this.codePend = params.form.code.split('-').slice(1).join('-')
         this.bigImgUrl = this.assetsDomain + '/' + params.form.cover[0]
         this.smlImgUrl = this.assetsDomain + '/' + params.form.flag[0]
       }
@@ -271,7 +272,7 @@ export default {
         if (valid) {
           console.log(this.form)
           if (this.type === 'add') {
-            this.form.code = this.lang + '-' + this.form.code
+            this.form.code = this.lang + '-' + this.codePend
             addCourse(this.form).then(res => {
               console.log(res)
               if (res.success) {
@@ -306,23 +307,6 @@ export default {
     },
     changeType () {
       console.log(this.form)
-    },
-    courseTypesList () {
-      let courseType = []
-      if (this.courseList) {
-        this.courseList.forEach(ele => {
-          console.log(ele)
-          this.courseTypes.forEach(item => {
-            if (ele.course_type === item.type) {
-              item.disabled = true
-            }
-            courseType.push(item)
-          })
-        })
-      } else {
-        courseType = this.courseTypes
-      }
-      return courseType
     }
   }
 }
