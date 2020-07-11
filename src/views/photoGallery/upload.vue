@@ -81,10 +81,12 @@ export default {
       let names = []
       let date = moment(new Date()).format('YYYY/MM/DD')
       uploadFiles.forEach(file => {
-        let ext = file.name.split('.')[1]
+        let i = file.name.lastIndexOf('.')
+        let ext = file.name.substring(i + 1)
+        let name = file.name.substring(0, i)
         let url = 'course/images/common/' + date + '/' + file.uid + '.' + ext
         imageUrls.push(url)
-        names.push(file.name.split('.')[0])
+        names.push(name)
         uploadQiniu(file.raw, this.token, url)
       })
       let obj = {

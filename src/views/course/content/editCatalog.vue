@@ -222,13 +222,13 @@ export default {
     catalogAttr () {
       let arr = []
       if (this.version && this.contentTags) {
-        let courseType = this.version.selCourseType
-        let type = 'catalog'
-        if (courseType === 3) {
-          type = 'kidCatalog'
-        }
+        // let courseType = this.version.selCourseType
+        // let type = 'catalog'
+        // if (courseType === 3) {
+        //   type = 'kidCatalog'
+        // }
         arr = this.contentTags.filter(item => {
-          return item.type === type
+          return item.type.toLowerCase() !== 'kid' && item.type.toLowerCase() !== 'pro'
         })
       }
       if (arr.length) {

@@ -666,7 +666,8 @@ export default {
             let p = this.form.posters[i]
             if (p.raw) {
               let date = moment(new Date()).format('YYYY/MM/DD')
-              let ext = p.name.split('.')[1]
+              let i = p.name.lastIndexOf('.')
+              let ext = p.name.substring(i + 1)
               let url = 'live/images/' + date + '/' + p.uid + '.' + ext
               let res = await uploadQiniu(p.raw, this.token, url)
               posters.push(res.key)
@@ -840,7 +841,8 @@ export default {
       let dataFrom = uploadIndexArr[0]
       let feild = uploadIndexArr[1]
       let date = moment(new Date()).format('YYYY/MM/DD')
-      let ext = file.name.split('.')[1]
+      let i = file.name.lastIndexOf('.')
+      let ext = file.name.substring(i + 1)
       let url = ''
       if (dataFrom === 'audio') {
         url = 'live/sounds/' + date + '/' + file.uid + '.' + ext

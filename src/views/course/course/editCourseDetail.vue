@@ -126,7 +126,8 @@ export default {
             let p = this.form.posters[i]
             if (p.raw) {
               let date = moment(new Date()).format('YYYY/MM/DD')
-              let ext = p.name.split('.')[1]
+              let i = p.name.lastIndexOf('.')
+              let ext = p.name.substring(i + 1)
               let url = 'course/images/' + date + '/' + p.uid + '.' + ext
               let res = await uploadQiniu(p.raw, this.token, url)
               posters.push(res.key)

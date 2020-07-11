@@ -148,7 +148,7 @@ export default {
       return obj.name
     },
     async initData () {
-      await this.getContentTags({ pageNo: 0, pageSize: 99999 })
+      await this.getContentTags({ pageNo: 0, pageSize: 0 })
       console.log('initData')
       this.tagsLists = this.contentTags
       this.allTags = this.contentTags
