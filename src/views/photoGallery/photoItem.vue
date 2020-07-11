@@ -24,20 +24,14 @@
         <el-tooltip class="item" effect="dark" :content="picture.desc" placement="top">
           <div class="picture-desc" v-html="picture.desc.replace(/(\r\n)|(\n)/g,'<br>')"></div>
         </el-tooltip>
-        <!-- <el-popover
-          v-show="picture.desc"
-          ref="popover1"
-          placement="top-start"
-          width="260"
-          trigger="hover">
-          <div class="popover-content" v-html="picture.desc.replace(/(\r\n)|(\n)/g,'<br>')"></div>
-        </el-popover> -->
         <div class="bottom clearfix">
-          <div class="size">{{ '宽高: ' + width + ' x ' + height}}</div>
+          <div class="size">{{ '宽高: ' + width + ' x ' + height + ' (' + picture.image_url.substring(picture.image_url.lastIndexOf('.') + 1) + ')'}}</div>
           <el-button type="text" class="button" @click="showEditPicture()">编辑</el-button>
           <el-button type="text" class="button" @click="delPicture()">删除</el-button>
           <el-button type="text" class="button" @click="download" v-show="false">下载</el-button>
-          <el-button type="text" class="button btnLink" :id="'btnLink-' + picture._id" @click="copyLink">复制链接</el-button>
+          <el-tooltip class="item" effect="dark" :content="picture.image_url" placement="top">
+            <el-button type="text" class="button btnLink" :id="'btnLink-' + picture._id" @click="copyLink">复制链接</el-button>
+          </el-tooltip>
         </div>
       </div>
     </el-card>
