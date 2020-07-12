@@ -188,11 +188,15 @@
             <el-upload slot="prepend"
               v-if="f.data_from.indexOf('upload_') > -1"
               action="#"
-              :accept="f.data_from == 'upload_audio' ? 'audio/mp3' : (f.data_from == 'upload_video' ? 'video/mp4' : 'image/png,image/jpg,image/jpeg,image/webp')"
+              :accept="f.data_from == 'upload_audio' ? 'audio/mp3' : (f.data_from == 'upload_video' ? 'video/mp4' : 'image/webp')"
               :on-change="uploadOnchange"
               :show-file-list="false"
               :auto-upload="false">
-              <el-button type="text" @click="upload(f, -1)">上传</el-button>
+              <el-tooltip class="item" effect="dark" content="点击图标上传" placement="top">
+                <el-button type="text" @click="upload(f, -1)">
+                  <i :class="['icon-input', f.feild.toLowerCase().indexOf('sound') > -1 ? 'icon-sound' : (f.feild.indexOf('video') > -1) ? 'icon-video' : 'icon-picture']"></i>
+                </el-button>
+              </el-tooltip>
             </el-upload>
             <el-button slot="append" v-if="f.data_from == 'upload_audio' && f.feild == 'motherSound'" @click="motherSoundPlay(contents[activeFormIndex]['' + f.feild + ''])">试听</el-button>
           </el-input>
@@ -258,47 +262,62 @@
           <!-- 图片声音-->
           <div class="form-sound" v-if="f.data_from.indexOf('upload_') === -1 && f.type == 'string' && (f.feild == 'sound' || f.feild == 'image' || f.feild == 'cover' || f.feild == 'video')">
             <el-input v-model="contents[activeFormIndex]['' + f.feild + '']" :placeholder="f.feild == 'sound' ? '请上传mp3格式的音频' : ''">
-              <el-button slot="append" @click="clear(f.feild)">清除</el-button>
-            </el-input>
-            <div class="upload-area">
-              <el-button v-if="contentModel == 'content_model_pro_sound' && f.feild == 'image'" type="text" @click="searchContent(f.feild)">内容查找</el-button>
-              <el-button v-if="contentModel == 'content_model_pro_sound' && f.feild == 'image'" type="text" @click="searchImg('images')">图库查找</el-button>
               <el-upload
+                slot="prepend"
                 v-if="f.feild == 'sound'"
                 action="#"
                 accept="audio/mp3"
                 :on-change="uploadSoundOnchange"
                 :show-file-list="false"
                 :auto-upload="false">
-                <el-button type="text">本地上传</el-button>
+                <el-tooltip class="item" effect="dark" content="点击图标上传" placement="top">
+                  <el-button type="text">
+                    <i :class="['icon-input', f.feild.toLowerCase().indexOf('sound') > -1 ? 'icon-sound' : (f.feild.toLowerCase().indexOf('video') > -1) ? 'icon-video' : 'icon-picture']"></i>
+                  </el-button>
+                </el-tooltip>
               </el-upload>
               <el-upload
+                slot="prepend"
                 v-if="f.feild == 'video'"
                 action="#"
                 accept="video/mp4"
                 :on-change="uploadVideoOnchange"
                 :show-file-list="false"
                 :auto-upload="false">
-                <el-button type="text">本地上传</el-button>
+                <el-tooltip class="item" effect="dark" content="点击图标上传" placement="top">
+                  <el-button type="text">
+                    <i :class="['icon-input', f.feild.toLowerCase().indexOf('sound') > -1 ? 'icon-sound' : (f.feild.toLowerCase().indexOf('video') > -1) ? 'icon-video' : 'icon-picture']"></i>
+                  </el-button>
+                </el-tooltip>
               </el-upload>
               <el-upload
+                slot="prepend"
                 v-if="f.feild == 'image'"
                 action="#"
-                accept="image/png,image/jpg,image/jpeg,image/webp"
+                accept="image/webp"
                 :on-change="uploadImageOnchange"
                 :show-file-list="false"
                 :auto-upload="false">
-                <el-button type="text">本地上传</el-button>
+                <el-tooltip class="item" effect="dark" content="点击图标上传" placement="top">
+                  <el-button type="text">
+                    <i :class="['icon-input', f.feild.toLowerCase().indexOf('sound') > -1 ? 'icon-sound' : (f.feild.toLowerCase().indexOf('video') > -1) ? 'icon-video' : 'icon-picture']"></i>
+                  </el-button>
+                </el-tooltip>
               </el-upload>
               <el-upload
                 v-if="f.feild == 'cover'"
                 action="#"
-                accept="image/png,image/jpg,image/jpeg,image/webp"
+                accept="image/webp"
                 :on-change="uploadCoverOnchange"
                 :show-file-list="false"
                 :auto-upload="false">
                 <el-button type="text">本地上传</el-button>
               </el-upload>
+              <el-button slot="append" @click="clear(f.feild)">清除</el-button>
+            </el-input>
+            <div class="upload-area">
+              <el-button v-if="contentModel == 'content_model_pro_sound' && f.feild == 'image'" type="text" @click="searchContent(f.feild)">内容查找</el-button>
+              <el-button v-if="contentModel == 'content_model_pro_sound' && f.feild == 'image'" type="text" @click="searchImg('images')">图库查找</el-button>
             </div>
             <look-image
               v-if="contentModel == 'content_model_pro_sound' && f.feild == 'image' && activeFeild == 'images'"
@@ -321,7 +340,7 @@
                 <el-upload slot="prepend"
                   v-if="f.data_from.indexOf('upload_') > -1"
                   action="#"
-                  :accept="f.data_from == 'upload_audio' ? 'audio/mp3' : 'image/png,image/jpg,image/jpeg,image/webp'"
+                  :accept="f.data_from == 'upload_audio' ? 'audio/mp3' : 'image/webp'"
                   :on-change="uploadOnchange"
                   :show-file-list="false"
                   :auto-upload="false">
@@ -356,7 +375,7 @@
                         <el-upload slot="prepend"
                           v-if="subItem.data_from.indexOf('upload_') > -1"
                           action="#"
-                          :accept="subItem.data_from == 'upload_audio' ? 'audio/mp3' : (subItem.data_from == 'upload_video' ? 'video/mp4' : 'image/png,image/jpg,image/jpeg,image/webp')"
+                          :accept="subItem.data_from == 'upload_audio' ? 'audio/mp3' : (subItem.data_from == 'upload_video' ? 'video/mp4' : 'image/webp')"
                           :on-change="uploadOnchangeSub"
                           :show-file-list="false"
                           :auto-upload="false">
@@ -670,6 +689,43 @@ export default {
             obj['list_order'] = (index + 1) * 10
             arr.push(obj)
           })
+
+          let msg = ''
+          for (let i = 0; i < this.contents.length; i++) {
+            let item = this.contents[i]
+            // 判断声音拓展名
+            let sound = item['sound']
+            if (sound) {
+              let ext = sound.substring(sound.lastIndexOf('.') + 1)
+              if (ext.toLowerCase() !== 'mp3') {
+                msg = '上传的声音文件地址格式不对，需要上传mp3格式的声音'
+                break
+              }
+            }
+            let image = item['image']
+            if (image) {
+              let ext = image.substring(image.lastIndexOf('.') + 1)
+              if (ext.toLowerCase() !== 'webp') {
+                msg = '上传的图片文件地址格式不对，需要上传webp格式的图片'
+                break
+              }
+            }
+            let video = item['video']
+            if (video) {
+              let ext = video.substring(video.lastIndexOf('.') + 1)
+              if (ext.toLowerCase() !== 'mp4') {
+                msg = '上传的视频文件地址格式不对，需要上传MP4格式的视频'
+                break
+              }
+            }
+          }
+          if (msg) {
+            this.$message({
+              type: 'warning',
+              message: msg
+            })
+            return false
+          }
           this.$set(this.$data, 'contents', arr)
           let obj = {
             content_model: this.contentModel,
@@ -821,7 +877,8 @@ export default {
     async uploadSoundOnchange (file) {
       console.log(file)
       let date = moment(new Date()).format('YYYY/MM/DD')
-      let ext = file.name.split('.')[1]
+      let i = file.name.lastIndexOf('.')
+      let ext = file.name.substring(i + 1)
       let url = 'course/sounds/' + this.version.selLang.toLowerCase() + '/' + date + '/' + file.uid + '.' + ext
       console.log(url)
       let res = await uploadQiniu(file.raw, this.token, url)
@@ -857,7 +914,8 @@ export default {
     async uploadImageOnchange (file) {
       console.log(file)
       let date = moment(new Date()).format('YYYY/MM/DD')
-      let ext = file.name.split('.')[1]
+      let i = file.name.lastIndexOf('.')
+      let ext = file.name.substring(i + 1)
       let url = 'course/images/common/' + this.version.selLang.toLowerCase() + '/' + date + '/' + file.uid + '.' + ext
       console.log(url)
       let res = await uploadQiniu(file.raw, this.token, url)
@@ -867,7 +925,8 @@ export default {
     async uploadVideoOnchange (file) {
       console.log(file)
       let date = moment(new Date()).format('YYYY/MM/DD')
-      let ext = file.name.split('.')[1]
+      let i = file.name.lastIndexOf('.')
+      let ext = file.name.substring(i + 1)
       let url = 'course/videos/' + this.version.selLang.toLowerCase() + '/' + date + '/' + file.uid + '.' + ext
       console.log(url)
       let res = await uploadQiniu(file.raw, this.token, url)
@@ -883,7 +942,8 @@ export default {
     async uploadCoverOnchange (file) {
       console.log(file)
       let date = moment(new Date()).format('YYYY/MM/DD')
-      let ext = file.name.split('.')[1]
+      let i = file.name.lastIndexOf('.')
+      let ext = file.name.substring(i + 1)
       let url = 'course/images/' + this.version.selLang.toLowerCase() + '/' + date + '/' + file.uid + '.' + ext
       console.log(url)
       let res = await uploadQiniu(file.raw, this.token, url)
@@ -937,7 +997,8 @@ export default {
       let feild = uploadIndexArr[1]
       let index = uploadIndexArr[2]
       let date = moment(new Date()).format('YYYY/MM/DD')
-      let ext = file.name.split('.')[1]
+      let i = file.name.lastIndexOf('.')
+      let ext = file.name.substring(i + 1)
       let url = ''
       if (dataFrom === 'upload_audio') {
         url = 'course/sounds/' + this.version.selLang + '/' + date + '/' + file.uid + '.' + ext
@@ -985,7 +1046,8 @@ export default {
       let subIndex = parseInt(uploadIndexArr[3])
       let subFeild = uploadIndexArr[4]
       let date = moment(new Date()).format('YYYY/MM/DD')
-      let ext = file.name.split('.')[1]
+      let i = file.name.lastIndexOf('.')
+      let ext = file.name.substring(i + 1)
       let url = ''
       if (dataFrom === 'upload_audio') {
         url = 'course/sounds/' + this.version.selLang + '/' + date + '/' + file.uid + '.' + ext
@@ -1256,6 +1318,26 @@ export default {
     width: 80%;
     margin-right: 10px;
   }
+}
+
+.icon-input {
+  display: inline-block;
+  width: 24px;
+  height:24px;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.icon-sound {
+  background-image: url('../../../assets/images/icons/icon-sound.png');
+}
+
+.icon-video {
+  background-image: url('../../../assets/images/icons/icon-video.png');
+}
+
+.icon-picture {
+  background-image: url('../../../assets/images/icons/icon-picture.png');
 }
 </style>
 
