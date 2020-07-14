@@ -122,6 +122,12 @@
             <el-checkbox v-for="tag in selfContentTags" :key="tag.key" :label="tag.key">{{ tag.name }}</el-checkbox>
           </el-checkbox-group>
         </el-form-item>
+        <el-form-item label="展示状态">
+          <el-radio-group v-model="form.onlineState">
+            <el-radio :label="1">即将上线</el-radio>
+            <el-radio :label="0">已上线</el-radio>
+          </el-radio-group>
+        </el-form-item>
         <el-form-item label="是否展示" v-show="handler === 'edit' && false" >
           <el-radio-group v-model="form.is_show">
             <el-radio :label="true">是</el-radio>
@@ -167,6 +173,7 @@ export default {
         name: '',
         title: {},
         goalTitle: '',
+        onlineState: 0,
         desc: {},
         is_show: true,
         flag: [],
@@ -288,6 +295,7 @@ export default {
         this.form.name = folder.name
         this.form.title = folder.title
         this.form.goalTitle = folder.goalTitle
+        this.form.onlineState = folder.onlineState
         this.form.desc = folder.desc
         this.form.flag = folder.flag
         this.form.cover = folder.cover
@@ -319,6 +327,7 @@ export default {
                 parent_uuid: this.form.parent_uuid,
                 title: this.form.title,
                 goalTitle: this.form.goalTitle,
+                onlineState: this.form.onlineState,
                 type: this.form.type
               },
               num: this.form.num
@@ -363,6 +372,7 @@ export default {
                 tags: this.tags,
                 title: this.form.title,
                 goalTitle: this.form.goalTitle,
+                onlineState: this.form.onlineState,
                 is_show: this.form.is_show
               },
               uuid: this.form.uuid
@@ -393,6 +403,7 @@ export default {
         name: '',
         title: {},
         goalTitle: '',
+        onlineState: 0,
         desc: {},
         is_show: true,
         flag: [],

@@ -30,7 +30,7 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="名称：" class="name" required>
+          <el-form-item label="名称：" class="desc" required>
             <!-- <div class="input-box" v-for="l in langInfos" :key="'title' + l.langKey">
               <el-input v-model="form.title[l.langKey]" maxlength="30" show-word-limit></el-input>
               <span>{{'(' + l.name + ')'}}</span>
@@ -38,7 +38,7 @@
             <el-row v-for="l in langInfos" :key="'title' + l.langKey">
               <el-form-item  class="input-box" :prop="'title.' + l.langKey"
                 :rules="[{required: true, message: '名称不能为空', trigger: 'blur'}]">
-                <el-input v-model="form.title[l.langKey]" maxlength="30" show-word-limit></el-input>
+                <el-input type="textarea" v-model="form.title[l.langKey]" maxlength="100" show-word-limit></el-input>
                 <span>{{'(' + l.name + ')'}}</span>
               </el-form-item>
             </el-row>
@@ -450,7 +450,7 @@ export default {
   margin-right: 10px;
 }
 .course-content .name .el-input {
-  width: 300px!important;
+  width: 360px!important;
 }
 .course-content .desc .el-input {
   width: 360px!important;
