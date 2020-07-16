@@ -82,9 +82,6 @@ export default {
     }
   },
   mounted () {
-    getInfoToken().then(res => {
-      this.token = res.data.token
-    })
   },
   computed: {
     ...mapState({
@@ -93,6 +90,9 @@ export default {
   },
   methods: {
     async show (row) {
+      getInfoToken().then(res => {
+        this.token = res.data.token
+      })
       this.course = row
       let res = await getCourseDetail({ course_code: this.course.code })
       console.log(res)

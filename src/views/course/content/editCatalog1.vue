@@ -44,13 +44,13 @@
         </el-form-item>
         <el-form-item label="标题">
           <div class="lang-input" v-for="l in langInfos" :key="l.langKey">
-            <el-input v-model="form.title[l.langKey]" :disabled="attr_tag != ''"></el-input>
+            <el-input v-if="form.title" v-model="form.title[l.langKey]" :disabled="attr_tag != ''"></el-input>
             <div class="text" v-text="'(' + l.name + ')'"></div>
           </div>
         </el-form-item>
         <el-form-item label="描述">
           <div class="lang-input" v-for="l in langInfos" :key="l.langKey">
-            <el-input type="textarea" v-model="form.desc[l.langKey]" :disabled="attr_tag != ''"></el-input>
+            <el-input type="textarea" v-if="form.desc" v-model="form.desc[l.langKey]" :disabled="attr_tag != ''"></el-input>
             <div class="text" v-text="'(' + l.name + ')'"></div>
           </div>
         </el-form-item>
@@ -74,7 +74,7 @@
         </el-form-item>
         <el-form-item label="封面">
           <div class="img-box big-img-box">
-            <div class="img" v-if="form.cover.length">
+            <div class="img" v-if="form.cover && form.cover.length">
               <div
                 class="block"
                 v-for="(cover, index) in form.cover"

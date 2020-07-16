@@ -218,6 +218,9 @@ export default {
     // 键盘上下左右键控制目录操作
     document.onkeydown = (event) => {
       let e = event || window.event
+      if (e.keyCode === 37 && e.ctrlKey) {
+        alert(1)
+      }
       if (!this.path) return
       let arr = this.path.split('/')
       arr.pop()
@@ -228,26 +231,26 @@ export default {
       })
       let folder = null
       // 左键
-      if (e && e.keyCode === 37) {
+      if (e && e.keyCode === 37 && e.altKey) {
         if (trackNum === 0) return
         trackNum--
         folderIndex = 0
         track = this.tracks[trackNum]
       }
       // 上键
-      if (e && e.keyCode === 38) {
+      if (e && e.keyCode === 38 && e.altKey) {
         if (folderIndex === 0) return
         folderIndex--
       }
       // 右键
-      if (e && e.keyCode === 39) {
+      if (e && e.keyCode === 39 && e.altKey) {
         if (trackNum === this.tracks.length - 1) return
         trackNum++
         folderIndex = 0
         track = this.tracks[trackNum]
       }
       // 下键
-      if (e && e.keyCode === 40) {
+      if (e && e.keyCode === 40 && e.altKey) {
         if (folderIndex === track.length - 1) return
         folderIndex++
       }
