@@ -218,9 +218,7 @@ export default {
     // 键盘上下左右键控制目录操作
     document.onkeydown = (event) => {
       let e = event || window.event
-      if (e.keyCode === 37 && e.ctrlKey) {
-        alert(1)
-      }
+      if (!e.altKey) return
       if (!this.path) return
       let arr = this.path.split('/')
       arr.pop()
