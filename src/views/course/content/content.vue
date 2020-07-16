@@ -42,6 +42,7 @@
               :value="item.uuid">
             </el-option>
           </el-select>
+          <span class="desc">(ALT + “↑、↓、←、→” 组合键，能够切换课程目录)</span>
         </div>
         <div class="right">
           <div class="back">
@@ -945,6 +946,9 @@ export default {
     background-image: url('../../../assets/images/course/icon-logo.png');
     background-repeat: no-repeat;
     background-size: cover;
+  }
+  span {
+    color: #FFFFFF;
   }
 }
 
