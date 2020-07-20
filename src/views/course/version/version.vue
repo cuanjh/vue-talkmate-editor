@@ -437,7 +437,7 @@ export default {
       } else {
         this.$message({
           type: 'warning',
-          message: '请选择课程分类'
+          message: '请选择课程'
         })
         return false
       }
@@ -449,7 +449,7 @@ export default {
         })
         return false
       }
-      if (copy.selCourseType !== this.selCourse.course_type) {
+      if (copy.selCourseType !== this.version.selCourse.course_type) {
         this.$message({
           type: 'warning',
           message: '请选择相同的课程分类再粘贴'
