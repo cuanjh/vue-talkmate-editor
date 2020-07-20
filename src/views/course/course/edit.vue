@@ -7,11 +7,11 @@
       </div>
       <div class="course-content">
         <el-form ref="form" :model="form">
-          <el-form-item label="编码：" prop="code" :rules="[
+          <el-form-item label="编码：" prop="codePend" :rules="[
             { required: true, message: '编码不能为空', trigger: 'blur' },
             { pattern: /^[a-zA-Z-]+$/, message: '只允许输入字母！' }
           ]">
-            <el-input v-model="codePend" maxlength="20" placeholder="AAA" show-word-limit :disabled="type == 'edit'">
+            <el-input v-model="form.codePend" maxlength="20" placeholder="AAA" show-word-limit :disabled="type == 'edit'">
               <template slot="prepend">{{ lang + '-' }}</template>
             </el-input>
           </el-form-item>
@@ -126,8 +126,8 @@ export default {
     return {
       showEdit: false,
       lang: '',
-      codePend: '',
       form: {
+        codePend: '',
         code: '',
         course_type: '', // 课程分类
         cover: [], // 大图标
@@ -164,9 +164,9 @@ export default {
       this.showEdit = true
       if (this.type === 'add') {
         this.lang = params.selLang
-        this.codePend = ''
         let obj = {
           code: '',
+          codePend: '',
           course_type: '', // 课程分类
           cover: [], // 大图标
           desc: {}, // 描述
@@ -183,7 +183,7 @@ export default {
       } else if (this.type === 'edit') {
         this.lang = params.form.code.split('-')[0]
         this.form = params.form
-        this.codePend = params.form.code.split('-').slice(1).join('-')
+        this.form.codePend = params.form.code.split('-').slice(1).join('-')
         this.bigImgUrl = this.assetsDomain + '/' + params.form.cover[0]
         this.smlImgUrl = this.assetsDomain + '/' + params.form.flag[0]
       }
@@ -272,8 +272,18 @@ export default {
         if (valid) {
           console.log(this.form)
           if (this.type === 'add') {
-            this.form.code = this.lang + '-' + this.codePend
-            addCourse(this.form).then(res => {
+            let obj = {
+              code: this.lang + '-' + this.form.codePend,
+              course_type: this.form.course_type, // 课程分类
+              cover: this.form.cover, // 大图标
+              desc: this.form.desc, // 描述
+              flag: this.form.flag, // 小图标
+              is_show: this.form.is_show, // 是否上线
+              lan_code: this.form.lan_code, // 语种的编码
+              tags: this.form.tags,
+              title: this.form.title // 名称
+            }
+            addCourse(obj).then(res => {
               console.log(res)
               if (res.success) {
                 this.close()

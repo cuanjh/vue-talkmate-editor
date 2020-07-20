@@ -291,7 +291,11 @@ export default {
       } else {
         result += '开始时间'
       }
-      result += moment(new Date(item.date)).format('MM月DD日') + ' '
+      if (item.state === 0) {
+        result += moment(new Date(item.date)).format('MM月DD日') + ' '
+      } else {
+        result += moment(new Date(item.realStartTime * 1000)).format('MM月DD日') + ' '
+      }
       let startTime = moment(new Date(item.startTime * 1000)).format('HH:mm')
       let endTime = moment(new Date(item.EndTime * 1000)).format('HH:mm')
       if (item.state === 1 || item.state === -1) {

@@ -112,6 +112,11 @@
             type="primary"
             plain
             @click="addDetail(scope.row)">添加详情</el-button>
+          <el-button
+            size="mini"
+            type="primary"
+            plain
+            @click="unlockCourse(scope.row)">解锁</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -120,6 +125,7 @@
       @addNewCourse="initData"/>
     <class-group ref="classGroup" />
     <course-detail ref="courseDetail" />
+    <unlock-course ref="unlockCourse" />
   </div>
 </template>
 
@@ -134,6 +140,7 @@ import {
 import EditComp from './edit'
 import ClassGroup from './classGroup'
 import CourseDetail from './editCourseDetail'
+import UnlockCourse from './unlockCourse'
 
 export default {
   data () {
@@ -146,7 +153,8 @@ export default {
   components: {
     EditComp,
     ClassGroup,
-    CourseDetail
+    CourseDetail,
+    UnlockCourse
   },
   created () {
     this.getLangList({ 'pageNo': 0, 'pageSize': 999 }).then(() => {
@@ -304,6 +312,9 @@ export default {
     },
     addDetail (row) {
       this.$refs['courseDetail'].show(row)
+    },
+    unlockCourse (row) {
+      this.$refs['unlockCourse'].show(row)
     }
   }
 }
