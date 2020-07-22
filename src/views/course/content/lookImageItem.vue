@@ -2,7 +2,7 @@
   <div class="item" @mouseleave="isShow = false" @mouseenter="isShow = true">
     <el-image
       class="form-img"
-      :src="assetsDomain + item['image_url']"
+      :src="(assetsDomain + item['image_url']) | urlFix('imageView2/1/format/jpg')"
       fit="cover">
     </el-image>
     <div class="desc" v-html="item['desc'].replace(new RegExp(/\./, 'g'), '.<br/>').replace(new RegExp(/\?/, 'g'), '?<br/>')">

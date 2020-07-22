@@ -6,7 +6,7 @@
     </div>
     <el-image
       class="form-img"
-      :src="assetsDomain + item['image']"
+      :src="(assetsDomain + item['image']) | urlFix('imageView2/1/format/jpg')"
       fit="cover">
     </el-image>
     <el-tooltip

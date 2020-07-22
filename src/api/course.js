@@ -163,6 +163,18 @@ export const getCourseDetail = (data) => {
   })
 }
 
+// @Summary 解锁课程
+// @Produce  application/json
+// @Param data
+// @Router /editor/course/unlock [post]
+export const unlockCourse = (data) => {
+  return service({
+    url: '/editor/course/unlock',
+    method: 'post',
+    data
+  })
+}
+
 // @Summary 编辑课程详情
 // @Produce  application/json
 // @Param data
