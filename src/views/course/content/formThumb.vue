@@ -6,7 +6,7 @@
         <el-image v-show="imgUrl" :src="imgUrl | urlFix('imageView2/1/format/jpg')" fit="cover"></el-image>
       </div>
       <div class="text">
-        <span v-text="(form && form.sentence) ? (form.type == 'fillGap') ? form.sentence.replace(form.options[0], '______') : form.sentence : ''"></span>
+        <span v-text="(form && form.sentence) ? (form.type == 'fillGap' && form.options) ? form.sentence.replace(form.options[0], '______') : form.sentence : ''"></span>
       </div>
     </div>
   </transition>

@@ -72,7 +72,6 @@
           <el-tooltip class="item" effect="dark" content="上传模板数据" placement="top">
             <div>
             <el-button
-              v-show="version.selCourse.course_type == 5"
               type="primary" icon="el-icon-upload2"
               :disabled="(userInfo.authorityId !== '1' && item.curUserAuth['auth'] == 'r')" circle @click="clickUpload"></el-button>
             <el-upload
