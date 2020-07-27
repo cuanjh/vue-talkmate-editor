@@ -514,7 +514,8 @@ import { mapState } from 'vuex'
 import {
   editContent,
   delContent,
-  getInfoToken
+  getInfoToken,
+  addMoreImages
   // ,
   // getContent
 } from '@/api/course'
@@ -916,8 +917,10 @@ export default {
       let date = moment(new Date()).format('YYYY/MM/DD')
       let i = file.name.lastIndexOf('.')
       let ext = file.name.substring(i + 1)
+      let name = file.name.substring(0, i)
       let url = 'course/images/common/' + this.version.selLang.toLowerCase() + '/' + date + '/' + file.uid + '.' + ext
       console.log(url)
+      this.saveImages([url], [name])
       let res = await uploadQiniu(file.raw, this.token, url)
       this.$set(this.contents[this.activeFormIndex], 'image', res.key)
     },
@@ -944,8 +947,10 @@ export default {
       let date = moment(new Date()).format('YYYY/MM/DD')
       let i = file.name.lastIndexOf('.')
       let ext = file.name.substring(i + 1)
+      let name = file.name.substring(0, i)
       let url = 'course/images/' + this.version.selLang.toLowerCase() + '/' + date + '/' + file.uid + '.' + ext
       console.log(url)
+      this.saveImages([url], [name])
       let res = await uploadQiniu(file.raw, this.token, url)
       this.$set(this.contents[this.activeFormIndex], 'cover', res.key)
     },
@@ -999,11 +1004,13 @@ export default {
       let date = moment(new Date()).format('YYYY/MM/DD')
       let i = file.name.lastIndexOf('.')
       let ext = file.name.substring(i + 1)
+      let name = file.name.substring(0, i)
       let url = ''
       if (dataFrom === 'upload_audio') {
         url = 'course/sounds/' + this.version.selLang + '/' + date + '/' + file.uid + '.' + ext
       } else if (dataFrom === 'upload_image') {
         url = 'course/images/' + this.version.selLang + '/' + date + '/' + file.uid + '.' + ext
+        this.saveImages([url], [name])
       } else if (dataFrom === 'upload_video') {
         url = 'course/videos/' + this.version.selLang + '/' + date + '/' + file.uid + '.' + ext
       }
@@ -1048,11 +1055,13 @@ export default {
       let date = moment(new Date()).format('YYYY/MM/DD')
       let i = file.name.lastIndexOf('.')
       let ext = file.name.substring(i + 1)
+      let name = file.name.substring(0, i)
       let url = ''
       if (dataFrom === 'upload_audio') {
         url = 'course/sounds/' + this.version.selLang + '/' + date + '/' + file.uid + '.' + ext
       } else if (dataFrom === 'upload_image') {
         url = 'course/images/' + this.version.selLang + '/' + date + '/' + file.uid + '.' + ext
+        this.saveImages([url], [name])
       } else if (dataFrom === 'upload_video') {
         url = 'course/videos/' + this.version.selLang + '/' + date + '/' + file.uid + '.' + ext
       }
@@ -1135,6 +1144,15 @@ export default {
     },
     minusSubItem (f, sf, i, oi) {
       this.contents[this.activeFormIndex]['' + f.feild + ''][i]['' + sf.feild + ''].splice(oi, 1)
+    },
+    // 对于上传的图片，存储到图片库“通用”分类下
+    saveImages (imageUrls, names) {
+      let obj = {
+        image_urls: imageUrls,
+        tagKeys: ['通用'],
+        names: names
+      }
+      addMoreImages(obj)
     }
   }
 }
