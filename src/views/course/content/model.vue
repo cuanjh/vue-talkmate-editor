@@ -194,7 +194,7 @@
               :auto-upload="false">
               <el-tooltip class="item" effect="dark" content="点击图标上传" placement="top">
                 <el-button type="text" @click="upload(f, -1)">
-                  <i :class="['icon-input', f.feild.toLowerCase().indexOf('sound') > -1 ? 'icon-sound' : (f.feild.indexOf('video') > -1) ? 'icon-video' : 'icon-picture']"></i>
+                  <i :class="['icon-input', f.data_from.toLowerCase().indexOf('audio') > -1 ? 'icon-sound' : (f.data_from.toLowerCase().indexOf('video') > -1) ? 'icon-video' : 'icon-picture']"></i>
                 </el-button>
               </el-tooltip>
             </el-upload>
@@ -272,7 +272,7 @@
                 :auto-upload="false">
                 <el-tooltip class="item" effect="dark" content="点击图标上传" placement="top">
                   <el-button type="text">
-                    <i :class="['icon-input', f.feild.toLowerCase().indexOf('sound') > -1 ? 'icon-sound' : (f.feild.toLowerCase().indexOf('video') > -1) ? 'icon-video' : 'icon-picture']"></i>
+                    <i :class="['icon-input', f.data_from.toLowerCase().indexOf('audio') > -1 ? 'icon-sound' : (f.data_from.toLowerCase().indexOf('video') > -1) ? 'icon-video' : 'icon-picture']"></i>
                   </el-button>
                 </el-tooltip>
               </el-upload>
@@ -286,7 +286,7 @@
                 :auto-upload="false">
                 <el-tooltip class="item" effect="dark" content="点击图标上传" placement="top">
                   <el-button type="text">
-                    <i :class="['icon-input', f.feild.toLowerCase().indexOf('sound') > -1 ? 'icon-sound' : (f.feild.toLowerCase().indexOf('video') > -1) ? 'icon-video' : 'icon-picture']"></i>
+                    <i :class="['icon-input', f.data_from.toLowerCase().indexOf('audio') > -1 ? 'icon-sound' : (f.data_from.toLowerCase().indexOf('video') > -1) ? 'icon-video' : 'icon-picture']"></i>
                   </el-button>
                 </el-tooltip>
               </el-upload>
@@ -300,7 +300,7 @@
                 :auto-upload="false">
                 <el-tooltip class="item" effect="dark" content="点击图标上传" placement="top">
                   <el-button type="text">
-                    <i :class="['icon-input', f.feild.toLowerCase().indexOf('sound') > -1 ? 'icon-sound' : (f.feild.toLowerCase().indexOf('video') > -1) ? 'icon-video' : 'icon-picture']"></i>
+                    <i :class="['icon-input', f.data_from.toLowerCase().indexOf('audio') > -1 ? 'icon-sound' : (f.data_from.toLowerCase().indexOf('video') > -1) ? 'icon-video' : 'icon-picture']"></i>
                   </el-button>
                 </el-tooltip>
               </el-upload>
