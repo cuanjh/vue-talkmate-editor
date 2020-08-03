@@ -265,7 +265,7 @@
           </div>
         </el-form-item>
         <el-form-item label="日期描述">
-          <el-input v-model="form.dateNotice" maxlength="100" show-word-limit></el-input>
+          <el-input style="width: 500px" type="textarea" v-model="form.dateNotice" maxlength="100" show-word-limit></el-input>
         </el-form-item>
       </div>
       <div class="course-info">
