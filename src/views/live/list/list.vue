@@ -26,8 +26,8 @@
               </el-col>
               <el-col :span="7" class="course-column">
                 <el-row>
-                  <el-button type="primary" size="small" :disabled="props.row.courses[index].state !== 1" class="btnPushLink" @click="publishComment(c)">发表评论</el-button>
-                  <el-button type="primary" size="small" :disabled="props.row.courses[index].state === 0" class="btnPushLink" @click="getComments(c)">评论列表</el-button>
+                  <el-button type="primary" size="small" class="btnPushLink" @click="publishComment(c)">发表评论</el-button>
+                  <el-button type="primary" size="small" class="btnPushLink" @click="getComments(c)">评论列表</el-button>
                   <el-button type="primary" size="small" :disabled="props.row.courses[index].state == -1" class="btnPushLink" @click="refreshLink(c)">刷新推流</el-button>
                   <br><br>
                   <el-tooltip class="item" effect="dark" :content="c.livePushUrl" placement="top">
