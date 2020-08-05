@@ -14,14 +14,14 @@
           :value="item['lan_code']">
         </el-option>
       </el-select>
-      <el-select v-show="false" v-model="selCourseType" filterable placeholder="请选择课程分类"  @change="initCourseVersionList">
+      <!-- <el-select v-show="false" v-model="selCourseType" filterable placeholder="请选择课程分类"  @change="initCourseVersionList">
         <el-option
           v-for="item in courseTypes"
           :key="item.type"
           :label="item.name"
           :value="item.type">
         </el-option>
-      </el-select>
+      </el-select> -->
       <el-select class="select-course" v-model="selCourseUUID" filterable placeholder="请选择课程"  @change="changeCourse">
         <el-option
           v-for="item in version.courseList"
