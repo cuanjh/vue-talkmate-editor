@@ -1,6 +1,6 @@
 <template>
   <el-container id="content-container" class="content-container" v-show="isShow">
-    <el-header height="70px">
+    <el-header height="90px">
       <div class="top-bar">
         <div class="left">
           <div class="icon-logo" @click="back"></div>
@@ -26,12 +26,16 @@
               :value="item.type">
             </el-option>
           </el-select>
-          <el-select v-model="selCourseUUID" filterable  size="small" placeholder="请选择课程"  @change="changeCourse">
+          <el-select class="select-course" v-model="selCourseUUID" filterable  size="small" placeholder="请选择课程"  @change="changeCourse">
             <el-option
               v-for="item in version.courseList"
               :key="item.uuid"
-              :label="'(' + courseTypes.find(i => { return i.type == item.course_type})['name'] + ') ' + item.title['zh-CN']"
+              :label="item.name ? item.name : '(' + courseTypes.find(i => { return i.type == item.course_type})['name'] + ') ' + item.title['zh-CN'] + '/' + item.title['en']"
               :value="item.uuid">
+              <div class="course">
+                <el-image style="width: 24px; height: 24px; border-radius: 4px; margin-right: 4px;" :src="assetsDomain + item.flag[0]" fit="cover"></el-image>
+                <span>{{item.name ? item.name : '(' + courseTypes.find(i => { return i.type == item.course_type})['name'] + ') ' + item.title['zh-CN'] + '/' + item.title['en']}}</span>
+              </div>
             </el-option>
           </el-select>
           <el-select v-model="selVersion" size="small" placeholder="请选择版本" @change="changeVersion">
@@ -42,7 +46,6 @@
               :value="item.uuid">
             </el-option>
           </el-select>
-          <span class="desc">(ALT + “↑、↓、←、→” 组合键，能够切换课程目录)</span>
         </div>
         <div class="right">
           <div class="back">
@@ -50,6 +53,7 @@
           </div>
         </div>
       </div>
+      <div class="tips"><span class="desc">(ALT + “↑、↓、←、→” 组合键，能够切换课程目录)</span></div>
     </el-header>
     <el-main>
       <div id="track-container" class="track-container">
@@ -276,6 +280,7 @@ export default {
   },
   computed: {
     ...mapState({
+      assetsDomain: state => state.course.assetsDomain,
       locale: state => state.course.locale,
       langList: state => state.course.langList,
       courseTypes: state => state.course.courseTypes,
@@ -931,7 +936,18 @@ export default {
 .el-header {
   padding: 0;
   background: #002742;
-  border-bottom: 1px solid rgba($color: #000000, $alpha: 0.1)
+  border-bottom: 1px solid rgba($color: #000000, $alpha: 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.tips {
+  padding-left: 30px;
+  padding-bottom: 10px;
+  .desc {
+    color: #FFFFFF;
+    font-size: 12px;
+  }
 }
 .left {
   display: flex;
@@ -1027,5 +1043,15 @@ export default {
       color: rgba($color: #409eff, $alpha: 1);
     }
   }
+}
+
+.course {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.select-course {
+  width: 400px;
 }
 </style>

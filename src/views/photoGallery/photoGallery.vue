@@ -11,9 +11,10 @@
           </el-switch>
         </el-input>
       </el-col>
-      <el-col :span="4" :offset="6">
+      <el-col :span="6" :offset="4">
         <el-button type="primary" @click="reset">重置</el-button>
         <el-button type="primary" @click="upload">上传</el-button>
+        <el-button type="primary" @click="download">下载</el-button>
       </el-col>
     </el-row>
     <el-row>
@@ -62,6 +63,7 @@ import {
   searchImages,
   imagesTags,
   getInfoToken
+  // downloadImageExcel
 } from '@/api/course'
 
 import EditTags from './editTags'
@@ -174,6 +176,17 @@ export default {
       this.activeTag = ''
       this.pictures = []
       this.search()
+    },
+    download () {
+      if (!this.activeTag) {
+        this.$message({
+          type: 'warning',
+          message: '请先选择要下载的图片分类'
+        })
+        return false
+      }
+      window.location.href = process.env.VUE_APP_BASE_API + '/editor/image/download?tagKey=' + this.activeTag
+      // downloadImageExcel({ tagKey: this.activeTag })
     }
   }
 }

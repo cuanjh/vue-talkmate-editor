@@ -22,12 +22,16 @@
           :value="item.type">
         </el-option>
       </el-select>
-      <el-select v-model="selCourseUUID" filterable placeholder="请选择课程"  @change="changeCourse">
+      <el-select class="select-course" v-model="selCourseUUID" filterable placeholder="请选择课程"  @change="changeCourse">
         <el-option
           v-for="item in version.courseList"
           :key="item.uuid"
-          :label="'(' + courseTypes.find(i => { return i.type == item.course_type})['name'] + ') ' + item.title['zh-CN']"
+          :label="item.name ? item.name : '(' + courseTypes.find(i => { return i.type == item.course_type})['name'] + ') ' + item.title['zh-CN'] + '/' + item.title['en']"
           :value="item.uuid">
+          <div class="course">
+            <el-image style="width: 24px; height: 24px; border-radius: 4px; margin-right: 4px;" :src="assetsDomain + item.flag[0]" fit="cover"></el-image>
+            <span>{{item.name ? item.name : '(' + courseTypes.find(i => { return i.type == item.course_type})['name'] + ') ' + item.title['zh-CN'] + '/' + item.title['en']}}</span>
+          </div>
         </el-option>
       </el-select>
     </div>
@@ -712,5 +716,15 @@ export default {
 
 .el-select {
   margin-right: 20px;
+}
+
+.course {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.select-course {
+  width: 400px;
 }
 </style>

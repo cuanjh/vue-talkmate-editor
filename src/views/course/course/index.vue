@@ -44,6 +44,11 @@
         type="index">
       </el-table-column>
       <el-table-column
+        width="140"
+        label="名称"
+        prop="name">
+      </el-table-column>
+      <el-table-column
         width="120"
         label="课程分类"
         :formatter="formatterCourseType">
@@ -55,7 +60,7 @@
       </el-table-column>
       <el-table-column
         width="180"
-        label="课程名称">
+        label="课程标题">
         <template slot-scope="scope">
           <div v-for="l in langInfos" :key="l.langKey">{{ l.name + ': ' +  (scope.row.title['' + l.langKey + ''] ? scope.row.title['' + l.langKey + ''] : '') + ' ' }}</div>
         </template>

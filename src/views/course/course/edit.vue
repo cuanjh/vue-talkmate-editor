@@ -15,6 +15,11 @@
               <template slot="prepend">{{ lang + '-' }}</template>
             </el-input>
           </el-form-item>
+          <el-form-item label="名称：" prop="name" :rules="[
+            { required: true, message: '名称不能为空', trigger: 'blur' }
+          ]">
+            <el-input v-model="form.name" maxlength="100" show-word-limit></el-input>
+          </el-form-item>
           <el-form-item label="分类：" prop="course_type" :rules="[
             { required: true, message: '请选择分类', trigger: 'blur' }
           ]">
@@ -30,7 +35,7 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="名称：" class="desc" required>
+          <el-form-item label="标题：" class="desc" required>
             <!-- <div class="input-box" v-for="l in langInfos" :key="'title' + l.langKey">
               <el-input v-model="form.title[l.langKey]" maxlength="30" show-word-limit></el-input>
               <span>{{'(' + l.name + ')'}}</span>
@@ -136,7 +141,8 @@ export default {
         is_show: true, // 是否上线
         lan_code: '', // 语种的编码
         tags: [],
-        title: {} // 名称
+        name: '',
+        title: {} // 标题
       },
       bigImgUrl: '',
       bigFileRaw: {},
@@ -174,7 +180,8 @@ export default {
           is_show: true, // 是否上线
           lan_code: params.selLang, // 语种的编码
           tags: [],
-          title: {} // 名称
+          name: '',
+          title: {} // 标题
         }
         this.form = obj
         this.bigImgUrl = ''
@@ -281,7 +288,8 @@ export default {
               is_show: this.form.is_show, // 是否上线
               lan_code: this.form.lan_code, // 语种的编码
               tags: this.form.tags,
-              title: this.form.title // 名称
+              name: this.form.name,
+              title: this.form.title // 标题
             }
             addCourse(obj).then(res => {
               console.log(res)
@@ -299,6 +307,7 @@ export default {
                 flag: this.form.flag,
                 is_show: this.form.is_show,
                 tags: [],
+                name: this.form.name,
                 title: this.form.title
               },
               uuid: this.form.uuid

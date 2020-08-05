@@ -739,6 +739,19 @@ export const delImageTag = (data) => {
   })
 }
 
+// 下载
+/**
+ * @Summary 下载图片存储到excel
+ * @param {*} data
+ * @Router /editor/image/download [get]
+ */
+export const downloadImageExcel = (data) => {
+  return service({
+    url: '/editor/image/download?tagKey=' + data.tagKey,
+    method: 'get'
+  })
+}
+
 /**
  * @Summary 搜索内容
  * @param {*} data
