@@ -501,9 +501,9 @@ export default {
       }
     },
     setTrackSortable () {
-      if (this.lowerRoleUser) {
-        return false
-      }
+      // if (this.lowerRoleUser) {
+      //   return false
+      // }
       for (let i = 0; i < this.tracks.length; i++) {
         let $trackItem = document.getElementById('track-item-' + i)
         /* eslint-disable */
@@ -670,9 +670,9 @@ export default {
     },
     // 显示右键菜单
     contentMenu (params) {
-      if (this.lowerRoleUser) {
-        return false
-      }
+      // if (this.lowerRoleUser) {
+      //   return false
+      // }
       console.log(params)
       this.$refs['rightMenu'].hide()
       this.rightUUID = params.folder.uuid
@@ -696,9 +696,9 @@ export default {
     },
     // 任意位置右键菜单
     otherContextMenu (ev, item, index) {
-      if (this.lowerRoleUser) {
-        return false
-      }
+      // if (this.lowerRoleUser) {
+      //   return false
+      // }
       console.log(index)
       this.uuid = ''
       this.curUUID = ''

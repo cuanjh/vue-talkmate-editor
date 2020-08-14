@@ -77,9 +77,6 @@ export default {
       }, 300)
     },
     dblclickFolder () {
-      if (this.lowerRoleUser) {
-        return false
-      }
       clearTimeout(timer)
       this.title = this.name
       this.isShow = false

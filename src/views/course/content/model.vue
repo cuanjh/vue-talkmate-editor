@@ -5,7 +5,7 @@
         路径：{{ pathDesc }}
       </div>
       <div class="right">
-        <el-button v-show="!lowerRoleUser" type="text" @click="addForm">新增</el-button>
+        <el-button type="text" @click="addForm">新增</el-button>
         <el-button type="text" @click="lookPreview">预览</el-button>
       </div>
     </div>
@@ -861,9 +861,9 @@ export default {
     },
     // form区域右键菜单
     contentmenu (ev) {
-      if (this.lowerRoleUser) {
-        return false
-      }
+      // if (this.lowerRoleUser) {
+      //   return false
+      // }
       this.$refs['rightMenuForm'].show(ev)
     },
     paste () {

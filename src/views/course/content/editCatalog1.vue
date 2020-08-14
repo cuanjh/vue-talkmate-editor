@@ -139,7 +139,7 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item>
-          <div class="handler" v-show="!lowerRoleUser">
+          <div class="handler">
             <el-button type="primary" @click="onSubmit">保存</el-button>
             <el-button @click="close">取消</el-button>
           </div>

@@ -140,6 +140,16 @@
           </el-upload>
           <el-tag type="warning">注：讲师照片将在发现页小图和分类课程-直播处展示</el-tag>
         </el-form-item>
+        <el-form-item label="直播老师" prop="selTeacher">
+          <el-select v-model="form.selTeacher" filterable placeholder="请选择直播老师">
+            <el-option
+              v-for="item in teacherList"
+              :key="item.user_id"
+              :label="item.live_nickname"
+              :value="item.user_id">
+            </el-option>
+        </el-select>
+        </el-form-item>
         <el-form-item label="讲师姓名" prop="teacherName"
           :rules="[
             { required: true, message: '讲师姓名不能为空'}
@@ -331,7 +341,8 @@ import {
   getInfoTokenUploadFile,
   getDisChannelList,
   addLive,
-  editLive
+  editLive,
+  getTeacherList
 } from '@/api/course'
 import { mapState } from 'vuex'
 export default {
@@ -350,6 +361,7 @@ export default {
       published: 'N',
       excludeDates: [],
       basicCourses: [],
+      teacherList: [],
       form: {
         moduleName: '',
         level: 0,
@@ -363,6 +375,7 @@ export default {
         money: 0,
         moneyDiscount: 0,
         teacherPhoto: '',
+        selTeacher: '',
         teacherName: '',
         teacherDesc: '',
         finishTitle: '',
@@ -458,6 +471,17 @@ export default {
       })
       this.langList = [...this.langList, ...langs]
     })
+
+    getTeacherList({
+      page_index: 1,
+      page_size: 100,
+      status: 3
+    }).then(res => {
+      if (res.success && res.data) {
+        this.teacherList = res.data
+        console.log(this.teacherList)
+      }
+    })
     this.flag = this.$route.query.flag
     if (this.flag === 'edit') {
       this.initEditInfo()
@@ -492,6 +516,7 @@ export default {
         this.form.basicProfilePhoto = this.roomInfo.liveInfo.basicProfilePhoto
         this.form.dateNotice = this.roomInfo.liveInfo.dateNotice
         this.form.teacherPhoto = this.roomInfo.liveInfo.tech_photo
+        this.form.selTeacher = this.roomInfo.user_id
         this.form.teacherName = this.roomInfo.liveInfo.tech_name
         this.form.teacherDesc = this.roomInfo.liveInfo.tech_desc
         this.form.weixinNo = this.roomInfo.liveInfo.weixinNo
@@ -730,7 +755,8 @@ export default {
               money: this.form.money,
               moneyDiscount: this.form.moneyDiscount,
               money_type: 'CNY',
-              tag_keys: this.form.tagKeys
+              tag_keys: this.form.tagKeys,
+              user_id: this.form.selTeacher
             }
           }
           console.log(params)

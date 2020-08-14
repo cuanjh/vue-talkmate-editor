@@ -1376,3 +1376,29 @@ export const rollbackOperateLog = (data) => {
     data
   })
 }
+
+/**
+ * @Summary 获取老师列表
+ * @param {*} data
+ * @Router /editor/teacher/list [post]
+ */
+export const getTeacherList = (data) => {
+  return service({
+    url: '/editor/teacher/list',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 审核老师
+ * @param {*} data
+ * @Router /editor/teacher/audit [post]
+ */
+export const approveTeacher = (data) => {
+  return service({
+    url: '/editor/teacher/audit',
+    method: 'post',
+    data
+  })
+}

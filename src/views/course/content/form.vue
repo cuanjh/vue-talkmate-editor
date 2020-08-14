@@ -5,10 +5,10 @@
       <span v-show="!form.self_sign">{{ typeName }}</span>
       <div class="icons">
         <el-tooltip effect="dark" content="复制" placement="top">
-          <i v-show="!lowerRoleUser" class="el-icon-document-copy" @click="copyForm"></i>
+          <i class="el-icon-document-copy" @click="copyForm"></i>
         </el-tooltip>
         <el-tooltip effect="dark" content="删除" placement="top">
-          <i v-show="!lowerRoleUser" class="el-icon-delete" @click="delForm"></i>
+          <i class="el-icon-delete" @click="delForm"></i>
         </el-tooltip>
       </div>
     </div>
