@@ -42,13 +42,14 @@
             </div>
           </el-form-item>
           <el-form-item label="图标: ">
+            <el-tag type="warning">请上传webp格式的图片</el-tag>
             <div class="img-box small-img-box">
               <div class="img">
                 <img v-if="flagUrl" :src="flagUrl" fit="cover" />
               </div>
               <el-upload
                 action="#"
-                accept="image/png,image/jpg,image/jpeg"
+                accept="image/webp"
                 :on-change="uploadFlagOnchange"
                 :show-file-list="false"
                 :auto-upload="false">
@@ -59,7 +60,7 @@
             </div>
           </el-form-item>
           <el-form-item label="封面: ">
-            <el-tag type="warning">第一张图为课程列表封面，第二张图为学习首页课程封面，第三张图为课程列表宝贝作品封面</el-tag>
+            <el-tag type="warning">请上传webp格式的图片，第一张图为课程列表封面，第二张图为学习首页课程封面，第三张图为课程列表宝贝作品封面</el-tag>
             <div class="img-box big-img-box">
               <div class="img" id="cover-sort" v-if="form.cover.length > 0">
                 <div
@@ -82,7 +83,7 @@
                 <div class="block" data-id="99">
                   <el-upload
                     action="#"
-                    accept="image/png,image/jpg,image/jpeg"
+                    accept="image/webp"
                     :on-change="uploadCoverOnchange"
                     :show-file-list="false"
                     :auto-upload="false">

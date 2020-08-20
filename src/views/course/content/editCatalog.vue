@@ -51,6 +51,7 @@
           </div>
         </el-form-item>
         <el-form-item label="图标">
+          <el-tag type="warning">请上传webp格式的图片</el-tag>
           <div class="img-box small-img-box">
             <div class="img">
               <img v-if="flagUrl" :src="flagUrl" fit="cover" />
@@ -58,7 +59,7 @@
             <el-upload
               v-show="attr_tag == ''"
               action="#"
-              accept="image/png,image/jpg,image/jpeg"
+              accept="image/webp"
               :on-change="uploadFlagOnchange"
               :show-file-list="false"
               :auto-upload="false">
@@ -69,6 +70,7 @@
           </div>
         </el-form-item>
         <el-form-item label="封面">
+          <el-tag type="warning">请上传webp格式的图片</el-tag>
           <div class="img-box big-img-box">
             <div class="img" v-if="form.cover.length">
               <!-- <img v-if="coverUrl" :src="coverUrl" /> -->
@@ -91,7 +93,7 @@
               <div class="block" v-show="attr_tag == ''">
                 <el-upload
                   action="#"
-                  accept="image/png,image/jpg,image/jpeg"
+                  accept="image/webp"
                   :on-change="uploadCoverOnchange"
                   :show-file-list="false"
                   :auto-upload="false">
@@ -105,7 +107,7 @@
               <div class="block">
                 <el-upload
                   action="#"
-                  accept="image/png,image/jpg,image/jpeg"
+                  accept="image/webp"
                   :on-change="uploadCoverOnchange"
                   :show-file-list="false"
                   :auto-upload="false">

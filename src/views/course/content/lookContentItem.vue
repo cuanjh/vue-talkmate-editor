@@ -1,7 +1,7 @@
 <template>
   <div class="item" @mouseleave="isShow = false" @mouseenter="isShow = true">
     <div class="form-type">
-      <i @click="playVoice"></i>
+      <span v-if="item['image']"><i @click="playVoice"></i>({{item['image'].slice(item['image'].lastIndexOf('.') + 1) ? item['image'].slice(item['image'].lastIndexOf('.') + 1) : '无'}})</span>
       <el-button size="small" type="text" v-show="showSave" @click="save">确定</el-button>
     </div>
     <el-image
@@ -32,14 +32,16 @@ export default {
       isShow: false,
       isPlay: false,
       checkedImg: false,
-      checkedSound: false,
-      showSave: false
+      checkedSound: false
     }
   },
   computed: {
     ...mapState({
       assetsDomain: state => state.course.assetsDomain
-    })
+    }),
+    showSave () {
+      return this.checkedImg || this.checkedSound
+    }
   },
   methods: {
     // 使用图片（声音）
@@ -49,7 +51,6 @@ export default {
         flag: type === 'image' ? this.checkedImg : this.checkedSound,
         url: type === 'image' ? this.item.image : this.item.sound
       })
-      this.showSave = true
     },
     save () {
       if (this.checkedImg) {
@@ -94,18 +95,24 @@ export default {
     overflow: hidden;
     .form-type {
       margin-top: 10px;
+      height: 46px;
       width: 200px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      i {
-        float: right;
-        width: 17px;
-        height: 17px;
-        background-image: url('../../../assets/images/course/icon-voice.png');
-        background-repeat: no-repeat;
-        background-size: cover;
-        cursor: pointer;
+      span {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        i {
+          width: 17px;
+          height: 17px;
+          background-image: url('../../../assets/images/course/icon-voice.png');
+          background-repeat: no-repeat;
+          background-size: cover;
+          margin-right: 10px;
+          cursor: pointer;
+        }
       }
     }
     .form-img {
@@ -114,7 +121,7 @@ export default {
       min-height: 120px;
       background: #D8D8D8;
       border-radius: 4px;
-      margin-top: 15px;
+      margin-top: 4px;
     }
     .desc {
       width: 210px;
