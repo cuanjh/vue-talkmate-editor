@@ -1,4 +1,28 @@
+import { Loading, Message } from 'element-ui'
 let qiniu = require('qiniu-js')
+let activeAxios = 0
+let loadingInstance
+let timer
+
+const showLoading = () => {
+  activeAxios++
+  if (timer) {
+    clearTimeout(timer)
+  }
+  timer = setTimeout(() => {
+    if (activeAxios > 0) {
+      loadingInstance = Loading.service({ fullscreen: true })
+    }
+  }, 400)
+}
+
+const closeLoading = () => {
+  activeAxios--
+  if (activeAxios <= 0) {
+    clearTimeout(timer)
+    loadingInstance && loadingInstance.close()
+  }
+}
 
 /** 将base64转换为文件对象
  *  @param {String} base64 base64字符串
@@ -31,6 +55,7 @@ export const convertBase64ToBlob = (base64) => {
 }
 
 export const uploadQiniu = (file, token, key) => {
+  showLoading()
   return new Promise((resolve, reject) => {
     let finishedAttr = []
     let compareChunks = []
@@ -78,15 +103,17 @@ export const uploadQiniu = (file, token, key) => {
       },
       complete: (res) => {
         resolve(res)
+        closeLoading()
       }
     })
   }, error => {
     // 请求异常处理
-    this.$message({
+    Message({
       showClose: true,
       message: '好像没有成功哦，再试一次吧~',
       type: 'error'
     })
+    closeLoading()
     console.log(error)
   })
 }
