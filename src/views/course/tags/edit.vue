@@ -97,7 +97,7 @@
                 <div class="block">
                   <el-upload
                     action="#"
-                    accept="image/png,image/jpg,image/jpeg"
+                    accept="image/webp"
                     :on-change="uploadCoverOnchange"
                     :show-file-list="false"
                     :auto-upload="false">
