@@ -10,6 +10,9 @@
           <el-form-item label="名称：">
             <el-input v-model="form.name" maxlength="25" show-word-limit></el-input>
           </el-form-item>
+          <el-form-item label="版本号：">
+            <el-input v-model="form.version" placeholder="V1（大写V + 数字）" maxlength="25" show-word-limit></el-input>
+          </el-form-item>
           <el-form-item label="版本描述：">
             <div class="input-box" v-for="l in langInfos.filter(item => {return item.langKey == 'zh-CN'})" :key="'desc' + l.langKey">
               <el-input type="textarea" v-model="form.desc[l.langKey]"></el-input>
@@ -152,9 +155,10 @@ export default {
         })
       }
       if (this.type === 'add') {
-        this.form.name = params.obj.name
+        this.form.name = ''
         this.form.parent_uuid = params.obj.parent_uuid
         this.versions = params.versions
+        this.form.version = ''
         // this.form.version = params.obj.name
         this.cover = []
         this.form.desc = {}
@@ -226,16 +230,6 @@ export default {
       console.log(this.form)
       await this.upload()
       if (this.type === 'add') {
-        let versionNum = 0
-        if (this.versions.length) {
-          let arr = this.versions.filter(item => {
-            return item.module === this.form.module
-          })
-          if (arr && arr.length) {
-            versionNum = arr.length
-          }
-        }
-        this.form.version = 'v' + (versionNum + 1)
         let res = await addCourseVersion(this.form)
         console.log(res)
         if (res.success) {
@@ -260,6 +254,7 @@ export default {
             name: this.form.name ? this.form.name : '',
             tags: [],
             title: this.form.title ? this.form.title : {},
+            version: this.form.version,
             update_time: this.form.update_time ? this.form.update_time : 0
           }
         }
