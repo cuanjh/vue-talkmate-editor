@@ -170,7 +170,7 @@ export default {
         if (valid) {
           let startTime = (new Date(this.date + ' ' + moment(this.times[0]).format('HH:mm:ss'))).getTime() / 1000
           let endTime = (new Date(this.date + ' ' + moment(this.times[1]).format('HH:mm:ss'))).getTime() / 1000
-          this.form.date = this.date
+          this.form.date = moment(this.date).format('YYYY-MM-DD')
           this.form.startTime = startTime
           this.form.EndTime = endTime
           editLiveCourse(this.form).then(res => {
