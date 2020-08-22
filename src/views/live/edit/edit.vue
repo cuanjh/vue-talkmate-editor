@@ -140,7 +140,7 @@
           </el-upload>
           <el-tag type="warning">注：讲师照片将在发现页小图和分类课程-直播处展示</el-tag>
         </el-form-item>
-        <el-form-item label="直播老师" prop="selTeacher" v-show="false">
+        <el-form-item label="直播老师" prop="selTeacher">
           <el-select v-model="form.selTeacher" filterable placeholder="请选择直播老师">
             <el-option
               v-for="item in teacherList"
@@ -341,9 +341,8 @@ import {
   getInfoTokenUploadFile,
   getDisChannelList,
   addLive,
-  editLive
-  // ,
-  // getTeacherList
+  editLive,
+  getTeacherList
 } from '@/api/course'
 import { mapState } from 'vuex'
 export default {
@@ -473,16 +472,16 @@ export default {
       this.langList = [...this.langList, ...langs]
     })
 
-    // getTeacherList({
-    //   page_index: 1,
-    //   page_size: 100,
-    //   status: 3
-    // }).then(res => {
-    //   if (res.success && res.data) {
-    //     this.teacherList = res.data
-    //     console.log(this.teacherList)
-    //   }
-    // })
+    getTeacherList({
+      page_index: 1,
+      page_size: 100,
+      status: 3
+    }).then(res => {
+      if (res.success && res.data) {
+        this.teacherList = res.data
+        console.log(this.teacherList)
+      }
+    })
     this.flag = this.$route.query.flag
     if (this.flag === 'edit') {
       this.initEditInfo()
