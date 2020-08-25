@@ -1402,3 +1402,55 @@ export const approveTeacher = (data) => {
     data
   })
 }
+
+/**
+ * @Summary 课件列表
+ * @param {*} data
+ * @Router /editor/course_files/file_list [post]
+ */
+export const getCourseFiles = (data) => {
+  return service({
+    url: '/editor/course_files/file_list',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 创建文件转码
+ * @param {*} data
+ * @Router /editor/course_files/create_transcode [post]
+ */
+export const createFileTranscode = (data) => {
+  return service({
+    url: '/editor/course_files/create_transcode',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 查询文件转码任务
+ * @param {*} data
+ * @Router /editor/course_files/describe_transcode [post]
+ */
+export const describeFileTranscode = (data) => {
+  return service({
+    url: '/editor/course_files/describe_transcode',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 删除课件
+ * @param {*} data
+ * @Router /editor/course_files/delete_file [post]
+ */
+export const delCourseFile = (data) => {
+  return service({
+    url: '/editor/course_files/delete_file',
+    method: 'post',
+    data
+  })
+}

@@ -82,7 +82,10 @@ service.interceptors.response.use(
     if (response.data.success) {
       return response.data
     } else {
-      let msg = response.data.data.err
+      let msg = ''
+      if (response.data.data && response.data.data.err) {
+        msg = response.data.data.err
+      }
       if (!msg) {
         msg = response.data.msg
       }
