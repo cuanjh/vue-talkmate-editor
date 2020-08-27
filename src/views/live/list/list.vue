@@ -43,8 +43,10 @@
       </el-table-column>
       <el-table-column
         label="序号"
-        type="index"
-        width="50">
+        width="74">
+        <template slot-scope="scope">
+          <el-input v-model.number="scope.row.room.list_order" max="3" @change="changeModuleOrder(scope.row.room)" size="small"></el-input>
+        </template>
       </el-table-column>
       <el-table-column
         width="450"
@@ -152,7 +154,8 @@ import {
   delLive,
   onlineLiveCourse,
   offlineLiveCourse,
-  getLivePushUrl
+  getLivePushUrl,
+  sortLiveModule
 } from '@/api/course'
 import { mapState, mapActions } from 'vuex'
 
@@ -403,6 +406,14 @@ export default {
     },
     onlinePerson (c) {
       this.$refs['onlinePersons'].show(c)
+    },
+    changeModuleOrder (room) {
+      console.log(room)
+      sortLiveModule({ code: room.code, list_order: room.list_order }).then(res => {
+        if (res.success) {
+          this.initData()
+        }
+      })
     }
   }
 }

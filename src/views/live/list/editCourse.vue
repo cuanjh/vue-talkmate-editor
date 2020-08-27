@@ -87,6 +87,7 @@ export default {
       form: {
         uuid: '',
         videoUrl: '',
+        videoTime: '',
         videoCover: '',
         finishTitle: '',
         finishInfo: '',
@@ -137,6 +138,7 @@ export default {
       this.form = {
         videoUrl: '',
         videoCover: '',
+        videoTime: '',
         finishTitle: '',
         finishInfo: '',
         weixinNo: '',
@@ -158,6 +160,12 @@ export default {
         url = 'live/images/' + date + '/' + file.uid + '.' + ext
       } else if (dataFrom === 'video') {
         url = 'live/videos/' + date + '/' + file.uid + '.' + ext
+        let createUrl = URL.createObjectURL(file.raw)
+        let audioElement = new Audio(createUrl)
+        audioElement.addEventListener('loadedmetadata', (e) => {
+          console.log(audioElement.duration)
+          this.form.videoTime = Math.round(audioElement.duration)
+        })
       }
       let res = await uploadQiniu(file.raw, this.token, url)
       this.$set(this.form, feild, this.uploadfileDomain + res.key)

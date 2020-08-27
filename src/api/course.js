@@ -1050,6 +1050,19 @@ export const addLive = (data) => {
 }
 
 /**
+ * @Summary 设置直播专辑顺序号
+ * @param {*} data
+ * @Router /live/edit_list_order [post]
+ */
+export const sortLiveModule = (data) => {
+  return service({
+    url: '/live/edit_list_order',
+    method: 'post',
+    data
+  })
+}
+
+/**
  * @Summary 编辑直播
  * @param {*} data
  * @Router /live/edit [post]
