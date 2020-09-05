@@ -94,6 +94,9 @@
               :on-success="uploadSuccess">
             </el-upload></div>
           </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="下载课程内容" placement="top">
+            <el-button type="primary" icon="el-icon-download" :disabled="(userInfo.authorityId !== '1' && item.curUserAuth['auth'] == 'r')" circle @click="download(item)"></el-button>
+          </el-tooltip>
         </div>
       </div>
     </div>
@@ -532,6 +535,9 @@ export default {
           message: res.data.err
         })
       }
+    },
+    download (item) {
+      window.location.href = process.env.VUE_APP_BASE_API + '/editor/content/export?uuid=' + item.uuid
     }
   }
 }
