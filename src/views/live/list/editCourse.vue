@@ -16,6 +16,9 @@
           </el-upload>
         </el-input>
       </el-form-item>
+      <el-form-item v-if="form.videoUrl">
+        <video ref="video" :src="form.videoUrl" controls style="width: 200px;"></video>
+      </el-form-item>
       <el-form-item label="视频封面" prop="videoCover">
         <el-input v-model="form.videoCover" placeholder="https://">
           <el-upload slot="prepend"
@@ -132,6 +135,7 @@ export default {
         new Date(st * 1000),
         new Date(et * 1000)
       ]
+      console.log(this.$refs['video'])
       this.dialogFormVisible = true
     },
     resetForm () {
@@ -160,12 +164,6 @@ export default {
         url = 'live/images/' + date + '/' + file.uid + '.' + ext
       } else if (dataFrom === 'video') {
         url = 'live/videos/' + date + '/' + file.uid + '.' + ext
-        let createUrl = URL.createObjectURL(file.raw)
-        let audioElement = new Audio(createUrl)
-        audioElement.addEventListener('loadedmetadata', (e) => {
-          console.log(audioElement.duration)
-          this.form.videoTime = Math.round(audioElement.duration)
-        })
       }
       let res = await uploadQiniu(file.raw, this.token, url)
       this.$set(this.form, feild, this.uploadfileDomain + res.key)
@@ -181,6 +179,7 @@ export default {
           this.form.date = moment(this.date).format('YYYY-MM-DD')
           this.form.startTime = startTime
           this.form.EndTime = endTime
+          this.form.videoTime = parseInt(this.$refs.video.duration)
           editLiveCourse(this.form).then(res => {
             if (res.success) {
               this.$message({

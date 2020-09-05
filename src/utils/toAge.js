@@ -1,9 +1,9 @@
 export const getAge = (strBirthday) => {
   let returnAge
   let strBirthdayArr = strBirthday.split('-')
-  let birthYear = strBirthdayArr[0]
-  let birthMonth = strBirthdayArr[1]
-  let birthDay = strBirthdayArr[2]
+  let birthYear = parseInt(strBirthdayArr[0])
+  let birthMonth = parseInt(strBirthdayArr[1])
+  let birthDay = parseInt(strBirthdayArr[2])
   let d = new Date()
   let nowYear = d.getFullYear()
   let nowMonth = d.getMonth() + 1

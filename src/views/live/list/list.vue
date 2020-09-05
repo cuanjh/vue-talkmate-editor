@@ -14,7 +14,7 @@
           <div class="live-courses">
             <el-row :gutter="5" :class="['course', { 'notStarted': props.row.courses[index].state == 0, 'inClass': props.row.courses[index].state == 1 }]" v-for="(c, index) in props.row.courses" :key="c.uuid">
               <el-col :span="2" class="course-column">{{ '第' + (index + 1) + '课'}}</el-col>
-              <el-col :span="5" class="course-column">{{ c.title }}</el-col>
+              <el-col :span="4" class="course-column">{{ c.title }}</el-col>
               <el-col :span="5" class="course-column">{{ formatCourseDate(c) }}</el-col>
               <el-col :span="1" class="course-column">{{ ' (' + c.online_number + ') ' }}</el-col>
               <el-col :span="4" class="course-column">
@@ -24,7 +24,7 @@
                   <el-option :label="'已下课'" :disabled="props.row.courses[index].state == 0" :value="-1"></el-option>
                 </el-select>
               </el-col>
-              <el-col :span="7" class="course-column">
+              <el-col :span="8" class="course-column">
                 <el-row>
                   <el-button type="primary" size="small" class="btnPushLink" @click="publishComment(c)">发表评论</el-button>
                   <el-button type="primary" size="small" class="btnPushLink" @click="getComments(c)">评论列表</el-button>
@@ -35,14 +35,17 @@
                   </el-tooltip>
                   <el-button type="primary" size="small" class="btnPushLink" @click="editLiveCourse(c)">编辑</el-button>
                   <el-button type="primary" size="small" class="btnPushLink" @click="onlinePerson(c)">在线统计</el-button>
+                  <el-button type="primary" size="small" class="btnPushLink" @click="courseFiles(c)">课件</el-button>
                 </el-row>
               </el-col>
             </el-row>
           </div>
         </template>
       </el-table-column>
+      <el-table-column type="index">
+      </el-table-column>
       <el-table-column
-        label="序号"
+        label="排序号"
         width="74">
         <template slot-scope="scope">
           <el-input v-model.number="scope.row.room.list_order" max="3" @change="changeModuleOrder(scope.row.room)" size="small"></el-input>
@@ -134,6 +137,7 @@
     <edit-course ref="editCourse" @initData="initData"  />
     <subscribe ref="subscribe" />
     <online-persons ref="onlinePersons" />
+    <course-files ref="courseFiles" />
   </div>
 </template>
 
@@ -146,6 +150,7 @@ import CommentList from './commentList'
 import EditCourse from './editCourse'
 import Subscribe from './subscribe'
 import OnlinePersons from './onlinePersons'
+import CourseFiles from './courseFiles'
 
 import {
   getLiveList,
@@ -185,7 +190,8 @@ export default {
     CommentList,
     EditCourse,
     Subscribe,
-    OnlinePersons
+    OnlinePersons,
+    CourseFiles
   },
   mounted () {
     this.getMajia()
@@ -414,6 +420,9 @@ export default {
           this.initData()
         }
       })
+    },
+    courseFiles (c) {
+      this.$refs['courseFiles'].show(c)
     }
   }
 }
