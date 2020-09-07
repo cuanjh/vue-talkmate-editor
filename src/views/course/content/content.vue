@@ -59,17 +59,17 @@
       <div id="track-container" class="track-container">
         <!-- :style="{width: (isShowEditFile && tracks.length > 1) ? '401px' : (tracks.length > 2 ? '602px' : 'auto'), maxWidth: '600px'}" -->
         <div
-          :class="['track-wrap', {'track-wrap-width': isShowEditFile}]"
-          :style="{width: settingWidth}"
+          class="track-wrap"
+          style="width: 602px"
           id="track-wrap">
-          <div class="track-item" data-intro='右键点击空白区域可操作右键菜单' v-for="(item,index) in tracks" :key="index">
+          <div class="track-item" data-intro='右键点击空白区域可操作右键菜单' v-for="index in 5" :key="index">
             <div class="list" :id="'track-item-' + index">
               <folder
                 :ref="'folder-' + f.uuid"
-                v-for="f in item"
+                v-for="f in tracks[index - 1]"
                 :key="f.uuid"
                 :folder="f"
-                :trackNum="index"
+                :trackNum="index - 1"
                 :name="f.name"
                 :class="{
                   'active': path.indexOf(f.uuid) > -1,
@@ -81,7 +81,7 @@
                 @resetTrackData="resetTrackData"
               />
             </div>
-            <div class="other" @contextmenu="otherContextMenu($event, item[0], index)"></div>
+            <div class="other" @contextmenu="otherContextMenu($event, tracks[index - 1][0], index)"></div>
           </div>
         </div>
         <transition name="fade" mode="out-in">
@@ -477,27 +477,54 @@ export default {
         if (this.courseContentPath === '') {
           this.courseContentPath = localStorage.getItem('courseContentPath')
         }
-        if (this.courseContentPath) {
+        if (this.courseContentPath && this.tracks[num]) {
           let arr = this.courseContentPath.split('/')
           let fIndex = this.tracks[num].findIndex(item => {
             return item.uuid === arr[num]
           })
           if (fIndex === -1) {
             this.courseContentPath = ''
+            setTimeout(() => {
+              this.trackLeftScroll()
+            }, 100)
           } else {
             this.clickFolder({ folder: this.tracks[num][fIndex], trackNum: num })
           }
         }
         setTimeout(() => {
-          var scrollDom = document.getElementById('track-wrap')
-          scrollDom.scrollLeft = scrollDom.scrollWidth
           if (this.version.selVersion && num === 0 && this.tracks[0].length === 0) {
             introJs().start()
           }
           if (this.tracks.length) {
             this.setTrackSortable()
           }
-        }, 10)
+        }, 500)
+      }
+    },
+    trackLeftScroll () {
+      let itemDom = document.getElementById('track-item-' + (this.tracks.length - 1))
+      if (!itemDom) {
+        return
+      }
+      var scrollDom = document.getElementById('track-wrap')
+      let sl = scrollDom.scrollLeft
+      let itemOL = itemDom.offsetLeft
+      if (itemOL - 200 >= 0) {
+        let si = setInterval(() => {
+          if (sl > 0 && sl < itemOL - 200) {
+            scrollDom.scrollLeft = sl++
+            if (sl > itemOL - 200) {
+              clearInterval(si)
+              scrollDom.scrollLeft = itemOL - 200
+            }
+          } else {
+            scrollDom.scrollLeft = sl--
+            if (sl < itemOL - 200) {
+              clearInterval(si)
+              scrollDom.scrollLeft = itemOL - 200
+            }
+          }
+        }, 1)
       }
     },
     setTrackSortable () {
@@ -505,7 +532,10 @@ export default {
       //   return false
       // }
       for (let i = 0; i < this.tracks.length; i++) {
-        let $trackItem = document.getElementById('track-item-' + i)
+        if (this.tracks[i].length === 0) {
+          break
+        }
+        let $trackItem = document.getElementById('track-item-' + (i + 1))
         /* eslint-disable */
         new Sortable($trackItem, {
           group: 'shared',
@@ -516,8 +546,8 @@ export default {
             let toId = evt.to.id
 
             // 左右拖拽
-            let fromTrackNum = parseInt(fromId.split('-').pop())
-            let toTrackNum = parseInt(toId.split('-').pop())
+            let fromTrackNum = parseInt(fromId.split('-').pop()) - 1
+            let toTrackNum = parseInt(toId.split('-').pop()) - 1
             let fromTrack = this.tracks[fromTrackNum][evt.oldIndex]
             let toTrack = this.tracks[toTrackNum]
             let toPUUID = this.uuid
@@ -539,7 +569,7 @@ export default {
             let fromId = evt.from.id
             let toId = evt.to.id
             // 上下拖拽
-            let trackNum = parseInt(toId.split('-').pop())
+            let trackNum = parseInt(toId.split('-').pop()) - 1
             let track = this.tracks[trackNum]
             let dragObj = track[evt.oldIndex]
             let newOrder = dragObj.list_order
@@ -756,7 +786,7 @@ export default {
       let trackNum = params.trackNum
       let track = this.tracks[params.trackNum]
       let pUUID = ''
-      if (track[0] && track[0].parent_uuid) {
+      if (track && track[0] && track[0].parent_uuid) {
         pUUID = track[0].parent_uuid
       } else {
         pUUID = this.uuid
@@ -809,7 +839,7 @@ export default {
       this.pathDesc = ''
       // 获取当前轨道内所有文件的最大顺序号
       params['maxOrder'] = 0
-      let num = params.trackNum + 1
+      let num = params.trackNum
       let curTrack = tracks[num]
       if (curTrack && curTrack.length) {
         let arr = []
@@ -842,7 +872,9 @@ export default {
       params['handler'] = 'edit'
       params['type'] = params.folder.type
       params['uuid'] = params.folder.uuid
-      this.$refs['editCatalog1'].show(params)
+      setTimeout(() => {
+        this.$refs['editCatalog1'].show(params)
+      }, 0)
     },
     // 编辑目录完成后拉取数据重置当前轨道的数据
     resetTrackData (params) {
@@ -860,12 +892,15 @@ export default {
       // })
     },
     getParentAuthorities (pUUID, trackNum) {
-      if (trackNum === -1) {
-        return null
+      if (trackNum === -1 || !this.tracks[trackNum]) {
+        return
       }
       let folder = this.tracks[trackNum].find(item => {
         return item.uuid === pUUID
       })
+      if (!folder) {
+        return
+      }
       let authorities = folder.authorities
       if (authorities && authorities.length) {
         return authorities
@@ -999,11 +1034,24 @@ export default {
     flex-direction: row;
     width: auto;
     height: 100%;
-    overflow-x: auto;
-    transition: width, scrollLeft ease-in .5s;
-    -moz-transition: width, scrollLeft ease-in .5s; /* Firefox 4 */
-    -webkit-transition: width, scrollLeft ease-in .5s; /* Safari 和 Chrome */
-    -o-transition: width, scrollLeft ease-in .5s; /* Opera */
+    background: #FAFAFA;
+    overflow-x: scroll;
+    -webkit-overflow-scrolling: touch;
+    // &::-webkit-scrollbar {
+    //   width: 100%;
+    //   height: 16px;
+    //   border-top: 1px solid rgba($color: #333333, $alpha: .1);
+    //   border-bottom: 1px solid rgba($color: #333333, $alpha: .1);
+    // }
+    // &::-webkit-scrollbar-thumb {
+    //   border: 4px solid #FAFAFA;
+    //   background: rgba($color: #000000, $alpha: 0.2);
+    //   border-radius: 8px;
+    // }
+    // transition: width, scrollLeft ease-in .5s;
+    // -moz-transition: width, scrollLeft ease-in .5s; /* Firefox 4 */
+    // -webkit-transition: width, scrollLeft ease-in .5s; /* Safari 和 Chrome */
+    // -o-transition: width, scrollLeft ease-in .5s; /* Opera */
     .track-item {
       vertical-align: top;
       height: 100%;
@@ -1013,6 +1061,12 @@ export default {
       overflow-y: scroll;
       display: flex;
       flex-direction: column;
+      // &::-webkit-scrollbar {
+      //   width: 16px;
+      //   height: 100%;
+      //   border-left: 1px solid rgba($color: #333333, $alpha: .1);
+      //   border-right: 1px solid rgba($color: #333333, $alpha: .1);
+      // }
       .list {
         width: 100%;
       }
@@ -1028,14 +1082,6 @@ export default {
   // }
 }
 
-.slide-list::-webkit-scrollbar {
-  width: 2px;
-  background: rgba($color: #D8D8D8, $alpha: 0.1)
-}
-
-.slide-list::-webkit-scrollbar-thumb {
-  background: rgba($color: #000000, $alpha: 0.4);
-}
 .back {
   .el-button {
     color: rgba($color: #ffffff, $alpha: 0.6);

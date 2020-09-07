@@ -335,7 +335,6 @@ export default {
               num: this.form.num
             }
             addCatalog(obj1).then(res => {
-              this.trackNum += 1
               if (res.success) {
                 this.$message({
                   type: 'success',

@@ -171,7 +171,7 @@
         <el-form-item label-width="140px" :label="f.name" v-if="(f.data_from !== 'part_of_speech' && f.data_from !== 'content_types' && f.feild !== 'list_order' && f.type !== 'template' && f.type !== 'templateArray' && f.feild !== 'sentence_phoneticize' && f.feild !== 'options_phoneticize') || (f.type == 'template' && contents[activeFormIndex]['' + f.feild + '']) || ((version['selLang'] == 'JPN' || version['selLang'] == 'CHI') && (f.feild == 'sentence_phoneticize' || f.feild == 'options_phoneticize')) || (f.feild === 'options' && f.type == 'array' && contents[activeFormIndex][f.feild])">
           <!-- string 或 int -->
           <el-input
-            :maxlength="150" show-word-limit
+            :maxlength="500" show-word-limit
             v-if="(f.type == 'string' && f.data_from == '') || f.type == 'int' || f.type == 'template'"
             v-model="contents[activeFormIndex]['' + f.feild + '']"
             :disabled="f.feild == 'list_order' || f.type == 'template'">
@@ -199,6 +199,7 @@
               </el-tooltip>
             </el-upload>
             <el-button slot="append" v-if="f.data_from == 'upload_audio' && f.feild == 'motherSound'" @click="motherSoundPlay(contents[activeFormIndex]['' + f.feild + ''])">试听</el-button>
+            <i slot="suffix" class="el-input__icon el-icon-download" @click="download(contents[activeFormIndex]['' + f.feild + ''])"></i>
           </el-input>
           <el-button v-if="f.data_from == 'upload_audio' && f.feild == 'sound'" type="text" @click="toggleRecorder">在线录音</el-button>
           <audio-recorder ref="recorder" @saveRecorder="saveRecorder" v-if="f.data_from == 'upload_audio'"/>
@@ -1153,6 +1154,30 @@ export default {
         names: names
       }
       addMoreImages(obj)
+    },
+    async download (url) {
+      if (!url) {
+        return
+      }
+      let name = url.slice(url.lastIndexOf('/') + 1)
+      let response = await fetch(this.assetsDomain + url)
+      // 内容转变成blob地址
+      let blob = await response.blob()
+      // 创建隐藏的可下载链接
+      let objectUrl = window.URL.createObjectURL(blob)
+      let a = document.createElement('a')
+      // 地址
+      a.href = objectUrl
+      // 修改文件名
+      a.download = name
+      // 触发点击
+      document.body.appendChild(a)
+      a.click()
+      // 移除
+      setTimeout(() => {
+        document.body.removeChild(a)
+      }, 1000)
+      console.log(response)
     }
   }
 }
@@ -1362,5 +1387,9 @@ export default {
 <style>
 .el-checkbox__label {
   white-space: break-spaces;
+}
+
+.el-icon-download {
+  cursor: pointer;
 }
 </style>

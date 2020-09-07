@@ -94,7 +94,7 @@
               :on-success="uploadSuccess">
             </el-upload></div>
           </el-tooltip>
-          <el-tooltip class="item" effect="dark" content="下载课程内容" placement="top">
+          <el-tooltip class="item" effect="dark" content="下载课程内容" placement="top" v-show="false">
             <el-button type="primary" icon="el-icon-download" :disabled="(userInfo.authorityId !== '1' && item.curUserAuth['auth'] == 'r')" circle @click="download(item)"></el-button>
           </el-tooltip>
         </div>

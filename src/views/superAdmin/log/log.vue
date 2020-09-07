@@ -242,7 +242,7 @@ export default {
         const res = await rollbackOperateLog({ uuid: row.uuid })
         if (res.success) {
           this.$message({ type: 'success', message: '回滚成功' })
-          this.search()
+          // this.search()
         }
       }).catch(() => {
         this.$message({

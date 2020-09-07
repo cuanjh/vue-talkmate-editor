@@ -49,6 +49,9 @@
           <div class="menu-item" v-show="userInfo.authorityId === '1'">
             <div class="name" @click="onlineJob">上线</div>
           </div>
+          <div class="menu-item" v-show="userInfo.authorityId === '1'">
+            <div class="name" @click="download">下载</div>
+          </div>
           <div class="menu-item" v-show="authorityUsers && authorityUsers.length" @mouseenter="isShowAuthority = true" @mouseleave="isShowAuthority = false">
             <div class="name">
               权限设置
@@ -266,7 +269,7 @@ export default {
     },
     paste () {
       let num = this.trackNum
-      if (this.type === 'other') {
+      if (this.type !== 'other') {
         num = num + 1
       }
       this.$emit('paste', { trackNum: num })
@@ -434,6 +437,17 @@ export default {
           message: '已取消上线'
         })
       })
+    },
+    // 下载
+    download () {
+      if (this.trackNum > 1) {
+        this.$message({
+          type: 'warning',
+          message: '只允许下载一、二级目录'
+        })
+        return false
+      }
+      window.location.href = process.env.VUE_APP_BASE_API + '/editor/content/export?uuid=' + this.folder.uuid
     }
   }
 }
