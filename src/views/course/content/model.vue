@@ -1391,5 +1391,13 @@ export default {
 
 .el-icon-download {
   cursor: pointer;
+  color: #FFF;
+  background-color: #409EFF;
+  border-color: #409EFF;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+  line-height: 24px;
 }
 </style>

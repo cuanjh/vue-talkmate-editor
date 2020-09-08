@@ -295,6 +295,42 @@ export const getCourseVersionList = (data) => {
 }
 
 /**
+ * @Summary 导出课程内容
+ * @Produce  application/json
+ * @param {*} data
+ * @Router /editor/content/export [post]
+ */
+export const exportCourseContent = (data) => {
+  return service({
+    url: '/editor/content/export',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 导出课程内容
+ * @Produce  application/json
+ * @param {*} data
+ * @Router /editor/content/export_list [post]
+ */
+export const exportCourseContentList = (data) => {
+  return service({
+    url: '/editor/content/export_list',
+    method: 'post',
+    data
+  })
+}
+
+// 课程链接下载
+export const exportDownload = (data) => {
+  return service({
+    url: data.url,
+    method: 'get'
+  })
+}
+
+/**
  * @Summary 添加课程版本
  * @Produce  application/json
  * @param {*} data

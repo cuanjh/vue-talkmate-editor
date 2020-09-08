@@ -53,7 +53,28 @@
           </div>
         </div>
       </div>
-      <div class="tips"><span class="desc">(ALT + “↑、↓、←、→” 组合键，能够切换课程目录)</span></div>
+      <div class="tips">
+        <span class="desc">(ALT + “↑、↓、←、→” 组合键，能够切换课程目录)</span>
+        <el-popover
+          placement="right"
+          width="400"
+          @show="showExportList"
+          trigger="click">
+          <el-tag type="warning">显示最新 5 条可下载的数据</el-tag>
+          <el-table :data="exportList">
+            <el-table-column property="created_on" label="创建日期" :formatter="formatDate"></el-table-column>
+            <el-table-column property="name" label="标题"></el-table-column>
+            <el-table-column label="操作">
+              <template slot-scope="scope">
+                <el-button @click="handleDownload(scope.row)" :disabled="scope.row.status !== 2" type="text" size="small">{{scope.row.status === 2 ? '下载' : '文件生成中...' }}</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+          <el-badge slot="reference" :value="exportNum" :hidden="exportNum == 0" class="item" type="warning">
+            <el-button size="small" icon="el-icon-message-solid" type="primary" circle></el-button>
+          </el-badge>
+        </el-popover>
+      </div>
     </el-header>
     <el-main>
       <div id="track-container" class="track-container">
@@ -118,6 +139,7 @@
       @resetTrackData="resetTrackData"
       @lookPreview="previewContent"
       @setIsShow="setIsShow"
+      @refreshDownloadList="refreshDownloadList"
     />
     <edit-catalog ref="editCatalog" @resetTrackData="resetTrackData"/>
     <edit-form ref="editForm"/>
@@ -128,6 +150,8 @@
 
 <script>
 import Sortable from 'sortablejs'
+import moment from 'moment'
+
 import Folder from './folder'
 // import Slide from './slide'
 import RightMenu from './rightMenu'
@@ -150,12 +174,15 @@ import {
   editCatalog,
   copyCatalog,
   delCatalog,
-  moveCatalog
+  moveCatalog,
+  exportCourseContentList
 } from '@/api/course'
 const introJs = require('intro.js')
 export default {
   data () {
     return {
+      exportList: [],
+      exportNum: 0,
       isHideCatalog1: true,
       isShow: true,
       isShowEditFile: false,
@@ -502,30 +529,32 @@ export default {
       }
     },
     trackLeftScroll () {
-      let itemDom = document.getElementById('track-item-' + (this.tracks.length - 1))
+      let num = this.tracks.length - 1
+      if (num === 0) {
+        num = 1
+      }
+      let itemDom = document.getElementById('track-item-' + num)
       if (!itemDom) {
         return
       }
       var scrollDom = document.getElementById('track-wrap')
       let sl = scrollDom.scrollLeft
       let itemOL = itemDom.offsetLeft
-      if (itemOL - 200 >= 0) {
-        let si = setInterval(() => {
-          if (sl > 0 && sl < itemOL - 200) {
-            scrollDom.scrollLeft = sl++
-            if (sl > itemOL - 200) {
-              clearInterval(si)
-              scrollDom.scrollLeft = itemOL - 200
-            }
-          } else {
-            scrollDom.scrollLeft = sl--
-            if (sl < itemOL - 200) {
-              clearInterval(si)
-              scrollDom.scrollLeft = itemOL - 200
-            }
+      let si = setInterval(() => {
+        if (sl > 0 && sl < itemOL - 200) {
+          scrollDom.scrollLeft = sl++
+          if (sl > itemOL - 200) {
+            clearInterval(si)
+            scrollDom.scrollLeft = itemOL - 200
           }
-        }, 1)
-      }
+        } else {
+          scrollDom.scrollLeft = sl--
+          if (sl < itemOL - 200) {
+            clearInterval(si)
+            scrollDom.scrollLeft = itemOL - 200
+          }
+        }
+      }, 1)
     },
     setTrackSortable () {
       // if (this.lowerRoleUser) {
@@ -943,6 +972,43 @@ export default {
         })
       }
       console.log(this.authorityUsers)
+    },
+    showExportList () {
+      this.exportList = []
+      exportCourseContentList({ code: this.version.selCourse.uuid, pageNo: 0, pageSize: 999 }).then(res => {
+        console.log(res)
+        this.exportList = res.data.data.slice(0, 5)
+        this.exportNum = this.exportList.filter(item => {
+          return item.status !== 2
+        }).length
+      })
+    },
+    formatDate (row, column, cellValue, index) {
+      return moment(cellValue).format('YYYY-MM-DD HH:mm')
+    },
+    refreshDownloadList () {
+      this.showExportList()
+      let timer = setInterval(() => {
+        this.showExportList()
+        if (this.exportNum === 0) {
+          clearInterval(timer)
+        }
+      }, 5000)
+    },
+    async handleDownload (row) {
+      // window.location.href = process.env.VUE_APP_BASE_API + row.url
+      let a = document.createElement('a')
+      // 地址
+      a.href = process.env.VUE_APP_BASE_API + row.url
+      // 修改文件名
+      a.download = row.url.slice(row.url.lastIndexOf('/') + 1)
+      // 触发点击
+      document.body.appendChild(a)
+      a.click()
+      // 移除
+      setTimeout(() => {
+        document.body.removeChild(a)
+      }, 1000)
     }
   }
 }
@@ -982,6 +1048,7 @@ export default {
   .desc {
     color: #FFFFFF;
     font-size: 12px;
+    margin-right: 30px;
   }
 }
 .left {

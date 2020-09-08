@@ -135,7 +135,8 @@ import {
   resetExamin,
   examin,
   addOnlineJob,
-  setIsShowCatalog
+  setIsShowCatalog,
+  exportCourseContent
 } from '@/api/course'
 import { mapState } from 'vuex'
 export default {
@@ -163,7 +164,8 @@ export default {
   },
   computed: {
     ...mapState({
-      userInfo: state => state.user.userInfo
+      userInfo: state => state.user.userInfo,
+      version: state => state.course.version
     }),
     // 当前用户的审核权限
     curUserAuthority () {
@@ -447,7 +449,15 @@ export default {
         })
         return false
       }
-      window.location.href = process.env.VUE_APP_BASE_API + '/editor/content/export?uuid=' + this.folder.uuid
+      exportCourseContent({ code: this.version.selCourse.uuid, uuid: this.folder.uuid, level: this.trackNum + 1 + '' }).then(res => {
+        if (res.success) {
+          this.$message({
+            type: 'success',
+            message: '请求已发送，请到下载任务列表中下载'
+          })
+          this.$emit('refreshDownloadList')
+        }
+      })
     }
   }
 }
