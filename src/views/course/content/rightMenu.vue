@@ -264,10 +264,12 @@ export default {
     rename () {
       let uuid = this.folder.uuid
       this.$emit('rename', uuid)
+      this.hide()
     },
     copy () {
       let uuid = this.folder.uuid
       this.$emit('copy', uuid)
+      this.hide()
     },
     paste () {
       let num = this.trackNum
@@ -275,10 +277,12 @@ export default {
         num = num + 1
       }
       this.$emit('paste', { trackNum: num })
+      this.hide()
     },
     del () {
       let num = this.trackNum
       this.$emit('del', { trackNum: num, folder: this.folder })
+      this.hide()
     },
     addFolder () {
       let uuid
@@ -288,6 +292,7 @@ export default {
         uuid = this.folder.uuid
       }
       this.$emit('editCatalog', { handler: 'add', type: 'catalog', uuid: uuid, trackNum: this.trackNum, clickType: this.type })
+      this.hide()
     },
     addDocument () {
       let uuid
@@ -297,10 +302,12 @@ export default {
         uuid = this.folder.uuid
       }
       this.$emit('editCatalog', { handler: 'add', type: 'content', uuid: uuid, trackNum: this.trackNum, clickType: this.type })
+      this.hide()
     },
     editCatalog () {
       let uuid = this.folder.uuid
       this.$emit('editCatalog', { handler: 'edit', type: this.folder.type, uuid: uuid, folder: this.folder, trackNum: this.trackNum, clickType: this.type })
+      this.hide()
     },
     // 显示隐藏
     clickShow (show) {
@@ -315,6 +322,7 @@ export default {
           message: '设置成功'
         })
         this.$emit('resetTrackData', { pUUID: this.folder.parent_uuid, trackNum: this.trackNum, curUUID: this.folder.uuid })
+        this.hide()
       })
     },
     // 权限设置
@@ -335,6 +343,7 @@ export default {
           message: res.msg
         })
         this.$emit('resetTrackData', { pUUID: this.folder.parent_uuid, trackNum: this.trackNum })
+        this.hide()
       })
     },
     // 提交审核
@@ -360,12 +369,14 @@ export default {
             message: res.msg
           })
           this.$emit('resetTrackData', { pUUID: this.folder.parent_uuid, trackNum: this.trackNum })
+          this.hide()
         })
       }).catch(() => {
         this.$message({
           type: 'info',
           message: '已取消提交审核'
         })
+        this.hide()
       })
     },
     // 审核状态重置
@@ -379,6 +390,7 @@ export default {
           message: res.msg
         })
         this.$emit('resetTrackData', { pUUID: this.folder.parent_uuid, trackNum: this.trackNum })
+        this.hide()
       })
     },
     // 审核
@@ -407,6 +419,7 @@ export default {
               message: res.msg
             })
             this.$emit('resetTrackData', { pUUID: this.folder.parent_uuid, trackNum: this.trackNum })
+            this.hide()
           })
         } else {
           this.$message({
@@ -431,6 +444,7 @@ export default {
               message: '上线成功'
             })
             this.$emit('resetTrackData', { pUUID: this.folder.parent_uuid, trackNum: this.trackNum })
+            this.hide()
           }
         })
       }).catch(() => {
@@ -438,6 +452,7 @@ export default {
           type: 'info',
           message: '已取消上线'
         })
+        this.hide()
       })
     },
     // 下载
@@ -456,6 +471,7 @@ export default {
             message: '请求已发送，请到下载任务列表中下载'
           })
           this.$emit('refreshDownloadList')
+          this.hide()
         }
       })
     }

@@ -105,9 +105,7 @@
             <div class="other" @contextmenu="otherContextMenu($event, tracks[index - 1][0], index)"></div>
           </div>
         </div>
-        <transition name="fade" mode="out-in">
-          <edit-file ref="editFile" v-show="isShowEditFile"/>
-        </transition>
+        <edit-file ref="editFile" v-show="isShowEditFile"/>
         <edit-catalog1
           class="edit-catalog"
           ref="editCatalog1"
@@ -295,12 +293,6 @@ export default {
     document.onkeydown = null
   },
   watch: {
-    isShowEditFile (newVal, oldVal) {
-      setTimeout(() => {
-        var scrollDom = document.getElementById('track-wrap')
-        scrollDom.scrollLeft = scrollDom.scrollWidth
-      }, 0)
-    },
     'version.selCourse' (newVal, oldVal) {
       this.selCourseUUID = newVal.uuid
     }
@@ -516,6 +508,11 @@ export default {
             }, 100)
           } else {
             this.clickFolder({ folder: this.tracks[num][fIndex], trackNum: num })
+            if (arr.length === num + 2) {
+              setTimeout(() => {
+                this.trackLeftScroll()
+              }, 100)
+            }
           }
         }
         setTimeout(() => {
