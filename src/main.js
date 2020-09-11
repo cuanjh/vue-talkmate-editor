@@ -14,6 +14,8 @@ import AudioRecorder from '@/components/common/record'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 
+import axios from 'axios'
+
 // 引入video.js
 // import Videojs from 'video.js'
 // import 'video.js/dist/video-js.css'
@@ -32,6 +34,7 @@ Vue.filter('formatDate', formatDate)
 Vue.filter('urlFix', urlfix)
 
 Vue.config.productionTip = false
+Vue.prototype.$http = axios
 
 new Vue({
   render: h => h(App),

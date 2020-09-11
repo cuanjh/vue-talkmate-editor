@@ -1503,3 +1503,68 @@ export const delCourseFile = (data) => {
     data
   })
 }
+
+/**
+ * @Summary 创建二维码
+ * @param {*} data
+ * @Router /editor/qr_code/add [post]
+ */
+export const qrCodeAdd = (data) => {
+  return service({
+    url: '/editor/qr_code/add',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 二维码列表
+ * @param {*} data
+ * @Router /editor/qr_code/list [post]
+ */
+export const qrCodeList = (data) => {
+  return service({
+    url: '/editor/qr_code/list',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 删除二维码
+ * @param {*} data
+ * @Router /editor/qr_code/delete [post]
+ */
+export const qrCodeDel = (data) => {
+  return service({
+    url: '/editor/qr_code/delete',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 更新二维码
+ * @param {*} data
+ * @Router /editor/qr_code/update [post]
+ */
+export const qrCodeUpdate = (data) => {
+  return service({
+    url: '/editor/qr_code/update',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 获取二维码
+ * @param {*} data
+ * @Router /editor/qr_code/image [post]
+ */
+export const qrCodeImage = (data) => {
+  return service({
+    url: '/editor/qr_code/image',
+    method: 'post',
+    data
+  })
+}
