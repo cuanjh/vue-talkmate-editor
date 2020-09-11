@@ -64,7 +64,7 @@ export default {
       /* eslint-disable */
       let el = document.getElementById('sort-words')
       this.sortable = new Sortable(el, {
-        animation: 150,
+        animation: 0,
         onEnd: (evt) => {
           this.sortContents = []
           let toId = evt.to.id

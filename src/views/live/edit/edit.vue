@@ -949,7 +949,7 @@ export default {
     sortCourses () {
       let el = document.getElementById('course-list')
       let sortable = new Sortable(el, {
-        animation: 150,
+        animation: 0,
         onEnd: (evt) => {
           let newCourses = []
           let copyCourses = this.form.courses

@@ -51,7 +51,7 @@ export default {
       /* eslint-disable */
       let el = document.getElementById('sort-question')
       this.sortable = new Sortable(el, {
-        animation: 150,
+        animation: 0,
         onEnd: (evt) => {
           let toId = evt.to.id
           let showPos = toId.split('-').pop()

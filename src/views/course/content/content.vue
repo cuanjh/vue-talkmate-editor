@@ -505,13 +505,13 @@ export default {
             this.courseContentPath = ''
             setTimeout(() => {
               this.trackLeftScroll()
-            }, 100)
+            }, 800)
           } else {
             this.clickFolder({ folder: this.tracks[num][fIndex], trackNum: num })
             if (arr.length === num + 2) {
               setTimeout(() => {
                 this.trackLeftScroll()
-              }, 100)
+              }, 800)
             }
           }
         }
@@ -565,9 +565,13 @@ export default {
         /* eslint-disable */
         new Sortable($trackItem, {
           group: 'shared',
-          animation: 150,
+          animation: 0,
+          setData: () => {
+            console.log(33)
+          },
           onAdd: (evt) => {
             console.log(evt)
+            console.log(1)
             let fromId = evt.from.id
             let toId = evt.to.id
 
@@ -592,6 +596,7 @@ export default {
             })
           },
           onUpdate: (evt) => {
+            console.log(2)
             let fromId = evt.from.id
             let toId = evt.to.id
             // 上下拖拽

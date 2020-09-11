@@ -45,7 +45,7 @@ export default {
     let $chapterList = document.getElementById('langs-lists')
     let sortable = new Sortable($chapterList, {
       swapThreshold: 1,
-      animation: 150,
+      animation: 0,
       onEnd: (evt) => {
         console.log(evt)
         console.log(this.allLangs)

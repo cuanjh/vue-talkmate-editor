@@ -156,7 +156,7 @@ export default {
     /* eslint-disable */
     let $el = document.getElementById('feilds-lists')
     let sortable = new Sortable($el, {
-      animation: 150,
+      animation: 0,
       onEnd: (evt) => {
         let oldIndex = evt.oldIndex
         let newIndex = evt.newIndex

@@ -634,7 +634,7 @@ export default {
       /* eslint-disable */
       let el = document.getElementById('sort-form')
       let sortable = new Sortable(el, {
-        animation: 150,
+        animation: 0,
         onEnd: (evt) => {
           let newContents = []
           let copyContents = this.contents

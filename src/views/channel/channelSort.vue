@@ -94,7 +94,7 @@ export default {
       /* eslint-disable */
       let el = document.getElementById('sort-channel-' + showPos)
       this.sortable[showPos] = new Sortable(el, {
-        animation: 150,
+        animation: 0,
         onEnd: (evt) => {
           let toId = evt.to.id
           let showPos = toId.split('-').pop()

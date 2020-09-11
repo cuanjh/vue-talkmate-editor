@@ -290,7 +290,7 @@ export default {
     resetSortable () {
       let el = document.getElementById('cover-sort')
       this.sortable = new Sortable(el, {
-        animation: 150,
+        animation: 0,
         onEnd: (evt) => {
           console.log(this.sortable.toArray())
           let arr = []

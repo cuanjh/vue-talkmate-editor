@@ -66,7 +66,7 @@ export default {
     let $chapterList = document.getElementById('chapter-list')
     let sortable = new Sortable($chapterList, {
       swapThreshold: 1,
-      animation: 150
+      animation: 0
     })
     console.log(sortable)
   }
