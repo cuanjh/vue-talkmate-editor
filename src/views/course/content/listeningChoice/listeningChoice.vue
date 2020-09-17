@@ -12,7 +12,7 @@
       </div>
     </div>
     <div class="form">
-      <div class="form-wrap chapter" v-if="form.type == 'listeningChoice_chapter'">
+      <div class="form-wrap chapter" v-if="form.type == 'listening_choice'">
         <div class="correct-area">
           <div class="wrap">
             <i @click="play(form.sound)"></i>

@@ -124,6 +124,7 @@
           </div>
         </div>
       </div>
+      <dialog-online ref="dialogOnline" @confirm="confirm" />
     </div>
   </transition>
 </template>
@@ -139,6 +140,8 @@ import {
   exportCourseContent
 } from '@/api/course'
 import { mapState } from 'vuex'
+import DialogOnline from '@/components/dialogOnline'
+
 export default {
   props: ['userList', 'authorityUsers', 'authorityList'],
   data () {
@@ -161,6 +164,9 @@ export default {
       },
       authorityTop: false
     }
+  },
+  components: {
+    DialogOnline
   },
   computed: {
     ...mapState({
@@ -430,14 +436,13 @@ export default {
         }
       })
     },
-    // 添加上线
-    onlineJob () {
+    confirm (item) {
       this.$confirm('确定要上线吗?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        addOnlineJob({ jobName: this.folder.name, online_type: 'catalog', online_uuid: this.folder.uuid }).then(res => {
+        addOnlineJob({ db_env: item.dbEnv, jobName: this.folder.name, online_type: 'catalog', online_uuid: this.folder.uuid }).then(res => {
           if (res.success) {
             this.$message({
               type: 'success',
@@ -454,6 +459,10 @@ export default {
         })
         this.hide()
       })
+    },
+    // 添加上线
+    onlineJob () {
+      this.$refs['dialogOnline'].show()
     },
     // 下载
     download () {

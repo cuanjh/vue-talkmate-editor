@@ -82,7 +82,7 @@ export default {
       this.$emit('switchForm', { content: this.form, formIndex: this.formIndex })
     },
     play (item) {
-      this.myAudio.src = this.assetsDomain + item.sound
+      this.myAudio.src = this.assetsDomain + item
       this.myAudio.oncanplay = () => {
         this.myAudio.play()
       }

@@ -431,7 +431,7 @@
           <!-- 备注 -->
           <el-tag type="warning" v-if="f.desc">注：{{ f.desc }}</el-tag>
           <div class="text-radar-sound" v-if="f.type == 'textRadar'">
-            <audio :src="assetsDomain + contents[activeFormIndex]['sound']" controls></audio>
+            <audio v-if="contents[activeFormIndex]['sound']" :src="assetsDomain + contents[activeFormIndex]['sound']" controls></audio>
           </div>
         </el-form-item>
         <el-form-item
@@ -1326,6 +1326,7 @@ export default {
     }
     .right {
       padding-left: 20px;
+      display: flex;
     }
     .el-input {
       width: 100%;
@@ -1381,6 +1382,10 @@ export default {
 
 .icon-picture {
   background-image: url('../../../assets/images/icons/icon-picture.png');
+}
+
+.sub-item-operate {
+  display: flex;
 }
 </style>
 

@@ -17,7 +17,7 @@
         <div class="correct-area">
           <div class="wrap">
             <span>{{ form.pos + ' ' + form.translate }}</span>
-            <i @click="play(form.sound)"></i>
+            <i @click="play(form)"></i>
           </div>
           <div class="word">
             {{ form.word }}

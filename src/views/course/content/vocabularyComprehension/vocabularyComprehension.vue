@@ -14,7 +14,7 @@
     <div class="form">
       <div class="form-wrap">
         <div class="title">
-          {{ form.text.replace(/\[(.*?)\]/g, "______") }}
+          {{ form.text ? form.text.replace(/\[(.*?)\]/g, "______") : '' }}
         </div>
       </div>
     </div>

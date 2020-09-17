@@ -105,6 +105,7 @@
       ref="rightMenu"
       @paste="paste"
     />
+    <dialog-online ref="dialogOnline" @confirm="confirm" />
     <!-- <add-version ref="addVersion"/> -->
     <!-- <course-content :langList="langList" :courseTypes="courseTypes" :contents="contents" ref="content" /> -->
   </div>
@@ -119,6 +120,8 @@ import { addCourseVersion, delCourseVersion, editCourseVersion, addOnlineJob, se
 import { getAuthorityList } from '@/api/authority'
 import { getUserList } from '@/api/user'
 import RightMenu from './rightMenu'
+import DialogOnline from '@/components/dialogOnline'
+
 export default {
   data () {
     return {
@@ -138,7 +141,8 @@ export default {
     // AddVersion
     // CourseContent
     editComp,
-    RightMenu
+    RightMenu,
+    DialogOnline
   },
   created () {
     this.getAuthorityUsers()
@@ -300,13 +304,13 @@ export default {
       }
       this.$refs.edit.show(params)
     },
-    onlineJob (item) {
+    confirm (item) {
       this.$confirm('确定要上线吗?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        addOnlineJob({ jobName: item.name, online_type: 'content_version', online_uuid: item.uuid }).then(res => {
+        addOnlineJob({ db_env: item.dbEnv, jobName: item.name, online_type: 'content_version', online_uuid: item.uuid }).then(res => {
           if (res.success) {
             this.$message({
               type: 'success',
@@ -321,6 +325,9 @@ export default {
           message: '已取消上线'
         })
       })
+    },
+    onlineJob (item) {
+      this.$refs['dialogOnline'].show(item)
     },
     // 下线上线
     editShow (item) {

@@ -13,7 +13,7 @@
     </div>
     <div class="form">
       <div class="form-wrap">
-        <div class="title" v-html="form.text.replace(/\//g, '<br/>')">
+        <div class="title" v-html="form.text ? form.text.replace(/\//g, '<br/>') : ''">
         </div>
       </div>
     </div>
