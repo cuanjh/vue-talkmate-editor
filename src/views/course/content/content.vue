@@ -493,6 +493,7 @@ export default {
           this.tracks.push(catalogs)
         }
         this.$set(this.tracks, num, catalogs)
+        console.log('courseContentPath', this.courseContentPath)
         if (this.courseContentPath === '') {
           this.courseContentPath = localStorage.getItem('courseContentPath')
         }
@@ -509,6 +510,7 @@ export default {
           } else {
             this.clickFolder({ folder: this.tracks[num][fIndex], trackNum: num })
             if (arr.length === num + 2) {
+              this.courseContentPath = ''
               setTimeout(() => {
                 this.trackLeftScroll()
               }, 800)
@@ -638,7 +640,9 @@ export default {
               },
               uuid: dragObj.uuid
             }
+            console.log('dragObj', dragObj)
             editCatalog(obj).then(res => {
+              this.clickFolder({ folder: dragObj, trackNum: trackNum })
               this.resetTrackData({ pUUID: pUUID, trackNum: trackNum })
             })
           }
