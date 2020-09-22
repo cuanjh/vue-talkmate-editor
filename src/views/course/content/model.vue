@@ -154,6 +154,17 @@
           @delForm="delForm"
           @switchForm="switchForm"/>
       </div>
+      <div class="list" id="sort-form" v-else-if="contentModel == 'content_model_picture_sentence'">
+        <form-picture-sentence
+          :data-id="index"
+          :class="{'active': activeFormIndex == index}"
+          v-for="(content, index) in contents"
+          :key="index"
+          :form="content"
+          :formIndex="index"
+          @delForm="delForm"
+          @switchForm="switchForm"/>
+      </div>
       <div class="list" id="sort-form" v-else>
         <form-comp
           :data-id="index"
@@ -507,6 +518,7 @@ import FormListeningChoice from './listeningChoice/listeningChoice'
 import FormDubbingRepeat from './dubbingRepeat/dubbingRepeat'
 import FormRubbingEar from './rubbingEar/rubbingEar'
 import FormListenRead from './listenRead/listenRead'
+import FormPictureSentence from './pictureSentence/pictureSentence'
 import LookImage from './lookImage'
 import LookContent from './lookContent'
 import RightMenuForm from './rightMenuForm'
@@ -560,6 +572,7 @@ export default {
     FormDubbingRepeat,
     FormRubbingEar,
     FormListenRead,
+    FormPictureSentence,
     LookImage,
     LookContent,
     RightMenuForm
@@ -833,12 +846,19 @@ export default {
     },
     // 预览
     lookPreview () {
-      let obj = {
-        contents: this.contents,
-        contentModel: this.contentModel
+      if (this.contentModel === 'content_model_pro_sound' || this.contentModel === 'content_model_level_grade') {
+        let obj = {
+          contents: this.contents,
+          contentModel: this.contentModel
+        }
+        // this.$refs.preview.show(obj)
+        this.$bus.emit('showPreviewModel', obj)
+      } else {
+        this.$message({
+          type: 'warning',
+          message: '该题型还不支持预览'
+        })
       }
-      // this.$refs.preview.show(obj)
-      this.$bus.emit('showPreviewModel', obj)
     },
     // 取消图库查找
     closeLook () {

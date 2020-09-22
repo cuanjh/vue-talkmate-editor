@@ -31,6 +31,8 @@ import MakeSentence from './form/makeSentence'
 import FillGap from './form/fillGap'
 import WriteWords from './form/writewords'
 import SentenceToImgBox from './form/sentenceToImgBox'
+// 看图听音选句子
+import PictureSentence from './form/pictureSentence'
 
 export default {
   props: ['slideForms'],
@@ -87,7 +89,8 @@ export default {
     'form-sentenceToImgBox': SentenceToImgBox, // 有句子选图片
     'form-writeWords': WriteWords, // 写单词
     'form-makeSentence': MakeSentence, // 组句子
-    'form-fillGap': FillGap // 选词填空
+    'form-fillGap': FillGap, // 选词填空
+    'form-pictureSentence': PictureSentence // 看图听音选句
   },
   methods: {
     initSwiper () {

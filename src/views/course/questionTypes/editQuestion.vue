@@ -156,13 +156,18 @@ export default {
   width:600px;
   background:rgba(245,246,250,1);
   border-radius:4px;
-  padding: 50px 30px 40px;
+  padding: 50px 0px 40px;
   box-sizing: border-box;
   .close {
     position: absolute;
     right: 20px;
     top: 20px;
     cursor: pointer;
+  }
+  .content {
+    max-height: 500px;
+    overflow-y: auto;
+    padding: 0 30px;
   }
   .btns {
     display: flex;
