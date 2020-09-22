@@ -305,7 +305,11 @@ export default {
       this.$refs.edit.show(params)
     },
     confirm (item) {
-      this.$confirm('确定要上线吗?', '提示', {
+      let envDesc = '测试环境'
+      if (item.dbEnv === 'online') {
+        envDesc = '正式环境'
+      }
+      this.$confirm(`确定要上线${envDesc}吗?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
