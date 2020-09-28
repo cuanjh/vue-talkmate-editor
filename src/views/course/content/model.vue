@@ -454,7 +454,7 @@
             v-model="contents[activeFormIndex]['' + f.feild + '']"
             placeholder="请选择">
             <el-option
-              v-for="(item, index) in partOfSpeech"
+              v-for="(item, index) in partOfSpeech['ENG']"
               :key="item.key + index"
               :label="item.name + '( '+ item.key +' )'"
               :value="item.key">

@@ -16,6 +16,28 @@
         </el-option>
       </el-select>
       <div class="right">
+        <el-tooltip class="item" effect="dark" content="课程数据下载列表" placement="top">
+          <el-popover
+            class="tips"
+            placement="bottom"
+            width="400"
+            @show="showExportList"
+            trigger="click">
+            <el-tag type="warning">显示最新 5 条可下载的数据</el-tag>
+            <el-table :data="exportList">
+              <el-table-column property="created_on" label="创建日期" :formatter="formatDate"></el-table-column>
+              <el-table-column property="name" label="标题"></el-table-column>
+              <el-table-column label="操作">
+                <template slot-scope="scope">
+                  <el-button @click="handleDownload(scope.row)" :disabled="scope.row.status !== 2" type="text" size="small">{{scope.row.status === 2 ? '下载' : '文件生成中...' }}</el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+            <el-badge slot="reference" :value="exportNum" :hidden="exportNum == 0" class="item" type="warning">
+              <el-button size="small" icon="el-icon-message-solid" type="primary" circle></el-button>
+            </el-badge>
+          </el-popover>
+        </el-tooltip>
         <el-button v-show="userInfo.authority.authorityId == '1' || userInfo.authority.authorityId == '2'"
           style="outline:none;"
           type="primary"
@@ -92,7 +114,7 @@
           {{scope.row.is_show ? '是' : '否'}}
         </template>
       </el-table-column>
-      <el-table-column label="操作" fixed="right" width="260px">
+      <el-table-column label="操作" fixed="right" width="300px">
         <template slot-scope="scope">
           <el-button
             v-show="userInfo.authority.authorityId == '1' || userInfo.authority.authorityId == '2'"
@@ -106,12 +128,12 @@
             type="danger"
             plain
             @click="deleteCourse(scope.row.uuid)">删除</el-button>
-          <br><br>
           <el-button
             size="mini"
             type="primary"
             plain
             @click="classGroup(scope.row)">班级群</el-button>
+          <br><br>
           <el-button
             size="mini"
             type="primary"
@@ -122,6 +144,11 @@
             type="primary"
             plain
             @click="unlockCourse(scope.row)">解锁</el-button>
+          <el-button
+            size="mini"
+            type="primary"
+            plain
+            @click="handleStatistic(scope.row)">统计</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -131,25 +158,32 @@
     <class-group ref="classGroup" />
     <course-detail ref="courseDetail" />
     <unlock-course ref="unlockCourse" />
+    <statistic ref="statistic" @refreshDownloadList="refreshDownloadList"/>
   </div>
 </template>
 
 <script>
 import { mapGetters, mapActions, mapState } from 'vuex'
+import moment from 'moment'
+
 import {
   getCourseList,
   courseEdit,
   courseDel,
+  exportCourseContentList,
   onlineCourses
 } from '@/api/course'
 import EditComp from './edit'
 import ClassGroup from './classGroup'
 import CourseDetail from './editCourseDetail'
 import UnlockCourse from './unlockCourse'
+import Statistic from './statistic'
 
 export default {
   data () {
     return {
+      exportList: [],
+      exportNum: 0,
       courseList: [],
       selCourseList: [],
       isShow: false
@@ -159,13 +193,15 @@ export default {
     EditComp,
     ClassGroup,
     CourseDetail,
-    UnlockCourse
+    UnlockCourse,
+    Statistic
   },
   created () {
     this.getLangList({ 'pageNo': 0, 'pageSize': 999 }).then(() => {
       this.initData()
     })
     this.getCourseTypes()
+    this.refreshDownloadList()
   },
   computed: {
     ...mapGetters('user', ['userInfo']),
@@ -320,6 +356,46 @@ export default {
     },
     unlockCourse (row) {
       this.$refs['unlockCourse'].show(row)
+    },
+    handleStatistic (row) {
+      this.$refs['statistic'].show(row)
+    },
+    refreshDownloadList () {
+      this.showExportList()
+      let timer = setInterval(() => {
+        this.showExportList()
+        if (this.exportNum === 0) {
+          clearInterval(timer)
+        }
+      }, 5000)
+    },
+    formatDate (row, column, cellValue, index) {
+      return moment(cellValue).format('YYYY-MM-DD HH:mm')
+    },
+    showExportList () {
+      this.exportList = []
+      exportCourseContentList({ code: this.version.selLang, pageNo: 0, pageSize: 999 }).then(res => {
+        console.log(res)
+        this.exportList = res.data.data.slice(0, 5)
+        this.exportNum = this.exportList.filter(item => {
+          return item.status !== 2
+        }).length
+      })
+    },
+    async handleDownload (row) {
+      // window.location.href = process.env.VUE_APP_BASE_API + row.url
+      let a = document.createElement('a')
+      // 地址
+      a.href = process.env.VUE_APP_BASE_API + row.url
+      // 修改文件名
+      a.download = row.url.slice(row.url.lastIndexOf('/') + 1)
+      // 触发点击
+      document.body.appendChild(a)
+      a.click()
+      // 移除
+      setTimeout(() => {
+        document.body.removeChild(a)
+      }, 1000)
     }
   }
 }
@@ -366,6 +442,10 @@ export default {
     height: 66px;
     border-radius: 4px;
     object-fit: cover;
+  }
+
+  .tips {
+    margin-right: 30px;
   }
 </style>
 <style>

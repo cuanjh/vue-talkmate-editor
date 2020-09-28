@@ -1568,3 +1568,55 @@ export const qrCodeImage = (data) => {
     data
   })
 }
+
+/**
+ * @Summary 添加统计
+ * @param {*} data
+ * @Router /editor/statistic/unlock_chapter [post]
+ */
+export const getStatisticUC = (data) => {
+  return service({
+    url: '/editor/statistic/unlock_chapter',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 统计part
+ * @param {*} data
+ * @Router /editor/statistic/unlock_part [post]
+ */
+export const getStatisticPart = (data) => {
+  return service({
+    url: '/editor/statistic/unlock_part',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 词典----单词列表
+ * @param {*} data
+ * @Router /editor/dict/list [post]
+ */
+export const getDictList = (data) => {
+  return service({
+    url: '/editor/dict/list',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 词典内容详情
+ * @param {*} data
+ * @Router /editor/dict/detail [post]
+ */
+export const getDictDetail = (data) => {
+  return service({
+    url: '/editor/dict/detail',
+    method: 'post',
+    data
+  })
+}

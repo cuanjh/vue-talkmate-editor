@@ -34,6 +34,29 @@
           </div>
         </el-option>
       </el-select>
+      <div class="tips" v-if="false">
+        <el-tooltip class="item" effect="dark" content="课程数据下载列表" placement="top">
+          <el-popover
+            placement="right"
+            width="400"
+            @show="showExportList"
+            trigger="click">
+            <el-tag type="warning">显示最新 5 条可下载的数据</el-tag>
+            <el-table :data="exportList">
+              <el-table-column property="created_on" label="创建日期" :formatter="formatDate"></el-table-column>
+              <el-table-column property="name" label="标题"></el-table-column>
+              <el-table-column label="操作">
+                <template slot-scope="scope">
+                  <el-button @click="handleDownload(scope.row)" :disabled="scope.row.status !== 2" type="text" size="small">{{scope.row.status === 2 ? '下载' : '文件生成中...' }}</el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+            <el-badge slot="reference" :value="exportNum" :hidden="exportNum == 0" class="item" type="warning">
+              <el-button size="small" icon="el-icon-message-solid" type="primary" circle></el-button>
+            </el-badge>
+          </el-popover>
+        </el-tooltip>
+      </div>
     </div>
     <div class="version-wrap">
       <div class="version-item create" v-show="isHaveAuthority" @click="addVersion">
@@ -94,7 +117,7 @@
               :on-success="uploadSuccess">
             </el-upload></div>
           </el-tooltip>
-          <el-tooltip class="item" effect="dark" content="下载课程内容" placement="top" v-show="false">
+          <el-tooltip class="item" effect="dark" content="下载课程统计数据" placement="top" v-if="false">
             <el-button type="primary" icon="el-icon-download" :disabled="(userInfo.authorityId !== '1' && item.curUserAuth['auth'] == 'r')" circle @click="download(item)"></el-button>
           </el-tooltip>
         </div>
@@ -114,6 +137,8 @@
 <script>
 // import AddVersion from './add'
 // import CourseContent from '../content/content'
+import moment from 'moment'
+
 import editComp from './edit'
 import { mapState, mapActions, mapMutations, mapGetters } from 'vuex'
 import { addCourseVersion, delCourseVersion, editCourseVersion, addOnlineJob, setAuthority } from '@/api/course'
@@ -134,7 +159,10 @@ export default {
       copyAuthorityList: [],
       authorityUsers: [],
       copyAuthorities: [],
-      loading: null
+      loading: null,
+      showExportList: false,
+      exportList: [],
+      exportNum: 0
     }
   },
   components: {
@@ -547,8 +575,19 @@ export default {
         })
       }
     },
+    formatDate (row, column, cellValue, index) {
+      return moment(cellValue).format('YYYY-MM-DD HH:mm')
+    },
     download (item) {
-      window.location.href = process.env.VUE_APP_BASE_API + '/editor/content/export?uuid=' + item.uuid
+      console.log(item)
+      // exportCourseContent({ id: item.uuid }).then(res => {
+      //   if (res.success) {
+      //     this.$message({
+      //       type: 'success',
+      //       message: '请求已发送，请到下载任务列表中下载'
+      //     })
+      //   }
+      // })
     }
   }
 }
@@ -560,6 +599,8 @@ export default {
   flex: 1;
   .top-bar{
     margin-top: 20px;
+    display: flex;
+    flex-direction: row;
   }
   .version-wrap {
     display: flex;
@@ -743,5 +784,10 @@ export default {
 
 .select-course {
   width: 400px;
+}
+
+.tips {
+  position: absolute;
+  right: 50px;
 }
 </style>

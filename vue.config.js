@@ -17,6 +17,7 @@ module.exports = {
       // detail: https://cli.vuejs.org/config/#devserver-proxy
       [process.env.VUE_APP_BASE_API]: { // 需要代理的路径   例如 '/api'
         target: `http://dev.api.talkmate.com:8888`, // 代理到 目标路径
+        // target: `http://192.168.1.47:8888`, // 代理到 目标路径
         changeOrigin: true,
         pathRewrite: { // 修改路径数据
           ['^' + process.env.VUE_APP_BASE_API]: '' // 举例 '^/api:""' 把路径中的/api字符串删除
