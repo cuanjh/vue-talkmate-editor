@@ -201,7 +201,7 @@ export default {
       this.initData()
     })
     this.getCourseTypes()
-    this.refreshDownloadList()
+    // this.refreshDownloadList()
   },
   computed: {
     ...mapGetters('user', ['userInfo']),
