@@ -1620,3 +1620,16 @@ export const getDictDetail = (data) => {
     data
   })
 }
+
+/**
+ * @Summary 词典----句子列表
+ * @param {*} data
+ * @Router /editor/sentence/list [post]
+ */
+export const getSentenceList = (data) => {
+  return service({
+    url: '/editor/sentence/list',
+    method: 'post',
+    data
+  })
+}

@@ -1,5 +1,5 @@
 <template>
-  <div class="main-content" ref="content" @scroll="handlerScroll">
+  <div class="main-content word" ref="content" @scroll="handlerScroll">
     <div class="top-bar">
       <div class="left">
         <el-input placeholder="请输入内容" v-model="searchKey" @keyup.enter.native="handlerSearch" class="input-with-select">
@@ -254,9 +254,11 @@ export default {
   }
 </style>
 <style lang="scss">
-.top-bar {
-  .el-select .el-input {
-    width: 130px;
+.word {
+  .top-bar {
+    .el-select .el-input {
+      width: 130px;
+    }
   }
 }
 

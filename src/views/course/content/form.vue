@@ -64,7 +64,7 @@ export default {
       if (obj) {
         name = obj.name
       }
-      return name
+      return name ? (this.formIndex + 1) + '. ' + obj.name : (this.formIndex + 1)
     },
     imgUrl () {
       let url = ''
