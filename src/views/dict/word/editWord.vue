@@ -117,48 +117,21 @@
           </div>
         </div>
       </el-form-item>
-      <el-form-item label="标签：" prop="type">
-        <el-checkbox-group v-model="ruleForm.type">
-          <el-checkbox label="美食/餐厅线上活动" name="type"></el-checkbox>
-          <el-checkbox label="地推活动" name="type"></el-checkbox>
-          <el-checkbox label="线下主题活动" name="type"></el-checkbox>
-          <el-checkbox label="单纯品牌曝光" name="type"></el-checkbox>
+      <el-form-item label="标签：">
+        <el-checkbox-group v-model="ruleForm.tags">
+          <el-checkbox v-for="tag in dictTags" :key="tag.key" :label="tag.key" name="type">{{ tag.name }}</el-checkbox>
         </el-checkbox-group>
       </el-form-item>
       <el-form-item label="配图：">
         <el-upload
           action="#"
+          accept="image/webp"
           list-type="picture-card"
+          :file-list="images"
+          :on-change="onChangeImage"
           :auto-upload="false">
             <i slot="default" class="el-icon-plus"></i>
-            <div slot="file" slot-scope="{file}">
-              <img
-                class="el-upload-list__item-thumbnail"
-                :src="file.url" alt=""
-              >
-              <span class="el-upload-list__item-actions">
-                <span
-                  class="el-upload-list__item-preview"
-                  @click="handlePictureCardPreview(file)"
-                >
-                  <i class="el-icon-zoom-in"></i>
-                </span>
-                <span
-                  v-if="!disabled"
-                  class="el-upload-list__item-delete"
-                  @click="handleDownload(file)"
-                >
-                  <i class="el-icon-download"></i>
-                </span>
-                <span
-                  v-if="!disabled"
-                  class="el-upload-list__item-delete"
-                  @click="handleRemove(file)"
-                >
-                  <i class="el-icon-delete"></i>
-                </span>
-              </span>
-            </div>
+            <div slot="tip" class="el-upload__tip">只能上传webp文件</div>
         </el-upload>
         <el-dialog :visible.sync="dialogImageVisible" append-to-body>
           <img width="100%" :src="dialogImageUrl" alt="">
@@ -166,8 +139,7 @@
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
-      <el-button @click="dialogVisible = false">取 消</el-button>
-      <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+      <el-button type="primary" @click="submitForm('ruleForm')">确 定</el-button>
     </span>
   </el-dialog>
 </template>
@@ -175,9 +147,11 @@
 <script>
 import { mapState } from 'vuex'
 import moment from 'moment'
+import md5 from 'md5'
 
 import {
-  getInfoToken
+  getInfoToken,
+  updateDictWord
 } from '@/api/course'
 
 import {
@@ -189,6 +163,7 @@ export default {
       flag: 'add',
       dialogVisible: false,
       selLang: '',
+      toLang: '',
       uploadIndex: '',
       token: '',
       dialogImageUrl: '',
@@ -203,43 +178,22 @@ export default {
           { key: 'us', name: '美' }
         ]
       },
+      images: [],
       ruleForm: {
+        uuid: '',
         content: '',
         sound_infos: [
         ],
         content_tr: [],
+        expansion: '',
         synonym: [],
         homonyms: [],
         phrase: [],
-        region: '',
-        date1: '',
-        date2: '',
-        delivery: false,
-        type: [],
-        resource: '',
-        desc: ''
+        tags: []
       },
       rules: {
         content: [
           { required: true, message: '请输入单词', trigger: 'blur' }
-        ],
-        region: [
-          { required: true, message: '请选择活动区域', trigger: 'change' }
-        ],
-        date1: [
-          { type: 'date', required: true, message: '请选择日期', trigger: 'change' }
-        ],
-        date2: [
-          { type: 'date', required: true, message: '请选择时间', trigger: 'change' }
-        ],
-        type: [
-          { type: 'array', required: true, message: '请至少选择一个活动性质', trigger: 'change' }
-        ],
-        resource: [
-          { required: true, message: '请选择活动资源', trigger: 'change' }
-        ],
-        desc: [
-          { required: true, message: '请填写活动形式', trigger: 'blur' }
         ]
       }
     }
@@ -247,7 +201,8 @@ export default {
   computed: {
     ...mapState({
       partOfSpeech: state => state.course.partOfSpeech,
-      assetsDomain: state => state.course.assetsDomain
+      assetsDomain: state => state.course.assetsDomain,
+      dictTags: state => state.course.dictTags
     })
   },
   methods: {
@@ -257,8 +212,11 @@ export default {
       })
       console.log(params)
       this.flag = params.type
-      this.selLang = params.selFromLang
+      this.selLang = params.fromLang
+      this.toLang = params.toLang
       console.log(this.partOfSpeech)
+      this.ruleForm.uuid = ''
+      this.ruleForm.expansion = ''
       this.ruleForm.sound_infos = [
         {
           ct: '',
@@ -297,12 +255,26 @@ export default {
           contentTr: ''
         }
       ]
+      this.ruleForm.tags = []
+      this.images = []
       if (this.flag === 'edit') {
+        this.ruleForm.uuid = params.form.uuid
         this.ruleForm.content = params.form.content
-        if (params.form.soundInfos) {
+        if (params.form.soundInfos && params.form.soundInfos.length > 0) {
           this.ruleForm.sound_infos = params.form.soundInfos
         }
+        if (params.form.images && params.form.images.length > 0) {
+          params.form.images.forEach(i => {
+            this.images.push({
+              name: i.name,
+              url: this.assetsDomain + i.url
+            })
+          })
+        }
         const dictTranslate = params.form.dictTranslate
+        if (dictTranslate) {
+          this.ruleForm.expansion = dictTranslate.expansion
+        }
         if (dictTranslate && dictTranslate.contentTr) {
           this.ruleForm.content_tr = dictTranslate.contentTr
         }
@@ -311,6 +283,11 @@ export default {
         }
         if (dictTranslate && dictTranslate.homonyms) {
           this.ruleForm.homonyms = dictTranslate.homonyms
+        }
+        if (dictTranslate && dictTranslate.tags) {
+          dictTranslate.tags.forEach(item => {
+            this.ruleForm.tags.push(item.key)
+          })
         }
         if (params.form.phrase) {
           this.ruleForm.phrase = params.form.phrase
@@ -456,12 +433,28 @@ export default {
       let feild = uploadIndexArr[1]
       let index = uploadIndexArr[2]
       let date = moment(new Date()).format('YYYY/MM/DD')
+      let time = parseInt((new Date()).getTime() / 1000)
       let i = file.name.lastIndexOf('.')
       let ext = file.name.substring(i + 1)
       let name = file.name.substring(0, i)
       let url = ''
       if (dataFrom === 'audio') {
-        url = 'dict/sounds/' + date + '/' + file.uid + '.' + ext
+        // url = 'dict/sounds/' + date + '/' + file.uid + '.' + ext
+        if (!this.ruleForm.sound_infos[index]['ct']) {
+          this.$message({
+            type: 'waring',
+            message: '请选择发音类型'
+          })
+          return
+        }
+        if (!this.ruleForm.sound_infos[index]['gender']) {
+          this.$message({
+            type: 'waring',
+            message: '请选择男女声'
+          })
+          return
+        }
+        url = `dict/${this.selLang.toLowerCase()}/${this.ruleForm.sound_infos[index]['ct']}/${this.ruleForm.sound_infos[index]['gender']}/${md5(time)}.${ext}`
       } else if (dataFrom === 'image') {
         url = 'dict/images/' + date + '/' + file.uid + '.' + ext
         this.saveImages([url], [name])
@@ -471,7 +464,7 @@ export default {
       console.log(url)
       let res = await uploadQiniu(file.raw, this.token, url)
       if (feild === 'sound_infos') {
-        this.$set(this.ruleForm['sound_infos'][index], 'sound', res.key)
+        this.$set(this.ruleForm['sound_infos'][index], 'sound', `${res.key}?time=${time}`)
       }
       console.log(this.ruleForm)
     },
@@ -483,10 +476,70 @@ export default {
         audio.play()
       }
     },
+    onChangeImage (file, fileList) {
+      this.images = fileList
+    },
     submitForm (formName) {
-      this.$refs[formName].validate((valid) => {
+      this.$refs[formName].validate(async (valid) => {
         if (valid) {
-          alert('submit!')
+          if (this.flag === 'edit') {
+            let tags = []
+            this.ruleForm.tags.forEach(item => {
+              let tag = this.dictTags.find(f => {
+                return f.key === item
+              })
+              tags.push(tag)
+            })
+
+            let images = []
+            for (let i = 0; i < this.images.length; i++) {
+              let p = this.images[i]
+              if (p.raw) {
+                let date = moment(new Date()).format('YYYY/MM/DD')
+                let i = p.name.lastIndexOf('.')
+                let name = p.name.substring(0, i)
+                let ext = p.name.substring(i + 1)
+                let url = 'dict/images/' + date + '/' + p.uid + '.' + ext
+                let res = await uploadQiniu(p.raw, this.token, url)
+                images.push({
+                  name: name,
+                  url: res.key
+                })
+              } else {
+                images.push({
+                  name: p.name,
+                  url: p.url
+                })
+              }
+            }
+            let obj = {
+              content: this.ruleForm.content,
+              dictTranslate: {
+                contentTr: this.ruleForm.content_tr.filter(item => { return item.cx.trim().length > 0 }),
+                from: this.selLang,
+                homonyms: this.ruleForm.homonyms.filter(item => { return item.cx.trim().length > 0 }),
+                synonym: this.ruleForm.synonym.filter(item => { return item.cx.trim().length > 0 }),
+                tags: tags,
+                to: this.toLang
+              },
+              from: this.selLang,
+              images: images,
+              phrase: this.ruleForm.phrase,
+              soundInfos: this.ruleForm.sound_infos.filter(item => { return item.ct.trim().length > 0 }),
+              to: this.toLang,
+              uuid: this.ruleForm.uuid
+            }
+            updateDictWord(obj).then(res => {
+              if (res.success) {
+                this.$message({
+                  type: 'success',
+                  message: '更新成功'
+                })
+                this.dialogVisible = false
+              }
+            })
+            console.log(obj)
+          }
         } else {
           console.log('error submit!!')
           return false

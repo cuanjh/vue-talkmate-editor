@@ -1,7 +1,7 @@
 <template>
   <div class="live-container">
     <div class="top-bar">
-      <el-button type="primary" icon="el-icon-plus" @click="add">添加直播间</el-button>
+      <el-button type="primary" v-show="!isEditor" icon="el-icon-plus" @click="add">添加直播间</el-button>
     </div>
     <el-table
       :data="rooms.filter(data => !search || data.room.module_name.toLowerCase().includes(search.toLowerCase()))"
@@ -18,7 +18,7 @@
               <el-col :span="5" class="course-column">{{ formatCourseDate(c) }}</el-col>
               <el-col :span="1" class="course-column">{{ ' (' + c.online_number + ') ' }}</el-col>
               <el-col :span="4" class="course-column">
-                <el-select size="small" :disabled="props.row.courses[index].state == -1" v-model="props.row.courses[index].state" placeholder="请选择..." @change="changeCourseState(c, props.row.courses, props.row, index)">
+                <el-select size="small" :disabled="props.row.courses[index].state == -1 || isEditor" v-model="props.row.courses[index].state" placeholder="请选择..." @change="changeCourseState(c, props.row.courses, props.row, index)">
                   <el-option :label="'未开始'" :disabled="props.row.courses[index].state == 1" :value="0"></el-option>
                   <el-option :label="'上课中'" :value="1"></el-option>
                   <el-option :label="'已下课'" :disabled="props.row.courses[index].state == 0" :value="-1"></el-option>
@@ -26,16 +26,15 @@
               </el-col>
               <el-col :span="8" class="course-column">
                 <el-row>
-                  <el-button type="primary" size="small" class="btnPushLink" @click="publishComment(c)">发表评论</el-button>
-                  <el-button type="primary" size="small" class="btnPushLink" @click="getComments(c)">评论列表</el-button>
-                  <el-button type="primary" size="small" :disabled="props.row.courses[index].state == -1" class="btnPushLink" @click="refreshLink(c)">刷新推流</el-button>
-                  <br><br>
+                  <el-button v-show="!isEditor" type="primary" size="small" class="btnPushLink" @click="publishComment(c)">发表评论</el-button>
+                  <el-button v-show="!isEditor" type="primary" size="small" class="btnPushLink" @click="getComments(c)">评论列表</el-button>
+                  <el-button v-show="!isEditor" type="primary" size="small" :disabled="props.row.courses[index].state == -1" class="btnPushLink" @click="refreshLink(c)">刷新推流</el-button>
                   <el-tooltip class="item" effect="dark" :content="c.livePushUrl" placement="top">
-                    <el-button type="primary" size="small" :disabled="c.livePushUrl == '' || props.row.courses[index].state == -1" class="btnPushLink" @click="copyLink(c)">复制推流</el-button>
+                    <el-button v-show="!isEditor" type="primary" size="small" :disabled="c.livePushUrl == '' || props.row.courses[index].state == -1" class="btnPushLink" @click="copyLink(c)">复制推流</el-button>
                   </el-tooltip>
                   <el-button type="primary" size="small" class="btnPushLink" @click="editLiveCourse(c)">编辑</el-button>
-                  <el-button type="primary" size="small" class="btnPushLink" @click="onlinePerson(c)">在线统计</el-button>
-                  <el-button type="primary" size="small" class="btnPushLink" @click="courseFiles(c)">课件</el-button>
+                  <el-button v-show="!isEditor" type="primary" size="small" class="btnPushLink" @click="onlinePerson(c)">在线统计</el-button>
+                  <el-button v-show="!isEditor" type="primary" size="small" class="btnPushLink" @click="courseFiles(c)">课件</el-button>
                 </el-row>
               </el-col>
             </el-row>
@@ -48,7 +47,7 @@
         label="排序号"
         width="74">
         <template slot-scope="scope">
-          <el-input v-model.number="scope.row.room.list_order" max="3" @change="changeModuleOrder(scope.row.room)" size="small"></el-input>
+          <el-input :disabled="isEditor" v-model.number="scope.row.room.list_order" max="3" @change="changeModuleOrder(scope.row.room)" size="small"></el-input>
         </template>
       </el-table-column>
       <el-table-column
@@ -105,26 +104,32 @@
         </template>
         <template slot-scope="scope">
           <el-button
+            v-show="!isEditor"
             size="mini"
             type="primary"
             @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
           <el-button
+            v-show="!isEditor"
             size="mini"
             type="danger"
             @click="handleDelete(scope.$index, scope.row)">删除</el-button>
           <el-button
+            v-show="!isEditor"
             size="mini"
             type="success"
             @click="handleOnline(scope.$index, scope.row)">上架</el-button>
           <el-button
+            v-show="!isEditor"
             size="mini"
             type="warning"
             @click="handleOffline(scope.$index, scope.row)">下架</el-button><br/><br/>
           <el-button
+            v-show="!isEditor"
             size="mini"
             type="primary"
             @click="handleShare(scope.$index, scope.row)">分享海报</el-button>
           <el-button
+            v-show="!isEditor"
             size="mini"
             type="primary"
             @click="handleSubscribe(scope.$index, scope.row)">订阅</el-button>
@@ -199,8 +204,15 @@ export default {
   },
   computed: {
     ...mapState({
-      uploadfileDomain: state => state.course.uploadfileDomain
-    })
+      uploadfileDomain: state => state.course.uploadfileDomain,
+      userInfo: state => state.user.userInfo
+    }),
+    isEditor () {
+      if (this.userInfo.authorityId === '131') {
+        return true
+      }
+      return false
+    }
   },
   methods: {
     ...mapActions({
@@ -487,6 +499,15 @@ export default {
       }
       &:nth-child(4) {
         font-size: 14px;
+      }
+      .el-row {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        .el-button {
+          margin: 5px;
+        }
       }
     }
   }

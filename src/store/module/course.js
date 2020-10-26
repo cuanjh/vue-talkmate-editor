@@ -12,7 +12,7 @@ import {
   tagTypes
 } from '@/api/course'
 import moment from 'moment'
-import { getMajiaUsers } from '../../api/course'
+import { getMajiaUsers, GetDictTags } from '../../api/course'
 
 export const course = {
   namespaced: true,
@@ -35,7 +35,8 @@ export const course = {
         { key: 'art.', name: '冠词' },
         { key: 'prep.', name: '介词' },
         { key: 'conj.', name: '连词' },
-        { key: 'interj.', name: '感叹词' }
+        { key: 'interj.', name: '感叹词' },
+        { key: 'det.', name: '限定词' }
       ]
     },
     courseOperateLogs: [
@@ -115,7 +116,8 @@ export const course = {
       { key: '0', type: 'danger', desc: '红色（改动过还不确定准确度）' },
       { key: '1', type: 'warning', desc: '黄色（修改完毕）' },
       { key: '2', type: 'success', desc: '绿色（审核完毕确认没问题）' }
-    ]
+    ],
+    dictTags: []
   },
   mutations: {
     updateConfigInfo (state, configInfo) {
@@ -152,6 +154,9 @@ export const course = {
     },
     updateMajia (state, data) {
       state.majia = data
+    },
+    updateDictTags (state, data) {
+      state.dictTags = data
     }
   },
   actions: {
@@ -284,6 +289,13 @@ export const course = {
       if (res.success) {
         console.log(res)
         commit('updateMajia', res.data.userInfos)
+      }
+    },
+    async getDictTags ({ commit }, data) {
+      const res = await GetDictTags(data)
+      if (res.success) {
+        console.log(res)
+        commit('updateDictTags', res.data)
       }
     }
   },

@@ -2,10 +2,7 @@
   <div class="main-content sentence" ref="content" @scroll="handlerScroll">
     <div class="top-bar">
       <div class="left">
-        <el-input placeholder="请输入内容" v-model="searchKey" @keyup.enter.native="handlerSearch" class="input-with-select">
-          <el-select v-model="selLang" slot="prepend" placeholder="请选择" @change="handlerSearch">
-            <el-option label="英汉" value="ENG-CHI"></el-option>
-          </el-select>
+        <el-input placeholder="请输入描述" v-model="searchKey" @keyup.enter.native="handlerSearch" class="input-with-select">
           <el-button slot="append" icon="el-icon-search" @click="handlerSearch"></el-button>
         </el-input>
       </div>
@@ -26,23 +23,59 @@
         type="index">
       </el-table-column>
       <el-table-column
-        label="句子"
-        prop="sentence">
-      </el-table-column>
-      <el-table-column
         label="更新时间"
+        width="140px"
         :formatter="formatterDate">
       </el-table-column>
-      <el-table-column label="操作" fixed="right">
+      <el-table-column
+        :filters="[{ text: '单词', value: 'word' }, { text: '句子', value: 'sentence' }]"
+        :filter-method="filterRepType"
+        label="分类">
+        <template slot-scope="props">
+          <el-tag v-if="props.row.repType == 'word'">单词</el-tag>
+          <el-tag type="success" v-if="props.row.repType == 'sentence'">句子</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column
+        label="描述"
+        width="300px"
+        prop="desc">
+      </el-table-column>
+      <el-table-column
+        width="300px"
+        label="标签">
+        <template slot-scope="props">
+          <div class="tags">
+            <div class="tag" v-for="item in props.row.tags.split('|')" :key="item">
+              <el-tag type="info" size="small" v-if="item">{{ item }}</el-tag>
+            </div>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column
+        :filters="[{ text: '未处理', value: 0 }, { text: '已处理', value: 1 }]"
+        :filter-method="filterState"
+        label="状态">
+        <template slot-scope="props">
+          <el-button size="small" :type="props.row.state == '0' ? 'warning' : 'success'" @click="handleState(props)">{{ props.row.state == '0' ? '未处理' : '已处理' }}</el-button>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" fixed="right" width="100px">
         <template slot-scope="scope">
           <el-button
-            v-show="userInfo.authority.authorityId == '1' || userInfo.authority.authorityId == '2'"
+            v-show="false"
             size="mini"
             @click="editCourse(scope.row)">编辑</el-button>
+          <el-button
+            v-show="userInfo.authority.authorityId == '1' || userInfo.authority.authorityId == '2'"
+            :disabled="scope.row.state == '1'"
+            size="mini"
+            @click="feedback(scope.row)">纠错</el-button>
         </template>
       </el-table-column>
     </el-table>
-    <edit-sentence ref="edit" />
+    <edit-sentence ref="editSentence" />
+    <edit-word ref="editWord" />
   </div>
 </template>
 
@@ -51,29 +84,31 @@ import { mapGetters, mapState } from 'vuex'
 import moment from 'moment'
 
 import {
-  getSentenceList,
+  getFeedbackList,
+  updateFeedback,
+  getDictDetail,
   getSentenceDetail
 } from '@/api/course'
-import EditSentence from './editSentence'
+import EditSentence from '../sentence/editSentence'
+import EditWord from '../word/editWord'
 
 let onlyOne = true
 export default {
   data () {
     return {
       searchKey: '',
-      selLang: 'ENG-CHI',
       list: [],
       isShow: false,
       currentPage: 1,
       total: 0,
-      pageSize: 10,
+      pageSize: 50,
       scrollTop: 0,
       isShowPagination: false
     }
   },
   components: {
-    EditSentence
-    // CourseDetail,
+    EditSentence,
+    EditWord
     // UnlockCourse
   },
   created () {
@@ -85,13 +120,7 @@ export default {
     ...mapGetters('user', ['userInfo']),
     ...mapState({
       assetsDomain: state => state.course.assetsDomain
-    }),
-    fromLang () {
-      return this.selLang.split('-')[0]
-    },
-    toLang () {
-      return this.selLang.split('-')[1]
-    }
+    })
   },
   methods: {
     handlerScroll (e) {
@@ -110,12 +139,12 @@ export default {
       if (this.currentPage === 1) {
         this.list = []
       }
-      let res = await getSentenceList({
-        sentence: this.searchKey,
-        from: this.fromLang,
-        to: this.toLang,
+      let res = await getFeedbackList({
         page_index: this.currentPage,
-        page_size: this.pageSize
+        page_size: this.pageSize,
+        desc: this.searchKey,
+        sort_type: -1,
+        text_field: 'created_time'
       })
       if (res.success && res.data) {
         let copy = this.list.slice()
@@ -128,37 +157,80 @@ export default {
     },
     editCourse (row) {
       getSentenceDetail({ uuid: row.uuid, from: this.fromLang, to: this.toLang }).then(res => {
-        if (!res.data.uuid) {
-          this.$message({
-            type: 'warning',
-            message: '此条数据为垃圾数据'
-          })
-          return false
-        }
         let obj = {
           type: 'edit',
           fromLang: this.fromLang,
-          toLang: this.toLang,
           form: res.data
         }
         this.$refs.edit.show(obj)
       })
     },
-    handleEdit (row) {
+    feedback (row) {
       console.log(row)
-      let obj = {
-        editInfo: {
-          course_type: row.course_type,
-          cover: row.cover,
-          desc: row.desc ? row.desc : '',
-          flag: row.flag ? row.flag : '',
-          is_show: !row.is_show,
-          tags: [],
-          title: row.title ? row.title : ''
-        },
-        uuid: row.uuid
+      let fromLang = row.fromLang
+      let toLang = row.toLang
+      if (!row.repType) {
+        this.$message({
+          type: 'warning',
+          message: '请先设置纠错分类'
+        })
+        return
       }
-      console.log(obj)
+
+      if (!row.fromLang || !row.toLang) {
+        this.$message({
+          type: 'warning',
+          message: '此条数据为垃圾数据'
+        })
+        return
+      }
+
+      if (row.repType === 'sentence') {
+        getSentenceDetail({ uuid: row.conId, from: fromLang, to: toLang }).then(res => {
+          let obj = {
+            type: 'edit',
+            fromLang: fromLang,
+            toLang: toLang,
+            form: res.data
+          }
+          this.$refs.editSentence.show(obj)
+        })
+      } else {
+        getDictDetail({ uuid: row.conId, from: fromLang, to: toLang }).then(res => {
+          let obj = {
+            type: 'edit',
+            fromLang: fromLang,
+            toLang: toLang,
+            form: res.data
+          }
+          this.$refs.editWord.show(obj)
+        })
+      }
+    },
+    handleState (props) {
+      const row = props.row
+      if (row.state === 0) {
+        this.$confirm('确认是否已经处理过该条纠错记录?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          updateFeedback({ id: row.id, state: 1 }).then(res => {
+            if (res.success) {
+              this.$message({
+                type: 'success',
+                message: '更新成功'
+              })
+              this.list[props.$index]['state'] = 1
+            }
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消'
+          })
+        })
+      }
     },
     addCourse () {
       let obj = {
@@ -189,7 +261,13 @@ export default {
       return url
     },
     formatterDate (obj) {
-      return obj && obj.updatedOn ? moment(obj.updatedOn).format('YYYY-MM-DD HH:mm') : ''
+      return obj && obj.createdTime ? moment(obj.createdTime).format('YYYY-MM-DD HH:mm') : ''
+    },
+    filterRepType (value, row) {
+      return row.repType === value
+    },
+    filterState (value, row) {
+      return row.state === value
     },
     addDetail (row) {
       this.$refs['courseDetail'].show(row)
@@ -259,6 +337,15 @@ export default {
   .el-pagination {
     text-align: center;
     margin-top: 30px;
+  }
+
+  .tags {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .tag {
+    margin: 5px;
   }
 </style>
 <style lang="scss">

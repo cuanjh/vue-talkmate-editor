@@ -492,28 +492,41 @@ export default {
         } else {
           this.tracks.push(catalogs)
         }
-        this.$set(this.tracks, num, catalogs)
+        setTimeout(() => {
+          this.$set(this, 'tracks', this.tracks.slice(0, num + 1))
+        }, 10)
         console.log('courseContentPath', this.courseContentPath)
-        if (this.courseContentPath === '') {
-          this.courseContentPath = localStorage.getItem('courseContentPath')
-        }
-        if (this.courseContentPath && this.tracks[num]) {
-          let arr = this.courseContentPath.split('/')
-          let fIndex = this.tracks[num].findIndex(item => {
-            return item.uuid === arr[num]
-          })
-          if (fIndex === -1) {
-            this.courseContentPath = ''
-            setTimeout(() => {
-              this.trackLeftScroll()
-            }, 800)
-          } else {
-            this.clickFolder({ folder: this.tracks[num][fIndex], trackNum: num })
-            if (arr.length === num + 2) {
+        console.log(this.curUUID)
+        let curFolder = this.tracks[num].find(item => {
+          return item.uuid === this.curUUID
+        })
+        if (curFolder) {
+          this.clickFolder({ folder: curFolder, trackNum: num })
+          setTimeout(() => {
+            this.trackLeftScroll()
+          }, 800)
+        } else {
+          if (this.courseContentPath === '') {
+            this.courseContentPath = localStorage.getItem('courseContentPath')
+          }
+          if (this.courseContentPath && this.tracks[num]) {
+            let arr = this.courseContentPath.split('/')
+            let fIndex = this.tracks[num].findIndex(item => {
+              return item.uuid === arr[num]
+            })
+            if (fIndex === -1) {
               this.courseContentPath = ''
               setTimeout(() => {
                 this.trackLeftScroll()
               }, 800)
+            } else {
+              this.clickFolder({ folder: this.tracks[num][fIndex], trackNum: num })
+              if (arr.length === num + 2) {
+                this.courseContentPath = ''
+                setTimeout(() => {
+                  this.trackLeftScroll()
+                }, 800)
+              }
             }
           }
         }
@@ -766,16 +779,17 @@ export default {
       // }
       console.log(index)
       this.uuid = ''
-      this.curUUID = ''
+      // this.curUUID = ''
       let params = {}
       params['event'] = ev
       params['type'] = 'other'
       if (item && item.parent_uuid) {
         params['pUUID'] = item.parent_uuid
+        this.curUUID = ''
       } else {
-        if (index > 0 && this.tracks[index - 1].length) {
-          let uuidArr = this.path.split('/')
-          this.uuid = uuidArr[uuidArr.length - 2]
+        if (index > 0) {
+          // let uuidArr = this.path.split('/')
+          this.uuid = this.curUUID
           params['pUUID'] = this.uuid
         } else {
           params['pUUID'] = this.version.uuid
@@ -857,7 +871,7 @@ export default {
               type: 'success',
               message: '删除成功!'
             })
-            this.resetTrackData({ pUUID: params.folder.parent_uuid, trackNum: params.trackNum })
+            this.resetTrackData({ pUUID: params.folder.parent_uuid, trackNum: params.trackNum, curUUID: params.folder.parent_uuid })
           }
         })
       }).catch(() => {

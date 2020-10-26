@@ -4,7 +4,10 @@
 
 <script>
 export default {
-  name: 'Dict'
+  name: 'Dict',
+  mounted () {
+    this.$store.dispatch('course/getDictTags')
+  }
 }
 </script>
 

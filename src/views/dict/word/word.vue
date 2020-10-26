@@ -9,12 +9,12 @@
           <el-button slot="append" icon="el-icon-search" @click="handlerSearch"></el-button>
         </el-input>
       </div>
-      <div class="right">
-        <el-button v-show="userInfo.authority.authorityId == '1' || userInfo.authority.authorityId == '2'"
+      <div class="right" v-show="false">
+        <el-button
           style="outline:none;"
           type="primary"
           class="btnAdd"
-          @click="addCourse">添加</el-button>
+          @click="add">添加</el-button>
       </div>
     </div>
     <el-table
@@ -38,7 +38,7 @@
           <el-button
             v-show="userInfo.authority.authorityId == '1' || userInfo.authority.authorityId == '2'"
             size="mini"
-            @click="editCourse(scope.row)">编辑</el-button>
+            @click="edit(scope.row)">编辑</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -115,7 +115,9 @@ export default {
         from: this.fromLang,
         to: this.toLang,
         page_index: this.currentPage,
-        page_size: this.pageSize
+        page_size: this.pageSize,
+        text_field: 'content',
+        sort_type: 1
       })
       if (res.success && res.data) {
         let copy = this.list.slice()
@@ -126,11 +128,12 @@ export default {
         }, 0)
       }
     },
-    editCourse (row) {
+    edit (row) {
       getDictDetail({ uuid: row.uuid, from: this.fromLang, to: this.toLang }).then(res => {
         let obj = {
           type: 'edit',
-          selFromLang: this.fromLang,
+          fromLang: this.fromLang,
+          toLang: this.toLang,
           form: res.data
         }
         this.$refs.edit.show(obj)
@@ -152,10 +155,11 @@ export default {
       }
       console.log(obj)
     },
-    addCourse () {
+    add () {
       let obj = {
         type: 'add',
-        selFromLang: this.fromLang
+        fromLang: this.fromLang,
+        toLang: this.toLang
       }
       this.$refs.edit.show(obj)
     },

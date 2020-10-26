@@ -1622,6 +1622,32 @@ export const getDictDetail = (data) => {
 }
 
 /**
+ * @Summary 词典--标签
+ * @param {*} data
+ * @Router /editor/dict/tags [post]
+ */
+export const GetDictTags = (data) => {
+  return service({
+    url: '/editor/dict/tags',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 词典内容详情
+ * @param {*} data
+ * @Router /editor/dict/update [post]
+ */
+export const updateDictWord = (data) => {
+  return service({
+    url: '/editor/dict/update',
+    method: 'post',
+    data
+  })
+}
+
+/**
  * @Summary 词典----句子列表
  * @param {*} data
  * @Router /editor/sentence/list [post]
@@ -1629,6 +1655,58 @@ export const getDictDetail = (data) => {
 export const getSentenceList = (data) => {
   return service({
     url: '/editor/sentence/list',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 词典----句子详情
+ * @param {*} data
+ * @Router /editor/sentence/detail [post]
+ */
+export const getSentenceDetail = (data) => {
+  return service({
+    url: '/editor/sentence/detail',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 词典----句子详情
+ * @param {*} data
+ * @Router /editor/sentence/update [post]
+ */
+export const updateDictSentence = (data) => {
+  return service({
+    url: '/editor/sentence/update',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 词典----纠错列表
+ * @param {*} data
+ * @Router /editor/reports/list [post]
+ */
+export const getFeedbackList = (data) => {
+  return service({
+    url: '/editor/reports/list',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 词典----更新反馈信息
+ * @param {*} data
+ * @Router /editor/reports/update [post]
+ */
+export const updateFeedback = (data) => {
+  return service({
+    url: '/editor/reports/update',
     method: 'post',
     data
   })

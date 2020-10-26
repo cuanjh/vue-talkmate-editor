@@ -46,7 +46,7 @@
         </div>
         <div class="menu-group" v-show="type == 'folder'">
           <div class="line"></div>
-          <div class="menu-item" v-show="false">
+          <div class="menu-item" v-show="userInfo.authorityId === '1'">
             <div class="name" @click="onlineJob">上线</div>
           </div>
           <div class="menu-item" v-show="userInfo.authorityId === '1'">
@@ -291,23 +291,27 @@ export default {
       this.hide()
     },
     addFolder () {
+      let trackNum = this.trackNum
       let uuid
       if (this.type === 'other') {
         uuid = this.pUUID
       } else {
         uuid = this.folder.uuid
+        trackNum++
       }
-      this.$emit('editCatalog', { handler: 'add', type: 'catalog', uuid: uuid, trackNum: this.trackNum, clickType: this.type })
+      this.$emit('editCatalog', { handler: 'add', type: 'catalog', uuid: uuid, trackNum: trackNum, clickType: this.type })
       this.hide()
     },
     addDocument () {
+      let trackNum = this.trackNum
       let uuid
       if (this.type === 'other') {
         uuid = this.pUUID
       } else {
         uuid = this.folder.uuid
+        trackNum++
       }
-      this.$emit('editCatalog', { handler: 'add', type: 'content', uuid: uuid, trackNum: this.trackNum, clickType: this.type })
+      this.$emit('editCatalog', { handler: 'add', type: 'content', uuid: uuid, trackNum: trackNum, clickType: this.type })
       this.hide()
     },
     editCatalog () {
@@ -542,6 +546,8 @@ export default {
   }
   .authority-wrap {
     padding: 5px;
+    overflow-y: auto;
+    max-height: 300px;
     .user-item {
       width: 400px;
       display: flex;

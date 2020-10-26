@@ -140,13 +140,23 @@
           </el-upload>
           <el-tag type="warning">注：讲师照片将在发现页小图和分类课程-直播处展示</el-tag>
         </el-form-item>
-        <el-form-item label="直播老师" prop="selTeacher">
+        <el-form-item label="直播老师(app)" prop="selTeacher">
           <el-select v-model="form.selTeacher" filterable placeholder="请选择直播老师">
             <el-option
               v-for="item in teacherList"
               :key="item.user_id"
               :label="item.live_nickname"
               :value="item.user_id">
+            </el-option>
+        </el-select>
+        </el-form-item>
+        <el-form-item label="直播老师(编辑器)" prop="liveUserUUID">
+          <el-select v-model="form.liveUserUUID" filterable placeholder="请选择直播老师">
+            <el-option
+              v-for="item in userList"
+              :key="item.uuid"
+              :label="item.nickName"
+              :value="item.uuid">
             </el-option>
         </el-select>
         </el-form-item>
@@ -344,6 +354,9 @@ import {
   editLive,
   getTeacherList
 } from '@/api/course'
+import {
+  getUserList
+} from '@/api/user'
 import { mapState } from 'vuex'
 export default {
   data () {
@@ -362,6 +375,7 @@ export default {
       excludeDates: [],
       basicCourses: [],
       teacherList: [],
+      userList: [],
       form: {
         moduleName: '',
         level: 0,
@@ -376,6 +390,7 @@ export default {
         moneyDiscount: 0,
         teacherPhoto: '',
         selTeacher: '',
+        liveUserUUID: '',
         teacherName: '',
         teacherDesc: '',
         finishTitle: '',
@@ -482,6 +497,12 @@ export default {
         console.log(this.teacherList)
       }
     })
+
+    getUserList({ page: 1, pageSize: 999 }).then(res => {
+      this.userList = res.data.userList.filter(res => {
+        return res.authorityId === '131'
+      })
+    })
     this.flag = this.$route.query.flag
     if (this.flag === 'edit') {
       this.initEditInfo()
@@ -517,6 +538,7 @@ export default {
         this.form.dateNotice = this.roomInfo.liveInfo.dateNotice
         this.form.teacherPhoto = this.roomInfo.liveInfo.tech_photo
         this.form.selTeacher = this.roomInfo.user_id
+        this.form.liveUserUUID = this.roomInfo.liveInfo.liveUserUUID
         this.form.teacherName = this.roomInfo.liveInfo.tech_name
         this.form.teacherDesc = this.roomInfo.liveInfo.tech_desc
         this.form.weixinNo = this.roomInfo.liveInfo.weixinNo
@@ -749,7 +771,8 @@ export default {
                 basicContentLevel: this.form.basicContentLevel,
                 basicChapterCover: this.form.basicChapterCover,
                 basicProfilePhoto: this.form.basicProfilePhoto,
-                dateNotice: this.form.dateNotice
+                dateNotice: this.form.dateNotice,
+                liveUserUUID: this.form.liveUserUUID
               },
               module_name: this.form.moduleName,
               money: this.form.money,
@@ -976,6 +999,7 @@ export default {
 <style lang="scss" scoped>
 .edit-container {
   overflow: auto;
+  padding-bottom: 50px;
 }
 .title {
   font-size: 18px;
@@ -1113,5 +1137,9 @@ export default {
   width: 120px;
   height: 120px;
   object-fit: cover;
+}
+
+.basic-info .el-form-item__label {
+  line-height: 22px;
 }
 </style>
