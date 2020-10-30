@@ -6,20 +6,44 @@
           <el-select v-model="selLang" slot="prepend" placeholder="请选择" @change="handlerSearch">
             <el-option label="英汉" value="ENG-CHI"></el-option>
           </el-select>
-          <el-button slot="append" icon="el-icon-search" @click="handlerSearch"></el-button>
+          <el-radio-group slot="append" v-model="searchType" @change="handlerSearch">
+            <el-radio :label="0">精确搜索</el-radio>
+            <el-radio :label="1">模糊搜索</el-radio>
+          </el-radio-group>
         </el-input>
       </div>
-      <div class="right" v-show="false">
+      <div class="right">
         <el-button
+          v-show="false"
           style="outline:none;"
           type="primary"
           class="btnAdd"
           @click="add">添加</el-button>
+        <el-button
+          style="outline:none;"
+          type="success"
+          class="btnAdd"
+          @click="multipleHandler('online')">上线</el-button>
+        <el-button
+          style="outline:none;"
+          type="warning"
+          class="btnAdd"
+          @click="multipleHandler('offline')">下线</el-button>
+        <el-button
+          style="outline:none;"
+          type="danger"
+          class="btnAdd"
+          @click="multipleHandler('del')">删除</el-button>
       </div>
     </div>
     <el-table
       :data="list"
+      @selection-change="handleSelectionChange"
       style="width: 100%;">
+      <el-table-column
+        type="selection"
+        width="55">
+      </el-table-column>
       <el-table-column
         width="60"
         label="序号"
@@ -33,12 +57,33 @@
         label="更新时间"
         :formatter="formatterDate">
       </el-table-column>
+      <el-table-column
+        label="状态"
+        prop="content">
+        <template slot-scope="scope">
+          <el-tag :type="scope.row.done ? 'success' : 'primary'">{{scope.row.done ? '已上线' : '未上线'}}</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" fixed="right">
         <template slot-scope="scope">
           <el-button
             v-show="userInfo.authority.authorityId == '1' || userInfo.authority.authorityId == '2'"
             size="mini"
+            type="info"
+            plain
             @click="edit(scope.row)">编辑</el-button>
+          <el-button
+            v-show="userInfo.authority.authorityId == '1' || userInfo.authority.authorityId == '2'"
+            :type="scope.row.done ? 'warning' : 'success'"
+            size="mini"
+            plain
+            @click="setState(scope.row, scope.$index)">{{scope.row.done ? '下线' : '上线'}}</el-button>
+          <el-button
+            v-show="userInfo.authority.authorityId == '1' || userInfo.authority.authorityId == '2'"
+            size="mini"
+            type="danger"
+            plain
+            @click="deleteDict(scope.row, scope.$index)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -52,7 +97,10 @@ import moment from 'moment'
 
 import {
   getDictList,
-  getDictDetail
+  getDictDetail,
+  dictOnline,
+  dictOffline,
+  dictDel
 } from '@/api/course'
 import EditWord from './editWord'
 
@@ -61,7 +109,9 @@ export default {
   data () {
     return {
       searchKey: '',
+      searchType: 0,
       selLang: 'ENG-CHI',
+      multipleSelection: [],
       list: [],
       isShow: false,
       currentPage: 1,
@@ -73,8 +123,6 @@ export default {
   },
   components: {
     EditWord
-    // CourseDetail,
-    // UnlockCourse
   },
   created () {
     this.initData()
@@ -116,6 +164,7 @@ export default {
         to: this.toLang,
         page_index: this.currentPage,
         page_size: this.pageSize,
+        searchType: this.searchType,
         text_field: 'content',
         sort_type: 1
       })
@@ -139,21 +188,38 @@ export default {
         this.$refs.edit.show(obj)
       })
     },
-    handleEdit (row) {
-      console.log(row)
-      let obj = {
-        editInfo: {
-          course_type: row.course_type,
-          cover: row.cover,
-          desc: row.desc ? row.desc : '',
-          flag: row.flag ? row.flag : '',
-          is_show: !row.is_show,
-          tags: [],
-          title: row.title ? row.title : ''
-        },
-        uuid: row.uuid
+    setState (row, index) {
+      const obj = {
+        ctype: 'word',
+        from: this.fromLang,
+        to: this.toLang,
+        uuids: [
+          row.uuid
+        ]
       }
-      console.log(obj)
+      if (row.done) {
+        // 下线操作
+        dictOffline(obj).then(res => {
+          if (res.success) {
+            this.$message({
+              type: 'success',
+              message: '下线成功'
+            })
+            this.$set(this.list[index], 'done', !row.done)
+          }
+        })
+      } else {
+        // 上线操作
+        dictOnline(obj).then(res => {
+          if (res.success) {
+            this.$message({
+              type: 'success',
+              message: '上线成功'
+            })
+            this.$set(this.list[index], 'done', !row.done)
+          }
+        })
+      }
     },
     add () {
       let obj = {
@@ -163,13 +229,28 @@ export default {
       }
       this.$refs.edit.show(obj)
     },
-    deleteCourse (id) {
-      console.log(id)
-      this.$confirm('此操作将永久删除该课程分类, 是否继续?', '提示', {
+    deleteDict (row, index) {
+      this.$confirm('此操作将永久删除该内容, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
+        dictDel({
+          ctype: 'word',
+          from: this.fromLang,
+          to: this.toLang,
+          uuid: [
+            row.uuid
+          ]
+        }).then(res => {
+          if (res.success) {
+            this.$message({
+              type: 'success',
+              message: '删除成功'
+            })
+            this.list.splice(index, 1)
+          }
+        })
       }).catch(() => {
         this.$message({
           type: 'info',
@@ -177,21 +258,80 @@ export default {
         })
       })
     },
-    curCourse () {
-      this.initData()
-    },
-    imageUrl (image) {
-      let url = this.assetsDomain + image
-      return url
-    },
     formatterDate (obj) {
       return obj && obj.updatedOn ? moment(obj.updatedOn).format('YYYY-MM-DD HH:mm') : ''
     },
-    addDetail (row) {
-      this.$refs['courseDetail'].show(row)
+    handleSelectionChange (val) {
+      this.multipleSelection = val
+      console.log(this.multipleSelection)
     },
-    unlockCourse (row) {
-      this.$refs['unlockCourse'].show(row)
+    multipleHandler (action) {
+      if (this.multipleSelection.length === 0) {
+        this.$message({
+          type: 'warning',
+          message: '请选择列表'
+        })
+        return false
+      }
+      let uuids = []
+      this.multipleSelection.map(item => {
+        uuids.push(item.uuid)
+      })
+      console.log(uuids)
+      const obj = {
+        ctype: 'word',
+        from: this.fromLang,
+        to: this.toLang,
+        uuids: uuids
+      }
+      switch (action) {
+        case 'online':
+          dictOnline(obj).then(res => {
+            if (res.success) {
+              this.$message({
+                type: 'success',
+                message: '上线成功'
+              })
+              this.initData()
+            }
+          })
+          break
+        case 'offline':
+          dictOffline(obj).then(res => {
+            if (res.success) {
+              this.$message({
+                type: 'success',
+                message: '下线成功'
+              })
+              this.initData()
+            }
+          })
+          break
+        case 'del':
+          this.$confirm('确认要删除吗?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            dictDel(obj).then(res => {
+              if (res.success) {
+                this.$message({
+                  type: 'success',
+                  message: '删除成功'
+                })
+                this.initData()
+              }
+            })
+          }).catch(() => {
+            this.$message({
+              type: 'info',
+              message: '已取消删除'
+            })
+          })
+          break
+        default:
+          break
+      }
     }
   }
 }
@@ -214,7 +354,7 @@ export default {
       padding-right: 20px;
     }
     .right {
-      width: 120px;
+      // width: 120px;
     }
   }
 

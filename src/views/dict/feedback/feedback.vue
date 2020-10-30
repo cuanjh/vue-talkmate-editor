@@ -28,6 +28,11 @@
         :formatter="formatterDate">
       </el-table-column>
       <el-table-column
+        label="内容"
+        prop="content"
+        width="140px">
+      </el-table-column>
+      <el-table-column
         :filters="[{ text: '单词', value: 'word' }, { text: '句子', value: 'sentence' }]"
         :filter-method="filterRepType"
         label="分类">
@@ -53,6 +58,7 @@
         </template>
       </el-table-column>
       <el-table-column
+        width="100px"
         :filters="[{ text: '未处理', value: 0 }, { text: '已处理', value: 1 }]"
         :filter-method="filterState"
         label="状态">

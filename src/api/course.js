@@ -1687,6 +1687,45 @@ export const updateDictSentence = (data) => {
 }
 
 /**
+ * @Summary 词典----上线
+ * @param {*} data
+ * @Router /editor/dict/online [post]
+ */
+export const dictOnline = (data) => {
+  return service({
+    url: '/editor/dict/online',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 词典----下线
+ * @param {*} data
+ * @Router /editor/dict/offline [post]
+ */
+export const dictOffline = (data) => {
+  return service({
+    url: '/editor/dict/offline',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 词典----删除
+ * @param {*} data
+ * @Router /editor/dict/del [post]
+ */
+export const dictDel = (data) => {
+  return service({
+    url: '/editor/dict/del',
+    method: 'post',
+    data
+  })
+}
+
+/**
  * @Summary 词典----纠错列表
  * @param {*} data
  * @Router /editor/reports/list [post]
