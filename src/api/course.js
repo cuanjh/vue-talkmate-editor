@@ -1750,3 +1750,16 @@ export const updateFeedback = (data) => {
     data
   })
 }
+
+/**
+ * @Summary 词典----删除反馈信息
+ * @param {*} data
+ * @Router /editor/reports/delete [post]
+ */
+export const delFeedback = (data) => {
+  return service({
+    url: '/editor/reports/delete',
+    method: 'post',
+    data
+  })
+}

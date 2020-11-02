@@ -107,9 +107,6 @@ export default {
     }
   },
   mounted () {
-    getInfoTokenUploadFile().then(res => {
-      this.token = res.data.token
-    })
   },
   computed: {
     ...mapState({
@@ -165,6 +162,8 @@ export default {
       } else if (dataFrom === 'video') {
         url = 'live/videos/' + date + '/' + file.uid + '.' + ext
       }
+      const resToken = await getInfoTokenUploadFile()
+      this.token = resToken.data.token
       let res = await uploadQiniu(file.raw, this.token, url)
       this.$set(this.form, feild, this.uploadfileDomain + res.key)
     },

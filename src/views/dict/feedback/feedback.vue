@@ -66,17 +66,17 @@
           <el-button size="small" :type="props.row.state == '0' ? 'warning' : 'success'" @click="handleState(props)">{{ props.row.state == '0' ? '未处理' : '已处理' }}</el-button>
         </template>
       </el-table-column>
-      <el-table-column label="操作" fixed="right" width="100px">
+      <el-table-column label="操作" fixed="right" width="160px">
         <template slot-scope="scope">
-          <el-button
-            v-show="false"
-            size="mini"
-            @click="editCourse(scope.row)">编辑</el-button>
           <el-button
             v-show="userInfo.authority.authorityId == '1' || userInfo.authority.authorityId == '2'"
             :disabled="scope.row.state == '1'"
             size="mini"
             @click="feedback(scope.row)">纠错</el-button>
+          <el-button
+            type="danger"
+            size="mini"
+            @click="del(scope.row, scope.$index)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -93,7 +93,8 @@ import {
   getFeedbackList,
   updateFeedback,
   getDictDetail,
-  getSentenceDetail
+  getSentenceDetail,
+  delFeedback
 } from '@/api/course'
 import EditSentence from '../sentence/editSentence'
 import EditWord from '../word/editWord'
@@ -115,7 +116,6 @@ export default {
   components: {
     EditSentence,
     EditWord
-    // UnlockCourse
   },
   created () {
     this.initData()
@@ -160,16 +160,6 @@ export default {
           onlyOne = true
         }, 0)
       }
-    },
-    editCourse (row) {
-      getSentenceDetail({ uuid: row.uuid, from: this.fromLang, to: this.toLang }).then(res => {
-        let obj = {
-          type: 'edit',
-          fromLang: this.fromLang,
-          form: res.data
-        }
-        this.$refs.edit.show(obj)
-      })
     },
     feedback (row) {
       console.log(row)
@@ -245,26 +235,28 @@ export default {
       }
       this.$refs.edit.show(obj)
     },
-    deleteCourse (id) {
-      console.log(id)
-      this.$confirm('此操作将永久删除该课程分类, 是否继续?', '提示', {
+    del (row, index) {
+      console.log(row)
+      this.$confirm('确认要删除吗?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
+        delFeedback({ id: row.id }).then(res => {
+          if (res.success) {
+            this.$message({
+              type: 'success',
+              message: '删除成功'
+            })
+            this.list.splice(index, 1)
+          }
+        })
       }).catch(() => {
         this.$message({
           type: 'info',
           message: '已取消删除'
         })
       })
-    },
-    curCourse () {
-      this.initData()
-    },
-    imageUrl (image) {
-      let url = this.assetsDomain + image
-      return url
     },
     formatterDate (obj) {
       return obj && obj.createdTime ? moment(obj.createdTime).format('YYYY-MM-DD HH:mm') : ''
@@ -274,12 +266,6 @@ export default {
     },
     filterState (value, row) {
       return row.state === value
-    },
-    addDetail (row) {
-      this.$refs['courseDetail'].show(row)
-    },
-    unlockCourse (row) {
-      this.$refs['unlockCourse'].show(row)
     }
   }
 }
