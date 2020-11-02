@@ -106,14 +106,14 @@ export default {
   data () {
     return {
       searchKey: '',
-      searchType: 0,
+      searchType: 1,
       selLang: 'ENG-CHI',
       multipleSelection: [],
       list: [],
       isShow: false,
       currentPage: 1,
       total: 0,
-      pageSize: 10,
+      pageSize: 50,
       scrollTop: 0,
       isShowPagination: false
     }

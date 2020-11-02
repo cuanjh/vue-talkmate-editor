@@ -276,12 +276,18 @@ export default {
           this.ruleForm.expansion = dictTranslate.expansion
         }
         if (dictTranslate && dictTranslate.contentTr) {
-          this.ruleForm.content_tr = dictTranslate.contentTr
+          let ct = []
+          dictTranslate.contentTr.map(item => {
+            let obj = item
+            obj['cx'] = item.cx.replace(/[\r\n]/g, '').replace(/\s*/g, '')
+            ct.push(obj)
+          })
+          this.ruleForm.content_tr = ct
         }
-        if (dictTranslate && dictTranslate.synonym) {
+        if (dictTranslate && dictTranslate.synonym && dictTranslate.synonym.length > 0) {
           this.ruleForm.synonym = dictTranslate.synonym
         }
-        if (dictTranslate && dictTranslate.homonyms) {
+        if (dictTranslate && dictTranslate.homonyms && dictTranslate.homonyms.length > 0) {
           this.ruleForm.homonyms = dictTranslate.homonyms
         }
         if (dictTranslate && dictTranslate.tags) {
