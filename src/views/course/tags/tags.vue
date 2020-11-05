@@ -3,11 +3,11 @@
     <div class="tags-content">
       <div class="top-bar">
         <div class="left">
-          <el-input v-model="searchKey" @input="search" clearable placeholder="请输入要查找的key或名称"></el-input>
+          <el-input v-model="searchKey" @change="initData" clearable placeholder="请输入要查找的key或名称"></el-input>
           &nbsp;
           <el-select v-model="type"
             placeholder="请选择分类"
-            @change="search">
+            @change="initData">
             <el-option value="" label="全部"></el-option>
             <el-option
               v-for="item in tagTypes"
@@ -84,7 +84,7 @@
         </el-pagination>
       </div>
     </div>
-    <edit-comp ref="tagEdit" :tagTypes="tagTypes" @addTagItem="initData"/>
+    <edit-comp ref="tagEdit" @addTagItem="initData"/>
     <cropper-dialog ></cropper-dialog>
   </div>
 </template>
@@ -148,7 +148,7 @@ export default {
       return obj.name
     },
     async initData () {
-      await this.getContentTags({ pageNo: 0, pageSize: 0 })
+      await this.getContentTags({ pageNo: 0, pageSize: 0, name: this.searchKey, type: this.type })
       console.log('initData')
       this.tagsLists = this.contentTags
       this.allTags = this.contentTags

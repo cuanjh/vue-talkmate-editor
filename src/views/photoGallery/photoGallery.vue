@@ -217,6 +217,9 @@ export default {
     max-height: 50px;
     overflow: hidden;
     transition: max-height .5s;
+    -webkit-transition: max-height .5s;
+    -moz-transition: max-height .5s;
+    -o-transition: max-height .5s;
     li {
       min-width: 80px;
       margin-right: 10px;
@@ -237,6 +240,9 @@ export default {
   .expand {
     max-height: 1000px;
     transition: max-height .5s;
+    -webkit-transition: max-height .5s;
+    -moz-transition: max-height .5s;
+    -o-transition: max-height .5s;
   }
   a {
     width: 30px;
@@ -250,6 +256,9 @@ export default {
       background-repeat: no-repeat;
       background-size: cover;
       transition: transform .5s;
+      -webkit-transition: transform .5s;
+      -moz-transition: transform .5s;
+      -o-transition: transform .5s;
     }
   }
 }

@@ -100,9 +100,9 @@
             <div v-show="!lowerRoleUser">
             <el-button
               type="primary" icon="el-icon-upload2"
-              :disabled="(userInfo.authorityId !== '1' && item.curUserAuth['auth'] == 'r')" circle @click="clickUpload"></el-button>
+              :disabled="(userInfo.authorityId !== '1' && item.curUserAuth['auth'] == 'r')" circle @click="clickUpload(item)"></el-button>
             <el-upload
-              ref="upload"
+              :ref="'upload-' + item.uuid"
               class="upload-demo"
               accept=".xls,.xlsx"
               :data="{
@@ -535,9 +535,9 @@ export default {
         this.$refs['rightMenu'].hide()
       }
     },
-    clickUpload () {
-      console.log(this.$refs['upload'][0].$refs['upload-inner'])
-      const uploadInner = this.$refs['upload'][0].$refs['upload-inner']
+    clickUpload (item) {
+      console.log(this.$refs['upload-' + item.uuid][0].$refs['upload-inner'])
+      const uploadInner = this.$refs['upload-' + item.uuid][0].$refs['upload-inner']
       this.$confirm('确定要上传吗?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -619,6 +619,9 @@ export default {
     margin: 15px;
     overflow: hidden;
     transition: all .3s ease;
+    -webkit-transition: all ease .3s;
+    -moz-transition: all ease .3s;
+    -o-transition: all ease .3s;
     // cursor: pointer;
     // &:hover {
     //   box-shadow:0px 24px 24px 0px rgba(0,0,0,0.12);
@@ -650,6 +653,9 @@ export default {
     border: 45px solid;
     border-color: transparent transparent #007AFF transparent;
     transform: rotate(-45deg) translateY(-70px) translateX(0px);
+    -webkit-transform: rotate(-45deg) translateY(-70px) translateX(0px);
+    -moz-transform: rotate(-45deg) translateY(-70px) translateX(0px);
+    -ms-transform: rotate(-45deg) translateY(-70px) translateX(0px);
     span {
       position: absolute;
       width: 100px;

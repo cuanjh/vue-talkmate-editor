@@ -127,6 +127,9 @@ export default {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+  -moz-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
   padding: 40px;
   display: flex;
   flex-direction: column;
@@ -173,6 +176,9 @@ export default {
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
+            -webkit-transform: translate(-50%, -50%);
+            -moz-transform: translate(-50%, -50%);
+            -ms-transform: translate(-50%, -50%);
             background: rgba(0, 0, 0,.6);
             border-radius: 8px;
             width: 100%;

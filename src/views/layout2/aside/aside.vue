@@ -416,6 +416,9 @@ export default {
         color: rgba($color: #fff, $alpha: 0.6);
         font-size: 14px;
         transition: all ease .3s;
+        -webkit-transition: all ease .3s;
+        -moz-transition: all ease .3s;
+        -o-transition: all ease .3s;
         cursor: pointer;
         span:nth-child(2) {
           position: absolute;
@@ -456,6 +459,9 @@ export default {
         font-weight: 400;
         line-height: 22px;
         transition: all ease .3s;
+        -webkit-transition: all ease .3s;
+        -moz-transition: all ease .3s;
+        -o-transition: all ease .3s;
         cursor: pointer;
         span:nth-child(2) {
           position: absolute;
@@ -486,9 +492,15 @@ export default {
   }
   .catalog-fade-enter-active {
     transition: all .3s ease;
+    -webkit-transition: all ease .3s;
+    -moz-transition: all ease .3s;
+    -o-transition: all ease .3s;
   }
   .catalog-fade-enter, .slide-fade-leave-to {
     transform: translateY(40px);
+    -webkit-transform: translateY(40px);
+    -moz-transform: translateY(40px);
+    -ms-transform: translateY(40px);
     opacity: 0;
   }
 </style>

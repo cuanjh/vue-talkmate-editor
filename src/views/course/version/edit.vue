@@ -296,6 +296,9 @@ export default {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+  -moz-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
   width:800px;
   background:rgba(245,246,250,1);
   border-radius:4px;

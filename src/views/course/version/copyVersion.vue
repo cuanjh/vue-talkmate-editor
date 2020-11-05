@@ -173,6 +173,9 @@ export default {
         border: 45px solid;
         border-color: transparent transparent #007AFF transparent;
         transform: rotate(-45deg) translateY(-70px) translateX(0px);
+        -webkit-transform: rotate(-45deg) translateY(-70px) translateX(0px);
+        -moz-transform: rotate(-45deg) translateY(-70px) translateX(0px);
+        -ms-transform: rotate(-45deg) translateY(-70px) translateX(0px);
         span {
           position: absolute;
           width: 100px;

@@ -660,6 +660,19 @@ export const editTags = (data) => {
 }
 
 /**
+ * @Summary 标签分类
+ * @param {*} data
+ * @Router /editor/tags/types/add [post]
+ */
+export const addTagType = (data) => {
+  return service({
+    url: '/editor/tag/types/add',
+    method: 'post',
+    data
+  })
+}
+
+/**
  * @Summary 标签类型
  * @param {*} data
  * @Router /editor/tag/types [post]

@@ -1,12 +1,8 @@
 <template>
-<transition name="fade">
-  <div class="tags-edit-container" v-if="showEdit">
+  <el-dialog class="tags-edit-container" width="70%" :visible.sync="showEdit" @close="close">
     <div class="edit-content">
-      <div class="close" @click="close">
-        <i class="el-icon-close"></i>
-      </div>
       <div class="content">
-        <el-form ref="form" :model="form">
+        <el-form ref="form" :model="form" size="small">
           <el-form-item label="key: " prop="key" :rules="[
             { required: true, message: 'key不能为空', trigger: 'blur'}
           ]">
@@ -28,6 +24,7 @@
                 :value="item.type">
               </el-option>
             </el-select>
+            <el-button size="small" type="primary" round @click="addTagType">添加分类</el-button>
           </el-form-item>
           <el-form-item label="标题: ">
             <div class="lang-input" v-for="l in langInfos" :key="l.langKey">
@@ -121,8 +118,31 @@
         </div>
       </div>
     </div>
-  </div>
-</transition>
+    <el-dialog
+      width="30%"
+      title="添加标签分类"
+      :visible.sync="innerVisible"
+      append-to-body>
+      <el-form ref="innerForm" label-width="80px" :model="innerForm" inline>
+        <el-form-item label="type" prop="type" :rules="[
+            { required: true, message: 'type不能为空', trigger: 'blur'}
+          ]">
+          <el-input v-model="innerForm.type" autocomplete="off" placeholder="请输入字母组合"></el-input>
+        </el-form-item>
+        <el-form-item label="名称" prop="name" :rules="[
+            { required: true, message: '名称不能为空', trigger: 'blur'}
+          ]">
+          <el-input v-model="innerForm.name" autocomplete="off"></el-input>
+        </el-form-item>
+        <div class="btns">
+          <el-button
+            class="determine active"
+            type="primary"
+            @click="addType()">添加</el-button>
+        </div>
+      </el-form>
+    </el-dialog>
+  </el-dialog>
 </template>
 
 <script>
@@ -130,17 +150,18 @@ import Sortable from 'sortablejs'
 import {
   editTags,
   addTags,
+  addTagType,
   getInfoToken
 } from '@/api/course'
 import { uploadQiniu } from '@/utils/uploadQiniu'
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 
 export default {
-  props: ['tagTypes'],
   data () {
     return {
       token: '',
       showEdit: false,
+      innerVisible: false,
       sortable: null,
       form: {
         cover: [],
@@ -152,11 +173,16 @@ export default {
         title: {},
         type: ''
       },
+      innerForm: {
+        type: '',
+        name: ''
+      },
       type: ''
     }
   },
   computed: {
     ...mapState({
+      tagTypes: state => state.course.tagTypes,
       assetsDomain: state => state.course.assetsDomain,
       langInfos: state => state.course.langInfos
     }),
@@ -189,6 +215,9 @@ export default {
     })
   },
   methods: {
+    ...mapActions({
+      getTagTypes: 'course/getTagTypes'
+    }),
     show (params) {
       console.log(params)
       this.type = params.type
@@ -307,6 +336,28 @@ export default {
           }, 0)
         }
       })
+    },
+    addTagType () {
+      this.innerForm.type = ''
+      this.innerForm.name = ''
+      this.innerVisible = true
+    },
+    addType () {
+      this.$refs['innerForm'].validate((valid) => {
+        if (valid) {
+          console.log(this.innerForm)
+          addTagType(this.innerForm).then(res => {
+            if (res.success) {
+              this.$message({
+                type: 'success',
+                message: '添加成功'
+              })
+              this.getTagTypes()
+              this.innerVisible = false
+            }
+          })
+        }
+      })
     }
   },
   destroyed () {
@@ -316,31 +367,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.tags-edit-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background:rgba(0,0,0,.7);
-  z-index: 999;
-}
 .edit-content {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width:870px;
-  background:rgba(245,246,250,1);
-  border-radius:4px;
-  padding: 50px 30px 40px;
-  box-sizing: border-box;
-  .close {
-    position: absolute;
-    right: 20px;
-    top: 20px;
-    cursor: pointer;
-  }
   .btns {
     display: flex;
     justify-content: center;
@@ -377,8 +404,6 @@ export default {
 .edit-content .content {
   width: 100%;
   height: 100%;
-  max-height:500px;
-  overflow-y: auto;
 }
 .lang-input {
   margin-bottom: 10px;
@@ -496,27 +521,6 @@ export default {
     object-fit: cover;
     margin-bottom: 20px;
   }
-}
-/*滚动条样式*/
-.content::-webkit-scrollbar {/*滚动条整体样式*/
-  position: relative;
-  width: 6px;     /*高宽分别对应横竖滚动条的尺寸*/
-  height: 4px;
-}
-.content::-webkit-scrollbar-thumb {/*滚动条里面小方块*/
-  position: absolute;
-  width: 6px;
-  border-radius: 4px;
-  -webkit-box-shadow: inset 0 0 4px rgba(0,0,0,0.4);
-  background: rgba(0, 0, 0, .4);
-  padding: 20px;
-}
-.content::-webkit-scrollbar-track {/*滚动条里面轨道*/
-  width: 4px;
-  width:2px;
-  background:rgba(216,216,216,1);
-  border-radius:1px;
-  opacity:0.1;
 }
 </style>
 <style>

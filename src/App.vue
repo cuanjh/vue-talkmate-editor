@@ -25,6 +25,9 @@ export default {
 }
 .fade-enter-active, .fade-leave-active {
   transition: opacity .5s;
+  -webkit-transition: opacity .5s;
+  -moz-transition: opacity .5s;
+  -o-transition: opacity .5s;
 }
 .fade-enter, .fade-leave-to {
   opacity: 0;

@@ -97,6 +97,9 @@ export default {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+  -moz-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
   width:500px;
   height:410px;
   background:rgba(245,246,250,1);
@@ -158,6 +161,9 @@ export default {
 }
 .fade-enter-active, .fade-leave-active {
   transition: opacity .5s;
+  -webkit-transition: opacity .5s;
+  -moz-transition: opacity .5s;
+  -o-transition: opacity .5s;
 }
 .fade-enter, .fade-leave-to {
   opacity: 0;

@@ -1052,6 +1052,9 @@ export default {
     line-height: 30px;
     margin-right: 30px;
     transition: all linear .3s;
+    -webkit-transition: all linear .3s;
+    -moz-transition: all linear .3s;
+    -o-transition: all linear .3s;
     cursor: pointer;
   }
   .active {

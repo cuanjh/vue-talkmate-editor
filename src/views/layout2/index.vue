@@ -66,6 +66,9 @@ $mainHight: 100vh;
 }
 .fade-enter-active, .fade-leave-active {
   transition: opacity .1s;
+  -webkit-transition: opacity .1s;
+  -moz-transition: opacity .1s;
+  -o-transition: opacity .1s;
 }
 .fade-enter, .fade-leave-to {
   opacity: 0;

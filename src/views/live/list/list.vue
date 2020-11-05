@@ -35,6 +35,27 @@
                   <el-button type="primary" size="small" class="btnPushLink" @click="editLiveCourse(c)">编辑</el-button>
                   <el-button v-show="!isEditor" type="primary" size="small" class="btnPushLink" @click="onlinePerson(c)">在线统计</el-button>
                   <el-button v-show="!isEditor" type="primary" size="small" class="btnPushLink" @click="courseFiles(c)">课件</el-button>
+                  <el-tooltip class="item" effect="dark" content="上传自定义评论数据" placement="top">
+                  <div v-show="!isEditor">
+                    <el-button
+                      type="primary" icon="el-icon-upload2" size="small" circle @click="clickUpload(c)"></el-button>
+                    <el-upload
+                      :ref="'upload-' + c.uuid"
+                      class="upload-demo"
+                      accept=".xls,.xlsx"
+                      name="filename"
+                      :data="{
+                        course_uuid: c.uuid
+                      }"
+                      :headers="{
+                        'x-token': token
+                      }"
+                      :action="api + '/live/comments_upload'"
+                      :show-file-list="false"
+                      :before-upload="beforeUpload"
+                      :on-success="uploadSuccess">
+                    </el-upload></div>
+                  </el-tooltip>
                 </el-row>
               </el-col>
             </el-row>
@@ -167,13 +188,15 @@ import {
   getLivePushUrl,
   sortLiveModule
 } from '@/api/course'
-import { mapState, mapActions } from 'vuex'
+import { mapState, mapGetters, mapActions } from 'vuex'
 
 export default {
   data () {
     return {
       rooms: [],
       search: '',
+      api: process.env.VUE_APP_BASE_API,
+      loading: null,
       liveRate: {
         '1': '一',
         '2': '二',
@@ -203,6 +226,9 @@ export default {
     this.initData()
   },
   computed: {
+    ...mapGetters({
+      token: 'user/token'
+    }),
     ...mapState({
       uploadfileDomain: state => state.course.uploadfileDomain,
       userInfo: state => state.user.userInfo
@@ -435,6 +461,46 @@ export default {
     },
     courseFiles (c) {
       this.$refs['courseFiles'].show(c)
+    },
+    clickUpload (c) {
+      console.log(this.$refs['upload-' + c.uuid][0].$refs['upload-inner'])
+      const uploadInner = this.$refs['upload-' + c.uuid][0].$refs['upload-inner']
+      this.$confirm('确定要上传吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        uploadInner.handleClick()
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消上传'
+        })
+      })
+    },
+    beforeUpload (file) {
+      this.loading = this.$loading({
+        lock: true,
+        text: 'Loading',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      })
+    },
+    // 上传
+    uploadSuccess (res, file, fileList) {
+      this.loading.close()
+      console.log(res)
+      if (res.success) {
+        this.$message({
+          type: 'success',
+          message: res.msg
+        })
+      } else {
+        this.$message({
+          type: 'error',
+          message: res.msg
+        })
+      }
     }
   }
 }
@@ -517,5 +583,9 @@ export default {
   .inClass {
     color:rgba(218,72,116,1);
   }
+}
+
+.upload-demo {
+  position: absolute;
 }
 </style>

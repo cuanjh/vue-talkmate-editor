@@ -524,12 +524,24 @@ export default {
   }
   &.right {
     animation: bb 2s linear 0s infinite;
+    -webkit-animation: bb 2s linear 0s infinite;
+    -moz-animation: bb 2s linear 0s infinite;
+    -o-animation: bb 2s linear 0s infinite;
+    -ms-animation: bb 2s linear 0s infinite;
   }
   &.left {
     animation: bb2 2s linear 0s infinite;
+    -webkit-animation: bb2 2s linear 0s infinite;
+    -moz-animation: bb2 2s linear 0s infinite;
+    -o-animation: bb2 2s linear 0s infinite;
+    -ms-animation: bb2 2s linear 0s infinite;
   }
   &:hover {
     animation: none;
+    -webkit-animation: none;
+    -moz-animation: none;
+    -o-animation: none;
+    -ms-animation: none;
   }
 }
 @keyframes bb {
@@ -543,6 +555,46 @@ export default {
   }
 }
 @keyframes bb2 {
+  from {
+    margin-left: 5px;
+    opacity: 0;
+  }
+  to {
+    margin-left: -5px;
+    opacity: 1;
+  }
+}
+@-webkit-keyframes bb {
+  from {
+    margin-left: -15px;
+    opacity: 0;
+  }
+  to {
+    margin-left: 0px;
+    opacity: 1;
+  }
+}
+@-webkit-keyframes bb2 {
+  from {
+    margin-left: 5px;
+    opacity: 0;
+  }
+  to {
+    margin-left: -5px;
+    opacity: 1;
+  }
+}
+@-moz-keyframes bb {
+  from {
+    margin-left: -15px;
+    opacity: 0;
+  }
+  to {
+    margin-left: 0px;
+    opacity: 1;
+  }
+}
+@-moz-keyframes bb2 {
   from {
     margin-left: 5px;
     opacity: 0;

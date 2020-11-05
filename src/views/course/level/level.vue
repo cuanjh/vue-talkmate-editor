@@ -182,13 +182,22 @@ export default {
     .more {
       position: absolute;
       transform: rotate(0deg);
+      -webkit-transform: rotate(0deg);
+      -moz-transform: rotate(0deg);
+      -ms-transform: rotate(0deg);
       right: 6px;
       top: 10px;
       cursor: pointer;
       z-index: 99;
       transition: all ease .3s;
+      -webkit-transition: all ease .3s;
+      -moz-transition: all ease .3s;
+      -o-transition: all ease .3s;
       &:hover {
-        transform: rotate(0)
+        transform: rotate(0);
+        -webkit-transform: rotate(0deg);
+        -moz-transform: rotate(0deg);
+        -ms-transform: rotate(0deg);
       }
       i {
         color: rgba($color: #000000, $alpha: 0.6)

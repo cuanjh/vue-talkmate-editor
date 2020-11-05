@@ -198,6 +198,9 @@ input:-ms-input-placeholder { /* Internet Explorer 10+ */
     &:active {
       background: #2A2A46!important;
       transform: scale(0.9);
+      -webkit-transform: scale(0.9);
+      -moz-transform: scale(0.9);
+      -ms-transform: scale(0.9);
       outline:none;
       box-shadow: 0px 19px 24px -12px #3e3e67;
     }
