@@ -138,7 +138,25 @@
               <i v-else class="el-icon-plus teacher-uploader-icon"></i>
             </div>
           </el-upload>
-          <el-tag type="warning">注：讲师照片将在发现页小图和分类课程-直播处展示</el-tag>
+          <el-tag type="warning">注：讲师照片将在分类课程-直播处展示</el-tag>
+        </el-form-item>
+        <el-form-item label="发现首页讲师照片" prop="disTechPhoto"
+          :rules="[
+            { required: true, message: '发现首页讲师照片不能为空'}
+          ]">
+          <el-upload
+            class="avatar-uploader"
+            action="#"
+            accept="image/png,image/jpg,image/jpeg"
+            :on-change="uploadOnchange"
+            :show-file-list="false"
+            :auto-upload="false">
+            <div class="upload-area" @click="setUploadField('image,disTechPhoto')">
+              <img v-if="form.disTechPhoto" :src="uploadfileDomain + form.disTechPhoto" class="teacher">
+              <i v-else class="el-icon-plus teacher-uploader-icon"></i>
+            </div>
+          </el-upload>
+          <el-tag type="warning">注：发现首页讲师照片将在发现页小图处展示</el-tag>
         </el-form-item>
         <el-form-item label="直播老师(app)" prop="selTeacher">
           <el-select v-model="form.selTeacher" filterable placeholder="请选择直播老师">
@@ -389,6 +407,7 @@ export default {
         money: 0,
         moneyDiscount: 0,
         teacherPhoto: '',
+        disTechPhoto: '',
         selTeacher: '',
         liveUserUUID: '',
         teacherName: '',
@@ -537,6 +556,7 @@ export default {
         this.form.basicProfilePhoto = this.roomInfo.liveInfo.basicProfilePhoto
         this.form.dateNotice = this.roomInfo.liveInfo.dateNotice
         this.form.teacherPhoto = this.roomInfo.liveInfo.tech_photo
+        this.form.disTechPhoto = this.roomInfo.liveInfo.disTechPhoto
         this.form.selTeacher = this.roomInfo.user_id
         this.form.liveUserUUID = this.roomInfo.liveInfo.liveUserUUID
         this.form.teacherName = this.roomInfo.liveInfo.tech_name
@@ -756,6 +776,7 @@ export default {
                 tech_desc: this.form.teacherDesc,
                 tech_name: this.form.teacherName,
                 tech_photo: this.form.teacherPhoto,
+                disTechPhoto: this.form.disTechPhoto,
                 weixinNo: this.form.weixinNo,
                 finishTitle: this.form.finishTitle,
                 finishInfo: this.form.finishInfo,
