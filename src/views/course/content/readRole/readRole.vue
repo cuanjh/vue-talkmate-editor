@@ -14,13 +14,14 @@
     <div class="form">
       <!-- 听音拼写 -->
       <div class="form-wrap">
-        <div class="correct-area">
-          <div class="wrap">
-            <i @click="play(form.sound)"></i>
-          </div>
-          <div class="word">
-            {{ form.sentence }}
-          </div>
+        <div class="form-img">
+          <el-image v-if="form.image" :src="imgUrl" fit="cover"></el-image>
+        </div>
+        <div class="word">
+          {{ form.title }}
+        </div>
+        <div class="word">
+          {{ form.desc }}
         </div>
       </div>
     </div>

@@ -49,8 +49,27 @@
           <div class="menu-item" v-show="userInfo.authorityId === '1'">
             <div class="name" @click="onlineJob">上线</div>
           </div>
-          <div class="menu-item" v-show="userInfo.authorityId === '1'">
-            <div class="name" @click="download">下载</div>
+          <div class="menu-item" v-show="userInfo.authorityId === '1'" @mouseenter="isShowDownload = true" @mouseleave="isShowDownload = false">
+            <div class="name">
+              下载
+              <i class="el-icon-caret-right"></i>
+            </div>
+            <transition name="fade">
+              <div class="authority-container" v-show="isShowDownload">
+                <div class="authority-wrap">
+                  <div class="user-item">
+                    <div class="name">是否合并sheet</div>
+                    <el-radio-group v-model="merge">
+                      <el-radio :label="true">是</el-radio>
+                      <el-radio :label="false">否</el-radio>
+                    </el-radio-group>
+                  </div>
+                  <div class="handler">
+                    <el-button size="small" type="primary" @click="download">下载</el-button>
+                  </div>
+                </div>
+              </div>
+            </transition>
           </div>
           <div class="menu-item" v-show="authorityUsers && authorityUsers.length" @mouseenter="isShowAuthority = true" @mouseleave="isShowAuthority = false">
             <div class="name">
@@ -149,6 +168,8 @@ export default {
       isShow: false,
       isShowAuthority: false,
       isShowAuthority1: false,
+      isShowDownload: false,
+      merge: false,
       editors: [],
       chiefEditors: [],
       authorities: [],
@@ -481,7 +502,7 @@ export default {
         })
         return false
       }
-      exportCourseContent({ code: this.version.selCourse.uuid, uuid: this.folder.uuid, level: this.trackNum + 1 + '' }).then(res => {
+      exportCourseContent({ code: this.version.selCourse.uuid, uuid: this.folder.uuid, level: this.trackNum + 1 + '', merge: this.merge }).then(res => {
         if (res.success) {
           this.$message({
             type: 'success',

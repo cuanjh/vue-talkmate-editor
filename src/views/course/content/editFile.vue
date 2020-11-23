@@ -42,9 +42,9 @@ export default {
         let val
         if (item.type === 'int') {
           val = 0
-        } else if (item.type === 'string' || item.type === 'text' || item.type === 'template') {
+        } else if (item.type === 'string' || item.type === 'text' || item.type === 'template' || item.type === 'select') {
           val = ''
-        } else if (item.type === 'templateArray') {
+        } else if (item.type === 'templateArray' || item.type === 'checkboxGroup') {
           val = []
         } else if (item.type === 'array') {
           val = ['']
@@ -56,10 +56,25 @@ export default {
               let sv
               if (si.type === 'int') {
                 sv = 0
-              } else if (si.type === 'string' || si.type === 'text') {
+              } else if (si.type === 'string' || si.type === 'text' || si.type === 'select') {
                 sv = ''
               } else if (si.type === 'array') {
                 sv = ['']
+              } else if (si.type === 'arrayObject') {
+                let o2 = {}
+                si.sub_feilds.forEach(sf2 => {
+                  let k2 = sf2.feild
+                  let v2 = ''
+                  if (sf2.type === 'string' || sf2.type === 'text' || si.type === 'select') {
+                    v2 = ''
+                  } else if (sf2.type === 'int') {
+                    v2 = 0
+                  } else if (sf2.type === 'array') {
+                    v2 = ['']
+                  }
+                  o2['' + k2 + ''] = v2
+                })
+                sv = [o2]
               }
               obj[si.feild] = sv
             })

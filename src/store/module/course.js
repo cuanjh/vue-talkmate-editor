@@ -117,13 +117,33 @@ export const course = {
       { key: '1', type: 'warning', desc: '黄色（修改完毕）' },
       { key: '2', type: 'success', desc: '绿色（审核完毕确认没问题）' }
     ],
-    dictTags: []
+    dictTags: [],
+    courseContentPath: '',
+    selCourseFormUUID: '',
+    soundLangMap: {
+      ENG: 'eng',
+      FRE: 'fra',
+      CHI: 'zho',
+      JPN: 'jpn',
+      RUS: 'rus',
+      KOR: 'kor',
+      GER: 'deu',
+      ITA: 'ita',
+      SPA: 'spa'
+    },
+    voiceActors: [] // 每个语言的声优列表
   },
   mutations: {
     updateConfigInfo (state, configInfo) {
       state.langInfos = configInfo.langInfos
       state.assetsDomain = configInfo.assetsDomain + '/'
       state.uploadfileDomain = configInfo.uploadfileDomain + '/'
+    },
+    updateCourseContentPath (state, path) {
+      state.courseContentPath = path
+    },
+    updateSelCourseFormUUID (state, uuid) {
+      state.selCourseFormUUID = uuid
     },
     updateLangList (state, langs) {
       state.langList = langs
@@ -157,6 +177,9 @@ export const course = {
     },
     updateDictTags (state, data) {
       state.dictTags = data
+    },
+    updateVoiceActors (state, data) {
+      state.voiceActors = data
     }
   },
   actions: {

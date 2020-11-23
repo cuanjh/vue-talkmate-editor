@@ -372,6 +372,48 @@ export const editCourseVersion = (data) => {
   })
 }
 
+/**
+ * @Summary 内容纠错列表
+ * @Produce  application/json
+ * @param {*} data
+ * @Router /editor/content_reports/list [post]
+ */
+export const getContentReports = (data) => {
+  return service({
+    url: '/editor/content_reports/list',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 内容纠错删除
+ * @Produce  application/json
+ * @param {*} data
+ * @Router /editor/content_reports/delete [post]
+ */
+export const delOneContentReport = (data) => {
+  return service({
+    url: '/editor/content_reports/delete',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 内容纠错更新
+ * @Produce  application/json
+ * @param {*} data
+ * @Router /editor/content_reports/update [post]
+ */
+export const updateContentReport = (data) => {
+  return service({
+    url: '/editor/content_reports/update',
+    method: 'post',
+    data
+  })
+}
+
 // @Summary 获取目录列表
 // @Produce  application/json
 // @Param
@@ -1193,6 +1235,22 @@ export const sharePosterLive = (data) => {
 }
 
 /**
+ * @Summary 音频打点
+ * @param {*} data
+ * @Router /editor/card/aeneas_job [post]
+ */
+export const cardAeneasJob = (data) => {
+  return service({
+    url: '/editor/card/aeneas_job',
+    method: 'post',
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    },
+    data
+  })
+}
+
+/**
  * @Summary 直播房间列表
  * @param {*} data
  * @Router /live/list [post]
@@ -1772,6 +1830,71 @@ export const updateFeedback = (data) => {
 export const delFeedback = (data) => {
   return service({
     url: '/editor/reports/delete',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 声优列表
+ * @param {*} data
+ * @Router /editor/actors/list [post]
+ */
+export const getVoiceActorList = (data) => {
+  return service({
+    url: '/editor/actors/list',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 创建声优
+ * @param {*} data
+ * @Router /editor/actors/create [post]
+ */
+export const createVoiceActor = (data) => {
+  return service({
+    url: '/editor/actors/create',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 获取一条声优信息
+ * @param {*} data
+ * @Router /editor/actors/findone [post]
+ */
+export const findOneVoiceActor = (data) => {
+  return service({
+    url: '/editor/actors/findone',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 获取一条声优信息
+ * @param {*} data
+ * @Router /editor/actors/delete [post]
+ */
+export const delVoiceActor = (data) => {
+  return service({
+    url: '/editor/actors/delete',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 获取一条声优信息
+ * @param {*} data
+ * @Router /editor/actors/update [post]
+ */
+export const updateVoiceActor = (data) => {
+  return service({
+    url: '/editor/actors/update',
     method: 'post',
     data
   })

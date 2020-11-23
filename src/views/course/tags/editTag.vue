@@ -39,9 +39,9 @@
             </div>
           </el-form-item>
           <el-form-item label="图标: ">
-            <el-tag type="warning">请上传webp格式的图片</el-tag>
+            <el-tag type="warning">请上传webp格式的图片, 图标第一个为默认图标，第二个为激活态图标。</el-tag>
             <div class="img-box small-img-box">
-              <div class="img">
+              <!-- <div class="img">
                 <img v-if="flagUrl" :src="flagUrl" fit="cover" />
               </div>
               <el-upload
@@ -53,7 +53,21 @@
                 <div id="upload-btn">
                   <i class="el-icon-plus avatar-uploader-icon"></i>
                 </div>
+              </el-upload> -->
+              <el-upload
+                action="#"
+                accept="image/webp"
+                list-type="picture-card"
+                :on-change="uploadFlagOnchange"
+                :auto-upload="false"
+                :on-preview="handlePictureCardPreview"
+                :on-remove="handleRemove"
+                :file-list="flag">
+                <i class="el-icon-plus"></i>
               </el-upload>
+              <el-dialog :visible.sync="dialogVisible" append-to-body>
+                <img width="100%" :src="dialogImageUrl" alt="">
+              </el-dialog>
             </div>
           </el-form-item>
           <el-form-item label="封面: ">
@@ -155,6 +169,7 @@ import {
 } from '@/api/course'
 import { uploadQiniu } from '@/utils/uploadQiniu'
 import { mapState, mapActions } from 'vuex'
+import moment from 'moment'
 
 export default {
   data () {
@@ -163,6 +178,9 @@ export default {
       showEdit: false,
       innerVisible: false,
       sortable: null,
+      dialogImageUrl: '',
+      dialogVisible: false,
+      flag: [],
       form: {
         cover: [],
         desc: {},
@@ -228,6 +246,11 @@ export default {
       })
       if (this.type === 'edit') {
         this.form = params.params
+        let flag = []
+        params.params.flag.map(item => {
+          flag.push({ name: item, url: this.assetsDomain + item })
+        })
+        this.flag = flag
       } else {
         let obj = {
           cover: [],
@@ -239,6 +262,7 @@ export default {
           title: {},
           type: ''
         }
+        this.flag = []
         this.form = obj
       }
       setTimeout(() => {
@@ -249,18 +273,21 @@ export default {
     },
     close () {
       this.showEdit = false
+      this.flag = []
+      this.form.flag = []
       this.$emit('addTagItem')
     },
     cropperImage (url) {
       this.$bus.$emit('showCropperDialog', { url: url, token: this.token })
     },
     async uploadFlagOnchange (file, fileList) {
-      this.form.flag = []
-      let i = file.raw.name.lastIndexOf('.')
-      let ext = file.raw.name.substring(i + 1)
-      let url = 'course/content/catalog/flag/' + file.uid + '.' + ext
-      let res = await uploadQiniu(file.raw, this.token, url)
-      this.form.flag.push(res.key)
+      console.log(fileList)
+      this.flag = fileList
+      // let i = file.raw.name.lastIndexOf('.')
+      // let ext = file.raw.name.substring(i + 1)
+      // let url = 'course/content/catalog/flag/' + file.uid + '.' + ext
+      // let res = await uploadQiniu(file.raw, this.token, url)
+      // this.form.flag.push({ name: url, url: this.assetsDomain + res.key })
     },
     async uploadCoverOnchange (file, fileList) {
       console.log(file)
@@ -291,8 +318,26 @@ export default {
     },
     determine () {
       console.log(this.form)
-      this.$refs['form'].validate((valid) => {
+      this.$refs['form'].validate(async (valid) => {
         if (valid) {
+          // 获取上传图片token
+          let resToken = await getInfoToken()
+          this.token = resToken.data.token
+          let flag = []
+          for (let i = 0; i < this.flag.length; i++) {
+            const item = this.flag[i]
+            if (item.raw) {
+              let i = item.raw.name.lastIndexOf('.')
+              let ext = item.raw.name.substring(i + 1)
+              let date = moment(new Date()).format('YYYYMMDD')
+              let url = 'course/content/catalog/flag/' + date + '/' + item.uid + '.' + ext
+              let res = await uploadQiniu(item.raw, this.token, url)
+              flag.push(res.key)
+            } else {
+              flag.push(item.name)
+            }
+          }
+          this.form.flag = flag
           if (this.type === 'edit') {
             editTags(this.form).then(res => {
               console.log(res)
@@ -358,6 +403,13 @@ export default {
           })
         }
       })
+    },
+    handleRemove (file, fileList) {
+      this.flag = fileList
+    },
+    handlePictureCardPreview (file) {
+      this.dialogImageUrl = file.url
+      this.dialogVisible = true
     }
   },
   destroyed () {
@@ -508,6 +560,11 @@ export default {
     }
   }
 }
+
+.small-img-box {
+  margin-top: 10px;
+}
+
 .small-img-box .img {
   width:120px;
   height:120px;
@@ -544,5 +601,8 @@ export default {
 }
 .tags-edit-container .tag-types .el-select {
   width: 30%;
+}
+.tags-edit-container .el-upload-list__item-thumbnail {
+  background: #e3e3e3;
 }
 </style>

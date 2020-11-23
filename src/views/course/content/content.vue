@@ -507,7 +507,8 @@ export default {
           }, 800)
         } else {
           if (this.courseContentPath === '') {
-            this.courseContentPath = localStorage.getItem('courseContentPath')
+            // this.courseContentPath = localStorage.getItem('courseContentPath')
+            this.courseContentPath = this.$store.state.course.courseContentPath
           }
           if (this.courseContentPath && this.tracks[num]) {
             let arr = this.courseContentPath.split('/')
@@ -727,7 +728,8 @@ export default {
       let puuid = folder.parent_uuid
       this.path = uuid + '/' + this.path
       console.log(this.path)
-      localStorage.setItem('courseContentPath', this.path)
+      // localStorage.setItem('courseContentPath', this.path)
+      this.$store.commit('course/updateCourseContentPath', this.path)
       if (tracks.length > 0) {
         this.getPath(tracks, puuid)
       }

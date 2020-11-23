@@ -1,10 +1,9 @@
 <template>
-<transition name="fade">
-  <div class="edit-container" v-if="showEdit">
+  <el-dialog
+    :visible.sync="showEdit"
+    width="50%"
+    @close="close">
     <div class="edit-content">
-      <div class="close" @click="close">
-        <i class="el-icon-close"></i>
-      </div>
       <div class="course-content">
         <el-form ref="form" :model="form">
           <el-form-item label="编码：" prop="codePend" :rules="[
@@ -104,6 +103,17 @@
               <el-radio :label="false">否</el-radio>
             </el-radio-group>
           </el-form-item>
+          <el-form-item label="是否显示词典：" class="flex-class">
+            <el-radio-group v-model="form.has_dict">
+              <el-radio :label="true">是</el-radio>
+              <el-radio :label="false">否</el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item label="声优：">
+            <el-checkbox-group v-model="checkVoiceActors">
+              <el-checkbox v-for="item in voiceActors" :key="item.uuid" :label="item.uuid">{{item.name + (item.gender === 1 ? '（男）' : '（女）')}}</el-checkbox>
+            </el-checkbox-group>
+          </el-form-item>
         </el-form>
         <div class="btns">
           <el-button
@@ -116,8 +126,7 @@
         </div>
       </div>
     </div>
-  </div>
-</transition>
+  </el-dialog>
 </template>
 
 <script>
@@ -139,6 +148,7 @@ export default {
         desc: {}, // 描述
         flag: [], // 小图标
         is_show: true, // 是否上线
+        has_dict: false, // 是否显示词典
         lan_code: '', // 语种的编码
         tags: [],
         name: '',
@@ -148,7 +158,8 @@ export default {
       bigFileRaw: {},
       smlImgUrl: '',
       smlFileRaw: {},
-      type: ''
+      type: '',
+      checkVoiceActors: []
     }
   },
   components: {
@@ -158,8 +169,55 @@ export default {
   computed: {
     ...mapState({
       assetsDomain: state => state.course.assetsDomain,
-      langInfos: state => state.course.langInfos
-    })
+      langInfos: state => state.course.langInfos,
+      voiceActors: state => state.course.voiceActors
+    }),
+    groupVoiceActors () {
+      if (this.voiceActors && this.voiceActors.length > 0) {
+        let result = []
+        this.voiceActors.forEach(item => {
+          if (item.role.indexOf(',') === -1) {
+            let findex = result.findIndex(r => {
+              return r.role === item.role
+            })
+            if (findex > -1) {
+              result[findex]['data'].push(item)
+            } else {
+              result.push({
+                data: [item],
+                role: item.role
+              })
+            }
+          } else {
+            const roles = item.role.split(',')
+            roles.forEach(r => {
+              let findex = result.findIndex(ret => {
+                return ret.role === r
+              })
+              if (findex > -1) {
+                result[findex]['data'].push(item)
+              } else {
+                result.push({
+                  data: [item],
+                  role: r
+                })
+              }
+            })
+          }
+        })
+        console.log(result)
+        return result.sort((a, b) => {
+          if (a.role < b.role) {
+            return -1
+          } else if (a.role > b.role) {
+            return 1
+          } else {
+            return 0
+          }
+        })
+      }
+      return []
+    }
   },
   mounted () {
   },
@@ -168,6 +226,7 @@ export default {
       console.log(params)
       this.type = params.type
       this.showEdit = true
+      this.checkVoiceActors = []
       if (this.type === 'add') {
         this.lang = params.selLang
         let obj = {
@@ -178,6 +237,7 @@ export default {
           desc: {}, // 描述
           flag: [], // 小图标
           is_show: true, // 是否上线
+          has_dict: false,
           lan_code: params.selLang, // 语种的编码
           tags: [],
           name: '',
@@ -190,6 +250,11 @@ export default {
       } else if (this.type === 'edit') {
         this.lang = params.form.code.split('-')[0]
         this.form = params.form
+        if (params.form.sound_actors && params.form.sound_actors.length > 0) {
+          params.form.sound_actors.forEach(item => {
+            this.checkVoiceActors.push(item.role)
+          })
+        }
         this.form.codePend = params.form.code.split('-').slice(1).join('-')
         this.bigImgUrl = this.assetsDomain + '/' + params.form.cover[0]
         this.smlImgUrl = this.assetsDomain + '/' + params.form.flag[0]
@@ -278,6 +343,45 @@ export default {
       this.$refs['form'].validate((valid) => {
         if (valid) {
           console.log(this.form)
+          let soundActors = []
+          if (this.checkVoiceActors.length > 0) {
+            this.checkVoiceActors.forEach(item => {
+              // const find = this.groupVoiceActors.find(f => {
+              //   return f.role === item
+              // })
+              // if (find) {
+              //   let actors = []
+              //   if (find.data && find.data.length > 0) {
+              //     find.data.forEach(d => {
+              //       actors.push({
+              //         gender: d.gender,
+              //         name: d.name,
+              //         photo: d.photo,
+              //         sound: d.sound
+              //       })
+              //     })
+              //   }
+              //   let obj = {
+              //     actors: actors,
+              //     role: find.role
+              //   }
+              //   soundActors.push(obj)
+              // }
+
+              const find = this.voiceActors.find(f => {
+                return f.uuid === item
+              })
+              if (find) {
+                soundActors.push({
+                  gender: find.gender,
+                  name: find.name,
+                  photo: find.photo,
+                  role: find.uuid,
+                  sound: find.sound
+                })
+              }
+            })
+          }
           if (this.type === 'add') {
             let obj = {
               code: this.lang + '-' + this.form.codePend,
@@ -286,6 +390,8 @@ export default {
               desc: this.form.desc, // 描述
               flag: this.form.flag, // 小图标
               is_show: this.form.is_show, // 是否上线
+              has_dict: this.form.has_dict,
+              sound_actors: soundActors,
               lan_code: this.form.lan_code, // 语种的编码
               tags: this.form.tags,
               name: this.form.name,
@@ -306,6 +412,8 @@ export default {
                 desc: this.form.desc,
                 flag: this.form.flag,
                 is_show: this.form.is_show,
+                has_dict: this.form.has_dict,
+                sound_actors: soundActors,
                 tags: [],
                 name: this.form.name,
                 title: this.form.title
@@ -326,46 +434,27 @@ export default {
     },
     changeType () {
       console.log(this.form)
+    },
+    getGroupVAs (data) {
+      let ret = []
+      if (data && data.length > 0) {
+        data.forEach(item => {
+          ret.push(item.name)
+        })
+      }
+      return ret.length > 0 ? `（${ret.join('、')}）` : ''
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.edit-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background:rgba(0,0,0,.7);
-  z-index: 999;
-}
-.edit-content {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  -webkit-transform: translate(-50%, -50%);
-  -moz-transform: translate(-50%, -50%);
-  -ms-transform: translate(-50%, -50%);
-  width:800px;
-  background:rgba(245,246,250,1);
-  border-radius:4px;
-  padding: 50px 30px 40px;
-  box-sizing: border-box;
-  .close {
-    position: absolute;
-    right: 20px;
-    top: 20px;
-    cursor: pointer;
-  }
-}
+
 .edit-content .course-content {
   width: 100%;
   height: 100%;
-  max-height:500px;
-  overflow-y: auto;
+  // max-height:500px;
+  // overflow-y: auto;
 
   .img-box {
     display: flex;
@@ -477,9 +566,7 @@ export default {
 .course-content .desc .el-input {
   width: 360px!important;
 }
-.course-content .el-form label {
-  width: 90px;
-}
+
 .course-content .el-form .el-form-item {
   display: flex;
 }
@@ -509,5 +596,8 @@ export default {
 .course-content .el-row .el-form-item__content {
   display: flex!important;
   flex-direction: row;
+}
+.course-content .el-form-item__label {
+  width: 110px;
 }
 </style>

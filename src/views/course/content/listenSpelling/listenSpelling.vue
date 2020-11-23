@@ -14,14 +14,17 @@
     <div class="form">
       <!-- 听音拼写 -->
       <div class="form-wrap">
-        <div class="correct-area">
-          <div class="wrap">
-            <span>{{ form.content + ' ' + form.translate }}</span>
-            <i @click="play(form)"></i>
-          </div>
-          <div class="word">
-            {{ form.word }}
-          </div>
+        <div class="sound">
+          <i @click="play(form)"></i>
+        </div>
+        <div class="word">
+          {{ form.sentence_trs }}
+        </div>
+        <div class="options">
+          <span v-for="(item, index) in form.options" :key="'correct' + index">{{ item }}</span>
+        </div>
+        <div class="all-options">
+          <span :class="{'correct': form.options.includes(item)}" v-for="(item, i) in allOptions" :key="'option' + i">{{item}}</span>
         </div>
       </div>
     </div>
@@ -67,6 +70,19 @@ export default {
       }
       return name
     },
+    allOptions () {
+      const correctOptions = this.form.options
+      let charCodes = []
+      for (let i = 0; i < 26; i++) {
+        charCodes.push(String.fromCharCode(97 + i))
+      }
+      const restCodes = charCodes.filter(item => {
+        return !correctOptions.includes(item)
+      })
+      const finishRestCodes = this.getRandomArrayElements(restCodes, 12 - correctOptions.length)
+      const result = this.getRandomArrayElements([...finishRestCodes, ...correctOptions], 12)
+      return result
+    },
     imgUrl () {
       let url = ''
       if (this.form && this.form.image) {
@@ -87,6 +103,20 @@ export default {
       this.myAudio.oncanplay = () => {
         this.myAudio.play()
       }
+    },
+    getRandomArrayElements (arr, count) {
+      let shuffled = arr.slice(0)
+      let i = arr.length
+      let min = i - count
+      let temp
+      let index
+      while (i-- > min) {
+        index = Math.floor((i + 1) * Math.random())
+        temp = shuffled[index]
+        shuffled[index] = shuffled[i]
+        shuffled[i] = temp
+      }
+      return shuffled.slice(min)
     },
     delForm () {
       this.$emit('delForm', { form: this.form, formIndex: this.formIndex })
@@ -175,6 +205,20 @@ export default {
   padding-bottom: 20px;
   min-height: 220px;
   width: 260px;
+  .sound {
+    i {
+      width: 15px;
+      min-width: 15px;
+      margin-right: 10px;
+      vertical-align: middle;
+      height: 15px;
+      display: inline-block;
+      background-image: url('../../../../assets/images/course/icon-voice.png');
+      background-repeat: no-repeat;
+      background-size: cover;
+      cursor: pointer;
+    }
+  }
   .correct-area {
     text-align: center;
     width: 100%;
@@ -184,34 +228,16 @@ export default {
       display: inline-block;
       padding: 10px 20px;
       border-radius: 20px;
-      i {
-        width: 15px;
-        min-width: 15px;
-        margin-right: 10px;
-        vertical-align: middle;
-        height: 15px;
-        display: inline-block;
-        background-image: url('../../../../assets/images/course/icon-voice.png');
-        background-repeat: no-repeat;
-        background-size: cover;
-        cursor: pointer;
-      }
     }
   }
   .options {
     display: flex;
     flex-direction: row;
-    .option {
-      background: #FFF;
-      width: 100px;
-      height: 50px;
-      margin: 10px;
-      padding: 5px;
-      border-radius: 4px;
-      cursor: pointer;
-      .el-image {
-        border-radius: 4px;
-      }
+    color: #22202e;
+    margin-top: 20px;
+    span {
+      text-decoration: underline;
+      margin: 0 5px;
     }
   }
 }
@@ -219,6 +245,16 @@ export default {
 .form-wrap {
   height: 100%;
   vertical-align: middle;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  .sound {
+    margin-top: 10px;
+  }
+  .word {
+    margin-top: 10px;
+    color: #22202e;
+  }
   .correct-area {
     text-align: center;
     width: 100%;
@@ -246,6 +282,28 @@ export default {
   }
   .word {
     letter-spacing: 6px;
+  }
+}
+.all-options {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 10px 10px 0;
+  span {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #b1afba;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin: 8px 10px;
+  }
+  .correct {
+    color: #FFFFFF;
+    background: #555365;
   }
 }
 </style>

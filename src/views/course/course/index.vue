@@ -114,6 +114,12 @@
           {{scope.row.is_show ? '是' : '否'}}
         </template>
       </el-table-column>
+      <el-table-column
+        label="是否显示词典">
+        <template slot-scope="scope">
+          {{scope.row.has_dict ? '是' : '否'}}
+        </template>
+      </el-table-column>
       <el-table-column label="操作" fixed="right" width="300px">
         <template slot-scope="scope">
           <el-button
@@ -171,7 +177,8 @@ import {
   courseEdit,
   courseDel,
   exportCourseContentList,
-  onlineCourses
+  onlineCourses,
+  getVoiceActorList
 } from '@/api/course'
 import EditComp from './edit'
 import ClassGroup from './classGroup'
@@ -220,10 +227,26 @@ export default {
       getCourseTypes: 'course/getCourseTypes'
     }),
     async initData () {
+      // 初始化声优列表信息
+      this.initVoiceActors()
       let courseListInfo = await getCourseList({ 'lan_code': this.version.selLang, 'pageNo': 0, 'pageSize': 0 })
       if (courseListInfo.success) {
         this.courseList = courseListInfo.data.courses
       }
+    },
+    initVoiceActors () {
+      getVoiceActorList({
+        lang: this.version.selLang,
+        page_index: 1,
+        page_size: 999,
+        text_field: 'role',
+        sort_type: 1
+      }).then(res => {
+        console.log(res)
+        if (res.success) {
+          this.$store.commit('course/updateVoiceActors', res.data)
+        }
+      })
     },
     editCourse (row) {
       console.log(this.courseList)

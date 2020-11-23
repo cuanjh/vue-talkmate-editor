@@ -80,7 +80,38 @@
                         :value="item">
                       </el-option>
                     </el-select>
+                    <el-button v-show="f.type == 'arrayObject'" @click="addSub2Feilds(f, index)" size="small" class="icon-plus-sub-fields" icon="el-icon-plus" circle></el-button>
                   </el-form-item>
+                  <div class="sub-feilds-list" v-if="f.type === 'arrayObject' && f.sub_feilds && f.sub_feilds.length">
+                    <div class="feilds-item"
+                      :data-id="i"
+                      v-for="(f2, i2) in f.sub_feilds"
+                      :key="i2">
+                      <div class="del" @click="delSub2Feild(index, i, i2)"><i class="el-icon-circle-close"></i></div>
+                      <el-form-item label="data_from: ">
+                        <el-input v-model="f2.data_from" size="small"></el-input>
+                      </el-form-item>
+                      <el-form-item label="feild: ">
+                        <el-input v-model="f2.feild" size="small"></el-input>
+                      </el-form-item>
+                      <el-form-item label="name: ">
+                        <el-input v-model="f2.name" size="small"></el-input>
+                      </el-form-item>
+                      <el-form-item label="type: ">
+                        <el-select v-model="f2.type" placeholder="请选择字段类型" size="small">
+                          <el-option
+                            v-for="item in feildTypes"
+                            :key="item"
+                            :label="item"
+                            :value="item">
+                          </el-option>
+                        </el-select>
+                      </el-form-item>
+                      <el-form-item class="desc" label="备注: ">
+                        <el-input style="width: 512px" type="textarea" v-model="f2.desc" size="small"></el-input>
+                      </el-form-item>
+                    </div>
+                  </div>
                   <el-form-item class="desc" label="备注: ">
                     <el-input style="width: 512px" type="textarea" v-model="f.desc" size="small"></el-input>
                   </el-form-item>
@@ -148,7 +179,10 @@ export default {
         'template',
         'templateArray',
         'array',
-        'arrayObject'
+        'arrayObject',
+        'button',
+        'select',
+        'checkboxGroup'
       ]
     }
   },
@@ -260,6 +294,32 @@ export default {
     delSubFeild (bigIndex, index) {
       this.form.feilds[bigIndex]['sub_feilds'].splice(index, 1)
     },
+    addSub2Feilds (f, index) {
+      let i = this.form.feilds[index].sub_feilds.findIndex(item => {
+        return item.feild === f.feild
+      })
+      let listOrder = 1
+      if (this.form.feilds[index]['sub_feilds'][i]['sub_feilds'] && this.form.feilds[index]['sub_feilds'][i]['sub_feilds'].length) {
+        listOrder = this.form.feilds[index]['sub_feilds'][i]['sub_feilds'].length + 1
+      }
+      let feild = {
+        data_from: '',
+        feild: '',
+        name: '',
+        type: '',
+        desc: '',
+        list_order: listOrder
+      }
+      if (this.form.feilds[index]['sub_feilds'][i]['sub_feilds'] && this.form.feilds[index]['sub_feilds'][i]['sub_feilds'].length) {
+        this.form.feilds[index]['sub_feilds'][i]['sub_feilds'].push(feild)
+      } else {
+        this.$set(this.form.feilds[index]['sub_feilds'][i], 'sub_feilds', [])
+        this.form.feilds[index]['sub_feilds'][i]['sub_feilds'].push(feild)
+      }
+    },
+    delSub2Feild (bigIndex, index, i) {
+      this.form.feilds[bigIndex]['sub_feilds'][index]['sub_feilds'].splice(i, 1)
+    },
     close () {
       this.$emit('editModel')
       this.$refs.form.resetFields()
@@ -317,7 +377,7 @@ export default {
   -webkit-transform: translate(-50%, -50%);
   -moz-transform: translate(-50%, -50%);
   -ms-transform: translate(-50%, -50%);
-  width:800px;
+  width:880px;
   background:rgba(245,246,250,1);
   border-radius:4px;
   padding: 50px 30px 20px;

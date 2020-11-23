@@ -179,7 +179,7 @@
     </div>
     <el-form id="form-model" ref="form" v-if="contents && contents.length" :model="contents[activeFormIndex]" label-width="80px">
       <div class="item" v-for="f in feilds" :key="f.feild">
-        <el-form-item label-width="140px" :label="f.name" v-if="(f.data_from !== 'part_of_speech' && f.data_from !== 'content_types' && f.feild !== 'list_order' && f.type !== 'template' && f.type !== 'templateArray' && f.feild !== 'sentence_phoneticize' && f.feild !== 'options_phoneticize') || (f.type == 'template' && contents[activeFormIndex]['' + f.feild + '']) || ((version['selLang'] == 'JPN' || version['selLang'] == 'CHI') && (f.feild == 'sentence_phoneticize' || f.feild == 'options_phoneticize')) || (f.feild === 'options' && f.type == 'array' && contents[activeFormIndex][f.feild])">
+        <el-form-item label-width="140px" :label="f.name" v-if="(f.type !== 'button' && f.data_from !== 'part_of_speech' && f.data_from !== 'content_types' && f.feild !== 'list_order' && f.type !== 'template' && f.type !== 'templateArray' && f.feild !== 'sentence_phoneticize' && f.feild !== 'options_phoneticize') || (f.type == 'template' && contents[activeFormIndex]['' + f.feild + '']) || ((version['selLang'] == 'JPN' || version['selLang'] == 'CHI') && (f.feild == 'sentence_phoneticize' || f.feild == 'options_phoneticize')) || (f.feild === 'options' && f.type == 'array' && contents[activeFormIndex][f.feild])">
           <!-- string 或 int -->
           <el-input
             :maxlength="500" show-word-limit
@@ -240,9 +240,23 @@
             placeholder="请输入内容"
             v-model="contents[activeFormIndex]['' + f.feild + '']">
           </el-input>
-          <!-- 标签 -->
-          <el-checkbox-group v-if="f.data_from == 'content_tags'" v-model="contents[activeFormIndex]['' + f.feild + '']">
-            <el-checkbox v-for="item in selfContentTags" :key="item.key" :label="item.key">{{ item.name }}</el-checkbox>
+          <!-- checkboxGroup -->
+          <el-checkbox-group v-if="f.data_from == 'content_tags' && f.type == 'checkboxGroup'"
+            v-model="contents[activeFormIndex]['' + f.feild + '']"
+            @change="changeCheckbox(f.feild)">
+            <el-checkbox
+              v-for="item in contentTags.filter(i => { return i.type.toLowerCase() === 'coursecontent'})"
+              :key="item.key" :label="item.key">
+              {{ item.name }}
+            </el-checkbox>
+          </el-checkbox-group>
+          <el-checkbox-group v-if="f.data_from == 'soundActors' && f.type == 'checkboxGroup'"
+            v-model="contents[activeFormIndex]['' + f.feild + '']" @change="changeSoundActors(f.feild)">
+            <el-checkbox
+              v-for="item in soundActors"
+              :key="item.uuid" :label="item.uuid">
+              {{ item.name + (item.gender == 1 ? '（男）' : '（女）') }}
+            </el-checkbox>
           </el-checkbox-group>
           <!-- <div class="options" v-if="f.feild === 'options' && (contents[activeFormIndex]['type'] == 'makeSentence' || contents[activeFormIndex]['type'] == 'fillGap')">
             <div class="option-list">
@@ -377,7 +391,7 @@
                 </div>
                 <div class="left" v-if="f.sub_feilds && f.sub_feilds.length > 0">
                   <div class="sub-item" v-for="(subItem, i) in f.sub_feilds" :key="'subItem' + i">
-                    <el-form-item size="small" :label="subItem.name" v-if="subItem.type == 'string' || subItem.type == 'text'">
+                    <el-form-item size="small" :label="subItem.name" v-if="subItem.type == 'string' || subItem.type == 'text' || subItem.type == 'select'">
                       <!-- string -->
                       <el-input  v-if="!subItem.data_from && subItem.type == 'string'" v-model="contents[activeFormIndex]['' + f.feild + ''][index]['' + subItem.feild + '']"></el-input>
                       <!-- textarea -->
@@ -395,6 +409,28 @@
                         </el-upload>
                         <el-button slot="append" v-if="subItem.data_from == 'upload_audio'" @click="motherSoundPlay(contents[activeFormIndex]['' + f.feild + ''][index]['' + subItem.feild + ''])">试听</el-button>
                       </el-input>
+                      <el-image class="small-image"
+                        v-if="subItem.data_from == 'upload_image' && contents[activeFormIndex]['' + f.feild + ''][index]['' + subItem.feild + '']"
+                        :src="assetsDomain + contents[activeFormIndex]['' + f.feild + ''][index]['' + subItem.feild + '']"
+                        :preview-src-list="[assetsDomain + contents[activeFormIndex]['' + f.feild + ''][index]['' + subItem.feild + '']]"></el-image>
+                      <!-- select -->
+                      <el-select
+                        v-if="subItem.data_from == 'genders'"
+                        v-model="contents[activeFormIndex]['' + f.feild + ''][index]['' + subItem.feild + '']"
+                        placeholder="请选择性别">
+                        <el-option label="男" :value="1"></el-option>
+                        <el-option label="女" :value="0"></el-option>
+                      </el-select>
+                      <el-select
+                        v-if="subItem.data_from == 'courseSoundActors' && subItem.type == 'select'"
+                        v-model="contents[activeFormIndex]['' + f.feild + ''][index]['' + subItem.feild + '']"
+                        placeholder="请选择声优">
+                        <el-option
+                          v-for="item in courseSoundActors"
+                          :key="item.role"
+                          :label="item.name + (item.gender === 1 ? '（男）' : '（女）')"
+                          :value="item.role"></el-option>
+                      </el-select>
                     </el-form-item>
                     <!-- array options -->
                     <el-form-item size="small" :label="subItem.name" v-if="subItem.type == 'array'">
@@ -413,6 +449,97 @@
                         <el-button @click="addSubItem(f, subItem, index)" round>添加</el-button>
                       </div>
                     </el-form-item>
+                    <!-- 对象数组 -->
+                    <div class="array-object" v-if="subItem.type == 'arrayObject'">
+                      <div class="list" v-if="contents[activeFormIndex]['' + f.feild + ''][index][''+ subItem.feild +''] && contents[activeFormIndex]['' + f.feild + ''][index][''+ subItem.feild +''].length">
+                        <div class="object-item" v-for="(item2, index2) in contents[activeFormIndex]['' + f.feild + ''][index][''+ subItem.feild +'']" :key="index2">
+                          <div class="num">
+                            <el-badge :value="index2 + 1" class="item" type="primary">
+                            </el-badge>
+                          </div>
+                          <div class="left" v-if="subItem.sub_feilds && subItem.sub_feilds.length > 0">
+                            <div class="sub-item" v-for="(subItem2, i2) in subItem.sub_feilds" :key="'subItem2' + i2">
+                              <el-form-item size="small" :label="subItem2.name" v-if="subItem2.type == 'string' || subItem2.type == 'text' || subItem2.type == 'select'">
+                                <!-- string -->
+                                <el-input  v-if="!subItem2.data_from && subItem2.type == 'string'" v-model="contents[activeFormIndex]['' + f.feild + ''][index]['' + subItem.feild + ''][index2]['' + subItem2.feild + '']"></el-input>
+                                <!-- textarea -->
+                                <el-input  v-if="!subItem2.data_from && subItem2.type == 'text'" type="textarea" v-model="contents[activeFormIndex]['' + f.feild + ''][index]['' + subItem.feild + ''][index2]['' + subItem2.feild + '']"></el-input>
+                                <!-- upload -->
+                                <el-input placeholder="请输入内容" v-if="subItem2.data_from && subItem2.data_from.indexOf('upload_') > -1" :maxlength="150" show-word-limit  v-model="contents[activeFormIndex]['' + f.feild + ''][index]['' + subItem.feild + ''][index2]['' + subItem2.feild + '']">
+                                  <el-upload slot="prepend"
+                                    v-if="subItem2.data_from.indexOf('upload_') > -1"
+                                    action="#"
+                                    :accept="subItem2.data_from == 'upload_audio' ? 'audio/mp3' : (subItem2.data_from == 'upload_video' ? 'video/mp4' : 'image/webp')"
+                                    :on-change="uploadOnchangeSub2"
+                                    :show-file-list="false"
+                                    :auto-upload="false">
+                                    <el-button type="text" @click="uploadSub2(f, -1, index, subItem, index2, subItem2)">上传</el-button>
+                                  </el-upload>
+                                  <el-button slot="append" v-if="subItem2.data_from == 'upload_audio'" @click="motherSoundPlay(contents[activeFormIndex]['' + f.feild + ''][index]['' + subItem.feild + ''][index2]['' + subItem2.feild + ''])">试听</el-button>
+                                </el-input>
+                                <el-image class="small-image"
+                                  v-if="subItem2.data_from == 'upload_image' && contents[activeFormIndex]['' + f.feild + ''][index]['' + subItem.feild + ''][index2]['' + subItem2.feild + '']"
+                                  :src="assetsDomain + contents[activeFormIndex]['' + f.feild + ''][index]['' + subItem.feild + ''][index2]['' + subItem2.feild + '']"
+                                  :preview-src-list="[assetsDomain + contents[activeFormIndex]['' + f.feild + ''][index]['' + subItem.feild + ''][index2]['' + subItem2.feild + '']]"></el-image>
+                                <!-- select -->
+                                <el-select
+                                  v-if="subItem2.data_from == 'genders'"
+                                  v-model="contents[activeFormIndex]['' + f.feild + ''][index]['' + subItem.feild + ''][index2]['' + subItem2.feild + '']"
+                                  placeholder="请选择性别">
+                                  <el-option label="男" :value="1"></el-option>
+                                  <el-option label="女" :value="0"></el-option>
+                                </el-select>
+                                <el-select
+                                  v-if="subItem2.data_from == 'soundActors' && subItem2.type === 'select'"
+                                  v-model="contents[activeFormIndex]['' + f.feild + ''][index]['' + subItem.feild + ''][index2]['' + subItem2.feild + '']"
+                                  filterable
+                                  placeholder="请选择声优">
+                                  <el-option v-for="sa in checkedSoundActors" :key="sa.uuid" :value="sa.uuid" :label="sa.name + (sa.gender == 1 ? '（男）' : '（女）')"></el-option>
+                                </el-select>
+                              </el-form-item>
+                              <!-- array options -->
+                              <el-form-item size="small" :label="subItem2.name" v-if="subItem2.type == 'array'">
+                                <div class="sub-item-options" v-if="contents[activeFormIndex]['' + f.feild + ''][index]['' + subItem.feild + ''][index2]['' + subItem2.feild + ''] && contents[activeFormIndex]['' + f.feild + ''][index]['' + subItem.feild + ''][index2]['' + subItem2.feild + ''].length > 0">
+                                  <div class="sub-item-option" v-for="(o2, oi2) in contents[activeFormIndex]['' + f.feild + ''][index]['' + subItem.feild + ''][index2]['' + subItem2.feild + '']" :key="oi2">
+                                    <div class="sub-item-input">
+                                      <el-input v-model="contents[activeFormIndex]['' + f.feild + ''][index]['' + subItem.feild + ''][index2]['' + subItem2.feild + ''][oi2]"></el-input>
+                                    </div>
+                                    <div class="sub-item-operate">
+                                      <el-button icon="el-icon-minus" @click="minusSubItem2(f, subItem, index, oi, subItem2, oi2)" circle></el-button>
+                                      <el-button icon="el-icon-plus" v-if="contents[activeFormIndex]['' + f.feild + ''][index]['' + subItem.feild + ''][index2]['' + subItem2.feild + ''].length - 1 == oi2" circle @click="addSubItem2(f, subItem, index)"></el-button>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div v-else>
+                                  <el-button @click="addSubItem(f, subItem, index)" round>添加</el-button>
+                                </div>
+                              </el-form-item>
+                            </div>
+                          </div>
+                          <div class="left" v-else>
+                            <div class="row">
+                              <div class="text">{{subItem.data_from ? subItem.data_from.split(',')[0].split('_')[0] + '：' : 'key：' }}</div>
+                              <div class="text-input">
+                                <el-input :type="(subItem.data_from && subItem.data_from.split(',')[0].indexOf('_1') > -1) ? 'textarea': 'text'" v-model="contents[activeFormIndex]['' + f.feild + ''][index]['key']" size="small"></el-input>
+                              </div>
+                            </div>
+                            <div class="row">
+                              <div class="text">{{subItem.data_from ? subItem.data_from.split(',')[1].split('_')[0] + '：' : 'val：' }}</div>
+                              <div class="text-input">
+                                <el-input :type="(subItem.data_from && subItem.data_from.split(',')[1].indexOf('_1') > -1) ? 'textarea': 'text'" v-model="contents[activeFormIndex]['' + f.feild + ''][index]['val']" size="small"></el-input>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="right">
+                            <el-button size="small" type="info" plain icon="el-icon-minus" @click="minusObj(index, f.feild, index2, subItem.feild)"></el-button>
+                            <el-button size="small" v-show="index2 == contents[activeFormIndex]['' + f.feild + ''][index][''+subItem.feild+''].length - 1" type="info" plain icon="el-icon-plus" @click="plusObj(f, index, subItem)"></el-button>
+                          </div>
+                        </div>
+                      </div>
+                      <!-- <div class="list" v-else>
+                        <el-button type="info" plain @click="plus('object', f)">添加一条{{contents[activeFormIndex]['' + f.data_from + ''] == 1 ? 'k/v的' : '' }}内容</el-button>
+                      </div> -->
+                    </div>
                   </div>
                 </div>
                 <div class="left" v-else>
@@ -444,6 +571,9 @@
           <div class="text-radar-sound" v-if="f.type == 'textRadar'">
             <audio v-if="contents[activeFormIndex]['sound']" :src="assetsDomain + contents[activeFormIndex]['sound']" controls></audio>
           </div>
+        </el-form-item>
+        <el-form-item v-if="f.type == 'button'" style="text-align:center">
+          <el-button type="primary" @click="analysisData(f.data_from)">{{f.name}}</el-button>
         </el-form-item>
         <el-form-item
           label-width="140px"
@@ -478,6 +608,21 @@
               :label="item.name"
               :value="item.type">
             </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item
+          label-width="140px"
+          label="性别"
+          v-if="f.data_from == 'genders'"
+          :prop="f.feild"
+          :rules="[
+            { required: true, message: '请选择性别', trigger: 'change' }
+          ]">
+          <el-select
+            v-model="contents[activeFormIndex]['' + f.feild + '']"
+            placeholder="请选择性别">
+            <el-option label="男" value="1"></el-option>
+            <el-option label="女" value="0"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label-width="140px" :label="f.name" v-if="(f.type == 'templateArray' && contents[activeFormIndex]['' + f.feild + ''] && contents[activeFormIndex]['' + f.feild + ''].length)">
@@ -528,9 +673,10 @@ import {
   editContent,
   delContent,
   getInfoToken,
-  addMoreImages
-  // ,
-  // getContent
+  addMoreImages,
+  cardAeneasJob,
+  getContentTags,
+  getVoiceActorList
 } from '@/api/course'
 import {
   uploadQiniu
@@ -554,6 +700,10 @@ export default {
       baseFormDataSelf: '',
       copyBaseFormDataSelf: '',
       uploadIndex: '',
+      contentTags: [],
+      soundActors: [],
+      checkedSoundActors: [],
+      courseSoundActors: [],
       audio: new Audio()
     }
   },
@@ -587,16 +737,19 @@ export default {
         this.$refs['rightMenuForm'].hide()
       }
     }
+    getContentTags({ page: 0, pageSize: 0 }).then(res => {
+      this.contentTags = res.data.tags
+    })
   },
   computed: {
     ...mapState({
       contentTypes: state => state.course.contentTypes,
-      contentTags: state => state.course.contentTags,
       assetsDomain: state => state.course.assetsDomain,
       selfSigns: state => state.course.selfSigns,
       version: state => state.course.version,
       partOfSpeech: state => state.course.partOfSpeech,
-      lowerRoleUser: state => state.user.lowerRoleUser
+      lowerRoleUser: state => state.user.lowerRoleUser,
+      soundLangMap: state => state.course.soundLangMap
     }),
     selfContentTypes () {
       // return this.contentTypes.filter(item => {
@@ -605,20 +758,6 @@ export default {
       return this.contentTypes.filter(item => {
         return item.model_keys && item.model_keys.findIndex(m => { return m === this.contentModel }) > -1
       })
-    },
-    selfContentTags () {
-      let arr = []
-      if (this.version && this.contentTags.length) {
-        let courseType = this.version.selCourseType
-        let type = 'pro'
-        if (courseType === 3) {
-          type = 'kid'
-        }
-        arr = this.contentTags.filter(item => {
-          return item.type.toLowerCase() === type
-        })
-      }
-      return arr
     }
   },
   methods: {
@@ -635,7 +774,43 @@ export default {
       this.copyBaseFormDataSelf = params.baseFormData
       this.$set(this.$data, 'feilds', params.feilds.sort((a, b) => { return a.list_order - b.list_order }))
       this.$set(this.$data, 'contentModel', params.contentModel)
+      // 判断缓存中是否已经选择了某个form
+      let selCourseFormUUID = this.$store.state.course.selCourseFormUUID
+      if (selCourseFormUUID) {
+        let fIndex = params.contents.findIndex(item => {
+          return item.uuid === selCourseFormUUID
+        })
+        if (fIndex > -1) {
+          this.activeFormIndex = fIndex
+        }
+      }
       this.$bus.$emit('curContentForm', params.contents[this.activeFormIndex])
+      if (this.contentModel === 'content_model_dubbing_repeat' && this.contents[this.activeFormIndex]['tags'].length > 0) {
+        this.changeCheckbox('tags')
+      }
+      if (params.contentModel === 'content_model_read_in_role') {
+        getVoiceActorList({
+          lang: this.version.selLang,
+          page_index: 1,
+          page_size: 99,
+          text_field: 'gender',
+          sort_type: -1
+        }).then(res => {
+          this.soundActors = res.data
+          if (this.contents[this.activeFormIndex]['checked_sound_actors'].length > 0) {
+            this.changeSoundActors('checked_sound_actors')
+          }
+        })
+      }
+      if (this.version && this.version.selCourse && this.version.selCourse.sound_actors) {
+        let sa = this.version.selCourse.sound_actors
+        const sortSA = sa.sort((a, b) => {
+          return b.gender - a.gender
+        })
+        this.courseSoundActors = sortSA
+      } else {
+        this.courseSoundActors = []
+      }
       this.formHeight = 220
       if (this.version.selCourseType === 0) {
         this.formHeight = 385
@@ -662,6 +837,7 @@ export default {
           setTimeout(() => {
             this.$set(this, 'contents', newContents)
             this.activeFormIndex = evt.newIndex
+            this.$store.commit('course/updateSelCourseFormUUID', this.contents[this.activeFormIndex].uuid)
             let obj = {
               content_model: this.contentModel,
               contents: this.contents,
@@ -687,12 +863,14 @@ export default {
       this.contentModel = ''
       this.form = {}
       this.activeFormIndex = 0
+      this.$store.commit('course/updateSelCourseFormUUID', this.contents[this.activeFormIndex].uuid)
       this.activeFeild = ''
       this.isShow = false
     },
     switchForm (params) {
       this.activeFormIndex = params.formIndex
       this.$set(this.contents, this.activeFormIndex, params.content)
+      this.$store.commit('course/updateSelCourseFormUUID', this.contents[this.activeFormIndex].uuid)
       this.$bus.$emit('curContentForm', this.contents[this.activeFormIndex])
     },
     async onSubmit () {
@@ -764,6 +942,7 @@ export default {
       let obj = JSON.parse(this.baseFormDataSelf)
       this.contents.push(obj)
       this.activeFormIndex = this.contents.length - 1
+      this.$store.commit('course/updateSelCourseFormUUID', this.contents[this.activeFormIndex].uuid)
       this.resetSortable()
     },
     delForm (params) {
@@ -784,6 +963,7 @@ export default {
           delContent(obj).then(res => {
             if (res.success) {
               this.activeFormIndex = 0
+              this.$store.commit('course/updateSelCourseFormUUID', this.contents[this.activeFormIndex].uuid)
               this.$message({
                 type: 'success',
                 message: '删除成功!'
@@ -819,6 +999,7 @@ export default {
         }
         this.activeFormIndex = 0
         this.contents.splice(params.formIndex, 1)
+        this.$store.commit('course/updateSelCourseFormUUID', this.contents[this.activeFormIndex].uuid)
       }
     },
     // 内容查找
@@ -892,6 +1073,7 @@ export default {
       obj['uuid'] = ''
       this.contents.push(obj)
       this.activeFormIndex = this.contents.length - 1
+      this.$store.commit('course/updateSelCourseFormUUID', this.contents[this.activeFormIndex].uuid)
       this.resetSortable()
       this.$refs['rightMenuForm'].hide()
     },
@@ -984,6 +1166,7 @@ export default {
     plus (flag, f) {
       let feild = f.feild
       this.copyBaseFormDataSelf = JSON.stringify(this.contents[this.activeFormIndex])
+      console.log(this.copyBaseFormDataSelf)
       let obj = JSON.parse(this.copyBaseFormDataSelf)
       if (!obj['' + feild + '']) {
         obj['' + feild + ''] = []
@@ -996,12 +1179,27 @@ export default {
           f.sub_feilds.forEach(sf => {
             let k = sf.feild
             let v = ''
-            if (sf.type === 'string' || sf.type === 'text') {
+            if (sf.type === 'string' || sf.type === 'text' || sf.type === 'select') {
               v = ''
             } else if (sf.type === 'int') {
               v = 0
             } else if (sf.type === 'array') {
               v = ['']
+            } else if (sf.type === 'arrayObject') {
+              let o2 = {}
+              sf.sub_feilds.forEach(sf2 => {
+                let k2 = sf2.feild
+                let v2 = ''
+                if (sf2.type === 'string' || sf2.type === 'text' || sf2.type === 'select') {
+                  v2 = ''
+                } else if (sf2.type === 'int') {
+                  v2 = 0
+                } else if (sf2.type === 'array') {
+                  v2 = ['']
+                }
+                o2['' + k2 + ''] = v2
+              })
+              v = [o2]
             }
             o['' + k + ''] = v
           })
@@ -1009,6 +1207,52 @@ export default {
         } else {
           obj['' + feild + ''].push({ key: '', val: '' })
         }
+      }
+      this.$set(this.contents, this.activeFormIndex, obj)
+      this.copyBaseFormDataSelf = JSON.stringify(obj)
+    },
+    minusObj (index, feild, index2, feild2) {
+      this.contents[this.activeFormIndex]['' + feild + ''][index]['' + feild2 + ''].splice(index2, 1)
+      this.copyBaseFormDataSelf = JSON.stringify(this.contents[this.activeFormIndex])
+    },
+    plusObj (f, index, subf) {
+      let feild = f.feild
+      let subFeild = subf.feild
+      this.copyBaseFormDataSelf = JSON.stringify(this.contents[this.activeFormIndex])
+      let obj = JSON.parse(this.copyBaseFormDataSelf)
+      if (!obj['' + feild + ''][index]['' + subFeild + '']) {
+        obj['' + feild + ''][index]['' + subFeild + ''] = []
+      }
+      if (subf.sub_feilds && subf.sub_feilds.length > 0) {
+        let o = {}
+        subf.sub_feilds.forEach(sf => {
+          let k = sf.feild
+          let v = ''
+          if (sf.type === 'string' || sf.type === 'text' || sf.type === 'select') {
+            v = ''
+          } else if (sf.type === 'int') {
+            v = 0
+          } else if (sf.type === 'array') {
+            v = ['']
+          } else if (sf.type === 'arrayObject') {
+            let o2 = {}
+            sf.sub_feilds.forEach(sf2 => {
+              let k2 = sf2.feild
+              let v2 = ''
+              if (sf2.type === 'string' || sf2.type === 'text' || sf2.type === 'select') {
+                v2 = ''
+              } else if (sf2.type === 'int') {
+                v2 = 0
+              } else if (sf2.type === 'array') {
+                v2 = ['']
+              }
+              o2['' + k2 + ''] = v2
+            })
+            v = [o2]
+          }
+          o['' + k + ''] = v
+        })
+        obj['' + feild + ''][index]['' + subFeild + ''].push(o)
       }
       this.$set(this.contents, this.activeFormIndex, obj)
       this.copyBaseFormDataSelf = JSON.stringify(obj)
@@ -1113,6 +1357,48 @@ export default {
         }
       }
     },
+    uploadSub2 (f, index, subIndex, sf, subIndex2, sf2) {
+      this.uploadIndex = sf2.data_from + ',' + f.feild + ',' + index + ',' + subIndex + ',' + sf.feild + ',' + subIndex2 + ',' + sf2.feild
+      console.log(this.uploadIndex)
+    },
+    async uploadOnchangeSub2 (file) {
+      let uploadIndexArr = this.uploadIndex.split(',')
+      let dataFrom = uploadIndexArr[0]
+      let feild = uploadIndexArr[1]
+      let index = uploadIndexArr[2]
+      let subIndex = parseInt(uploadIndexArr[3])
+      let subFeild = uploadIndexArr[4]
+      let subIndex2 = parseInt(uploadIndexArr[5])
+      let subFeild2 = uploadIndexArr[6]
+      let date = moment(new Date()).format('YYYY/MM/DD')
+      let i = file.name.lastIndexOf('.')
+      let ext = file.name.substring(i + 1)
+      let name = file.name.substring(0, i)
+      let url = ''
+      if (dataFrom === 'upload_audio') {
+        url = 'course/sounds/' + this.version.selLang + '/' + date + '/' + file.uid + '.' + ext
+      } else if (dataFrom === 'upload_image') {
+        url = 'course/images/' + this.version.selLang + '/' + date + '/' + file.uid + '.' + ext
+        this.saveImages([url], [name])
+      } else if (dataFrom === 'upload_video') {
+        url = 'course/videos/' + this.version.selLang + '/' + date + '/' + file.uid + '.' + ext
+      }
+      let res = await uploadQiniu(file.raw, this.token, url)
+      if (index === '-1') {
+        console.log(this.contents[this.activeFormIndex]['' + feild + ''][subIndex]['' + subFeild + ''])
+        this.$set(this.contents[this.activeFormIndex]['' + feild + ''][subIndex]['' + subFeild + ''][subIndex2], subFeild2, res.key)
+        this.copyBaseFormDataSelf = JSON.stringify(this.contents[this.activeFormIndex])
+        // 计算声音时长
+        if (typeof this.contents[this.activeFormIndex]['' + feild + ''][subIndex]['' + subFeild + ''][subIndex2][subFeild2 + '_time'] !== 'undefined') {
+          let mySound = new Audio()
+          mySound.src = this.assetsDomain + res.key
+          mySound.oncanplay = () => {
+            this.$set(this.contents[this.activeFormIndex]['' + feild + ''][subIndex]['' + subFeild + ''][subIndex2], subFeild2 + '_time', mySound.duration)
+            this.copyBaseFormDataSelf = JSON.stringify(this.contents[this.activeFormIndex])
+          }
+        }
+      }
+    },
     selOneSign (sign) {
       this.contents[this.activeFormIndex]['self_sign'] = sign.key
     },
@@ -1166,6 +1452,12 @@ export default {
     minusSubItem (f, sf, i, oi) {
       this.contents[this.activeFormIndex]['' + f.feild + ''][i]['' + sf.feild + ''].splice(oi, 1)
     },
+    addSubItem2 (f, sf, i) {
+      this.contents[this.activeFormIndex]['' + f.feild + ''][i]['' + sf.feild + ''].push('')
+    },
+    minusSubItem2 (f, sf, i, oi, sf2, oi2) {
+      this.contents[this.activeFormIndex]['' + f.feild + ''][i]['' + sf.feild + ''][oi]['' + sf2 + ''].splice(oi2, 1)
+    },
     // 对于上传的图片，存储到图片库“通用”分类下
     saveImages (imageUrls, names) {
       let obj = {
@@ -1198,6 +1490,144 @@ export default {
         document.body.removeChild(a)
       }, 1000)
       console.log(response)
+    },
+    changeCheckbox (feild) {
+      console.log(this.contents[this.activeFormIndex]['' + feild + ''])
+      const arr = []
+      if (this.contents[this.activeFormIndex]['' + feild + ''].length > 0) {
+        this.contents[this.activeFormIndex]['' + feild + ''].forEach(item => {
+          let f = this.contentTags.find(i => {
+            return i.key === item
+          })
+          if (f) {
+            arr.push({
+              key: f.key,
+              name: f.name
+            })
+          }
+        })
+      }
+      this.$set(this.contents[this.activeFormIndex], 'tagObjs', arr)
+      console.log(this.contents[this.activeFormIndex]['tagObjs'])
+    },
+    changeSoundActors (feild) {
+      this.checkedSoundActors = []
+      if (this.contents[this.activeFormIndex]['' + feild + ''].length > 0) {
+        this.contents[this.activeFormIndex]['' + feild + ''].forEach(item => {
+          let f = this.soundActors.find(i => {
+            return i.uuid === item
+          })
+          if (f) {
+            this.checkedSoundActors.push(f)
+          }
+        })
+      }
+      console.log(this.checkedSoundActors)
+    },
+    // 解析数据
+    analysisData (type) {
+      switch (type) {
+        case 'rubbingEar':
+          this.analysisData1()
+          break
+        case 'dubbingRepeat':
+          this.analysisData2()
+          break
+        default:
+          break
+      }
+    },
+    // 解析磨耳朵数据
+    analysisData1 () {
+      console.log(this.contents[this.activeFormIndex])
+      let sound = this.contents[this.activeFormIndex].sound
+      let audio = new Audio()
+      audio.src = this.assetsDomain + sound
+      audio.onloadeddata = (e) => {
+        this.contents[this.activeFormIndex]['sound_time'] = audio.duration
+      }
+
+      const xhr = new XMLHttpRequest()
+      xhr.onreadystatechange = (r) => {
+        console.log(xhr)
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          console.log(xhr.response)
+          cardAeneasJob({
+            filename: xhr.response,
+            language: this.soundLangMap[this.version.selLang],
+            content: this.contents[this.activeFormIndex].content,
+            plain: 'plain'
+          }).then(res => {
+            if (res.success) {
+              const data = JSON.parse(res.data)
+              const fragments = data.fragments
+              fragments.forEach((item, index) => {
+                if (this.contents[this.activeFormIndex]['radar'][index]) {
+                  this.contents[this.activeFormIndex]['radar'][index].sentence = item.lines[0]
+                  this.contents[this.activeFormIndex]['radar'][index].begin = item.begin
+                  this.contents[this.activeFormIndex]['radar'][index].end = item.end
+                } else {
+                  this.contents[this.activeFormIndex]['radar'].push({
+                    sentence: item.lines[0],
+                    sentence_trs: '',
+                    image: '',
+                    begin: item.begin,
+                    end: item.end
+                  })
+                }
+              })
+              console.log(data)
+            }
+          })
+          // const file = new File([xhr.response], 'text', { type: 'audio/mp3' })
+          // console.log(file)
+        }
+      }
+      xhr.open('GET', this.assetsDomain + sound)
+      xhr.responseType = 'blob'
+      xhr.send()
+    },
+    // 解析配音数据
+    analysisData2 () {
+      console.log(this.contents[this.activeFormIndex])
+      let videoUrl = this.contents[this.activeFormIndex].video
+
+      const xhr = new XMLHttpRequest()
+      xhr.onreadystatechange = (r) => {
+        console.log(xhr)
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          console.log(xhr.response)
+          cardAeneasJob({
+            filename: xhr.response,
+            language: this.soundLangMap[this.version.selLang],
+            content: this.contents[this.activeFormIndex].content,
+            plain: 'plain'
+          }).then(res => {
+            if (res.success) {
+              const data = JSON.parse(res.data)
+              const fragments = data.fragments
+              fragments.forEach((item, index) => {
+                if (this.contents[this.activeFormIndex]['radar'][index]) {
+                  this.contents[this.activeFormIndex]['radar'][index].sentence = item.lines[0]
+                  this.contents[this.activeFormIndex]['radar'][index].begin = item.begin
+                  this.contents[this.activeFormIndex]['radar'][index].end = item.end
+                } else {
+                  this.contents[this.activeFormIndex]['radar'].push({
+                    sentence: item.lines[0],
+                    sentence_trs: '',
+                    begin: item.begin,
+                    end: item.end
+                  })
+                }
+              })
+              console.log(data)
+            }
+          })
+        }
+      }
+      xhr.open('GET', this.assetsDomain + videoUrl)
+      xhr.responseType = 'blob'
+      xhr.send()
     }
   }
 }
@@ -1399,6 +1829,9 @@ export default {
 .icon-video {
   background-image: url('../../../assets/images/icons/icon-video.png');
 }
+.icon-video::before {
+  content: '';
+}
 
 .icon-picture {
   background-image: url('../../../assets/images/icons/icon-picture.png');
@@ -1424,5 +1857,12 @@ export default {
   height: 24px;
   display: inline-block;
   line-height: 24px;
+}
+
+.small-image {
+  margin-top: 5px;
+  width: 60px;
+  height: 30px;
+  border-radius: 4px;
 }
 </style>

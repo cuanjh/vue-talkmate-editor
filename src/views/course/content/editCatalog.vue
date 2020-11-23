@@ -51,13 +51,12 @@
           </div>
         </el-form-item>
         <el-form-item label="图标">
-          <el-tag type="warning">请上传webp格式的图片</el-tag>
+          <el-tag type="warning">请上传webp格式的图片, 图标第一个为默认图标，第二个为激活态图标。</el-tag>
           <div class="img-box small-img-box">
-            <div class="img">
+            <!-- <div class="img">
               <img v-if="flagUrl" :src="flagUrl" fit="cover" />
             </div>
             <el-upload
-              v-show="attr_tag == ''"
               action="#"
               accept="image/webp"
               :on-change="uploadFlagOnchange"
@@ -66,7 +65,22 @@
               <div id="upload-btn">
                 <i class="el-icon-plus avatar-uploader-icon"></i>
               </div>
+            </el-upload> -->
+            <el-upload
+              :disabled="attr_tag != ''"
+              action="#"
+              accept="image/webp"
+              list-type="picture-card"
+              :on-change="uploadFlagOnchange"
+              :auto-upload="false"
+              :on-preview="handlePictureCardPreview"
+              :on-remove="handleRemove"
+              :file-list="flag">
+              <i class="el-icon-plus"></i>
             </el-upload>
+            <el-dialog :visible.sync="dialogVisible" append-to-body>
+              <img width="100%" :src="dialogImageUrl" alt="">
+            </el-dialog>
           </div>
         </el-form-item>
         <el-form-item label="封面">
@@ -156,6 +170,8 @@ import {
 } from '@/api/course'
 import { uploadQiniu } from '@/utils/uploadQiniu'
 import { mapState } from 'vuex'
+import moment from 'moment'
+
 export default {
   data () {
     return {
@@ -169,6 +185,9 @@ export default {
       attr_tag: '',
       tags: [],
       folder: {},
+      dialogImageUrl: '',
+      dialogVisible: false,
+      flag: [],
       form: {
         parent_uuid: '',
         uuid: '',
@@ -311,8 +330,26 @@ export default {
     },
     onSubmit () {
       console.log('submit!', this.form)
-      this.$refs['form'].validate((valid) => {
+      this.$refs['form'].validate(async (valid) => {
         if (valid) {
+          // 获取上传图片token
+          let resToken = await getInfoToken()
+          this.token = resToken.data.token
+          let flag = []
+          for (let i = 0; i < this.flag.length; i++) {
+            const item = this.flag[i]
+            if (item.raw) {
+              let i = item.raw.name.lastIndexOf('.')
+              let ext = item.raw.name.substring(i + 1)
+              let date = moment(new Date()).format('YYYYMMDD')
+              let url = 'course/content/catalog/flag/' + date + '/' + item.uid + '.' + ext
+              let res = await uploadQiniu(item.raw, this.token, url)
+              flag.push(res.key)
+            } else {
+              flag.push(item.name)
+            }
+          }
+          this.form.flag = flag
           if (this.handler === 'add') {
             let obj1 = {
               catalogsInfo: {
@@ -398,6 +435,7 @@ export default {
       this.height = h - 2
       this.pathDesc = ''
       this.attr_tag = ''
+      this.flag = []
       this.form = {
         parent_uuid: '',
         uuid: '',
@@ -416,11 +454,13 @@ export default {
       this.form.cover.length = 0
     },
     async uploadFlagOnchange (file, fileList) {
-      this.form.flag = []
-      let ext = file.raw.name.split('.')[1]
-      let url = 'course/content/catalog/flag/' + file.uid + '.' + ext
-      let res = await uploadQiniu(file.raw, this.token, url)
-      this.form.flag.push(res.key)
+      console.log(fileList)
+      this.flag = fileList
+      // this.form.flag = []
+      // let ext = file.raw.name.split('.')[1]
+      // let url = 'course/content/catalog/flag/' + file.uid + '.' + ext
+      // let res = await uploadQiniu(file.raw, this.token, url)
+      // this.form.flag.push(res.key)
     },
     async uploadCoverOnchange (file, fileList) {
       console.log(file)
@@ -452,6 +492,7 @@ export default {
       this.form[flag].splice(index, 1)
     },
     changeAttrTag () {
+      let flag = []
       if (this.attr_tag) {
         let attr = this.catalogAttr.find(item => {
           return item.key === this.attr_tag
@@ -461,19 +502,25 @@ export default {
           this.form.title = attr.title ? attr.title : {}
           this.form.desc = attr.desc ? attr.desc : {}
           this.form.cover = attr.cover
-          this.form.flag = attr.flag
+          attr.flag.map(item => {
+            flag.push({ name: item, url: this.assetsDomain + item })
+          })
+          this.flag = flag
         } else {
           this.form.title = {}
           this.form.desc = {}
           this.form.cover = ''
-          this.form.flag = ''
+          this.form.flag = []
         }
       } else {
         if (this.handler === 'edit') {
           this.form.title = this.folder.title
           this.form.desc = this.folder.desc
           this.form.cover = this.folder.cover
-          this.form.flag = this.folder.flag
+          this.folder.flag.map(item => {
+            flag.push({ name: item, url: this.assetsDomain + item })
+          })
+          this.flag = flag
         } else {
           this.form.title = {}
           this.form.desc = {}
@@ -481,6 +528,13 @@ export default {
           this.form.flag = []
         }
       }
+    },
+    handleRemove (file, fileList) {
+      this.flag = fileList
+    },
+    handlePictureCardPreview (file) {
+      this.dialogImageUrl = file.url
+      this.dialogVisible = true
     }
   },
   destroyed () {

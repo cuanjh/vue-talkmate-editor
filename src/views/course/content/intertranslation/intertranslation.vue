@@ -15,8 +15,8 @@
       <div class="form-wrap">
         <div class="list">
           <div class="item" v-for="(item, index) in form.radar" :key="index">
-            <div class="content">{{ item.key }}</div>
-            <div class="content">{{ item.val }}</div>
+            <div class="content">{{ item.sentence }}</div>
+            <div class="content">{{ item.sentence_trs }}</div>
           </div>
         </div>
       </div>

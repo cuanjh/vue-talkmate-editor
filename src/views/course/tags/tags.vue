@@ -95,7 +95,7 @@ import {
   delTags,
   onlineCourses
 } from '@/api/course'
-import EditComp from './edit'
+import EditComp from './editTag'
 import CropperDialog from '../../../components/common/cropper'
 
 export default {
