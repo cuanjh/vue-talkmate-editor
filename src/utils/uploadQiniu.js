@@ -4,14 +4,15 @@ let activeAxios = 0
 let loadingInstance
 let timer
 
-const showLoading = () => {
+const showLoading = (text) => {
   activeAxios++
   if (timer) {
     clearTimeout(timer)
   }
   timer = setTimeout(() => {
     if (activeAxios > 0) {
-      loadingInstance = Loading.service({ fullscreen: true })
+      loadingInstance = Loading.service({ fullscreen: true, text: text })
+      console.log(loadingInstance)
     }
   }, 400)
 }
@@ -55,15 +56,16 @@ export const convertBase64ToBlob = (base64) => {
 }
 
 export const uploadQiniu = (file, token, key) => {
-  showLoading()
+  showLoading(0)
   return new Promise((resolve, reject) => {
     let finishedAttr = []
     let compareChunks = []
 
     let config = {
       useCdnDomain: true,
-      disableStatisticsReport: false,
+      disableStatisticsReport: true,
       retryCount: 6,
+      concurrentRequestLimit: 6,
       region: qiniu.region.z0
     }
 
@@ -96,6 +98,9 @@ export const uploadQiniu = (file, token, key) => {
           console.log(chunks[i].percent + '%')
         }
         console.log('进度：' + total.percent + '%')
+        if (loadingInstance) {
+          loadingInstance.setText(parseInt(total.percent) + '%')
+        }
         compareChunks = chunks
       },
       error: (err) => {
@@ -113,7 +118,7 @@ export const uploadQiniu = (file, token, key) => {
       message: '好像没有成功哦，再试一次吧~',
       type: 'error'
     })
-    closeLoading()
+    // closeLoading()
     console.log(error)
   })
 }
