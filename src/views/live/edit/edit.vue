@@ -140,10 +140,7 @@
           </el-upload>
           <el-tag type="warning">注：讲师照片将在分类课程-直播处展示</el-tag>
         </el-form-item>
-        <el-form-item label="发现首页讲师照片" prop="disTechPhoto"
-          :rules="[
-            { required: true, message: '发现首页讲师照片不能为空'}
-          ]">
+        <el-form-item label="发现首页讲师照片" prop="disTechPhoto">
           <el-upload
             class="avatar-uploader"
             action="#"
