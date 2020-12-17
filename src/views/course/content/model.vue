@@ -179,7 +179,7 @@
     </div>
     <el-form id="form-model" ref="form" v-if="contents && contents.length" :model="contents[activeFormIndex]" label-width="80px">
       <div class="item" v-for="f in feilds" :key="f.feild">
-        <el-form-item label-width="140px" :label="f.name" v-if="(f.type !== 'button' && f.data_from !== 'part_of_speech' && f.data_from !== 'content_types' && f.feild !== 'list_order' && f.type !== 'template' && f.type !== 'templateArray' && f.feild !== 'sentence_phoneticize' && f.feild !== 'options_phoneticize') || (f.type == 'template' && contents[activeFormIndex]['' + f.feild + '']) || ((version['selLang'] == 'JPN' || version['selLang'] == 'CHI') && (f.feild == 'sentence_phoneticize' || f.feild == 'options_phoneticize')) || (f.feild === 'options' && f.type == 'array' && contents[activeFormIndex][f.feild])">
+        <el-form-item label-width="140px" :label="f.name" v-if="(f.type !== 'button' && f.data_from !== 'part_of_speech' && f.data_from !== 'content_types' && f.feild !== 'list_order' && f.type !== 'template' && f.type !== 'templateArray' && f.feild !== 'sentence_phoneticize') || (f.type == 'template' && contents[activeFormIndex]['' + f.feild + '']) || ((version['selLang'] == 'JPN' || version['selLang'] == 'CHI') && (f.feild == 'sentence_phoneticize')) || (f.feild === 'options' && f.type == 'array' && contents[activeFormIndex][f.feild])">
           <!-- string 或 int -->
           <el-input
             :maxlength="500" show-word-limit
@@ -391,7 +391,7 @@
                 </div>
                 <div class="left" v-if="f.sub_feilds && f.sub_feilds.length > 0">
                   <div class="sub-item" v-for="(subItem, i) in f.sub_feilds" :key="'subItem' + i">
-                    <el-form-item size="small" :label="subItem.name" v-if="subItem.type == 'string' || subItem.type == 'text' || subItem.type == 'select'">
+                    <el-form-item size="small" :label="subItem.name" v-if="subItem.type == 'string' || subItem.type == 'int' || subItem.type == 'text' || subItem.type == 'select'">
                       <!-- string -->
                       <el-input  v-if="!subItem.data_from && subItem.type == 'string'" v-model="contents[activeFormIndex]['' + f.feild + ''][index]['' + subItem.feild + '']"></el-input>
                       <!-- textarea -->
@@ -459,7 +459,7 @@
                           </div>
                           <div class="left" v-if="subItem.sub_feilds && subItem.sub_feilds.length > 0">
                             <div class="sub-item" v-for="(subItem2, i2) in subItem.sub_feilds" :key="'subItem2' + i2">
-                              <el-form-item size="small" :label="subItem2.name" v-if="subItem2.type == 'string' || subItem2.type == 'text' || subItem2.type == 'select'">
+                              <el-form-item size="small" :label="subItem2.name" v-if="subItem2.type == 'string' || subItem2.type == 'int' || subItem2.type == 'text' || subItem2.type == 'select'">
                                 <!-- string -->
                                 <el-input  v-if="!subItem2.data_from && subItem2.type == 'string'" v-model="contents[activeFormIndex]['' + f.feild + ''][index]['' + subItem.feild + ''][index2]['' + subItem2.feild + '']"></el-input>
                                 <!-- textarea -->
@@ -1184,7 +1184,7 @@ export default {
             } else if (sf.type === 'int') {
               v = 0
             } else if (sf.type === 'array') {
-              v = ['']
+              v = []
             } else if (sf.type === 'arrayObject') {
               let o2 = {}
               sf.sub_feilds.forEach(sf2 => {
@@ -1512,6 +1512,7 @@ export default {
     },
     changeSoundActors (feild) {
       this.checkedSoundActors = []
+      let arr = []
       if (this.contents[this.activeFormIndex]['' + feild + ''].length > 0) {
         this.contents[this.activeFormIndex]['' + feild + ''].forEach(item => {
           let f = this.soundActors.find(i => {
@@ -1519,9 +1520,14 @@ export default {
           })
           if (f) {
             this.checkedSoundActors.push(f)
+            let obj = f
+            obj['photo'] = this.assetsDomain + obj.photo
+            obj['sound'] = this.assetsDomain + obj.sound
+            arr.push(obj)
           }
         })
       }
+      this.$set(this.contents[this.activeFormIndex], 'sound_actors', arr)
       console.log(this.checkedSoundActors)
     },
     // 解析数据

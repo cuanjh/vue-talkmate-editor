@@ -45,8 +45,11 @@
       <el-form-item label="声音时长：">
         <el-input v-model="ruleForm.soundTime" disabled></el-input>
       </el-form-item>
-      <el-form-item label="声音特点：" prop="desc">
+      <el-form-item label="声音特点：">
         <el-input type="textarea" v-model="ruleForm.feature"></el-input>
+      </el-form-item>
+      <el-form-item label="描述：">
+        <el-input type="textarea" v-model="ruleForm.desc"></el-input>
       </el-form-item>
       <el-form-item label="头像：" prop="photo">
         <el-upload
@@ -103,6 +106,7 @@ export default {
         country: '',
         city: '',
         feature: '',
+        desc: '',
         lang: '',
         photo: '',
         role: '',
@@ -162,6 +166,7 @@ export default {
         country: '',
         city: '',
         feature: '',
+        desc: '',
         lang: '',
         photo: '',
         role: '',
@@ -175,6 +180,7 @@ export default {
         this.ruleForm.country = params.form.country
         this.ruleForm.city = params.form.city
         this.ruleForm.feature = params.form.feature
+        this.ruleForm.desc = params.form.desc
         this.ruleForm.lang = params.form.lang
         this.ruleForm.photo = params.form.photo
         this.ruleForm.sound = params.form.sound
@@ -249,6 +255,7 @@ export default {
               country: this.ruleForm.country,
               city: this.ruleForm.city,
               feature: this.ruleForm.feature,
+              desc: this.ruleForm.desc,
               gender: parseInt(this.ruleForm.gender),
               lang: this.ruleForm.lang,
               name: this.ruleForm.name,

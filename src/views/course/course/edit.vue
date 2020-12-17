@@ -377,7 +377,9 @@ export default {
                   name: find.name,
                   photo: find.photo,
                   role: find.uuid,
-                  sound: find.sound
+                  sound: find.sound,
+                  city: find.city,
+                  desc: find.desc
                 })
               }
             })

@@ -47,7 +47,7 @@ export default {
         } else if (item.type === 'templateArray' || item.type === 'checkboxGroup') {
           val = []
         } else if (item.type === 'array') {
-          val = ['']
+          val = []
         } else if (item.type === 'arrayObject') {
           val = []
           if (item.sub_feilds && item.sub_feilds.length) {
