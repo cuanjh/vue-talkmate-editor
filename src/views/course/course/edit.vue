@@ -109,6 +109,11 @@
               <el-radio :label="false">否</el-radio>
             </el-radio-group>
           </el-form-item>
+          <el-form-item label="默认声优：" class="flex-class">
+            <el-select v-model="form.default_actor">
+              <el-option v-for="item in voiceActors" :key="item.uuid" :value="item.uuid" :label="item.name + (item.gender === 1 ? '（男）' : '（女）')"></el-option>
+            </el-select>
+          </el-form-item>
           <el-form-item label="声优：">
             <el-checkbox-group v-model="checkVoiceActors">
               <el-checkbox v-for="item in voiceActors" :key="item.uuid" :label="item.uuid">{{item.name + (item.gender === 1 ? '（男）' : '（女）')}}</el-checkbox>
@@ -151,6 +156,8 @@ export default {
         has_dict: false, // 是否显示词典
         lan_code: '', // 语种的编码
         tags: [],
+        sound_actors: [],
+        default_actor: '',
         name: '',
         title: {} // 标题
       },
@@ -240,6 +247,8 @@ export default {
           has_dict: false,
           lan_code: params.selLang, // 语种的编码
           tags: [],
+          sound_actors: [],
+          default_actor: '',
           name: '',
           title: {} // 标题
         }
@@ -393,6 +402,7 @@ export default {
               flag: this.form.flag, // 小图标
               is_show: this.form.is_show, // 是否上线
               has_dict: this.form.has_dict,
+              default_actor: this.form.default_actor,
               sound_actors: soundActors,
               lan_code: this.form.lan_code, // 语种的编码
               tags: this.form.tags,
@@ -415,6 +425,7 @@ export default {
                 flag: this.form.flag,
                 is_show: this.form.is_show,
                 has_dict: this.form.has_dict,
+                default_actor: this.form.default_actor,
                 sound_actors: soundActors,
                 tags: [],
                 name: this.form.name,
