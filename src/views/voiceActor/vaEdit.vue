@@ -56,6 +56,7 @@
           class="avatar-uploader"
           action="#"
           accept="image/webp;image/png;image/jpg;image/jpeg"
+          :on-preview="handlePictureCardPreview"
           :show-file-list="false"
           :auto-upload="false"
           :on-change="onChangeImage">

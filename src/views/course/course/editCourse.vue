@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     :visible.sync="showEdit"
-    width="50%"
+    width="750px"
     @close="close">
     <div class="edit-content">
       <div class="course-content">
@@ -41,8 +41,25 @@
             </div> -->
             <el-row v-for="l in langInfos" :key="'title' + l.langKey">
               <el-form-item  class="input-box" :prop="'title.' + l.langKey"
-                :rules="[{required: true, message: '名称不能为空', trigger: 'blur'}]">
+                :rules="[{required: true, message: '标题不能为空', trigger: 'blur'}]">
                 <el-input type="textarea" v-model="form.title[l.langKey]" maxlength="100" show-word-limit></el-input>
+                <span>{{'(' + l.name + ')'}}</span>
+              </el-form-item>
+            </el-row>
+          </el-form-item>
+          <el-form-item label="副标题：" class="desc">
+            <el-row v-for="l in langInfos" :key="'subTitle' + l.langKey">
+              <el-form-item  class="input-box" :prop="'subTitle.' + l.langKey">
+                <el-input type="textarea" v-model="form.subTitle[l.langKey]" maxlength="100" show-word-limit></el-input>
+                <span>{{'(' + l.name + ')'}}</span>
+              </el-form-item>
+            </el-row>
+          </el-form-item>
+          <el-form-item label="标签：" class="desc">
+            <el-row v-for="l in langInfos" :key="'tag' + l.langKey">
+              <el-form-item  class="input-box" :prop="'tag.' + l.langKey"
+                >
+                <el-input type="text" v-model="form.tag[l.langKey]" maxlength="100" show-word-limit></el-input>
                 <span>{{'(' + l.name + ')'}}</span>
               </el-form-item>
             </el-row>
@@ -53,7 +70,7 @@
               <span>{{'(' + l.name + ')'}}</span>
             </div>
           </el-form-item>
-          <el-form-item label="大图：" prop="flag[0]" :rules="[
+          <el-form-item label="大图：" prop="cover[0]" :rules="[
             { required: true, message: '大图标不能为空', trigger: 'change' }
           ]">
             <div class="img-box big-img-box">
@@ -97,6 +114,21 @@
               </el-upload>
             </div>
           </el-form-item>
+          <el-form-item label="配图：">
+            <el-upload
+              class="avatar-uploader"
+              action="#"
+              accept="image/webp;image/png;image/jpg;image/jpeg"
+              :show-file-list="false"
+              :auto-upload="false"
+              :on-change="onChangeImage">
+              <img v-if="form.image" :src="form.image.indexOf('http') > -1 ? form.image : assetsDomain + form.image" class="avatar">
+              <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+            </el-upload>
+            <el-dialog :visible.sync="dialogImageVisible" append-to-body>
+              <img width="100%" :src="dialogImageUrl" alt="">
+            </el-dialog>
+          </el-form-item>
           <el-form-item label="是否显示：" class="flex-class">
             <el-radio-group v-model="form.is_show">
               <el-radio :label="true">是</el-radio>
@@ -138,6 +170,7 @@
 import { addCourse, courseEdit, getInfoToken } from '@/api/course'
 import { mapState } from 'vuex'
 import { uploadQiniu } from '@/utils/uploadQiniu'
+import moment from 'moment'
 
 export default {
   props: ['courseTypes'],
@@ -145,6 +178,9 @@ export default {
     return {
       showEdit: false,
       lang: '',
+      imageFile: null,
+      dialogImageUrl: '',
+      dialogImageVisible: false,
       form: {
         codePend: '',
         code: '',
@@ -159,7 +195,10 @@ export default {
         sound_actors: [],
         default_actor: '',
         name: '',
-        title: {} // 标题
+        title: {}, // 标题
+        subTitle: {},
+        tag: {},
+        image: ''
       },
       bigImgUrl: '',
       bigFileRaw: {},
@@ -234,6 +273,7 @@ export default {
       this.type = params.type
       this.showEdit = true
       this.checkVoiceActors = []
+      this.imageFile = null
       if (this.type === 'add') {
         this.lang = params.selLang
         let obj = {
@@ -250,7 +290,10 @@ export default {
           sound_actors: [],
           default_actor: '',
           name: '',
-          title: {} // 标题
+          title: {}, // 标题
+          subTitle: {},
+          tag: {},
+          image: ''
         }
         this.form = obj
         this.bigImgUrl = ''
@@ -263,6 +306,12 @@ export default {
           params.form.sound_actors.forEach(item => {
             this.checkVoiceActors.push(item.role)
           })
+        }
+        if (!this.form.subTitle) {
+          this.form.subTitle = {}
+        }
+        if (!this.form.tag) {
+          this.form.tag = {}
         }
         this.form.codePend = params.form.code.split('-').slice(1).join('-')
         this.bigImgUrl = this.assetsDomain + '/' + params.form.cover[0]
@@ -349,10 +398,39 @@ export default {
     },
     // 添加
     determine () {
-      this.$refs['form'].validate((valid) => {
+      this.$refs['form'].validate(async (valid) => {
         if (valid) {
           console.log(this.form)
+          let imageUrl = this.form.image
+          let p = this.imageFile
+          if (this.imageFile && p.raw) {
+            let date = moment(new Date()).format('YYYY/MM/DD')
+            let i = p.name.lastIndexOf('.')
+            let ext = p.name.substring(i + 1)
+            let url = 'voiceActor/images/' + date + '/' + p.uid + '.' + ext
+            let res = await uploadQiniu(p.raw, this.token, url)
+            imageUrl = res.key
+          }
+          this.form.image = imageUrl
           let soundActors = []
+          // 默认声优排在第一位
+          let defaultActor = null
+          if (this.form.default_actor) {
+            defaultActor = this.voiceActors.find((item) => {
+              return item.uuid === this.form.default_actor
+            })
+            if (defaultActor) {
+              soundActors.push({
+                gender: defaultActor.gender,
+                name: defaultActor.name,
+                photo: defaultActor.photo,
+                role: defaultActor.uuid,
+                sound: defaultActor.sound,
+                city: defaultActor.city,
+                desc: defaultActor.desc
+              })
+            }
+          }
           if (this.checkVoiceActors.length > 0) {
             this.checkVoiceActors.forEach(item => {
               // const find = this.groupVoiceActors.find(f => {
@@ -380,7 +458,7 @@ export default {
               const find = this.voiceActors.find(f => {
                 return f.uuid === item
               })
-              if (find) {
+              if (find && find.uuid !== defaultActor.uuid) {
                 soundActors.push({
                   gender: find.gender,
                   name: find.name,
@@ -407,7 +485,10 @@ export default {
               lan_code: this.form.lan_code, // 语种的编码
               tags: this.form.tags,
               name: this.form.name,
-              title: this.form.title // 标题
+              title: this.form.title, // 标题
+              subTitle: this.form.subTitle,
+              tag: this.form.tag,
+              image: this.form.image
             }
             addCourse(obj).then(res => {
               console.log(res)
@@ -429,7 +510,10 @@ export default {
                 sound_actors: soundActors,
                 tags: [],
                 name: this.form.name,
-                title: this.form.title
+                title: this.form.title,
+                subTitle: this.form.subTitle,
+                tag: this.form.tag,
+                image: this.form.image
               },
               uuid: this.form.uuid
             }
@@ -456,6 +540,10 @@ export default {
         })
       }
       return ret.length > 0 ? `（${ret.join('、')}）` : ''
+    },
+    onChangeImage (file, fileList) {
+      this.imageFile = file
+      this.form.image = URL.createObjectURL(file.raw)
     }
   }
 }

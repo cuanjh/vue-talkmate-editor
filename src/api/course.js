@@ -1899,3 +1899,16 @@ export const updateVoiceActor = (data) => {
     data
   })
 }
+
+/**
+ * @Summary 获取冬奥小使者列表
+ * @param {*} data
+ * @Router /editor/dong_ao/list [post]
+ */
+export const getDongAoList = (data) => {
+  return service({
+    url: '/editor/dong_ao/list',
+    method: 'post',
+    data
+  })
+}

@@ -166,9 +166,10 @@ export default {
         name: this.searchKey,
         lang: this.selLang,
         page_index: this.currentPage,
-        page_size: this.pageSize,
-        text_field: 'role',
-        sort_type: 1
+        page_size: this.pageSize
+        // ,
+        // text_field: 'role',
+        // sort_type: 1
       })
       if (res.success && res.data) {
         let copy = this.list.slice()

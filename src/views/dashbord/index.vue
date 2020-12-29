@@ -66,7 +66,7 @@ export default {
   },
   mounted () {
     console.log(this.userInfo)
-    if (this.userInfo.authorityId !== '2') {
+    if (this.userInfo.authorityId === '1') {
       this.initData()
       this.initEchart()
     }

@@ -69,12 +69,13 @@
         </div>
         <div class="content">
           <el-tooltip effect="dark" :content="item.name" placement="top">
-            <div class="title" v-text="item.name + ((item.module == 'levelGrade') ? '（等级测试）' : '') "></div>
+            <div :class="['title', item.is_show ? '' : 'red']" v-text="item.name + ((item.module == 'levelGrade') ? '（等级测试）' : '') "></div>
           </el-tooltip>
           <ul>
             <li>版本：{{ item.version }}</li>
             <li>版本描述：{{ Object.keys(item.desc).length ? item.desc['zh-CN'] : '' }}</li>
             <li>最后修改时间：{{ item.update_time | formatDate('YYYY年MM月DD日') }}</li>
+            <li>是否展示：{{ item.is_show ? '是' : '否' }}</li>
           </ul>
         </div>
         <div class="operate">
@@ -229,20 +230,21 @@ export default {
           }
         })
       }
-      if (arr && arr.length) {
-        arr = arr.sort((a, b) => {
-          let pre = a.module ? a.module : 'basic'
-          let next = b.module ? b.module : 'basic'
-          let flag = 0
-          if (pre > next) {
-            flag = 1
-          }
-          if (pre < next) {
-            flag = -1
-          }
-          return flag
-        })
-      }
+      // 排序规则有后端处理
+      // if (arr && arr.length) {
+      //   arr = arr.sort((a, b) => {
+      //     let pre = a.module ? a.module : 'basic'
+      //     let next = b.module ? b.module : 'basic'
+      //     let flag = 0
+      //     if (pre > next) {
+      //       flag = 1
+      //     }
+      //     if (pre < next) {
+      //       flag = -1
+      //     }
+      //     return flag
+      //   })
+      // }
       return arr
     },
     isHaveAuthority () {
@@ -795,5 +797,9 @@ export default {
 .tips {
   position: absolute;
   right: 50px;
+}
+
+.red {
+  color: red !important;
 }
 </style>

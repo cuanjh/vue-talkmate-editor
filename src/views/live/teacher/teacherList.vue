@@ -67,10 +67,11 @@
       <el-table-column
         fixed="right"
         label="操作"
-        width="100">
+        width="120">
         <template slot-scope="scope">
           <el-button @click="handleApprove(scope.row)" type="text" size="small">审核</el-button>
           <el-button @click="handleFrozen(scope.row)" type="text" size="small">冻结</el-button>
+          <el-button @click="handleEdit(scope.row)" type="text" size="small">编辑</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -85,6 +86,7 @@
       :total="total">
     </el-pagination>
     <approve-comp ref="approve" :langs="langs" @loadData="loadData" />
+    <edit-teacher ref="edit" @loadData="loadData"/>
   </div>
 </template>
 
@@ -95,6 +97,7 @@ import {
 } from '@/api/course'
 
 import ApproveComp from './approve'
+import EditTeacher from './editTeacher'
 export default {
   data () {
     return {
@@ -116,7 +119,8 @@ export default {
     }
   },
   components: {
-    ApproveComp
+    ApproveComp,
+    EditTeacher
   },
   mounted () {
     getLangList({ 'pageNo': 0, 'pageSize': 0 }).then(res => {
@@ -193,6 +197,9 @@ export default {
           message: '已取消冻结'
         })
       })
+    },
+    handleEdit (data) {
+      this.$refs['edit'].show(data)
     }
   }
 }

@@ -180,7 +180,7 @@ import {
   onlineCourses,
   getVoiceActorList
 } from '@/api/course'
-import EditComp from './edit'
+import EditComp from './editCourse'
 import ClassGroup from './classGroup'
 import CourseDetail from './editCourseDetail'
 import UnlockCourse from './unlockCourse'
@@ -238,9 +238,10 @@ export default {
       getVoiceActorList({
         lang: this.version.selLang,
         page_index: 1,
-        page_size: 999,
-        text_field: 'role',
-        sort_type: 1
+        page_size: 999
+        // ,
+        // text_field: 'gender',
+        // sort_type: -1
       }).then(res => {
         console.log(res)
         if (res.success) {
