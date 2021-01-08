@@ -1,129 +1,64 @@
 <template>
   <el-dialog
-    title="审核信息"
+    title="编辑"
     :visible.sync="dialogVisible"
     @close="close"
     width="50%">
     <el-form :model="form" ref="form" size="small" label-width="84px">
-      <el-row>
-        <el-col :span="12">
-          <el-form-item label="真实姓名：">
-            {{ form.real_name }}
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
-          <el-form-item :label="form.certificate_type == '1' ? '身份证号：' : '护照编号'">
-            {{ form.identity_card }}
-          </el-form-item>
-        </el-col>
-      </el-row>
-      <el-row>
-        <el-col :span="12">
-          <el-form-item>
-            <label for="nationality" slot="label">昵 称：</label>
-            {{ form.nickname }}
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
-          <el-form-item>
-            <label for="nationality" slot="label">手机号：</label>
-            {{ form.phonenumber }}
-          </el-form-item>
-        </el-col>
-      </el-row>
-      <el-row>
-        <el-col :span="12">
-          <el-form-item>
-            <label for="nationality" slot="label">国 籍：</label>
-            {{ form.nationality }}
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
-          <el-form-item>
-            <label for="nationality" slot="label">性 别：</label>
-            {{ form.gender }}
-          </el-form-item>
-        </el-col>
-      </el-row>
-      <el-row>
-        <el-col :span="12">
-          <el-form-item>
-            <label for="nationality" slot="label">年 龄：</label>
-            {{ form.birth_date }}
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
-          <el-form-item label="现居住地：">
-            {{ form.address }}
-          </el-form-item>
-        </el-col>
-      </el-row>
-      <el-row>
-        <el-col :span="12">
-          <el-form-item label="直播昵称：">
-            {{ form.live_nickname }}
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
-          <el-form-item label="直播语种：">
-            {{ form.lan_code }}
-          </el-form-item>
-        </el-col>
-      </el-row>
-      <el-form-item label="个人简介：">
-        {{ form.introduction }}
+      <el-form-item label="头像：">
+        <el-upload
+          class="avatar-uploader"
+          action="#"
+          accept="image/jpeg,image/jpg,image/png"
+          :on-change="changeUpload"
+          :auto-upload="false"
+          :show-file-list="false">
+          <img v-if="form.photo" :src="form.photo.indexOf('http') > -1 ? form.photo : uploadfileDomain + form.photo" class="avatar">
+          <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+        </el-upload>
       </el-form-item>
-      <el-form-item class="identify-photo" label="证件照：">
-        <el-image v-show="form.certificate_front" :src="uploadfileDomain + form.certificate_front" fit="cover"></el-image>
-        <el-image v-show="form.certificate_back" :src="uploadfileDomain + form.certificate_back" fit="cover"></el-image>
+      <el-form-item label="主修语言：">
+        <el-input v-model="form.ownLangs" placeholder="请输入主修语言"></el-input>
+        <el-tag type="warning">注：自定义格式如“英/法”</el-tag>
       </el-form-item>
-      <el-form-item label="审核意见：">
-        <el-input
-          type="textarea"
-          :rows="2"
-          placeholder="请输入审核意见"
-          v-model="content">
-        </el-input>
+      <el-form-item label="角色：">
+        <el-checkbox-group v-model="checkRoles">
+          <el-checkbox label="1">直播</el-checkbox>
+          <el-checkbox label="2">值班</el-checkbox>
+        </el-checkbox-group>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
-      <el-button @click="handleApprove(2)">审核不通过</el-button>
-      <el-button type="primary" @click="handleApprove(3)">审核通过</el-button>
+      <el-button @click="save">保存</el-button>
     </span>
   </el-dialog>
 </template>
 
 <script>
 import { mapState } from 'vuex'
+import moment from 'moment'
+
 import {
-  getAge
-} from '@/utils/toAge'
-import {
-  approveTeacher
+  updateTeacher,
+  getInfoTokenUploadFile
 } from '@/api/course'
+
+import {
+  uploadQiniu
+} from '@/utils/uploadQiniu'
+
 export default {
-  props: ['langs'],
   data () {
     return {
       dialogVisible: false,
-      content: '',
+      checkRoles: [],
+      photoFile: null,
       form: {
         user_id: '',
         photo: '',
-        nickname: '',
-        phonenumber: '',
-        real_name: '',
-        certificate_type: '1',
-        identity_card: '',
-        nationality: '',
-        gender: '',
-        birth_date: '',
-        address: '',
-        live_nickname: '',
-        lan_code: '',
-        introduction: '',
-        certificate_front: '',
-        certificate_back: ''
+        ownLangs: '',
+        status: '',
+        role: ''
       }
     }
   },
@@ -136,45 +71,33 @@ export default {
     show (params) {
       console.log(params)
       this.dialogVisible = true
-
-      this.content = ''
+      this.photoFile = null
       this.form.user_id = params.user_id
       this.form.photo = params.photo
-      this.form.nickname = params.nickname
-      this.form.phonenumber = params.phonenumber
-      this.form.real_name = params.real_name
-      this.form.certificate_type = params.certificate_type ? params.certificate_type : '1'
-      this.form.identity_card = params.identity_card
-      this.form.nationality = params.nationality
-      this.form.gender = params.gender === 1 ? '男' : '女'
-      this.form.birth_date = getAge(params.birth_date)
-      this.form.address = params.address
-      this.form.live_nickname = params.live_nickname
-      let langs = []
-      if (params.lan_code.length && this.langs.length) {
-        params.lan_code.forEach(item => {
-          let lang = this.langs.find(l => {
-            return l.lan_code === item
-          })
-          langs.push(lang.title['zh-CN'])
-        })
+      this.form.ownLangs = params.ownLangs
+      if (params.role) {
+        this.checkRoles = params.role.split(',')
       }
-      this.form.lan_code = langs.length ? langs.join('、') : ''
-      this.form.introduction = params.introduction
-      this.form.certificate_front = params.certificate_front
-      this.form.certificate_back = params.certificate_back
+      this.form.status = params.status
       console.log(this.form)
     },
-    handleApprove (status) {
-      if (status === 2 && !this.content) {
-        this.$message({
-          type: 'warning',
-          message: '请填写审核意见！'
-        })
-        return false
+    changeUpload (file, fileList) {
+      this.photoFile = file
+      this.form.photo = URL.createObjectURL(file.raw)
+    },
+    async save () {
+      this.form.role = this.checkRoles.join(',')
+      if (this.photoFile) {
+        const file = this.photoFile
+        let date = moment(new Date()).format('YYYY/MM/DD')
+        let i = file.name.lastIndexOf('.')
+        let ext = file.name.substring(i + 1)
+        let url = `liveroom/images/${date}/${file.uid}.${ext}`
+        let resToken = await getInfoTokenUploadFile()
+        let res = await uploadQiniu(file.raw, resToken.data.token, url)
+        this.form.photo = res.key
       }
-
-      approveTeacher({ content: this.content, status: status, user_id: this.form.user_id }).then(res => {
+      updateTeacher(this.form).then(res => {
         if (res.success) {
           this.$message({
             type: 'success',

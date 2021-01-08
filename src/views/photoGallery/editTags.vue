@@ -3,7 +3,7 @@
     title="标签分类"
     :visible.sync="dialogVisible"
     @close="close"
-    width="30%">
+    width="500px">
     <div class="edit-tags">
       <div class="title">新建分类</div>
       <div :class="['add', {'require': isRequire}]">
@@ -164,11 +164,5 @@ export default {
 .no-tags {
   text-align: center;
   padding-top: 30px;
-}
-</style>
-
-<style>
-.el-dialog {
-  min-width: 460px;
 }
 </style>

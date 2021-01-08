@@ -70,7 +70,7 @@
               <span>{{'(' + l.name + ')'}}</span>
             </div>
           </el-form-item>
-          <el-form-item label="大图：" prop="cover[0]" :rules="[
+          <el-form-item label="大图：" v-show="false" prop="cover[0]" :rules="[
             { required: true, message: '大图标不能为空', trigger: 'change' }
           ]">
             <div class="img-box big-img-box">
@@ -92,7 +92,21 @@
               </el-upload>
             </div>
           </el-form-item>
-          <el-form-item label="小图：" prop="flag[0]" :rules="[
+          <el-form-item label="大图：" prop="cover" :rules="[
+            { required: true, message: '大图标不能为空', trigger: 'change'}]">
+            <el-upload
+              list-type="picture-card"
+              action="#"
+              accept="image/webp;image/png;image/jpg;image/jpeg"
+              :file-list="bigImgs"
+              :auto-upload="false"
+              :on-change="onChangeImage"
+              :on-preview="handlePictureCardPreview"
+              :on-remove="handleRemove">
+              <i class="el-icon-plus"></i>
+            </el-upload>
+          </el-form-item>
+          <el-form-item label="小图：" v-show="false" prop="flag[0]" :rules="[
             { required: true, message: '小图标不能为空', trigger: 'change' }
           ]">
             <div class="img-box small-img-box">
@@ -114,7 +128,21 @@
               </el-upload>
             </div>
           </el-form-item>
-          <el-form-item label="配图：">
+          <el-form-item label="小图：" prop="flag" :rules="[
+            { required: true, message: '小图标不能为空', trigger: 'change'}]">
+            <el-upload
+              list-type="picture-card"
+              action="#"
+              accept="image/webp;image/png;image/jpg;image/jpeg"
+              :file-list="smlImgs"
+              :auto-upload="false"
+              :on-change="onChangeImageSml"
+              :on-preview="handlePictureCardPreview"
+              :on-remove="handleRemoveSml">
+              <i class="el-icon-plus"></i>
+            </el-upload>
+          </el-form-item>
+          <el-form-item label="配图：" v-show="false">
             <el-upload
               class="avatar-uploader"
               action="#"
@@ -201,9 +229,11 @@ export default {
         image: ''
       },
       bigImgUrl: '',
+      bigImgs: [],
       bigFileRaw: {},
       smlImgUrl: '',
       smlFileRaw: {},
+      smlImgs: [],
       type: '',
       checkVoiceActors: []
     }
@@ -273,6 +303,8 @@ export default {
       this.type = params.type
       this.showEdit = true
       this.checkVoiceActors = []
+      this.bigImgs = []
+      this.smlImgs = []
       this.imageFile = null
       if (this.type === 'add') {
         this.lang = params.selLang
@@ -315,7 +347,23 @@ export default {
         }
         this.form.codePend = params.form.code.split('-').slice(1).join('-')
         this.bigImgUrl = this.assetsDomain + '/' + params.form.cover[0]
+        if (params.form.cover && params.form.cover.length > 0) {
+          params.form.cover.forEach(c => {
+            this.bigImgs.push({
+              name: c,
+              url: this.assetsDomain + c
+            })
+          })
+        }
         this.smlImgUrl = this.assetsDomain + '/' + params.form.flag[0]
+        if (params.form.flag && params.form.flag.length > 0) {
+          params.form.flag.forEach(c => {
+            this.smlImgs.push({
+              name: c,
+              url: this.assetsDomain + c
+            })
+          })
+        }
       }
     },
     close () {
@@ -401,17 +449,44 @@ export default {
       this.$refs['form'].validate(async (valid) => {
         if (valid) {
           console.log(this.form)
-          let imageUrl = this.form.image
-          let p = this.imageFile
-          if (this.imageFile && p.raw) {
-            let date = moment(new Date()).format('YYYY/MM/DD')
-            let i = p.name.lastIndexOf('.')
-            let ext = p.name.substring(i + 1)
-            let url = 'voiceActor/images/' + date + '/' + p.uid + '.' + ext
-            let res = await uploadQiniu(p.raw, this.token, url)
-            imageUrl = res.key
+          let res1 = await getInfoToken()
+          let token = res1.data.token
+          let covers = []
+          if (this.bigImgs.length > 0) {
+            for (let j = 0; j < this.bigImgs.length; j++) {
+              let img = this.bigImgs[j]
+              if (img.raw) {
+                let date = moment(new Date()).format('YYYY/MM/DD')
+                let i = img.name.lastIndexOf('.')
+                let ext = img.name.substring(i + 1)
+                let url = 'course/images/covers/' + date + '/' + img.uid + '.' + ext
+                let res = await uploadQiniu(img.raw, token, url)
+                covers.push(res.key)
+              } else {
+                covers.push(img.name)
+              }
+            }
           }
-          this.form.image = imageUrl
+
+          let flags = []
+          if (this.smlImgs.length > 0) {
+            for (let j = 0; j < this.smlImgs.length; j++) {
+              let img = this.smlImgs[j]
+              if (img.raw) {
+                let date = moment(new Date()).format('YYYY/MM/DD')
+                let i = img.name.lastIndexOf('.')
+                let ext = img.name.substring(i + 1)
+                let url = 'course/images/covers/' + date + '/' + img.uid + '.' + ext
+                let res = await uploadQiniu(img.raw, token, url)
+                flags.push(res.key)
+              } else {
+                flags.push(img.name)
+              }
+            }
+          }
+
+          this.form.cover = covers
+          this.form.flag = flags
           let soundActors = []
           // 默认声优排在第一位
           let defaultActor = null
@@ -487,8 +562,7 @@ export default {
               name: this.form.name,
               title: this.form.title, // 标题
               subTitle: this.form.subTitle,
-              tag: this.form.tag,
-              image: this.form.image
+              tag: this.form.tag
             }
             addCourse(obj).then(res => {
               console.log(res)
@@ -512,8 +586,7 @@ export default {
                 name: this.form.name,
                 title: this.form.title,
                 subTitle: this.form.subTitle,
-                tag: this.form.tag,
-                image: this.form.image
+                tag: this.form.tag
               },
               uuid: this.form.uuid
             }
@@ -542,8 +615,25 @@ export default {
       return ret.length > 0 ? `（${ret.join('、')}）` : ''
     },
     onChangeImage (file, fileList) {
-      this.imageFile = file
-      this.form.image = URL.createObjectURL(file.raw)
+      this.bigImgs = fileList
+    },
+    handleRemove (file, fileList) {
+      this.bigImgs = fileList
+    },
+    handlePictureCardPreview (file) {
+      console.log(file)
+      if (file.raw) {
+        this.dialogImageUrl = URL.createObjectURL(file.raw)
+      } else {
+        this.dialogImageUrl = file.url
+      }
+      this.dialogImageVisible = true
+    },
+    onChangeImageSml (file, fileList) {
+      this.smlImgs = fileList
+    },
+    handleRemoveSml (file, fileList) {
+      this.smlImgs = fileList
     }
   }
 }

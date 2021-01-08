@@ -92,7 +92,7 @@
         <template slot-scope="scope">
           <el-image
             class="course-flag"
-            :src="imageUrl(scope.row.flag[0]) | urlFix('imageView2/1/format/jpg')"
+            :src="imageUrl(scope.row.flag[scope.row.flag.length - 1]) | urlFix('imageView2/1/format/jpg')"
             fit="cover">
           </el-image>
         </template>
@@ -103,7 +103,7 @@
         <template slot-scope="scope">
           <el-image
             class="course-cover"
-            :src="imageUrl(scope.row.cover[0]) | urlFix('imageView2/1/format/jpg')"
+            :src="imageUrl(scope.row.cover[scope.row.cover.length - 1]) | urlFix('imageView2/1/format/jpg')"
             fit="cover">
           </el-image>
         </template>
@@ -229,7 +229,7 @@ export default {
     async initData () {
       // 初始化声优列表信息
       this.initVoiceActors()
-      let courseListInfo = await getCourseList({ 'lan_code': this.version.selLang, 'pageNo': 0, 'pageSize': 0 })
+      let courseListInfo = await getCourseList({ 'lan_code': this.version.selLang, 'pageNo': 1, 'pageSize': 9999 })
       if (courseListInfo.success) {
         this.courseList = courseListInfo.data.courses
       }
@@ -320,6 +320,13 @@ export default {
     },
     onlineCourse (id) {
       console.log(id)
+      if (!this.selCourseList.length) {
+        this.$message({
+          type: 'warning',
+          message: '请勾选要上线的数据'
+        })
+        return false
+      }
       this.$confirm('确定要上线吗?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',

@@ -2,6 +2,8 @@
   <el-dialog
     :visible.sync="dialogVisible"
     center
+    top="5vh"
+    width="800px"
     @closed="closed">
     <div class="video-content">
       <video ref="video" :src="url" controls></video>
@@ -52,19 +54,17 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.el-dialog {
-  width: 380px;
-  min-width: 380px;
-  height: 600px;
-}
 .video-content {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
+  width: 750px;
+  height: 500px;
 }
 video {
-  width: 281px;
-  height: 500px;
+  width: 100%;
+  height: 100%;
+  // object-fit: cover;
 }
 </style>

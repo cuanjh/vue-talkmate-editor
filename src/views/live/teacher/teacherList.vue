@@ -29,6 +29,12 @@
       stripe
       style="width: 100%">
       <el-table-column
+        label="头像">
+        <template slot-scope="scope">
+          <el-avatar :size="44" :src="scope.row.photo.indexOf('http') > -1 ? scope.row.photo : uploadfileDomain + scope.row.photo" fit="cover"></el-avatar>
+        </template>
+      </el-table-column>
+      <el-table-column
         prop="real_name"
         label="真实姓名"
         width="180">
@@ -48,6 +54,15 @@
         label="语种"
         :formatter="formatterGender"
         width="180">
+      </el-table-column>
+      <el-table-column
+        prop="role"
+        label="角色"
+        :formatter="formatterRole">
+      </el-table-column>
+      <el-table-column
+        prop="ownLangs"
+        label="主修语言">
       </el-table-column>
       <el-table-column
         prop="course_number"
@@ -98,6 +113,7 @@ import {
 
 import ApproveComp from './approve'
 import EditTeacher from './editTeacher'
+import { mapState } from 'vuex'
 export default {
   data () {
     return {
@@ -131,6 +147,11 @@ export default {
     })
     this.loadData()
   },
+  computed: {
+    ...mapState({
+      uploadfileDomain: state => state.course.uploadfileDomain
+    })
+  },
   methods: {
     formatterGender (row, column, cellValue, index) {
       let langs = []
@@ -143,6 +164,19 @@ export default {
         })
       }
       return langs.length ? langs.join('、') : ''
+    },
+    formatterRole (row, column, cellValue, index) {
+      let roles = []
+      if (cellValue && cellValue.split(',').length) {
+        cellValue.split(',').forEach(item => {
+          let desc = '直播'
+          if (item === '2') {
+            desc = '值班'
+          }
+          roles.push(desc)
+        })
+      }
+      return roles.length ? roles.join('，') : ''
     },
     loadData () {
       getTeacherList({

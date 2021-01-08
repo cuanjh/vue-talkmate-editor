@@ -5,10 +5,13 @@
         <el-input v-model="name" placeholder="请输入想要查找的姓名" @change="handlerSearch"></el-input>
         <el-input v-model="entrollNo" placeholder="请输入想要查找的编号" @change="handlerSearch"></el-input>
         <el-input v-model="phone" placeholder="请输入想要查找的手机号" @change="handlerSearch"></el-input>
-        <el-select v-model="selLang" filterable placeholder="请选择语种" @change="handlerSearch">
-          <el-option label="英语" value="英语"></el-option>
+        <el-select v-model="selLang" filterable placeholder="请选择语言" @change="handlerSearch">
+          <el-option label="所有语言" value=""></el-option>
+          <el-option label="中文" value="中文"></el-option>
+          <el-option label="英文" value="英文"></el-option>
         </el-select>
         <el-select v-model="selGroup" filterable placeholder="请选择分组" @change="handlerSearch">
+          <el-option label="所有分组" value=""></el-option>
           <el-option label="小学组" value="小学组"></el-option>
           <el-option label="中学组" value="中学组"></el-option>
         </el-select>
@@ -50,29 +53,29 @@
                 </div>
               </div>
             </el-col>
-            <el-col class="center" :span="4">{{ item.name }}</el-col>
+            <el-col class="center" :span="4">{{ item.teacher }}</el-col>
             <el-col class="center" :span="5">
               <video-item
-                v-show="item.dynamics && item.dynamics.length > 0"
-                :url="item.dynamics[item.dynamics.length - 1]['videoUrl']"
+                v-if="item.dynamics && item.dynamics.length > 0"
+                :url="item.dynamics[0]['videoUrl']"
                 :num="item.dynamics.length"
                 @openVideo="openVideo"/>
             </el-col>
             <el-col class="center" :span="1">
               <i
                 :class="['el-icon-arrow-up', 'is-expand', item.isExpand ? 'rotate' : '']"
-                v-show="item.dynamics && item.dynamics.length > 1"
+                v-if="item.dynamics && item.dynamics.length > 1"
                 @click="expandRow(index)"></i>
             </el-col>
           </el-row>
           <transition name="fade">
-            <div class="videos" :data-index="index" v-show="item.dynamics && item.dynamics.length > 0 && item.isExpand">
+            <div class="videos" :data-index="index" v-if="item.dynamics && item.dynamics.length > 0 && item.isExpand">
               <video-item
                 class="mr50"
                 v-for="(v, i) in item.dynamics"
                 :key="i"
                 :url="v['videoUrl']"
-                :num="i + 1"
+                :num="item.dynamics.length - i"
                 @openVideo="openVideo"/>
             </div>
           </transition>
@@ -105,8 +108,8 @@ export default {
       name: '',
       entrollNo: '',
       phone: '',
-      selLang: '英语',
-      selGroup: '小学组',
+      selLang: '',
+      selGroup: '',
       list: [],
       currentPage: 1,
       pageSize: 10,
@@ -168,6 +171,10 @@ export default {
             }
             onlyOne = true
           }, 0)
+        } else {
+          if (this.currentPage === 1) {
+            this.list = []
+          }
         }
       })
     },

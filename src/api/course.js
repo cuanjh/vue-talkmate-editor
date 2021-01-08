@@ -1394,6 +1394,58 @@ export const getMajiaUsers = (data) => {
 }
 
 /**
+ * @Summary 添加排班
+ * @param {*} data
+ * @Router /editor/live_course/create [post]
+ */
+export const addAttendances = (data) => {
+  return service({
+    url: '/editor/live_course/create',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 排班列表
+ * @param {*} data
+ * @Router /editor/live_course/list [post]
+ */
+export const getAttendances = (data) => {
+  return service({
+    url: '/editor/live_course/list',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 删除排班
+ * @param {*} data
+ * @Router /editor/live_course/delete [post]
+ */
+export const delAttendance = (data) => {
+  return service({
+    url: '/editor/live_course/delete',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 更新排班
+ * @param {*} data
+ * @Router /editor/live_course/update [post]
+ */
+export const updateAttendance = (data) => {
+  return service({
+    url: '/editor/live_course/update',
+    method: 'post',
+    data
+  })
+}
+
+/**
  * @Summary 获取关键词列表
  * @param {*} data
  * @Router /editor/sword/list [post]
@@ -1518,6 +1570,19 @@ export const getTeacherList = (data) => {
 export const approveTeacher = (data) => {
   return service({
     url: '/editor/teacher/audit',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 编辑老师
+ * @param {*} data
+ * @Router /editor/teacher/update [post]
+ */
+export const updateTeacher = (data) => {
+  return service({
+    url: '/editor/teacher/update',
     method: 'post',
     data
   })
@@ -1908,6 +1973,58 @@ export const updateVoiceActor = (data) => {
 export const getDongAoList = (data) => {
   return service({
     url: '/editor/dong_ao/list',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 添加会员专享
+ * @param {*} data
+ * @Router /editor/advantage/create [post]
+ */
+export const addAdvantage = (data) => {
+  return service({
+    url: '/editor/advantage/create',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 会员专享列表
+ * @param {*} data
+ * @Router /editor/advantage/list [post]
+ */
+export const getAdvantageList = (data) => {
+  return service({
+    url: '/editor/advantage/list',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 更新会员专享
+ * @param {*} data
+ * @Router /editor/advantage/update [post]
+ */
+export const updateAdvantage = (data) => {
+  return service({
+    url: '/editor/advantage/update',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 删除会员专享
+ * @param {*} data
+ * @Router /editor/advantage/delete [post]
+ */
+export const delAdvantage = (data) => {
+  return service({
+    url: '/editor/advantage/delete',
     method: 'post',
     data
   })

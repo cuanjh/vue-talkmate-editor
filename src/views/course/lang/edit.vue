@@ -1,89 +1,104 @@
 <template>
-<transition name="fade">
-  <div class="edit-container" v-if="showEdit">
-    <div class="edit-content">
-      <div class="close" @click="close">
-        <i class="el-icon-close"></i>
-      </div>
-      <div class="lang-content">
-        <el-form ref="form" :model="form">
-          <el-form-item label="编码：" prop="lan_code" :rules="[
-            { required: true, message: '编码不能为空', trigger: 'blur' },
-            { pattern: /^[a-zA-Z]+$/, message: '只允许输入字母！' }
-          ]">
-            <el-input v-model="form.lan_code" maxlength="20" show-word-limit :disabled="type == 'edit'"></el-input>
-          </el-form-item>
-          <el-form-item label="名称：" class="name" required>
-            <!-- <div class="input-box" v-for="l in langInfos" :key="'title' + l.langKey">
+ <el-dialog
+    :visible.sync="showEdit"
+    width="750px"
+    @close="close">
+    <div class="lang-content">
+      <el-form ref="form" :model="form">
+        <el-form-item label="编码：" prop="lan_code" :rules="[
+          { required: true, message: '编码不能为空', trigger: 'blur' },
+          { pattern: /^[a-zA-Z]+$/, message: '只允许输入字母！' }
+        ]">
+          <el-input v-model="form.lan_code" maxlength="20" show-word-limit :disabled="type == 'edit'"></el-input>
+        </el-form-item>
+        <el-form-item label="名称：" class="name" required>
+          <!-- <div class="input-box" v-for="l in langInfos" :key="'title' + l.langKey">
+            <el-input v-model="form.title[l.langKey]" maxlength="30" show-word-limit></el-input>
+            <span>{{'(' + l.name + ')'}}</span>
+          </div> -->
+          <el-row v-for="l in langInfos" :key="'title' + l.langKey">
+            <el-form-item  class="input-box" :prop="'title.' + l.langKey"
+              :rules="[{required: true, message: '名称不能为空', trigger: 'blur'}]">
               <el-input v-model="form.title[l.langKey]" maxlength="30" show-word-limit></el-input>
               <span>{{'(' + l.name + ')'}}</span>
-            </div> -->
-            <el-row v-for="l in langInfos" :key="'title' + l.langKey">
-              <el-form-item  class="input-box" :prop="'title.' + l.langKey"
-                :rules="[{required: true, message: '名称不能为空', trigger: 'blur'}]">
-                <el-input v-model="form.title[l.langKey]" maxlength="30" show-word-limit></el-input>
-                <span>{{'(' + l.name + ')'}}</span>
-              </el-form-item>
-            </el-row>
-          </el-form-item>
-          <el-form-item label="描述：" class="desc">
-            <div class="input-box" v-for="l in langInfos" :key="'desc' + l.langKey">
-              <el-input type="textarea" v-model="form.desc[l.langKey]"></el-input>
-              <span>{{'(' + l.name + ')'}}</span>
+            </el-form-item>
+          </el-row>
+        </el-form-item>
+        <el-form-item label="描述：" class="desc">
+          <div class="input-box" v-for="l in langInfos" :key="'desc' + l.langKey">
+            <el-input type="textarea" v-model="form.desc[l.langKey]"></el-input>
+            <span>{{'(' + l.name + ')'}}</span>
+          </div>
+        </el-form-item>
+        <el-form-item label="图标：" v-show="false" prop="flag[0]" :rules="[
+          { required: true, message: '图标不能为空', trigger: 'change' }
+        ]">
+          <div class="img-box">
+            <div class="img">
+              <img :src="imageUrl" alt="">
             </div>
-          </el-form-item>
-          <el-form-item label="图标：" prop="flag[0]" :rules="[
-            { required: true, message: '图标不能为空', trigger: 'change' }
-          ]">
-            <div class="img-box">
-              <div class="img">
-                <img :src="imageUrl" alt="">
+            <el-upload
+              action="#"
+              :http-request="upload"
+              accept="image/png,image/jpg,image/jpeg"
+              :on-change="fileChange"
+              :on-success="handleAvatarSuccess"
+              :before-upload="handleBeforeUpload"
+              :show-file-list="false"
+              :auto-upload="false">
+              <div id="upload-btn">
+                <i class="el-icon-plus avatar-uploader-icon"></i>
               </div>
-              <el-upload
-                action="#"
-                :http-request="upload"
-                accept="image/png,image/jpg,image/jpeg"
-                :on-change="fileChange"
-                :on-success="handleAvatarSuccess"
-                :before-upload="handleBeforeUpload"
-                :show-file-list="false"
-                :auto-upload="false">
-                <div id="upload-btn">
-                  <i class="el-icon-plus avatar-uploader-icon"></i>
-                </div>
-              </el-upload>
-            </div>
-          </el-form-item>
-          <el-form-item label="书写顺序：" class="flex-class">
-            <el-radio-group v-model="form.word_direction">
-              <el-radio :label="'l2r'">从左到右</el-radio>
-              <el-radio :label="'r2l'">从右到左</el-radio>
-            </el-radio-group>
-          </el-form-item>
-          <el-form-item label="是否热门：" class="flex-class">
-            <el-radio-group v-model="form.is_hot">
-              <el-radio :label="false">否</el-radio>
-              <el-radio :label="true">是</el-radio>
-            </el-radio-group>
-          </el-form-item>
-          <el-form-item label="是否显示：" class="flex-class">
-            <el-radio-group v-model="form.is_show">
-              <el-radio :label="false">否</el-radio>
-              <el-radio :label="true">是</el-radio>
-            </el-radio-group>
-          </el-form-item>
-        </el-form>
-        <div class="btns">
-          <a class="cancel" @click="close()">取消</a>
-          <a class="determine active" @click="determine()">确定</a>
-        </div>
+            </el-upload>
+          </div>
+        </el-form-item>
+        <el-form-item label="图标：" prop="flag" :rules="[
+          { required: true, message: '图标不能为空', trigger: 'change' }
+        ]">
+          <el-upload
+            list-type="picture-card"
+            action="#"
+            accept="image/webp;image/png;image/jpg;image/jpeg"
+            :file-list="flags"
+            :auto-upload="false"
+            :on-change="onChangeImage"
+            :on-preview="handlePictureCardPreview"
+            :on-remove="handleRemove">
+            <i class="el-icon-plus"></i>
+          </el-upload>
+        </el-form-item>
+        <el-form-item label="书写顺序：" class="flex-class">
+          <el-radio-group v-model="form.word_direction">
+            <el-radio :label="'l2r'">从左到右</el-radio>
+            <el-radio :label="'r2l'">从右到左</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="是否热门：" class="flex-class">
+          <el-radio-group v-model="form.is_hot">
+            <el-radio :label="false">否</el-radio>
+            <el-radio :label="true">是</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="是否显示：" class="flex-class">
+          <el-radio-group v-model="form.is_show">
+            <el-radio :label="false">否</el-radio>
+            <el-radio :label="true">是</el-radio>
+          </el-radio-group>
+        </el-form-item>
+      </el-form>
+      <div class="btns">
+        <a class="cancel" @click="close()">取消</a>
+        <a class="determine active" @click="determine()">确定</a>
       </div>
     </div>
-  </div>
-</transition>
+    <el-dialog :visible.sync="dialogImageVisible" append-to-body>
+      <img width="100%" :src="dialogImageUrl" alt="">
+    </el-dialog>
+ </el-dialog>
 </template>
 
 <script>
+import moment from 'moment'
 import {
   addLang,
   editLang,
@@ -107,6 +122,9 @@ export default {
         title: {}, // 名称
         word_direction: 'l2r' // 从左到右还是相反
       },
+      dialogImageUrl: '',
+      dialogImageVisible: false,
+      flags: [],
       imageUrl: '',
       fileRaw: {},
       type: ''
@@ -128,9 +146,18 @@ export default {
       console.log(type, params)
       this.showEdit = true
       this.type = type
+      this.flags = []
       if (type === 'edit' && params) {
         this.form = params
         this.imageUrl = this.assetsDomain + '/' + params.flag[0]
+        if (params.flag && params.flag.length > 0) {
+          params.flag.forEach(c => {
+            this.flags.push({
+              name: c,
+              url: this.assetsDomain + c
+            })
+          })
+        }
       } else if (type === 'add') {
         let obj = {
           desc: {},
@@ -201,9 +228,28 @@ export default {
     },
     // 添加
     determine () {
-      this.$refs['form'].validate((valid) => {
+      this.$refs['form'].validate(async (valid) => {
         if (valid) {
           console.log(this.form)
+          let res1 = await getInfoToken()
+          let token = res1.data.token
+          let flags = []
+          if (this.flags.length > 0) {
+            for (let j = 0; j < this.flags.length; j++) {
+              let img = this.flags[j]
+              if (img.raw) {
+                let date = moment(new Date()).format('YYYY/MM/DD')
+                let i = img.name.lastIndexOf('.')
+                let ext = img.name.substring(i + 1)
+                let url = 'course/images/flags/' + date + '/' + img.uid + '.' + ext
+                let res = await uploadQiniu(img.raw, token, url)
+                flags.push(res.key)
+              } else {
+                flags.push(img.name)
+              }
+            }
+          }
+          this.form.flag = flags
           if (this.type === 'edit') {
             let obj = {
               'lang_info': {}
@@ -236,6 +282,21 @@ export default {
           }
         }
       })
+    },
+    onChangeImage (file, fileList) {
+      this.flags = fileList
+    },
+    handleRemove (file, fileList) {
+      this.flags = fileList
+    },
+    handlePictureCardPreview (file) {
+      console.log(file)
+      if (file.raw) {
+        this.dialogImageUrl = URL.createObjectURL(file.raw)
+      } else {
+        this.dialogImageUrl = file.url
+      }
+      this.dialogImageVisible = true
     }
   }
 }
@@ -271,11 +332,11 @@ export default {
     cursor: pointer;
   }
 }
-.edit-content .lang-content {
+.lang-content {
   width: 100%;
   height: 100%;
-  max-height:500px;
-  overflow-y: auto;
+  // max-height:500px;
+  // overflow-y: auto;
 
   .img-box {
     display: flex;
@@ -368,9 +429,6 @@ export default {
 }
 .lang-content .desc .el-input {
   width: 360px!important;
-}
-.lang-content .el-form label {
-  width: 90px;
 }
 .lang-content .el-form .el-form-item {
   display: flex;

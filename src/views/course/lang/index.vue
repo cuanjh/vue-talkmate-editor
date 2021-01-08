@@ -65,7 +65,7 @@
         <template slot-scope="scope">
           <el-image
             class="lang-img"
-            :src="(scope.row.flag ? (assetsUrl + scope.row.flag[0]) : '') | urlFix('imageView2/1/format/jpg')"
+            :src="(scope.row.flag ? (assetsUrl + scope.row.flag[scope.row.flag.length - 1]) : '') | urlFix('imageView2/1/format/jpg')"
             fit="cover">
           </el-image>
         </template>
