@@ -214,7 +214,11 @@ export default {
               type: 'success',
               message: '删除成功'
             })
-            this.initData()
+
+            let findex = this.list.findIndex(f => {
+              return f.userId === item.userId
+            })
+            this.list.splice(findex, 1)
           }
         })
       }).catch(() => {
