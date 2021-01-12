@@ -29,9 +29,9 @@
         <el-row>
           <el-col class="center" :span="4">编号</el-col>
           <el-col class="center" :span="10">报名信息</el-col>
-          <el-col class="center" :span="4">指导老师</el-col>
+          <el-col class="center" :span="3">指导老师</el-col>
           <el-col class="center" :span="5">参赛视频</el-col>
-          <el-col class="center" :span="1"></el-col>
+          <el-col class="center" :span="2"></el-col>
         </el-row>
       </div>
       <div class="tb-body" v-if="list.length > 0">
@@ -53,7 +53,7 @@
                 </div>
               </div>
             </el-col>
-            <el-col class="center" :span="4">{{ item.teacher }}</el-col>
+            <el-col class="center" :span="3">{{ item.teacher }}</el-col>
             <el-col class="center" :span="5">
               <video-item
                 v-if="item.dynamics && item.dynamics.length > 0"
@@ -61,17 +61,18 @@
                 :num="item.dynamics.length"
                 @openVideo="openVideo"/>
             </el-col>
-            <el-col class="center" :span="1">
+            <el-col class="center" :span="2">
               <i
                 :class="['el-icon-arrow-up', 'is-expand', item.isExpand ? 'rotate' : '']"
                 v-if="item.dynamics && item.dynamics.length > 1"
                 @click="expandRow(index)"></i>
+              <el-button v-if="userInfo.authorityId == '1'" class="btn-del" type="danger" @click="del(item)">删除</el-button>
             </el-col>
           </el-row>
           <transition name="fade">
             <div class="videos" :data-index="index" v-if="item.dynamics && item.dynamics.length > 0 && item.isExpand">
               <video-item
-                class="mr50"
+                class="mr50 mb10"
                 v-for="(v, i) in item.dynamics"
                 :key="i"
                 :url="v['videoUrl']"
@@ -96,8 +97,10 @@ import VideoItem from './videoItem.vue'
 import VideoComp from './video.vue'
 
 import {
-  getDongAoList
+  getDongAoList,
+  delDongAo
 } from '@/api/course'
+import { mapState } from 'vuex'
 
 let onlyOne = true
 
@@ -123,6 +126,11 @@ export default {
   },
   mounted () {
     this.initData()
+  },
+  computed: {
+    ...mapState({
+      userInfo: state => state.user.userInfo
+    })
   },
   methods: {
     handlerScroll (e) {
@@ -192,6 +200,29 @@ export default {
       }
       this.currentPage = 1
       this.initData()
+    },
+    del (item) {
+      console.log(item)
+      this.$confirm('确认要删除吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        delDongAo({ userId: item.userId }).then(res => {
+          if (res.success) {
+            this.$message({
+              type: 'success',
+              message: '删除成功'
+            })
+            this.initData()
+          }
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
     }
   }
 }
@@ -312,6 +343,7 @@ export default {
       font-weight: 400;
       line-height: 20px;
       border-radius: 6px;
+      word-break: break-all;
       &:nth-child(1) {
         background: rgba(7,137,130,.1);
         color: rgba(7,137,130,1);
@@ -333,6 +365,7 @@ export default {
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
+  flex-wrap: wrap;
   border-bottom: 1px solid #efefef;
 }
 
@@ -347,5 +380,9 @@ export default {
   transform: rotate(180deg);
   -webkit-transform: rotate(180deg);
   -moz-transform: rotate(180deg);
+}
+
+.btn-del {
+  margin-left: 15px;
 }
 </style>

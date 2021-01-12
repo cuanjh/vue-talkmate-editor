@@ -76,7 +76,9 @@ export default {
   },
   watch: {
     calendarVal (newVal, oldVal) {
-      this.loadData()
+      if (newVal.getMonth() !== oldVal.getMonth()) {
+        this.loadData()
+      }
     }
   },
   computed: {

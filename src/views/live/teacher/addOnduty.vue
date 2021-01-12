@@ -72,7 +72,8 @@ export default {
         startTime: '',
         state: 0,
         userId: '',
-        uuid: ''
+        uuid: '',
+        species: 1
       }
     }
   },
@@ -114,7 +115,8 @@ export default {
                 date: moment(item.range[0]).format('YYYY-MM-DD'),
                 EndTime: item.range[1].getTime() / 1000,
                 startTime: item.range[0].getTime() / 1000,
-                userId: item.teacher
+                userId: item.teacher,
+                species: 1
               }
               arr.push(obj)
               console.log(obj)

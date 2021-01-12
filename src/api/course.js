@@ -1979,6 +1979,19 @@ export const getDongAoList = (data) => {
 }
 
 /**
+ * @Summary 删除冬奥小使者信息
+ * @param {*} data
+ * @Router /editor/dong_ao/delete [post]
+ */
+export const delDongAo = (data) => {
+  return service({
+    url: '/editor/dong_ao/delete',
+    method: 'post',
+    data
+  })
+}
+
+/**
  * @Summary 添加会员专享
  * @param {*} data
  * @Router /editor/advantage/create [post]
