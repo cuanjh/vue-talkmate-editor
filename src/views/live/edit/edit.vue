@@ -9,6 +9,12 @@
           ]">
           <el-input v-model="form.moduleName" maxlength="30" show-word-limit></el-input>
         </el-form-item>
+        <el-form-item label="分类" prop="albumType">
+          <el-radio-group v-model="form.albumType">
+            <el-radio :label="0">直播</el-radio>
+            <el-radio :label="1">讲座</el-radio>
+          </el-radio-group>
+        </el-form-item>
         <el-form-item label="定级" prop="level"
           :rules="[
             { required: true, message: '请选择定级'}
@@ -400,6 +406,7 @@ export default {
         basicProfilePhoto: '',
         dateNotice: '',
         coverV2: '', // 大图
+        albumType: 0,
         lanCode: 'ALL',
         money: 0,
         moneyDiscount: 0,
@@ -476,9 +483,18 @@ export default {
     })
     getDisChannelList().then(res => {
       console.log(res)
-      this.disChannels = res.data.channels.filter(c => {
-        return c.uuid.toLowerCase().indexOf('live') > -1
+      this.disChannels = res.data.channels.sort((a, b) => {
+        if (a.showPos > b.showPos) {
+          return 1
+        } else if (a.showPos < b.showPos) {
+          return -1
+        } else {
+          return 0
+        }
       })
+      // .filter(c => {
+      //   return c.uuid.toLowerCase().indexOf('live') > -1
+      // })
     })
     this.langList = []
     getLangList({ 'pageNo': 0, 'pageSize': 999 }).then(res => {
@@ -544,6 +560,7 @@ export default {
         this.form.lanCode = this.roomInfo.lan_code
         this.form.tagKeys = this.roomInfo.tag_keys
         this.form.coverV2 = this.roomInfo.cover_v2
+        this.form.albumType = this.roomInfo.albumType
         this.form.money = this.roomInfo.money
         this.form.moneyDiscount = this.roomInfo.moneyDiscount
         this.form.level = this.roomInfo.liveInfo.level
@@ -793,6 +810,7 @@ export default {
                 liveUserUUID: this.form.liveUserUUID
               },
               module_name: this.form.moduleName,
+              albumType: this.form.albumType,
               money: this.form.money,
               moneyDiscount: this.form.moneyDiscount,
               money_type: 'CNY',
@@ -1158,9 +1176,5 @@ export default {
   width: 120px;
   height: 120px;
   object-fit: cover;
-}
-
-.basic-info .el-form-item__label {
-  line-height: 22px;
 }
 </style>

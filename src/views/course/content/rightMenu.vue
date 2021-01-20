@@ -46,7 +46,7 @@
         </div>
         <div class="menu-group" v-show="type == 'folder'">
           <div class="line"></div>
-          <div class="menu-item" v-show="userInfo.authorityId === '1'">
+          <div class="menu-item" v-show="false">
             <div class="name" @click="onlineJob">上线</div>
           </div>
           <div class="menu-item" v-show="userInfo.authorityId === '1'" @mouseenter="isShowDownload = true" @mouseleave="isShowDownload = false">
