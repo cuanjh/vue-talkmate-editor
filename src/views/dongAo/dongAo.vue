@@ -27,17 +27,17 @@
     <div class="table">
       <div class="tb-header">
         <el-row>
-          <el-col class="center" :span="4">编号</el-col>
+          <el-col class="center" :span="3">编号</el-col>
           <el-col class="center" :span="10">报名信息</el-col>
           <el-col class="center" :span="3">指导老师</el-col>
           <el-col class="center" :span="5">参赛视频</el-col>
-          <el-col class="center" :span="2"></el-col>
+          <el-col class="center" :span="3"></el-col>
         </el-row>
       </div>
       <div class="tb-body" v-if="list.length > 0">
         <div class="item" v-for="(item, index) in list" :key="index">
           <el-row class="item-row">
-            <el-col class="center" :span="4">{{ item.entrollNo }}</el-col>
+            <el-col class="center" :span="3">{{ item.entrollNo }}</el-col>
             <el-col class="center" :span="10">
               <div class="info">
                 <div class="left">
@@ -61,12 +61,24 @@
                 :num="item.dynamics.length"
                 @openVideo="openVideo"/>
             </el-col>
-            <el-col class="center" :span="2">
-              <i
-                :class="['el-icon-arrow-up', 'is-expand', item.isExpand ? 'rotate' : '']"
-                v-if="item.dynamics && item.dynamics.length > 1"
-                @click="expandRow(index)"></i>
-              <el-button v-if="userInfo.authorityId == '1'" class="btn-del" type="danger" @click="del(item)">删除</el-button>
+            <el-col class="center" :span="3">
+              <div class="handler">
+                <i
+                  :class="['el-icon-arrow-up', 'is-expand', item.isExpand ? 'rotate' : '']"
+                  v-if="item.dynamics && item.dynamics.length > 1"
+                  @click="expandRow(index)"></i>
+                <el-button v-if="userInfo.authorityId == '1'" size="small" class="btn-del" type="danger" @click="del(item)">删除</el-button>
+                <el-upload
+                  v-if="userInfo.authorityId == '1'"
+                  class="upload-demo"
+                  action="#"
+                  accept="video/mp4"
+                  :auto-upload="false"
+                  :show-file-list="false"
+                  :on-change="handleChange">
+                  <el-button size="small" type="primary" @click="setSelItem(item)">上传</el-button>
+                </el-upload>
+              </div>
             </el-col>
           </el-row>
           <transition name="fade">
@@ -98,9 +110,14 @@ import VideoComp from './video.vue'
 
 import {
   getDongAoList,
-  delDongAo
+  delDongAo,
+  getInfoTokenUploadFile,
+  createDynamic
 } from '@/api/course'
+import { uploadQiniu } from '@/utils/uploadQiniu'
+
 import { mapState } from 'vuex'
+import moment from 'moment'
 
 let onlyOne = true
 
@@ -117,7 +134,8 @@ export default {
       currentPage: 1,
       pageSize: 10,
       sortType: -1,
-      scrollTop: 0
+      scrollTop: 0,
+      selItem: {}
     }
   },
   components: {
@@ -144,6 +162,32 @@ export default {
     handlerSearch () {
       this.currentPage = 1
       this.initData()
+    },
+    setSelItem (item) {
+      this.selItem = item
+    },
+    async handleChange (e) {
+      console.log(e)
+      const res = await getInfoTokenUploadFile()
+      const token = res.data.token
+      let date = moment(new Date()).format('YYYY/MM/DD')
+      let url = 'feed/video/' + date + '/' + e.uid + '.mp4'
+      let res1 = await uploadQiniu(e.raw, token, url)
+      createDynamic({
+        content: '#冬奥会语言服务小使者#',
+        topicKey: 'dongAo',
+        typeInfo: 'video',
+        userId: this.selItem.userId,
+        videoUrl: res1.key
+      }).then(r => {
+        if (r.success) {
+          this.$message({
+            type: 'success',
+            message: '上传成功'
+          })
+          this.handlerSearch()
+        }
+      })
     },
     initData () {
       getDongAoList({
@@ -387,6 +431,13 @@ export default {
 }
 
 .btn-del {
-  margin-left: 15px;
+  margin: 15px;
+}
+
+.handler {
+  width: 140px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 </style>

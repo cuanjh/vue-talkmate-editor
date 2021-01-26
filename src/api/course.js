@@ -1992,6 +1992,19 @@ export const delDongAo = (data) => {
 }
 
 /**
+ * @Summary 删除冬奥小使者信息
+ * @param {*} data
+ * @Router /editor/dynamic/create [post]
+ */
+export const createDynamic = (data) => {
+  return service({
+    url: '/editor/dynamic/create',
+    method: 'post',
+    data
+  })
+}
+
+/**
  * @Summary 添加会员专享
  * @param {*} data
  * @Router /editor/advantage/create [post]
