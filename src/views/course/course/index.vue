@@ -43,7 +43,7 @@
           type="primary"
           class="btnAdd"
           @click="addCourse">添加</el-button>
-        <el-button v-show="userInfo.authority.authorityId == '1' || userInfo.authority.authorityId == '2'"
+        <el-button v-show="false"
           style="outline:none;"
           type="success"
           class="btnOnline"

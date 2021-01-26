@@ -23,7 +23,7 @@
             style="outline:none;"
             type="success"
             class="btnOnline"
-            v-show="userInfo.authorityId == '1'"
+            v-show="false"
             @click="onlineCourse">上线</el-button>
         </div>
       </div>
