@@ -20,10 +20,10 @@
         <div class="right">
           <el-button style="outline:none;" type="primary" class="btnAdd" @click="addTags()">添加</el-button>
           <el-button
+            v-show="false"
             style="outline:none;"
             type="success"
             class="btnOnline"
-            v-show="false"
             @click="onlineCourse">上线</el-button>
         </div>
       </div>
@@ -86,6 +86,7 @@
     </div>
     <edit-comp ref="tagEdit" @addTagItem="initData"/>
     <cropper-dialog ></cropper-dialog>
+    <dialog-online ref="dialogOnline" @confirm="confirm" />
   </div>
 </template>
 
@@ -95,6 +96,7 @@ import {
   delTags,
   onlineCourses
 } from '@/api/course'
+import DialogOnline from '@/components/dialogOnline'
 import EditComp from './editTag'
 import CropperDialog from '../../../components/common/cropper'
 
@@ -115,7 +117,8 @@ export default {
   },
   components: {
     EditComp,
-    CropperDialog
+    CropperDialog,
+    DialogOnline
   },
   created () {
     this.initData()
@@ -228,19 +231,23 @@ export default {
         })
       })
     },
-    onlineCourse () {
-      this.$confirm('确定要上线吗?', '提示', {
+    confirm (item) {
+      let envDesc = '测试环境'
+      if (item.dbEnv === 'online') {
+        envDesc = '正式环境'
+      }
+      this.$confirm(`确定要上线${envDesc}吗?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        let arr = []
-        onlineCourses(arr).then(res => {
+        onlineCourses({ onlineType: item.dbEnv, hasCourse: false, hasTags: true, tagKeys: [] }).then(res => {
           if (res.success) {
             this.$message({
               type: 'success',
-              message: '上线成功!'
+              message: '上线成功'
             })
+            this.selCourseList = []
             this.initData()
           }
         })
@@ -250,6 +257,9 @@ export default {
           message: '已取消上线'
         })
       })
+    },
+    onlineCourse () {
+      this.$refs['dialogOnline'].show()
     },
     changeType () {}
   }

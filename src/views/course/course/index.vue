@@ -43,7 +43,8 @@
           type="primary"
           class="btnAdd"
           @click="addCourse">添加</el-button>
-        <el-button v-show="false"
+        <el-button
+          v-show="false"
           style="outline:none;"
           type="success"
           class="btnOnline"
@@ -165,6 +166,7 @@
     <course-detail ref="courseDetail" />
     <unlock-course ref="unlockCourse" />
     <statistic ref="statistic" @refreshDownloadList="refreshDownloadList"/>
+    <dialog-online ref="dialogOnline" @confirm="confirm" />
   </div>
 </template>
 
@@ -180,6 +182,7 @@ import {
   onlineCourses,
   getVoiceActorList
 } from '@/api/course'
+import DialogOnline from '@/components/dialogOnline'
 import EditComp from './editCourse'
 import ClassGroup from './classGroup'
 import CourseDetail from './editCourseDetail'
@@ -201,7 +204,8 @@ export default {
     ClassGroup,
     CourseDetail,
     UnlockCourse,
-    Statistic
+    Statistic,
+    DialogOnline
   },
   created () {
     this.getLangList({ 'pageNo': 0, 'pageSize': 999 }).then(() => {
@@ -318,31 +322,27 @@ export default {
         })
       })
     },
-    onlineCourse (id) {
-      console.log(id)
-      if (!this.selCourseList.length) {
-        this.$message({
-          type: 'warning',
-          message: '请勾选要上线的数据'
-        })
-        return false
+    confirm (item) {
+      let envDesc = '测试环境'
+      if (item.dbEnv === 'online') {
+        envDesc = '正式环境'
       }
-      this.$confirm('确定要上线吗?', '提示', {
+      this.$confirm(`确定要上线${envDesc}吗?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
         let arr = []
         if (this.selCourseList.length) {
-          this.selCourseList.forEach(item => {
-            arr.push(item.code)
+          this.selCourseList.forEach(i => {
+            arr.push(i.code)
           })
         }
-        onlineCourses(arr).then(res => {
+        onlineCourses({ onlineType: item.dbEnv, hasCourse: true, hasTags: false, courseCodes: arr }).then(res => {
           if (res.success) {
             this.$message({
               type: 'success',
-              message: '上线成功!'
+              message: '上线成功'
             })
             this.selCourseList = []
             this.initData()
@@ -354,6 +354,9 @@ export default {
           message: '已取消上线'
         })
       })
+    },
+    onlineCourse () {
+      this.$refs['dialogOnline'].show()
     },
     curCourse () {
       console.log(this.version.selLang)

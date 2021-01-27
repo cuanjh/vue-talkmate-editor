@@ -2,7 +2,7 @@
   <el-dialog
     title="请确定要上线的环境"
     :visible.sync="dialogVisible"
-    width="30%">
+    width="500px">
     <el-radio-group v-model="dbEnv">
       <el-radio label="test">测试环境</el-radio>
       <el-radio label="online">线上环境</el-radio>
