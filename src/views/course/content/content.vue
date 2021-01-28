@@ -392,6 +392,7 @@ export default {
       this.selVersion = ''
       this.uuid = ''
       this.initData(0)
+      this.tracks = []
       this.isShowEditFile = false
     },
     changeCourse () {
@@ -404,6 +405,7 @@ export default {
       this.updateVersion({ key: 'uuid', val: '' })
       this.selVersion = ''
       this.uuid = ''
+      this.tracks = []
       this.initData(0)
       this.isShowEditFile = false
     },
@@ -445,7 +447,7 @@ export default {
         this.tracks = []
       }
       let res = await getCatalogList({ 'parent_uuid': this.uuid })
-      if (res.success) {
+      if (this.uuid && res.success) {
         let catalogs = res.data.catalogs.sort((a, b) => {
           return a.list_order - b.list_order
         })
@@ -539,6 +541,8 @@ export default {
             this.setTrackSortable()
           }
         }, 500)
+      } else {
+        this.tracks = []
       }
     },
     trackLeftScroll () {
@@ -789,7 +793,7 @@ export default {
         params['pUUID'] = item.parent_uuid
         this.curUUID = ''
       } else {
-        if (index > 0) {
+        if (index > 1) {
           // let uuidArr = this.path.split('/')
           this.uuid = this.curUUID
           params['pUUID'] = this.uuid
@@ -1150,6 +1154,7 @@ export default {
       overflow-y: scroll;
       display: flex;
       flex-direction: column;
+      border-right: 1px solid rgba($color: #000000, $alpha: 0.1);
       // &::-webkit-scrollbar {
       //   width: 16px;
       //   height: 100%;

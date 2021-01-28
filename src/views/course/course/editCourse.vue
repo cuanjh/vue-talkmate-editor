@@ -70,30 +70,7 @@
               <span>{{'(' + l.name + ')'}}</span>
             </div>
           </el-form-item>
-          <el-form-item label="大图：" v-show="false" prop="cover[0]" :rules="[
-            { required: true, message: '大图标不能为空', trigger: 'change' }
-          ]">
-            <div class="img-box big-img-box">
-              <div class="img">
-                <img :src="bigImgUrl" alt="">
-              </div>
-              <el-upload
-                action="#"
-                :http-request="uploadBig"
-                accept="image/png,image/jpg,image/jpeg"
-                :on-change="bigFileChange"
-                :on-success="handleBigSuccess"
-                :before-upload="handleBeforeUpload"
-                :show-file-list="false"
-                :auto-upload="false">
-                <div id="upload-btn">
-                  <i class="el-icon-plus avatar-uploader-icon"></i>
-                </div>
-              </el-upload>
-            </div>
-          </el-form-item>
-          <el-form-item label="大图：" prop="cover" :rules="[
-            { required: true, message: '大图标不能为空', trigger: 'change'}]">
+          <el-form-item label="大图：">
             <el-upload
               list-type="picture-card"
               action="#"
@@ -106,30 +83,7 @@
               <i class="el-icon-plus"></i>
             </el-upload>
           </el-form-item>
-          <el-form-item label="小图：" v-show="false" prop="flag[0]" :rules="[
-            { required: true, message: '小图标不能为空', trigger: 'change' }
-          ]">
-            <div class="img-box small-img-box">
-              <div class="img">
-                <img :src="smlImgUrl" alt="">
-              </div>
-              <el-upload
-                action="#"
-                :http-request="uploadSml"
-                accept="image/png,image/jpg,image/jpeg"
-                :on-change="smlFileChange"
-                :on-success="handleSmlSuccess"
-                :before-upload="handleBeforeUpload"
-                :show-file-list="false"
-                :auto-upload="false">
-                <div id="upload-btn">
-                  <i class="el-icon-plus avatar-uploader-icon"></i>
-                </div>
-              </el-upload>
-            </div>
-          </el-form-item>
-          <el-form-item label="小图：" prop="flag" :rules="[
-            { required: true, message: '小图标不能为空', trigger: 'change'}]">
+          <el-form-item label="小图：">
             <el-upload
               list-type="picture-card"
               action="#"
