@@ -353,17 +353,17 @@
               <el-button slot="append" @click="clear(f.feild)">清除</el-button>
             </el-input>
             <div class="upload-area">
-              <el-button v-if="contentModel == 'content_model_pro_sound' && f.feild == 'image'" type="text" @click="searchContent(f.feild)">内容查找</el-button>
-              <el-button v-if="contentModel == 'content_model_pro_sound' && f.feild == 'image'" type="text" @click="searchImg('images')">图库查找</el-button>
+              <el-button v-if="f.feild == 'image'" type="text" @click="searchContent(f.feild)">内容查找</el-button>
+              <el-button v-if="f.feild == 'image'" type="text" @click="searchImg('images')">图库查找</el-button>
             </div>
             <look-image
-              v-if="contentModel == 'content_model_pro_sound' && f.feild == 'image' && activeFeild == 'images'"
+              v-if="f.feild == 'image' && activeFeild == 'images'"
               @close="closeLook"
               @use="use"/>
             <look-content
               :contentModel="contentModel"
               :activeFeild="activeFeild"
-              v-if="contentModel == 'content_model_pro_sound' && f.feild == activeFeild"
+              v-if="f.feild == activeFeild"
               @close="closeLook"
               @use="use"/>
           </div>

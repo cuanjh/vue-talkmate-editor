@@ -42,7 +42,7 @@ export default {
       words: '',
       searchResult: [],
       searchHistory: [],
-      searchType: 0
+      searchType: true
     }
   },
   components: {
@@ -71,7 +71,7 @@ export default {
       }
       localStorage.setItem('searchCourseImgsHistory', JSON.stringify(history))
 
-      let res = await searchContent({ content_model: this.contentModel, words: this.words, searchType: this.searchType ? 1 : 0 })
+      let res = await searchContent({ content_model: 'content_model_pro_sound', words: this.words, searchType: this.searchType ? 1 : 0 })
       console.log(res)
       this.searchResult = res.data.contents
       console.log(this.searchResult)
