@@ -173,6 +173,7 @@ export default {
       }
     },
     reset () {
+      this.page = 1
       this.activeTag = ''
       this.pictures = []
       this.search()
@@ -214,7 +215,7 @@ export default {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    max-height: 50px;
+    // max-height: 50px;
     overflow: hidden;
     transition: max-height .5s;
     -webkit-transition: max-height .5s;
