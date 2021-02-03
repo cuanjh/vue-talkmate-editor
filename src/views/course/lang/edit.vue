@@ -30,31 +30,7 @@
             <span>{{'(' + l.name + ')'}}</span>
           </div>
         </el-form-item>
-        <el-form-item label="图标：" v-show="false" prop="flag[0]" :rules="[
-          { required: true, message: '图标不能为空', trigger: 'change' }
-        ]">
-          <div class="img-box">
-            <div class="img">
-              <img :src="imageUrl" alt="">
-            </div>
-            <el-upload
-              action="#"
-              :http-request="upload"
-              accept="image/png,image/jpg,image/jpeg"
-              :on-change="fileChange"
-              :on-success="handleAvatarSuccess"
-              :before-upload="handleBeforeUpload"
-              :show-file-list="false"
-              :auto-upload="false">
-              <div id="upload-btn">
-                <i class="el-icon-plus avatar-uploader-icon"></i>
-              </div>
-            </el-upload>
-          </div>
-        </el-form-item>
-        <el-form-item label="图标：" prop="flag" :rules="[
-          { required: true, message: '图标不能为空', trigger: 'change' }
-        ]">
+        <el-form-item label="图标：">
           <el-upload
             list-type="picture-card"
             action="#"
@@ -335,6 +311,7 @@ export default {
 .lang-content {
   width: 100%;
   height: 100%;
+  padding: 0 20px;
   // max-height:500px;
   // overflow-y: auto;
 

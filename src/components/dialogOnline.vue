@@ -2,12 +2,12 @@
   <el-dialog
     title="请确定要上线的环境"
     :visible.sync="dialogVisible"
-    width="500px">
+    width="600px">
     <el-radio-group v-model="dbEnv">
       <el-radio label="test">测试环境</el-radio>
-      <el-radio label="online">线上环境</el-radio>
+      <el-radio label="online"><span class="danger">线上环境</span></el-radio>
     </el-radio-group>
-    <el-tag type="warning">注：测试环境地址选择这两个无效，都上线的是测试，仅线上环境做区分。</el-tag>
+    <div class="danger">注：选择测试环境上线到测试，选择线上环境上线到正式。<br/>选择线上环境一定要确认修改内容无误后再上线，切记！切记！切记！</div>
     <div slot="footer" class="dialog-footer">
       <el-button type="primary" @click="confirm">确 定</el-button>
     </div>
@@ -46,5 +46,9 @@ export default {
 }
 .dialog-footer {
   text-align: center;
+}
+.danger {
+  color: #F56C6C;
+  font-size: 18px;
 }
 </style>

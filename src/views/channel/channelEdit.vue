@@ -96,7 +96,7 @@ export default {
         uuid: '',
         listOrder: 0,
         title: {},
-        isShow: true,
+        isShow: false,
         showPos: 'index',
         icon: ''
       },
@@ -127,7 +127,7 @@ export default {
           uuid: '',
           listOrder: params.listOrder,
           title: {},
-          isShow: true,
+          isShow: false,
           showPos: 'index',
           icon: ''
         }

@@ -13,6 +13,7 @@
       </div>
       <div class="right">
         <el-button type="primary" @click="add">添加</el-button>
+        <el-button type="primary" @click="config">配置项</el-button>
       </div>
     </div>
     <el-calendar v-model="calendarVal">
@@ -32,6 +33,7 @@
       </template>
     </el-calendar>
     <add-comp ref="add" @loadData="loadData"/>
+    <config-comp ref="config" />
   </div>
 </template>
 
@@ -43,6 +45,7 @@ import {
   delAttendance
 } from '@/api/course'
 import AddComp from './addOnduty'
+import ConfigComp from './config'
 import { mapState } from 'vuex'
 
 export default {
@@ -55,7 +58,8 @@ export default {
     }
   },
   components: {
-    AddComp
+    AddComp,
+    ConfigComp
   },
   mounted () {
     this.teachers = []
@@ -174,6 +178,9 @@ export default {
         }
       }
       return arr
+    },
+    config () {
+      this.$refs.config.show()
     }
   }
 }

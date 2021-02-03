@@ -9,8 +9,7 @@
             style="outline:none;"
             type="success"
             class="btnOnline"
-            v-show="false"
-            @click="onlineCourse">上线</el-button>
+            @click="onlineCourse">批量上线</el-button>
       </div>
     </div>
     <el-table
@@ -64,10 +63,20 @@
         label="图标">
         <template slot-scope="scope">
           <el-image
+            v-if="scope.row.flag.length > 0"
             class="lang-img"
-            :src="(scope.row.flag ? (assetsUrl + scope.row.flag[scope.row.flag.length - 1]) : '') | urlFix('imageView2/1/format/jpg')"
+            :src="(assetsUrl + scope.row.flag[scope.row.flag.length - 1]) | urlFix('imageView2/1/format/jpg')"
             fit="cover">
+            <div slot="error"  >
+              <el-image :lazy="true" fit="cover" :src="talkmateLogo">
+              </el-image>
+            </div>
           </el-image>
+          <el-image
+            v-else
+            class="lang-img"
+            :src="talkmateLogo"
+            fit="cover"></el-image>
         </template>
       </el-table-column>
       <el-table-column
@@ -125,12 +134,15 @@
     <edit-comp ref="edit" @addNewLang="updateNewLang" :langInfos="langInfos" :langList="langList"/>
     <!-- <sort-course-comp ref="sorLang" @sortLang="updateNewLang"/> -->
     <sort-course-comp ref="sorLang" @sortLang="updateNewLang"/>
+    <dialog-online ref="dialogOnline" @confirm="confirm" />
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex'
 import { getLangList, delLang, editLang, onlineCourses } from '@/api/course'
+import DialogOnline from '@/components/dialogOnline'
+import TalkmateLogo from '@/assets/images/icons/talkmate-logo.png'
 import EditComp from './edit'
 import SortCourseComp from './sortCourse'
 
@@ -140,6 +152,7 @@ export default {
       allLangs: [],
       langList: [],
       showTableData: [],
+      talkmateLogo: TalkmateLogo,
       assetsUrl: '',
       searchKey: '',
       // 分页信息
@@ -151,7 +164,8 @@ export default {
   },
   components: {
     EditComp,
-    SortCourseComp
+    SortCourseComp,
+    DialogOnline
   },
   mounted () {
     this.initData()
@@ -267,20 +281,24 @@ export default {
       }
       this.$refs.sorLang.show(obj)
     },
-    // 上线
-    onlineCourse () {
-      this.$confirm('确定要上线吗?', '提示', {
+    confirm (item) {
+      let envDesc = '测试环境'
+      if (item.dbEnv === 'online') {
+        envDesc = '正式环境'
+      }
+      this.$confirm(`确定要上线${envDesc}吗?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
         let arr = []
-        onlineCourses(arr).then(res => {
+        onlineCourses({ onlineType: item.dbEnv, hasCourse: true, hasTags: false, courseCodes: arr }).then(res => {
           if (res.success) {
             this.$message({
               type: 'success',
-              message: '上线成功!'
+              message: '上线成功'
             })
+            this.selCourseList = []
             this.initData()
           }
         })
@@ -290,6 +308,9 @@ export default {
           message: '已取消上线'
         })
       })
+    },
+    onlineCourse () {
+      this.$refs['dialogOnline'].show()
     }
   }
 }

@@ -1446,6 +1446,32 @@ export const updateAttendance = (data) => {
 }
 
 /**
+ * @Summary 获取排班标题
+ * @param {*} data
+ * @Router /live/title [get]
+ */
+export const getLiveTitle = (data) => {
+  return service({
+    url: '/live/title',
+    method: 'get',
+    data
+  })
+}
+
+/**
+ * @Summary 更新排班标题
+ * @param {*} data
+ * @Router /live/title/update [post]
+ */
+export const updateLiveTitle = (data) => {
+  return service({
+    url: '/live/title/update',
+    method: 'post',
+    data
+  })
+}
+
+/**
  * @Summary 获取关键词列表
  * @param {*} data
  * @Router /editor/sword/list [post]
