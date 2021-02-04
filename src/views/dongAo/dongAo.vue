@@ -1,28 +1,36 @@
 <template>
   <div class="dongao-container" ref="content" @scroll="handlerScroll">
     <div class="top-bar">
-      <div class="left">
-        <el-input v-model="name" placeholder="请输入想要查找的姓名" @change="handlerSearch"></el-input>
-        <el-input v-model="entrollNo" placeholder="请输入想要查找的编号" @change="handlerSearch"></el-input>
-        <el-input v-model="phone" placeholder="请输入想要查找的手机号" @change="handlerSearch"></el-input>
-        <el-select v-model="selLang" filterable placeholder="请选择语言" @change="handlerSearch">
-          <el-option label="所有语言" value=""></el-option>
-          <el-option label="中文" value="中文"></el-option>
-          <el-option label="英文" value="英文"></el-option>
-        </el-select>
-        <el-select v-model="selGroup" filterable placeholder="请选择分组" @change="handlerSearch">
-          <el-option label="所有分组" value=""></el-option>
-          <el-option label="小学组" value="小学组"></el-option>
-          <el-option label="中学组" value="中学组"></el-option>
-        </el-select>
-      </div>
-      <div class="right">
-        <div class="sort" @click="sort">
-          <i class="el-icon-sort"></i>
-          <span>编号{{ sortType == 1 ? '倒序' : '升序' }}排列</span>
-        </div>
+      <el-row>
+        <el-col :span="24">
+          <el-input v-model="school" placeholder="请输入想要查找的学校" @change="handlerSearch"></el-input>
+          <el-input v-model="name" placeholder="请输入想要查找的姓名" @change="handlerSearch"></el-input>
+          <el-input v-model="entrollNo" placeholder="请输入想要查找的编号" @change="handlerSearch"></el-input>
+          <el-input v-model="phone" placeholder="请输入想要查找的手机号" @change="handlerSearch"></el-input>
+          <el-select v-model="selLang" filterable placeholder="请选择语言" @change="handlerSearch">
+            <el-option label="所有语言" value=""></el-option>
+            <el-option label="中文" value="中文"></el-option>
+            <el-option label="英文" value="英文"></el-option>
+          </el-select>
+          <el-select v-model="selGroup" filterable placeholder="请选择分组" @change="handlerSearch">
+            <el-option label="所有分组" value=""></el-option>
+            <el-option label="小学组" value="小学组"></el-option>
+            <el-option label="中学组" value="中学组"></el-option>
+          </el-select>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="12" class="mt10">
+          为你查找到{{ list.length }}名小使者
+        </el-col>
+        <el-col :span="12">
+          <div class="sort" @click="sort">
+            <i class="el-icon-sort"></i>
+            <span>编号{{ sortType == 1 ? '倒序' : '升序' }}排列</span>
+          </div>
+        </el-col>
         <!-- <el-button type="primary" @click="reset">重置</el-button> -->
-      </div>
+      </el-row>
     </div>
     <div class="table">
       <div class="tb-header">
@@ -125,6 +133,7 @@ export default {
   data () {
     return {
       searchKey: '',
+      school: '',
       name: '',
       entrollNo: '',
       phone: '',
@@ -132,7 +141,7 @@ export default {
       selGroup: '',
       list: [],
       currentPage: 1,
-      pageSize: 10,
+      pageSize: 9999999,
       sortType: -1,
       scrollTop: 0,
       selItem: {}
@@ -191,6 +200,7 @@ export default {
     },
     initData () {
       getDongAoList({
+        school: this.school,
         name: this.name,
         entrollNo: parseInt(this.entrollNo),
         phone: this.phone,
@@ -285,7 +295,7 @@ export default {
 
 .el-input {
   margin-right: 10px;
-  width: 200px;
+  width: 180px;
 }
 .el-select {
   width: 100px;
@@ -293,18 +303,8 @@ export default {
 
 .top-bar {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   margin-bottom: 20px;
-  .left {
-    display: flex;
-    flex-direction: row;
-  }
-  .right {
-    flex: 1;
-    flex-direction: row;
-    text-align: right;
-    align-items: center
-  }
 }
 
 .sort {
