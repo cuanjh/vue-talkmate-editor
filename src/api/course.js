@@ -2005,6 +2005,19 @@ export const getDongAoList = (data) => {
 }
 
 /**
+ * @Summary 下载冬奥小使者列表
+ * @param {*} data
+ * @Router /editor/dong_ao/download [get]
+ */
+export const downloadDongAoList = (data) => {
+  return service({
+    url: '/editor/dong_ao/download',
+    method: 'get',
+    data
+  })
+}
+
+/**
  * @Summary 删除冬奥小使者信息
  * @param {*} data
  * @Router /editor/dong_ao/delete [post]

@@ -20,16 +20,18 @@
         </el-col>
       </el-row>
       <el-row>
-        <el-col :span="12" class="mt10">
+        <el-col :span="10" class="mt10">
           为你查找到{{ list.length }}名小使者
         </el-col>
-        <el-col :span="12">
+        <el-col :span="10">
           <div class="sort" @click="sort">
             <i class="el-icon-sort"></i>
             <span>编号{{ sortType == 1 ? '倒序' : '升序' }}排列</span>
           </div>
         </el-col>
-        <!-- <el-button type="primary" @click="reset">重置</el-button> -->
+        <el-col :span="4">
+          <el-button type="primary" @click="download">下载</el-button>
+        </el-col>
       </el-row>
     </div>
     <div class="table">
@@ -121,6 +123,8 @@ import {
   delDongAo,
   getInfoTokenUploadFile,
   createDynamic
+  // ,
+  // downloadDongAoList
 } from '@/api/course'
 import { uploadQiniu } from '@/utils/uploadQiniu'
 
@@ -202,7 +206,7 @@ export default {
       getDongAoList({
         school: this.school,
         name: this.name,
-        entrollNo: parseInt(this.entrollNo),
+        entrollNo: this.entrollNo ? parseInt(this.entrollNo) : null,
         phone: this.phone,
         lang: this.selLang,
         group: this.selGroup,
@@ -281,6 +285,27 @@ export default {
           message: '已取消删除'
         })
       })
+    },
+    download () {
+      const obj = {
+        school: this.school,
+        name: this.name,
+        entrollNo: this.entrollNo ? parseInt(this.entrollNo) : null,
+        phone: this.phone,
+        lang: this.selLang,
+        group: this.selGroup,
+        page_index: this.currentPage,
+        page_size: this.pageSize,
+        text_field: 'entrollNo',
+        sort_type: this.sortType
+      }
+      let objStr = ''
+      Object.keys(obj).forEach(key => {
+        objStr += `${key}=${obj[key]}&`
+      })
+      const url = `/editor/dong_ao/download?${objStr}`
+      window.location.href = process.env.VUE_APP_BASE_API + url
+      // downloadDongAoList(obj)
     }
   }
 }

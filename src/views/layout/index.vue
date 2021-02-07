@@ -96,6 +96,7 @@ export default {
 <style lang="scss">
 .admin-box {
   padding: 0 20px;
+  overflow: auto;
 }
 $headerHigh: 52px;
 $mainHight: 100vh;
