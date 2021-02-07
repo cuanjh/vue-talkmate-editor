@@ -495,13 +495,13 @@ export default {
     },
     // 下载
     download () {
-      if (this.trackNum > 1) {
-        this.$message({
-          type: 'warning',
-          message: '只允许下载一、二级目录'
-        })
-        return false
-      }
+      // if (this.trackNum > 1) {
+      //   this.$message({
+      //     type: 'warning',
+      //     message: '只允许下载一、二级目录'
+      //   })
+      //   return false
+      // }
       exportCourseContent({ code: this.version.selCourse.uuid, uuid: this.folder.uuid, level: this.trackNum + 1 + '', merge: this.merge }).then(res => {
         if (res.success) {
           this.$message({
