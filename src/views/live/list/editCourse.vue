@@ -8,7 +8,6 @@
         <el-input v-model="form.videoUrl" placeholder="https://">
           <el-upload slot="prepend"
             action="#"
-            accept="video/mp4"
             :on-change="uploadOnchange"
             :show-file-list="false"
             :auto-upload="false">
