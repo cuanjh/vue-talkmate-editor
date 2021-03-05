@@ -14,6 +14,9 @@ const vuexLocal = new VuexPersistence({
 })
 
 export const store = new Vuex.Store({
+  state: {
+    pageSizes: [10, 20, 30, 40, 1000]
+  },
   modules: {
     user,
     course,

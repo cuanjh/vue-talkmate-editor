@@ -194,9 +194,9 @@ export const course = {
     async getLangList ({ state, commit }, data) {
       const res = await getLangList(data)
       if (res.success) {
-        commit('updateLangList', res.data.langs)
+        commit('updateLangList', res.data.list)
         if (!state.version.selLang) {
-          commit('updateVersion', { key: 'selLang', val: res.data.langs[0]['lan_code'] })
+          commit('updateVersion', { key: 'selLang', val: res.data.list[0]['lan_code'] })
         }
       }
     },

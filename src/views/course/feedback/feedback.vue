@@ -306,9 +306,6 @@ export default {
   .select-course {
     width: 300px;
   }
-  .btnAdd {
-    width: 100px;
-  }
 
   .btnOnline {
     width: 100px;

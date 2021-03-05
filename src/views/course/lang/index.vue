@@ -1,10 +1,10 @@
 <template>
   <div class="lang-manage">
     <div class="top-bar">
-      <el-input v-model="searchKey" @input="search" clearable placeholder="请输入要查找的语言"></el-input>
+      <el-input v-model="searchKey" @input="initData" clearable placeholder="请输入要查找的语言"></el-input>
       <div class="btn-area">
-        <el-button style="outline:none;" type="primary" class="btnAdd" @click="addLang()">添加</el-button>
-        <el-button style="outline:none;" type="primary" class="btnSort" @click="previewSort()">预览排序</el-button>
+        <el-button style="outline:none;" type="primary" class="btnAdd" @click="addLang()">创建新语言</el-button>
+        <el-button style="outline:none;" type="primary" class="btnSort" @click="previewSort()">语言排序</el-button>
         <el-button
             style="outline:none;"
             type="success"
@@ -14,12 +14,13 @@
     </div>
     <el-table
       :data="showTableData"
+      @select="select"
+      @select-all="selectAll"
       style="width: 100%;">
-      <!-- <el-table-column label="序号" width="60" align="center">
-        <template slot-scope="scope">
-          <span>{{scope.$index+(pageRequest.pageNum - 1) * pageRequest.pageSize + 1}}</span>
-        </template>
-      </el-table-column> -->
+      <el-table-column
+        type="selection"
+        width="55">
+      </el-table-column>
       <el-table-column
         label="排序号"
         width="80"
@@ -44,11 +45,10 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column
+      <!-- <el-table-column
         width="200"
         label="描述">
         <template slot-scope="scope" v-if="Object.keys(scope.row.desc).length">
-          <!-- <div v-for="l in langInfos" :key="l.langKey">{{ l.name + ': ' +  (scope.row.desc['' + l.langKey + ''] ? scope.row.desc['' + l.langKey + ''] : '') + ' ' }}</div> -->
           <div v-for="l in langInfos" :key="l.langKey">
             <el-tooltip :content="l.name + ': ' +  (scope.row.desc['' + l.langKey + ''] ? scope.row.desc['' + l.langKey + ''] : '') + ' '" width="300" placement="top" effect="light">
               <span>{{ l.name + ': ' +  (scope.row.desc['' + l.langKey + ''] ? scope.row.desc['' + l.langKey + ''] : '') + ' ' }}</span>
@@ -57,7 +57,7 @@
         </template>
         <template v-else>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column
         width="80"
         label="图标">
@@ -79,25 +79,24 @@
             fit="cover"></el-image>
         </template>
       </el-table-column>
-      <el-table-column
+      <!-- <el-table-column
         label="书写顺序">
         <template slot-scope="scope">
           {{scope.row.word_direction == 'l2r' ? '从左到右' : '从右到左'}}
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column
         width="80"
         label="是否热门">
         <template slot-scope="scope">
-          {{scope.row.is_hot ? '是' : '否'}}
+          <i :class="scope.row.is_hot ? 'icon-yes' : 'icon-no'"></i>
         </template>
       </el-table-column>
       <el-table-column
         width="100"
         label="是否显示">
         <template slot-scope="scope">
-          <el-tag type="success" v-if="scope.row.is_show">是</el-tag>
-          <el-tag type="dange" v-else>否</el-tag>
+          <i :class="scope.row.is_show ? 'icon-yes' : 'icon-no'"></i>
         </template>
       </el-table-column>
       <el-table-column fixed="right" width="300" label="操作">
@@ -121,13 +120,13 @@
     </el-table>
     <div class="pagination-box">
       <el-pagination
-        background layout="prev, pager, next"
-        :current-page="pageRequest.pageNum"
-        :page-size="pageRequest.pageSize"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
-        :total="langList.length"
-        >
+        :current-page="pageRequest.pageNo"
+        :page-sizes="pageSizes"
+        :page-size="pageRequest.pageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="pageRequest.total">
       </el-pagination>
     </div>
     <edit-comp ref="edit"/>
@@ -151,14 +150,16 @@ export default {
     return {
       allLangs: [],
       langList: [],
+      selLangList: [],
       showTableData: [],
       talkmateLogo: TalkmateLogo,
       assetsUrl: '',
       searchKey: '',
       // 分页信息
       pageRequest: {
-        pageNum: 1,
-        pageSize: 5
+        pageNo: 1,
+        pageSize: 10,
+        total: 0
       }
     }
   },
@@ -174,50 +175,39 @@ export default {
     ...mapState({
       assetsDomain: state => state.course.assetsDomain,
       langInfos: state => state.course.langInfos,
-      userInfo: state => state.user.userInfo
+      userInfo: state => state.user.userInfo,
+      pageSizes: state => state.pageSizes
     })
   },
   methods: {
     // 添加新课程
     updateNewLang () {
       this.initData()
-      console.log(this.pageRequest.pageNum)
     },
     async initData () {
-      let res = await getLangList({ 'pageNo': 0, 'pageSize': 999 })
+      let res = await getLangList({
+        title: this.searchKey,
+        pageNo: this.pageRequest.pageNo,
+        pageSize: this.pageRequest.pageSize
+      })
       if (res.success) {
-        let sortLangs = res.data.langs.sort((a, b) => {
+        let sortLangs = res.data.list.sort((a, b) => {
           return a.list_order - b.list_order
         })
+        this.showTableData = sortLangs
+        this.pageRequest.total = res.data.total
         this.allLangs = sortLangs
         this.langList = sortLangs
         this.assetsUrl = res.data.assetsUrl
-        console.log(this.showTableData)
-        this.handleCurrentChange(this.pageRequest.pageNum)
       }
-    },
-    search () {
-      let _this = this
-      console.log(_this.searchKey)
-      this.langList = this.allLangs.filter(item => {
-        let flag = false
-        this.langInfos.forEach(i => {
-          flag = flag || (item.title['' + i.langKey + ''] && (item.title['' + i.langKey + ''].indexOf(_this.searchKey) > -1))
-        })
-        return flag
-      })
-      console.log(this.langList)
-      console.log(this.showTableData)
-      this.handleCurrentChange(1)
     },
     handleSizeChange (val) {
       this.pageRequest.pageSize = val
+      this.initData()
     },
     handleCurrentChange (val) {
-      this.pageRequest.pageNum = val
-      let starNum = (val - 1) * this.pageRequest.pageSize
-      let endNum = val * this.pageRequest.pageSize
-      this.showTableData = this.langList.slice(starNum, endNum)
+      this.pageRequest.pageNo = val
+      this.initData()
     },
     // 编辑
     editLang (lang) {
@@ -292,6 +282,11 @@ export default {
         type: 'warning'
       }).then(() => {
         let arr = []
+        if (this.selLangList.length) {
+          this.selLangList.forEach(i => {
+            arr.push(i.code)
+          })
+        }
         onlineCourses({ onlineType: item.dbEnv, hasCourse: true, hasTags: false, courseCodes: arr }).then(res => {
           if (res.success) {
             this.$message({
@@ -311,19 +306,18 @@ export default {
     },
     onlineCourse () {
       this.$refs['dialogOnline'].show()
+    },
+    select (selection, row) {
+      this.selLangList = selection
+    },
+    selectAll (selection) {
+      this.selLangList = selection
     }
   }
 }
 </script>
 
 <style scoped lang="scss">
-  .pagination-box {
-    text-align: center;
-    padding-top: 20px;
-  }
-  .lang-manage {
-    padding: 20px;
-  }
   .el-table {
     margin-top: 20px;
   }
@@ -334,7 +328,6 @@ export default {
     float: right;
   }
   .btnAdd {
-    width: 100px;
     margin-right: 10px;
   }
   .btnSort {

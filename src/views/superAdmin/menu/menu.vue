@@ -8,6 +8,11 @@
     <el-table :data="tableData" border stripe row-key="ID">
       <el-table-column label="ID" min-width="100" prop="ID"></el-table-column>
       <el-table-column label="路由Name" min-width="160" prop="name"></el-table-column>
+      <el-table-column label="展示名称" min-width="120" prop="authorityName">
+        <template slot-scope="scope">
+          <span>{{scope.row.meta.title}}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="是否隐藏" min-width="80" prop="hidden">
         <template slot-scope="scope">
           <span>{{scope.row.hidden?"隐藏":"显示"}}</span>
@@ -16,11 +21,6 @@
       <el-table-column label="父节点" min-width="70" prop="parentId"></el-table-column>
       <el-table-column label="排序" min-width="70" prop="sort"></el-table-column>
       <el-table-column label="文件路径" min-width="400" prop="component"></el-table-column>
-      <el-table-column label="展示名称" min-width="120" prop="authorityName">
-        <template slot-scope="scope">
-          <span>{{scope.row.meta.title}}</span>
-        </template>
-      </el-table-column>
       <el-table-column label="图标" min-width="140" prop="authorityName">
         <template slot-scope="scope">
           <span>{{scope.row.meta.icon}}</span>
@@ -46,8 +46,13 @@
             <el-option :value="true" label="是"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="父节点Id">
-          <el-input autocomplete="off" disabled v-model="form.parentId"></el-input>
+        <el-form-item label="父节点">
+          <el-cascader
+            v-model="parentIds"
+            :options="tableData"
+            :props="{ checkStrictly: true, value: 'ID', label: 'nickName' }"
+            clearable></el-cascader>
+          <!-- <el-input autocomplete="off" disabled v-model="form.parentId"></el-input> -->
         </el-form-item>
         <el-form-item label="文件路径">
           <el-input autocomplete="off" v-model="form.component"></el-input>
@@ -89,6 +94,7 @@ export default {
       listApi: getMenuList,
       listKey: 'list',
       dialogFormVisible: false,
+      parentIds: [],
       form: {
         ID: 0,
         path: '',
@@ -96,6 +102,7 @@ export default {
         hidden: '',
         parentId: '',
         component: '',
+        nickName: '',
         meta: {
           title: '',
           icon: ''
@@ -103,6 +110,8 @@ export default {
       },
       isEdit: false
     }
+  },
+  computed: {
   },
   methods: {
     handleClose (done) {
@@ -167,6 +176,12 @@ export default {
     },
     // 添加menu
     async enterDialog () {
+      this.form.parentId = '0'
+      if (this.parentIds.length > 0) {
+        this.form.parentId = String(this.parentIds[0])
+      }
+      this.form.nickName = this.form.meta.title
+      console.log(this.form)
       let res
       this.form.name = this.form.path
       if (this.isEdit) {
@@ -191,6 +206,7 @@ export default {
     // 添加菜单方法，id为 0则为添加根菜单
     addMenu (id) {
       this.form.parentId = String(id)
+      this.parentIds = [id]
       this.isEdit = false
       this.dialogFormVisible = true
     },
@@ -198,6 +214,7 @@ export default {
     async editMenu (id) {
       const res = await getBaseMenuById({ id })
       this.form = res.data.menu
+      this.parentIds = [parseInt(this.form.parentId)]
       this.dialogFormVisible = true
       this.isEdit = true
     }

@@ -34,6 +34,12 @@
           </div>
         </el-option>
       </el-select>
+      <el-select v-model="selModule" @change="initCourseVersionList">
+        <el-option label="全部内容" value=""></el-option>
+        <el-option label="基础内容" value="basic"></el-option>
+        <el-option label="等级测试内容" value="levelGrade"></el-option>
+      </el-select>
+      <el-button type="primary" v-show="isHaveAuthority" @click="addVersion">创建新版本</el-button>
       <div class="tips" v-if="false">
         <el-tooltip class="item" effect="dark" content="课程数据下载列表" placement="top">
           <el-popover
@@ -58,7 +64,83 @@
         </el-tooltip>
       </div>
     </div>
-    <div class="version-wrap">
+    <div class="tabs-wrap">
+      <div class="tabs" v-for="tab in tabs" :key="tab.value">
+        <div class="tabs-header" v-show="(versions.filter(f => { return f.module === tab.value }).length > 0 && !selModule) || (versions.filter(f => { return f.module === tab.value }).length > 0 && selModule && selModule === tab.value)">
+          <div class="nav">
+            <div class="item">{{ tab.label }}</div>
+          </div>
+        </div>
+        <div class="tabs-content" v-show="(versions.filter(f => { return f.module === tab.value }).length > 0 && !selModule) || (versions.filter(f => { return f.module === tab.value }).length > 0 && selModule && selModule === tab.value)">
+          <div class="tab-panel">
+            <div class="version-list">
+              <div class="version-item" v-for="item in versions.filter(f => { return f.module === tab.value })" :key="item.uuid">
+                <div class="online-flag" v-show="item['is_show'] && false">
+                  <span>线上</span>
+                </div>
+                <more-btns
+                  class="more-btns"
+                  :handlers="handlers"
+                  :dataObj="item"
+                  v-show="isHaveAuthority"
+                  @handlerClick="handlerClick"/>
+                <div class="content">
+                  <el-tooltip effect="dark" :content="item.name" placement="top">
+                    <div :class="['title', item.is_show ? '' : 'red']" v-text="item.name + ((item.module == 'levelGrade') ? '（等级测试）' : '') "></div>
+                  </el-tooltip>
+                  <ul>
+                    <li>版本：{{ item.version }}</li>
+                    <!-- <li>版本描述：{{ Object.keys(item.desc).length ? item.desc['zh-CN'] : '' }}</li> -->
+                    <li>最后编辑时间：{{ item.update_time | formatDate('YYYY年MM月DD日') }}</li>
+                    <li>是否展示：{{ item.is_show ? '是' : '否' }}</li>
+                  </ul>
+                </div>
+                <div class="operate">
+                  <el-button size="small" plain v-show="isHaveAuthority" :disabled="(userInfo.authorityId !== '1' && item.curUserAuth['auth'] == 'r')" @click="editVersion(item)">设置</el-button>
+                  <el-tooltip class="item" effect="dark" content="复制" placement="top">
+                    <el-button type="info" v-show="false" icon="el-icon-document-copy" :disabled="(userInfo.authorityId !== '1' && item.curUserAuth['auth'] == 'r')" circle @click="copyVersion(item)"></el-button>
+                  </el-tooltip>
+                  <el-button size="small" type="success" v-show="false" :disabled="!item.has_changed || (userInfo.authorityId !== '1' && item.curUserAuth['auth'] == 'r')" @click="onlineJob(item)">上线</el-button>
+                  <el-tooltip class="item" effect="dark" content="下线" placement="top">
+                    <el-button type="warning" v-show="false" icon="el-icon-minus" circle :disabled="!item.is_show || (userInfo.authorityId !== '1' && item.curUserAuth['auth'] == 'r')" @click="editShow(item)"></el-button>
+                  </el-tooltip>
+                  <el-tooltip class="item" effect="dark" content="删除" placement="top">
+                    <el-button type="danger" v-show="false" :disabled="(userInfo.authorityId !== '1' && item.curUserAuth['auth'] == 'r')" icon="el-icon-delete" circle @click="delVerdion(item)"></el-button>
+                  </el-tooltip>
+                  <el-button size="small" type="primary" :disabled="(userInfo.authorityId !== '1' && item.curUserAuth['auth'] == 'r')" @click="courseContent(item)">编辑课程</el-button>
+                  <div v-show="!lowerRoleUser">
+                    <el-button
+                      size="small"
+                      plain
+                      type="primary"
+                      :disabled="(userInfo.authorityId !== '1' && item.curUserAuth['auth'] == 'r')" @click="clickUpload(item)">上传内容</el-button>
+                    <el-upload
+                      :ref="'upload-' + item.uuid"
+                      class="upload-demo"
+                      accept=".xls,.xlsx"
+                      :data="{
+                        parent_uuid: item.uuid
+                      }"
+                      :headers="{
+                        'x-token': token
+                      }"
+                      :action="api + '/editor/content/import'"
+                      :show-file-list="false"
+                      :before-upload="beforeUpload"
+                      :on-success="uploadSuccess">
+                    </el-upload>
+                  </div>
+                  <el-tooltip class="item" effect="dark" content="下载课程统计数据" placement="top" v-if="false">
+                    <el-button type="primary" icon="el-icon-download" :disabled="(userInfo.authorityId !== '1' && item.curUserAuth['auth'] == 'r')" circle @click="download(item)"></el-button>
+                  </el-tooltip>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- <div class="version-wrap">
       <div class="version-item create" v-show="isHaveAuthority" @click="addVersion">
         <i class="el-icon-plus"></i>
         <span>创建新版本</span>
@@ -123,7 +205,7 @@
           </el-tooltip>
         </div>
       </div>
-    </div>
+    </div> -->
     <edit-comp ref="edit" :authorityUsers="authorityUsers" @newEditVersion="initCourseVersionList"/>
     <right-menu
       ref="rightMenu"
@@ -147,6 +229,7 @@ import { getAuthorityList } from '@/api/authority'
 import { getUserList } from '@/api/user'
 import RightMenu from './rightMenu'
 import DialogOnline from '@/components/dialogOnline'
+import MoreBtns from '@/components/moreBtns'
 
 export default {
   data () {
@@ -154,6 +237,7 @@ export default {
       selLang: 'ENG',
       selCourseType: '',
       selCourseUUID: '',
+      selModule: '',
       contents: [],
       api: process.env.VUE_APP_BASE_API,
       authorityList: [],
@@ -163,7 +247,15 @@ export default {
       loading: null,
       showExportList: false,
       exportList: [],
-      exportNum: 0
+      exportNum: 0,
+      tabs: [
+        { value: 'basic', label: '基础内容' },
+        { value: 'levelGrade', label: '等级测试内容' }
+      ],
+      handlers: [
+        { key: 'copy', text: '复制', cls: '' },
+        { key: 'del', text: '删除', cls: 'error' }
+      ]
     }
   },
   components: {
@@ -171,7 +263,8 @@ export default {
     // CourseContent
     editComp,
     RightMenu,
-    DialogOnline
+    DialogOnline,
+    MoreBtns
   },
   created () {
     this.getAuthorityUsers()
@@ -590,6 +683,20 @@ export default {
       //     })
       //   }
       // })
+    },
+    handlerClick (params) {
+      console.log(params)
+      const data = params.data
+      switch (params.type) {
+        case 'copy':
+          this.copyVersion(data)
+          break
+        case 'del':
+          this.delVerdion(data)
+          break
+        default:
+          break
+      }
     }
   }
 }
@@ -610,6 +717,11 @@ export default {
     flex-wrap: wrap;
     margin: 20px 0;
   }
+  .version-list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
   .version-item {
     position: relative;
     display: flex;
@@ -619,7 +731,6 @@ export default {
     background: rgba($color: #000000, $alpha: 0.05);
     border-radius: 4px;
     margin: 15px;
-    overflow: hidden;
     transition: all .3s ease;
     -webkit-transition: all ease .3s;
     -moz-transition: all ease .3s;
@@ -801,5 +912,70 @@ export default {
 
 .red {
   color: red !important;
+}
+
+.el-tabs {
+  margin: 20px 0;
+}
+
+.el-tabs__header {
+  margin: 0;
+}
+.el-tab-pane {
+  background: #f6f7fa;
+}
+
+.tabs {
+  display: flex;
+  flex-direction: column;
+  margin: 20px 0;
+}
+
+.tabs-header {
+  position: relative;
+  .nav {
+    background: #d1d8ed;
+    white-space: nowrap;
+    position: relative;
+    transition: -webkit-transform .3s;
+    -webkit-transition: -webkit-transform .3s;
+    transition: transform .3s;
+    transition: transform .3s, -webkit-transform .3s;
+    transition: transform .3s,-webkit-transform .3s;
+    float: left;
+    z-index: 2;
+    border-bottom: none;
+    border-radius: 4px 4px 0 0;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    .item {
+      padding: 0 20px;
+      height: 40px;
+      -webkit-box-sizing: border-box;
+      box-sizing: border-box;
+      line-height: 40px;
+      display: inline-block;
+      list-style: none;
+      font-size: 14px;
+      font-weight: 500;
+      color: #303133;
+      position: relative;
+    }
+  }
+}
+
+.tabs-content {
+  overflow: hidden;
+  position: relative;
+  .tab-panel {
+    background: #f6f7fa;
+    min-height: 200px;
+    width: 100%;
+  }
+}
+
+.more-btns {
+  right: 10px;
+  top: 5px;
 }
 </style>

@@ -146,7 +146,7 @@ export default {
       this.form.certificate_type = params.certificate_type ? params.certificate_type : '1'
       this.form.identity_card = params.identity_card
       this.form.nationality = params.nationality
-      this.form.gender = params.gender === 1 ? '男' : '女'
+      this.form.gender = params.gender === '1' ? '男' : '女'
       this.form.birth_date = getAge(params.birth_date)
       this.form.address = params.address
       this.form.live_nickname = params.live_nickname

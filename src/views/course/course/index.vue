@@ -42,7 +42,7 @@
           style="outline:none;"
           type="primary"
           class="btnAdd"
-          @click="addCourse">添加</el-button>
+          @click="addCourse">新建课程</el-button>
         <el-button
           v-show="false"
           style="outline:none;"
@@ -112,13 +112,13 @@
       <el-table-column
         label="是否显示">
         <template slot-scope="scope">
-          {{scope.row.is_show ? '是' : '否'}}
+          <i :class="scope.row.is_show ? 'icon-yes' : 'icon-no'"></i>
         </template>
       </el-table-column>
       <el-table-column
         label="是否显示词典">
         <template slot-scope="scope">
-          {{scope.row.has_dict ? '是' : '否'}}
+          <i :class="scope.row.has_dict ? 'icon-yes' : 'icon-no'"></i>
         </template>
       </el-table-column>
       <el-table-column label="操作" fixed="right" width="300px">
@@ -156,6 +156,7 @@
             type="primary"
             plain
             @click="handleStatistic(scope.row)">统计</el-button>
+          <more-btns class="more-btns" />
         </template>
       </el-table-column>
     </el-table>
@@ -183,6 +184,7 @@ import {
   getVoiceActorList
 } from '@/api/course'
 import DialogOnline from '@/components/dialogOnline'
+import MoreBtns from '@/components/moreBtns'
 import EditComp from './editCourse'
 import ClassGroup from './classGroup'
 import CourseDetail from './editCourseDetail'
@@ -205,7 +207,8 @@ export default {
     CourseDetail,
     UnlockCourse,
     Statistic,
-    DialogOnline
+    DialogOnline,
+    MoreBtns
   },
   created () {
     this.getLangList({ 'pageNo': 0, 'pageSize': 999 }).then(() => {
@@ -447,9 +450,6 @@ export default {
   .right {
     float: right;
   }
-  .btnAdd {
-    width: 100px;
-  }
 
   .btnOnline {
     width: 100px;
@@ -480,6 +480,10 @@ export default {
 
   .tips {
     margin-right: 30px;
+  }
+  .more-btns {
+    top: 10px;
+    right: 5px;
   }
 </style>
 <style>

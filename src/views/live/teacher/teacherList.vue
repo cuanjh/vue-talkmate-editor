@@ -139,10 +139,10 @@ export default {
     EditTeacher
   },
   mounted () {
-    getLangList({ 'pageNo': 0, 'pageSize': 0 }).then(res => {
+    getLangList({ pageNo: 1, pageSize: 999 }).then(res => {
       console.log(res)
       if (res.success && res.data) {
-        this.langs = res.data.langs
+        this.langs = res.data.list
       }
     })
     this.loadData()

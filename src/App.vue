@@ -32,4 +32,22 @@ export default {
 .fade-enter, .fade-leave-to {
   opacity: 0;
 }
+
+.icon-yes {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background-image: url('./assets/images/icons/icon-yes.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.icon-no {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background-image: url('./assets/images/icons/icon-no.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+}
 </style>

@@ -1,7 +1,8 @@
 <template>
   <el-submenu ref="subMenu" :index="routerInfo.name">
     <template slot="title">
-      <i :class="'el-icon-'+routerInfo.meta.icon"></i>
+      <i v-if="routerInfo.meta.icon.indexOf('icon') > -1" :class="['font_family', routerInfo.meta.icon]"></i>
+      <i v-else :class="'el-icon-'+routerInfo.meta.icon"></i>
       <span slot="title">{{routerInfo.meta.title}}</span>
     </template>
     <slot></slot>

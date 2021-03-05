@@ -129,7 +129,7 @@ export default {
   },
   created () {
     getLangList({ 'pageNo': 0, 'pageSize': 999 }).then(res => {
-      const langList = res.data.langs.sort((a, b) => {
+      const langList = res.data.list.sort((a, b) => {
         return b.is_hot - a.is_hot
       })
       this.$store.commit('course/updateLangList', langList)
@@ -264,10 +264,6 @@ export default {
     .right {
       // width: 120px;
     }
-  }
-
-  .btnAdd {
-    width: 100px;
   }
 
   .btnOnline {

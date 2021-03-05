@@ -92,3 +92,25 @@
 .mt10 {
   margin-top: 10px;
 }
+
+.font_family {
+  margin-right: 11px;
+  width: 24px;
+  text-align: center;
+  font-size: 22px;
+}
+
+.pagination-box {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  box-shadow: 0px -1px 4px 0px rgba(0,0,0,0.09);
+  z-index: 999;
+}

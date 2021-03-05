@@ -358,10 +358,6 @@ export default {
     }
   }
 
-  .btnAdd {
-    width: 100px;
-  }
-
   .btnOnline {
     width: 100px;
   }
