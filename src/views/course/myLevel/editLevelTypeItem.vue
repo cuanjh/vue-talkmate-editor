@@ -35,8 +35,12 @@ export default {
   },
   methods: {
     ...mapActions({
-      updateLevelType: ''
+      getLevelTypeList: 'course/getLevelTypeList',
+      updateLevelType: 'course/updateLevelType'
     }),
+    loadData () {
+      this.getLevelTypeList({ pageNo: 1 })
+    },
     edit () {
       console.log(this.item)
       if (!this.item.title) {

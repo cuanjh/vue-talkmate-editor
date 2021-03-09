@@ -84,6 +84,7 @@ export default {
       token: '',
       state: 0,
       date: new Date(),
+      time: 0,
       times: [
         new Date(), new Date()
       ],
@@ -153,7 +154,7 @@ export default {
       let uploadIndexArr = this.uploadField.split(',')
       let feild = uploadIndexArr[1]
       let date = moment(new Date()).format('YYYY/MM/DD')
-      let url = 'live/videos/' + this.form.uuid + '/' + date + '/' + file.uid + '/' + file.name
+      let url = 'live/videos/' + this.form.uuid + '/' + date + '/' + this.time + '/' + file.name
       const resToken = await getInfoTokenUploadFile()
       this.token = resToken.data.token
       let res = await uploadQiniu(file.raw, this.token, url)
@@ -183,6 +184,7 @@ export default {
     },
     setUploadField (name) {
       this.uploadField = name
+      this.time = (new Date()).getTime()
     },
     submitForm () {
       this.$refs['form'].validate((valid) => {
