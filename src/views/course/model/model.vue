@@ -5,14 +5,14 @@
         <el-button style="outline:none;" type="primary" class="btnAdd" @click="addModel()">添加</el-button>
       </div>
       <el-table
-        :data="showTableData"
+        :data="modelList"
         style="width: 100%;">
         <el-table-column
           label="序号"
           width="80"
           align="center">
           <template slot-scope="scope">
-            <span>{{scope.$index+(pageRequest.pageNum - 1) * pageRequest.pageSize + 1}}</span>
+            <span>{{scope.$index+(pageRequest.pageNo - 1) * pageRequest.pageSize + 1}}</span>
           </template>
         </el-table-column>
         <el-table-column
@@ -50,13 +50,13 @@
       </el-table>
       <div class="pagination-box">
         <el-pagination
-          background layout="prev, pager, next"
-          :current-page="pageRequest.pageNum"
-          :page-size="pageRequest.pageSize"
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
-          :total="modelList.length"
-          >
+          :current-page="pageRequest.pageNo"
+          :page-sizes="pageSizes"
+          :page-size="pageRequest.pageSize"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="pageRequest.total">
         </el-pagination>
       </div>
     </div>
@@ -65,20 +65,22 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex'
+import { mapState } from 'vuex'
 import {
-  delModel
+  delModel,
+  getModelList
 } from '@/api/course'
 import EditComp from './editModel'
 
 export default {
   data () {
     return {
-      showTableData: [],
+      modelList: [],
       // 分页信息
       pageRequest: {
-        pageNum: 1,
-        pageSize: 5
+        pageNo: 1,
+        pageSize: 10,
+        total: 0
       }
     }
   },
@@ -90,28 +92,29 @@ export default {
   },
   computed: {
     ...mapState({
-      modelList: state => state.course.modelList
+      pageSizes: state => state.pageSizes
     })
   },
   methods: {
-    ...mapActions({
-      getModelList: 'course/getModelList'
-    }),
-    async initData () {
-      await this.getModelList({ pageNo: 0, pageSize: 0 })
-      console.log('initData')
-      this.handleCurrentChange(this.pageRequest.pageNum)
+    initData () {
+      getModelList({
+        pageNo: this.pageRequest.pageNo,
+        pageSize: this.pageRequest.pageSize
+      }).then(res => {
+        console.log(res)
+        this.modelList = res.data.models
+        this.pageRequest.total = res.data.total
+      })
     },
     handleSizeChange (val) {
       console.log(`每页 ${val} 条`)
       this.pageRequest.pageSize = val
+      this.initData()
     },
     handleCurrentChange (val) {
       console.log(`当前页: ${val}`)
-      this.pageRequest.pageNum = val
-      let starNum = (val - 1) * this.pageRequest.pageSize
-      let endNum = val * this.pageRequest.pageSize
-      this.showTableData = this.modelList.slice(starNum, endNum)
+      this.pageRequest.pageNo = val
+      this.initData()
     },
     addModel () {
       let obj = {
@@ -162,10 +165,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.pagination-box {
-  text-align: center;
-  padding-top: 20px;
-}
 .top-bar {
   padding: 20px 0px 0;
   text-align: right;

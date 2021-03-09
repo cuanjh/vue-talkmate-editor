@@ -71,8 +71,13 @@ export const uploadQiniu = (file, token, key) => {
 
     let putExtra = {
       fname: '',
-      params: {},
-      mimeType: ['audio/mp3', 'audio/mpeg', 'video/mp4', 'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/vnd.ms-powerpoint', 'image/jpeg', 'image/png', 'image/webp', 'application/pdf'] || null
+      params: {}
+      // ,
+      // mimeType: [
+      //   'audio/mp3', 'audio/mpeg', 'application/x-mpegURL', 'video/MP2T', 'video/m3u8',
+      //   'video/mpeg', 'video/quicktime', 'video/x-la-asf', 'video/x-ms-asf', 'video/x-msvideo', 'video/x-sgi-movie', 'video/x-f4v', 'video/x-flv', 'video/h264',
+      //   'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/vnd.ms-powerpoint', 'application/vnd.americandynamics.acc',
+      //   'image/jpeg', 'image/png', 'image/webp', 'application/pdf'] || null
     }
 
     let observable = qiniu.upload(file, key, token, putExtra, config)

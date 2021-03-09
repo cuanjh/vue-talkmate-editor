@@ -82,8 +82,7 @@
                   class="more-btns"
                   :handlers="handlers"
                   :dataObj="item"
-                  v-show="isHaveAuthority"
-                  @handlerClick="handlerClick"/>
+                  v-show="isHaveAuthority"/>
                 <div class="content">
                   <el-tooltip effect="dark" :content="item.name" placement="top">
                     <div :class="['title', item.is_show ? '' : 'red']" v-text="item.name + ((item.module == 'levelGrade') ? '（等级测试）' : '') "></div>
@@ -270,6 +269,9 @@ export default {
     this.getAuthorityUsers()
     this.getLangList({ 'pageNo': 0, 'pageSize': 999 })
     this.getCourseTypes()
+    this.$bus.on('handlerClick', (params) => {
+      this.handlerClick(params)
+    })
   },
   mounted () {
     if (!this.lowerRoleUser) {
@@ -698,6 +700,9 @@ export default {
           break
       }
     }
+  },
+  destroyed () {
+    this.$bus.off('handlerClick')
   }
 }
 </script>

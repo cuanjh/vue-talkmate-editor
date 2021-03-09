@@ -1,48 +1,30 @@
 <template>
-  <div class="course-manage">
+  <div class="mylevel-container">
     <div class="top-bar">
-      <el-select v-model="version.selLang"
+      <el-select v-model="selLevelType"
         filterable
         default-first-option
-        placeholder="请选择语种"
+        placeholder="请选择等级分类"
         @change="curCourse">
-        <el-option label="所有语种" value="">
-        </el-option>
         <el-option
-          v-for="item in langList"
-          :key="item['lan_code']"
-          :label="item.title[locale]"
-          :value="item['lan_code']">
+          v-for="item in levelTypeList"
+          :key="item['uuid']"
+          :label="item.title"
+          :value="item.uuid">
         </el-option>
       </el-select>
       <div class="right">
-        <el-tooltip class="item" effect="dark" content="课程数据下载列表" placement="top">
-          <el-popover
-            class="tips"
-            placement="bottom"
-            width="400"
-            @show="showExportList"
-            trigger="click">
-            <el-tag type="warning">显示最新 5 条可下载的数据</el-tag>
-            <el-table :data="exportList">
-              <el-table-column property="created_on" label="创建日期" :formatter="formatDate"></el-table-column>
-              <el-table-column property="name" label="标题"></el-table-column>
-              <el-table-column label="操作">
-                <template slot-scope="scope">
-                  <el-button @click="handleDownload(scope.row)" :disabled="scope.row.status !== 2" type="text" size="small">{{scope.row.status === 2 ? '下载' : '文件生成中...' }}</el-button>
-                </template>
-              </el-table-column>
-            </el-table>
-            <el-badge slot="reference" :value="exportNum" :hidden="exportNum == 0" class="item" type="warning">
-              <el-button size="small" icon="el-icon-message-solid" type="primary" circle></el-button>
-            </el-badge>
-          </el-popover>
-        </el-tooltip>
         <el-button v-show="userInfo.authority.authorityId == '1' || userInfo.authority.authorityId == '2'"
           style="outline:none;"
           type="primary"
           class="btnAdd"
-          @click="addCourse">新建课程</el-button>
+          @click="addLevelType">新建等级分类</el-button>
+        <el-button v-show="userInfo.authority.authorityId == '1' || userInfo.authority.authorityId == '2'"
+          style="outline:none;"
+          type="primary"
+          class="btnAdd"
+          :disabled="!(levelTypeList && levelTypeList.length > 0)"
+          @click="addCourse">新建等级</el-button>
         <el-button
           v-show="false"
           style="outline:none;"
@@ -183,6 +165,7 @@
         :total="pageRequest.total">
       </el-pagination>
     </div>
+    <level-type ref="levelType" />
     <edit-comp ref="edit"
       :courseTypes="courseTypes"
       @addNewCourse="initData"/>
@@ -208,6 +191,7 @@ import {
 } from '@/api/course'
 import DialogOnline from '@/components/dialogOnline'
 import MoreBtns from '@/components/moreBtns'
+import LevelType from './editLevelType'
 import EditComp from './editCourse'
 import ClassGroup from './classGroup'
 import CourseDetail from './editCourseDetail'
@@ -217,6 +201,7 @@ import Statistic from './statistic'
 export default {
   data () {
     return {
+      selLevelType: '',
       exportList: [],
       exportNum: 0,
       courseList: [],
@@ -238,6 +223,7 @@ export default {
     }
   },
   components: {
+    LevelType,
     EditComp,
     ClassGroup,
     CourseDetail,
@@ -247,9 +233,7 @@ export default {
     MoreBtns
   },
   created () {
-    this.getLangList({ pageNo: 1, pageSize: 999 }).then(() => {
-      this.initData()
-    })
+    this.getLevelTypeList({ pageNo: 1, pageSize: 999 })
     this.getCourseTypes()
     this.$bus.on('handlerClick', (params) => {
       console.log(params)
@@ -281,6 +265,7 @@ export default {
     ...mapGetters('user', ['userInfo']),
     ...mapState({
       assetsDomain: state => state.course.assetsDomain,
+      levelTypeList: state => state.course.levelTypeList,
       langList: state => state.course.langList,
       langInfos: state => state.course.langInfos,
       locale: state => state.course.locale,
@@ -291,7 +276,7 @@ export default {
   },
   methods: {
     ...mapActions({
-      getLangList: 'course/getLangList',
+      getLevelTypeList: 'course/getLevelTypeList',
       getCourseTypes: 'course/getCourseTypes'
     }),
     async initData () {
@@ -354,6 +339,9 @@ export default {
           this.initData()
         }
       })
+    },
+    addLevelType () {
+      this.$refs.levelType.show()
     },
     addCourse () {
       console.log(this.courseList)
@@ -573,9 +561,4 @@ export default {
     top: 26px;
     right: 30px;
   }
-</style>
-<style>
-.course-table.el-table th>.cell {
-  /* width: 100px!important; */
-}
 </style>

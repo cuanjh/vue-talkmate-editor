@@ -15,14 +15,14 @@
         <el-button style="outline:none;" type="primary" class="btnAdd" @click="sortType()">排序</el-button>
       </div>
       <el-table
-        :data="showTableData"
+        :data="contentTypeList"
         style="width: 100%;">
         <el-table-column
           label="序号"
           width="80"
           align="center">
           <template slot-scope="scope">
-            <span>{{scope.$index+(pageRequest.pageNum - 1) * pageRequest.pageSize + 1}}</span>
+            <span>{{scope.$index+(pageRequest.pageNo - 1) * pageRequest.pageSize + 1}}</span>
           </template>
         </el-table-column>
         <el-table-column
@@ -44,6 +44,17 @@
           </template>
         </el-table-column>
         <el-table-column
+          width="120"
+          label="提示语">
+          <template slot-scope="scope" v-if="scope.row.title && Object.keys(scope.row.title).length">
+            <div v-for="l in langInfos" :key="l.langKey">
+              <el-tooltip :content="l.name + ': ' +  (scope.row.title['' + l.langKey + ''] ? scope.row.title['' + l.langKey + ''] : '') + ' '" width="300" placement="top" effect="light">
+                <span>{{ l.name + ': ' +  (scope.row.title['' + l.langKey + ''] ? scope.row.title['' + l.langKey + ''] : '') + ' ' }}</span>
+              </el-tooltip>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column
           width="300"
           label="描述">
           <template slot-scope="scope">
@@ -54,6 +65,7 @@
         </el-table-column>
         <el-table-column
           fixed="right"
+          width="180px"
           label="操作">
           <template slot-scope="scope">
             <el-button type="primary" size="small" @click="editType(scope.row)">编辑</el-button>
@@ -61,17 +73,17 @@
           </template>
         </el-table-column>
       </el-table>
-      <div class="pagination-box">
-        <el-pagination
-          background layout="prev, pager, next"
-          :current-page="pageRequest.pageNum"
-          :page-size="pageRequest.pageSize"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          :total="filterContentTypeList.length"
-          >
-        </el-pagination>
-      </div>
+    </div>
+    <div class="pagination-box">
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="pageRequest.pageNo"
+        :page-sizes="pageSizes"
+        :page-size="pageRequest.pageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="pageRequest.total">
+      </el-pagination>
     </div>
     <edit-question ref="contentTypeEdit" @addContentType="initData"/>
     <sort-question ref="sortQuestion" @initData="initData"/>
@@ -81,6 +93,7 @@
 <script>
 import { mapState, mapActions } from 'vuex'
 import {
+  getContentTypeList,
   delContentType
 } from '@/api/course'
 import EditQuestion from './editQuestion'
@@ -89,17 +102,18 @@ import SortQuestion from './sortQuestion'
 export default {
   data () {
     return {
-      showTableData: [],
+      contentTypeList: [],
       selModel: '',
       // 分页信息
       pageRequest: {
-        pageNum: 1,
-        pageSize: 5
+        pageNo: 1,
+        pageSize: 10,
+        total: 0
       }
     }
   },
   created () {
-    this.getModelList({ pageNo: 0, pageSize: 0 })
+    this.getModelList({ pageNo: 1, pageSize: 99 })
     this.initData()
   },
   components: {
@@ -108,43 +122,36 @@ export default {
   },
   computed: {
     ...mapState({
-      contentTypeList: state => state.course.contentTypeList,
-      modelList: state => state.course.modelList
-    }),
-    filterContentTypeList () {
-      let list = this.contentTypeList
-      if (this.selModel) {
-        return list.filter(item => {
-          return item.model_keys && item.model_keys.findIndex(m => { return m === this.selModel }) > -1
-        }).sort((a, b) => {
-          return a.list_order - b.list_order
-        })
-      }
-      return list.sort((a, b) => {
-        return a.list_order - b.list_order
-      })
-    }
+      modelList: state => state.course.modelList,
+      langInfos: state => state.course.langInfos,
+      pageSizes: state => state.pageSizes
+    })
   },
   methods: {
     ...mapActions({
-      getContentTypeList: 'course/getContentTypeList',
       getModelList: 'course/getModelList'
     }),
     async initData () {
-      await this.getContentTypeList({ pageNo: 0, pageSize: 0 })
-      console.log('initData')
-      this.handleCurrentChange(this.pageRequest.pageNum)
+      getContentTypeList({
+        modelKey: this.selModel,
+        pageNo: this.pageRequest.pageNo,
+        pageSize: this.pageRequest.pageSize
+      }).then(res => {
+        if (res.success) {
+          this.contentTypeList = res.data.types
+          this.pageRequest.total = res.data.total
+        }
+      })
     },
     handleSizeChange (val) {
       console.log(`每页 ${val} 条`)
       this.pageRequest.pageSize = val
+      this.initData()
     },
     handleCurrentChange (val) {
       console.log(`当前页: ${val}`)
-      this.pageRequest.pageNum = val
-      let starNum = (val - 1) * this.pageRequest.pageSize
-      let endNum = val * this.pageRequest.pageSize
-      this.showTableData = this.filterContentTypeList.slice(starNum, endNum)
+      this.pageRequest.pageNo = val
+      this.initData()
     },
     addType () {
       this.$refs.contentTypeEdit.show({ flag: 'add' })
@@ -186,10 +193,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.pagination-box {
-  text-align: center;
-  padding-top: 20px;
-}
 .question-content {
   padding-bottom: 50px;
 }

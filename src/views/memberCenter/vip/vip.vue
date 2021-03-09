@@ -186,10 +186,6 @@ export default {
   flex: 1;
   padding-bottom: 50px;
 }
-.pagination-box {
-  text-align: center;
-  padding-top: 20px;
-}
 .top-bar {
   padding: 20px 0px 0;
   display: flex;

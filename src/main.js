@@ -10,6 +10,8 @@ import { urlfix } from '@/utils/filter'
 
 import AudioRecorder from '@/components/common/record'
 
+import hoverDialog from '@/components/hoverDialog'
+
 // 引入element
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
@@ -27,6 +29,8 @@ Vue.use(VueIntro)
 Vue.use(ElementUI)
 
 Vue.use(AudioRecorder)
+
+Vue.use(hoverDialog)
 
 Vue.use(Bus)
 Vue.filter('formatDate', formatDate)

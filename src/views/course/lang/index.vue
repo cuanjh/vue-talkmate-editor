@@ -1,7 +1,7 @@
 <template>
   <div class="lang-manage">
     <div class="top-bar">
-      <el-input v-model="searchKey" @input="initData" clearable placeholder="请输入要查找的语言"></el-input>
+      <el-input v-model="searchKey" @input="search" clearable placeholder="请输入要查找的语言"></el-input>
       <div class="btn-area">
         <el-button style="outline:none;" type="primary" class="btnAdd" @click="addLang()">创建新语言</el-button>
         <el-button style="outline:none;" type="primary" class="btnSort" @click="previewSort()">语言排序</el-button>
@@ -13,26 +13,35 @@
       </div>
     </div>
     <el-table
-      :data="showTableData"
+      :data="langList"
       @select="select"
       @select-all="selectAll"
       style="width: 100%;">
       <el-table-column
         type="selection"
+        :selectable="selectable"
         width="55">
       </el-table-column>
       <el-table-column
+        label="序号"
+        width="50"
+        align="center">
+        <template slot-scope="scope">
+          <span>{{scope.$index+(pageRequest.pageNo - 1) * pageRequest.pageSize + 1}}</span>
+        </template>
+      </el-table-column>
+      <!-- <el-table-column
         label="排序号"
         width="80"
         prop="list_order">
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column
         label="编码"
         width="80"
         prop="lan_code">
       </el-table-column>
       <el-table-column
-        width="150"
+        width="220"
         label="名称">
         <template slot-scope="scope" v-if="Object.keys(scope.row.title).length">
           <!-- <div v-for="l in langInfos" :key="l.langKey">
@@ -58,6 +67,11 @@
         <template v-else>
         </template>
       </el-table-column> -->
+      <el-table-column
+        label="上线课程数"
+        width="100"
+        prop="total">
+      </el-table-column>
       <el-table-column
         width="80"
         label="图标">
@@ -129,7 +143,6 @@
         :total="pageRequest.total">
       </el-pagination>
     </div>
-    <edit-comp ref="edit"/>
     <edit-comp ref="edit" @addNewLang="updateNewLang" :langInfos="langInfos" :langList="langList"/>
     <!-- <sort-course-comp ref="sorLang" @sortLang="updateNewLang"/> -->
     <sort-course-comp ref="sorLang" @sortLang="updateNewLang"/>
@@ -151,7 +164,6 @@ export default {
       allLangs: [],
       langList: [],
       selLangList: [],
-      showTableData: [],
       talkmateLogo: TalkmateLogo,
       assetsUrl: '',
       searchKey: '',
@@ -191,13 +203,8 @@ export default {
         pageSize: this.pageRequest.pageSize
       })
       if (res.success) {
-        let sortLangs = res.data.list.sort((a, b) => {
-          return a.list_order - b.list_order
-        })
-        this.showTableData = sortLangs
+        this.langList = res.data.list
         this.pageRequest.total = res.data.total
-        this.allLangs = sortLangs
-        this.langList = sortLangs
         this.assetsUrl = res.data.assetsUrl
       }
     },
@@ -208,6 +215,9 @@ export default {
     handleCurrentChange (val) {
       this.pageRequest.pageNo = val
       this.initData()
+    },
+    search () {
+      this.handleCurrentChange(1)
     },
     // 编辑
     editLang (lang) {
@@ -312,6 +322,13 @@ export default {
     },
     selectAll (selection) {
       this.selLangList = selection
+    },
+    selectable (row, index) {
+      if (row.total > 0) {
+        return true
+      } else {
+        return false
+      }
     }
   }
 }

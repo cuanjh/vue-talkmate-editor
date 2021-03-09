@@ -1,5 +1,5 @@
 <template>
-  <div class="main-content course" ref="content" @scroll="handlerScroll">
+  <div class="main-content course" ref="content">
     <div class="top-bar">
       <div class="left">
         <el-select
@@ -27,9 +27,8 @@
             </div>
           </el-option>
         </el-select>
-        <el-input placeholder="请输入描述" v-model="searchKey" @keyup.enter.native="handlerSearch">
-          <el-button slot="append" icon="el-icon-search" @click="handlerSearch"></el-button>
-        </el-input>
+        <el-input placeholder="请输入要查找的描述" class="mr10" v-model="searchKey" @keyup.enter.native="handlerSearch"></el-input>
+        <el-input placeholder="请输入要查找的标签" v-model="searchTag" @keyup.enter.native="handlerSearch"></el-input>
       </div>
       <div class="right">
         <el-button v-show="false"
@@ -90,6 +89,17 @@
         </template>
       </el-table-column>
     </el-table>
+    <div class="pagination-box">
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="pageRequest.pageNo"
+        :page-sizes="pageSizes"
+        :page-size="pageRequest.pageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="pageRequest.total">
+      </el-pagination>
+    </div>
   </div>
 </template>
 
@@ -103,26 +113,30 @@ import {
   delOneContentReport
 } from '@/api/course'
 
-let onlyOne = true
+// let onlyOne = true
 export default {
   data () {
     return {
       selLang: 'ENG',
       selCourseUUID: '',
       searchKey: '',
+      searchTag: '',
       list: [],
       isShow: false,
-      currentPage: 1,
-      total: 0,
-      pageSize: 50,
       scrollTop: 0,
-      isShowPagination: false
+      isShowPagination: false,
+      // 分页信息
+      pageRequest: {
+        pageNo: 1,
+        pageSize: 10,
+        total: 0
+      }
     }
   },
   components: {
   },
   created () {
-    this.$store.dispatch('course/getLangList', { 'pageNo': 0, 'pageSize': 999 })
+    this.$store.dispatch('course/getLangList', { 'pageNo': 1, 'pageSize': 999 })
     this.$store.dispatch('course/getCourseTypes')
     this.initData()
   },
@@ -141,7 +155,8 @@ export default {
       locale: state => state.course.locale,
       langList: state => state.course.langList,
       courseTypes: state => state.course.courseTypes,
-      version: state => state.course.version
+      version: state => state.course.version,
+      pageSizes: state => state.pageSizes
     })
   },
   watch: {
@@ -163,38 +178,41 @@ export default {
       this.$store.dispatch('course/getCourseVersions', { 'pageNo': 0, 'pageSize': 0, 'parent_uuid': selCourse.uuid })
     },
     handlerScroll (e) {
-      if (e.target.scrollTop + e.target.offsetHeight === e.target.scrollHeight && onlyOne) {
-        this.scrollTop = e.target.scrollHeight - e.target.offsetHeight
-        onlyOne = false
-        this.currentPage++
-        this.initData()
-      }
+      // if (e.target.scrollTop + e.target.offsetHeight === e.target.scrollHeight && onlyOne) {
+      //   this.scrollTop = e.target.scrollHeight - e.target.offsetHeight
+      //   onlyOne = false
+      //   this.currentPage++
+      //   this.initData()
+      // }
     },
     handlerSearch () {
-      this.currentPage = 1
-      this.initData()
+      this.handleCurrentChange(1)
     },
     async initData () {
-      if (this.currentPage === 1) {
-        this.list = []
-      }
       let res = await getContentReports({
-        page_index: this.currentPage,
-        page_size: this.pageSize,
+        pageNo: this.pageRequest.pageNo,
+        pageSize: this.pageRequest.pageSize,
         langCode: this.selLang,
         code: this.version.selCourse.code,
         desc: this.searchKey,
+        tags: this.searchTag,
         sort_type: -1,
         text_field: 'createdTime'
       })
       if (res.success && res.data) {
-        let copy = this.list.slice()
-        this.list = copy.concat(res.data)
-        setTimeout(() => {
-          this.$refs['content'].scrollTop = this.scrollTop
-          onlyOne = true
-        }, 0)
+        this.list = res.data.list
+        this.pageRequest.total = res.data.total
       }
+    },
+    handleSizeChange (val) {
+      console.log(`每页 ${val} 条`)
+      this.pageRequest.pageSize = val
+      this.initData()
+    },
+    handleCurrentChange (val) {
+      console.log(`当前页: ${val}`)
+      this.pageRequest.pageNo = val
+      this.initData()
     },
     feedback (row) {
       console.log(row)
@@ -282,10 +300,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-  .main-content {
-    padding: 20px;
-    overflow: auto;
-  }
   .el-table {
     margin-top: 20px;
   }
@@ -332,11 +346,6 @@ export default {
     height: 66px;
     border-radius: 4px;
     object-fit: cover;
-  }
-
-  .el-pagination {
-    text-align: center;
-    margin-top: 30px;
   }
 
   .tags {

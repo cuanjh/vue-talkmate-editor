@@ -2094,3 +2094,42 @@ export const delAdvantage = (data) => {
     data
   })
 }
+
+/**
+ * @Summary 获取等级分类列表
+ * @param {*} data
+ * @Router /editor/level_cat/list [post]
+ */
+export const getLevelTypeList = (data) => {
+  return service({
+    url: '/editor/level_cat/list',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 创建等级分类
+ * @param {*} data
+ * @Router /editor/level_cat/create [post]
+ */
+export const createLevelType = (data) => {
+  return service({
+    url: '/editor/level_cat/create',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 更新等级分类
+ * @param {*} data
+ * @Router /editor/level_cat/update [post]
+ */
+export const updateLevelType = (data) => {
+  return service({
+    url: '/editor/level_cat/update',
+    method: 'post',
+    data
+  })
+}

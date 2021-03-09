@@ -8,7 +8,8 @@
         <el-input v-model="form.videoUrl" placeholder="https://">
           <el-upload slot="prepend"
             action="#"
-            :on-change="uploadOnchange"
+            :multiple="true"
+            :on-change="uploadVideoOnchange"
             :show-file-list="false"
             :auto-upload="false">
             <el-button type="text" @click="setUploadField('video,videoUrl')">上传</el-button>
@@ -145,6 +146,19 @@ export default {
         date: '',
         startTime: '',
         EndTime: ''
+      }
+    },
+    async uploadVideoOnchange (file, fileList) {
+      if (file.name === 'index.ts') return
+      let uploadIndexArr = this.uploadField.split(',')
+      let feild = uploadIndexArr[1]
+      let date = moment(new Date()).format('YYYY/MM/DD')
+      let url = 'live/videos/' + this.form.uuid + '/' + date + '/' + file.uid + '/' + file.name
+      const resToken = await getInfoTokenUploadFile()
+      this.token = resToken.data.token
+      let res = await uploadQiniu(file.raw, this.token, url)
+      if (file.name === 'index.m3u8') {
+        this.$set(this.form, feild, this.uploadfileDomain + res.key)
       }
     },
     async uploadOnchange (file, fileList) {

@@ -9,7 +9,8 @@ import {
   getContentTags,
   getContentTypeList,
   getOnlineList,
-  tagTypes
+  tagTypes,
+  getLevelTypeList
 } from '@/api/course'
 import moment from 'moment'
 import { getMajiaUsers, GetDictTags } from '../../api/course'
@@ -131,7 +132,8 @@ export const course = {
       ITA: 'ita',
       SPA: 'spa'
     },
-    voiceActors: [] // 每个语言的声优列表
+    voiceActors: [], // 每个语言的声优列表
+    levelTypeList: [] // 我的等级分类列表
   },
   mutations: {
     updateConfigInfo (state, configInfo) {
@@ -180,6 +182,9 @@ export const course = {
     },
     updateVoiceActors (state, data) {
       state.voiceActors = data
+    },
+    updataLevelTypeList (state, data) {
+      state.levelTypeList = data
     }
   },
   actions: {
@@ -319,6 +324,15 @@ export const course = {
       if (res.success) {
         console.log(res)
         commit('updateDictTags', res.data)
+      }
+    },
+    // 获取等级分类列表
+    async getLevelTypeList ({ commit }, data) {
+      const res = await getLevelTypeList(data)
+      if (res.success) {
+        let list = res.data.list || []
+        console.log(list)
+        commit('updataLevelTypeList', list)
       }
     }
   },

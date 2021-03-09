@@ -28,14 +28,14 @@
         </div>
       </div>
       <el-table
-        :data="showTableData"
+        :data="allTags"
         style="width: 100%;">
         <el-table-column
           label="序号"
           width="80"
           align="center">
           <template slot-scope="scope">
-            <span>{{scope.$index+(pageRequest.pageNum - 1) * pageRequest.pageSize + 1}}</span>
+            <span>{{scope.$index+(pageRequest.pageNo - 1) * pageRequest.pageSize + 1}}</span>
           </template>
         </el-table-column>
         <el-table-column
@@ -72,17 +72,17 @@
           </template>
         </el-table-column>
       </el-table>
-      <div class="pagination-box">
-        <el-pagination
-          background layout="prev, pager, next"
-          :current-page="pageRequest.pageNum"
-          :page-size="pageRequest.pageSize"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          :total="tagsLists.length"
-          >
-        </el-pagination>
-      </div>
+    </div>
+    <div class="pagination-box">
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="pageRequest.pageNo"
+        :page-sizes="pageSizes"
+        :page-size="pageRequest.pageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="pageRequest.total">
+      </el-pagination>
     </div>
     <edit-comp ref="tagEdit" @addTagItem="initData"/>
     <cropper-dialog ></cropper-dialog>
@@ -93,6 +93,7 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import {
+  getContentTags,
   delTags,
   onlineCourses
 } from '@/api/course'
@@ -108,8 +109,9 @@ export default {
       type: '',
       // 分页信息
       pageRequest: {
-        pageNum: 1,
-        pageSize: 5
+        pageNo: 1,
+        pageSize: 10,
+        total: 0
       },
       allTags: [],
       tagsLists: []
@@ -127,19 +129,16 @@ export default {
     ...mapState({
       tagTypes: state => state.course.tagTypes,
       contentTags: state => state.course.contentTags,
-      userInfo: state => state.user.userInfo
+      userInfo: state => state.user.userInfo,
+      pageSizes: state => state.pageSizes
     })
   },
   mounted () {
     this.getTagTypes()
-    // this.tagsLists = this.contentTags
-    // this.allTags = this.contentTags
-    // console.log(this.contentTags, this.allTags)
   },
   methods: {
     ...mapActions({
-      getTagTypes: 'course/getTagTypes',
-      getContentTags: 'course/getContentTags'
+      getTagTypes: 'course/getTagTypes'
     }),
     typeName (key) {
       let obj = {}
@@ -150,46 +149,32 @@ export default {
       })
       return obj.name
     },
-    async initData () {
-      await this.getContentTags({ pageNo: 0, pageSize: 0, name: this.searchKey, type: this.type })
-      console.log('initData')
-      this.tagsLists = this.contentTags
-      this.allTags = this.contentTags
-      // console.log(this.contentTags, this.allTags)
-      this.tagsLists = this.allTags.filter(item => {
-        if (this.type) {
-          return (item.name.indexOf(this.searchKey) > -1 || item.key.indexOf(this.searchKey) > -1) && (item.type === this.type)
-        } else {
-          return item.name.indexOf(this.searchKey) > -1 || item.key.indexOf(this.searchKey) > -1
+    initData () {
+      getContentTags({
+        pageNo: this.pageRequest.pageNo,
+        pageSize: this.pageRequest.pageSize,
+        name: this.searchKey,
+        type: this.type
+      }).then(res => {
+        if (res.success) {
+          this.allTags = res.data.tags
+          this.pageRequest.total = res.data.total
         }
       })
-      this.handleCurrentChange(this.pageRequest.pageNum)
     },
     // 模糊搜索
     search () {
-      let _this = this
-      console.log(_this.searchKey)
-      this.tagsLists = this.allTags.filter(item => {
-        if (this.type) {
-          return (item.name.indexOf(this.searchKey) > -1 || item.key.indexOf(this.searchKey) > -1) && (item.type === this.type)
-        } else {
-          return item.name.indexOf(this.searchKey) > -1 || item.key.indexOf(this.searchKey) > -1
-        }
-      })
-      // console.log(this.tagsLists)
-      // console.log(this.showTableData)
       this.handleCurrentChange(1)
     },
     handleSizeChange (val) {
       console.log(`每页 ${val} 条`)
       this.pageRequest.pageSize = val
+      this.initData()
     },
     handleCurrentChange (val) {
       console.log(`当前页: ${val}`)
-      this.pageRequest.pageNum = val
-      let starNum = (val - 1) * this.pageRequest.pageSize
-      let endNum = val * this.pageRequest.pageSize
-      this.showTableData = this.tagsLists.slice(starNum, endNum)
+      this.pageRequest.pageNo = val
+      this.initData()
     },
     // 添加
     addTags () {
@@ -266,10 +251,6 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.pagination-box {
-  text-align: center;
-  padding-top: 20px;
-}
 .top-bar {
   padding: 20px 0px 0;
   display: flex;

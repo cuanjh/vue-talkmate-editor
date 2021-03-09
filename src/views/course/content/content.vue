@@ -54,7 +54,7 @@
         </div>
       </div>
       <div class="tips">
-        <span class="desc">(ALT + “↑、↓、←、→” 组合键，能够切换课程目录)</span>
+        <span class="desc">(<kbd>Alt</kbd> + “<kbd>↑</kbd>、<kbd>↓</kbd>、<kbd>←</kbd>、<kbd>→</kbd>” 组合键，能够切换课程目录)</span>
         <el-popover
           placement="right"
           width="400"

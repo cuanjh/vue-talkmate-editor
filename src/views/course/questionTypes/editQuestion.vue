@@ -16,6 +16,15 @@
           <el-form-item label="名称: " prop="name"  :rules="{ required: true, message: '名称不能为空', trigger: 'blur'}">
             <el-input v-model="form.name" maxlength="25" show-word-limit></el-input>
           </el-form-item>
+          <el-form-item label="提示语：" class="name" required>
+            <el-row v-for="l in langInfos" :key="'title' + l.langKey">
+              <el-form-item  class="input-box" :prop="'title.' + l.langKey"
+                :rules="[{required: true, message: '提示语不能为空', trigger: 'blur'}]">
+                <el-input v-model="form.title[l.langKey]" maxlength="30" show-word-limit></el-input>
+                <span>{{'(' + l.name + ')'}}</span>
+              </el-form-item>
+            </el-row>
+          </el-form-item>
           <el-form-item v-show="false" label="文件类型: ">
             <el-select v-model="form.model_key" placeholder="请选择">
               <el-option
@@ -65,6 +74,7 @@ export default {
       form: {
         type: '',
         name: '',
+        title: {},
         desc: '',
         list_order: 0,
         model_key: '',
@@ -74,6 +84,7 @@ export default {
   },
   computed: {
     ...mapState({
+      langInfos: state => state.course.langInfos,
       modelList: state => state.course.modelList
     })
   },
@@ -87,6 +98,7 @@ export default {
           type: data.type,
           name: data.name,
           desc: data.desc,
+          title: data.title ? data.title : {},
           model_key: data.model_key,
           model_keys: data.model_keys ? data.model_keys : [],
           list_order: data.list_order
@@ -213,4 +225,12 @@ export default {
 .el-input__count {
   line-height: 10px;
 }
+
+/* .input-box .el-input {
+  margin-bottom: 10px;
+}
+.input-box {
+  display: flex;
+  align-items: center;
+} */
 </style>
