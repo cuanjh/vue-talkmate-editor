@@ -2,7 +2,6 @@
   <el-dialog
     title="等级分类管理"
     :visible.sync="dialogVisible"
-    @close="close"
     width="500px">
     <div class="edit-tags">
       <div class="title">新建</div>
@@ -104,9 +103,6 @@ export default {
       } catch (e) {
         console.log(e)
       }
-    },
-    close () {
-      this.$emit('loadTags')
     }
   }
 }

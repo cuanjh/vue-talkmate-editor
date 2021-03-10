@@ -750,7 +750,7 @@ export default {
         this.$refs['rightMenuForm'].hide()
       }
     }
-    getContentTags({ page: 0, pageSize: 0 }).then(res => {
+    getContentTags({ pageNo: 1, pageSize: 999 }).then(res => {
       this.contentTags = res.data.tags
     })
   },

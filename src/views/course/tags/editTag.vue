@@ -73,7 +73,7 @@
           <el-form-item label="封面: ">
             <el-tag type="warning">请上传webp格式的图片，第一张图为课程列表封面，第二张图为学习首页课程封面，第三张图为课程列表宝贝作品封面</el-tag>
             <div class="img-box big-img-box">
-              <div class="img" id="cover-sort" v-if="form.cover.length > 0">
+              <div class="img" id="cover-sort" v-if="form.cover && form.cover.length > 0">
                 <div
                   class="block"
                   v-for="(cover, index) in form.cover"
@@ -246,10 +246,14 @@ export default {
       })
       if (this.type === 'edit') {
         this.form = params.params
+        this.form.title = this.form.title ? this.form.title : {}
+        this.form.desc = this.form.desc ? this.form.desc : {}
         let flag = []
-        params.params.flag.map(item => {
-          flag.push({ name: item, url: this.assetsDomain + item })
-        })
+        if (params.params.flag && params.params.flag.length > 0) {
+          params.params.flag.map(item => {
+            flag.push({ name: item, url: this.assetsDomain + item })
+          })
+        }
         this.flag = flag
       } else {
         let obj = {
@@ -266,7 +270,7 @@ export default {
         this.form = obj
       }
       setTimeout(() => {
-        if (this.form.cover.length > 0) {
+        if (this.form.cover && this.form.cover.length > 0) {
           this.resetSortable()
         }
       }, 0)

@@ -80,6 +80,11 @@
         :formatter="formatterCourseType">
       </el-table-column>
       <el-table-column
+        width="120"
+        label="等级分类"
+        :formatter="formatterLevelType">
+      </el-table-column>
+      <el-table-column
         width="140"
         label="课程编码"
         prop="code">
@@ -251,6 +256,7 @@ export default {
       this.initData()
     })
     this.getCourseTypes()
+    this.getLevelTypeList({ pageNo: 1, pageSize: 999 })
     this.$bus.on('handlerClick', (params) => {
       console.log(params)
       const type = params.type
@@ -286,13 +292,15 @@ export default {
       locale: state => state.course.locale,
       courseTypes: state => state.course.courseTypes,
       version: state => state.course.version,
+      levelTypeList: state => state.course.levelTypeList,
       pageSizes: state => state.pageSizes
     })
   },
   methods: {
     ...mapActions({
       getLangList: 'course/getLangList',
-      getCourseTypes: 'course/getCourseTypes'
+      getCourseTypes: 'course/getCourseTypes',
+      getLevelTypeList: 'course/getLevelTypeList'
     }),
     async initData () {
       // 初始化声优列表信息
@@ -449,6 +457,16 @@ export default {
       })
       if (ct) {
         desc = ct.name
+      }
+      return desc
+    },
+    formatterLevelType (obj) {
+      let desc = ''
+      let ct = this.levelTypeList.find(item => {
+        return item.uuid === obj.levelCatUuid
+      })
+      if (ct) {
+        desc = ct.title
       }
       return desc
     },

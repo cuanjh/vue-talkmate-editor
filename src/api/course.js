@@ -2133,3 +2133,68 @@ export const updateLevelType = (data) => {
     data
   })
 }
+
+/**
+ * @Summary 删除等级分类
+ * @param {*} data
+ * @Router /editor/level_cat/delete [post]
+ */
+export const delLevelType = (data) => {
+  return service({
+    url: '/editor/level_cat/delete',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 获取等级列表
+ * @param {*} data
+ * @Router /editor/learn_level/list [post]
+ */
+export const getLevelList = (data) => {
+  return service({
+    url: '/editor/learn_level/list',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 创建等级
+ * @param {*} data
+ * @Router /editor/learn_level/create [post]
+ */
+export const createLearnLevel = (data) => {
+  return service({
+    url: '/editor/learn_level/create',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 更新等级
+ * @param {*} data
+ * @Router /editor/learn_level/update [post]
+ */
+export const updateLearnLevel = (data) => {
+  return service({
+    url: '/editor/learn_level/update',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 删除等级
+ * @param {*} data
+ * @Router /editor/learn_level/delete [post]
+ */
+export const delLearnLevel = (data) => {
+  return service({
+    url: '/editor/learn_level/delete',
+    method: 'post',
+    data
+  })
+}

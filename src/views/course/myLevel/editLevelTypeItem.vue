@@ -1,7 +1,7 @@
 <template>
   <div class="edit-tag-item">
     <input type="text" :class="{'require': isRequire}"  v-model="item.title">
-    <a href="javascript:;" @click="edit()">修改</a>
+    <a href="javascript:;" @click="edit()">更新</a>
     <a href="javascript:;" @click="delTag()">删除</a>
   </div>
 </template>
@@ -10,7 +10,7 @@
 import { mapActions } from 'vuex'
 import {
   updateLevelType,
-  delImageTag
+  delLevelType
 } from '@/api/course'
 export default {
   props: ['item'],
@@ -39,7 +39,7 @@ export default {
       updateLevelType: 'course/updateLevelType'
     }),
     loadData () {
-      this.getLevelTypeList({ pageNo: 1 })
+      this.getLevelTypeList({ pageNo: 1, pageSize: 99 })
     },
     edit () {
       console.log(this.item)
@@ -54,15 +54,14 @@ export default {
       console.log(params)
       updateLevelType(params).then(res => {
         if (res.success) {
-          this.$notify({
-            title: '成功',
-            message: res.msg,
+          this.$message({
+            message: '更新成功',
             type: 'success'
           })
+          this.loadData()
         } else {
-          this.$notify({
-            title: '警告',
-            message: res.msg,
+          this.$message({
+            message: '更新失败',
             type: 'warning'
           })
         }
@@ -74,19 +73,19 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        delImageTag({ tagKey: this.tag.TagKey }).then(res => {
+        delLevelType({ uuid: this.item.uuid }).then(res => {
           if (res.success) {
             this.$message({
               type: 'success',
               message: '删除成功'
             })
-            this.$emit('initData')
+            this.loadData()
           }
         })
       }).catch(() => {
         this.$message({
           type: 'info',
-          message: '已取消下架'
+          message: '已取消删除'
         })
       })
     }

@@ -23,14 +23,26 @@
             { required: true, message: '请选择分类', trigger: 'blur' }
           ]">
             <el-select v-model="form.course_type"
-              placeholder="请选择课程分类"
-              @change="changeType">
+              placeholder="请选择课程分类">
               <el-option
                 v-for="item in courseTypes"
                 :key="item.name"
                 :label="item.name"
                 :value="item.type"
                 :disabled="item.disabled ? item.disabled : false">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="等级分类：" prop="levelCatUuid" :rules="[
+            { required: true, message: '请选择等级分类', trigger: 'blur' }
+          ]">
+            <el-select v-model="form.levelCatUuid"
+              placeholder="请选择等级分类">
+              <el-option
+                v-for="item in levelTypeList"
+                :key="item.uuid"
+                :label="item.title"
+                :value="item.uuid">
               </el-option>
             </el-select>
           </el-form-item>
@@ -180,7 +192,8 @@ export default {
         title: {}, // 标题
         subTitle: {},
         tag: {},
-        image: ''
+        image: '',
+        levelCatUuid: ''
       },
       bigImgUrl: '',
       bigImgs: [],
@@ -200,7 +213,8 @@ export default {
     ...mapState({
       assetsDomain: state => state.course.assetsDomain,
       langInfos: state => state.course.langInfos,
-      voiceActors: state => state.course.voiceActors
+      voiceActors: state => state.course.voiceActors,
+      levelTypeList: state => state.course.levelTypeList
     }),
     groupVoiceActors () {
       if (this.voiceActors && this.voiceActors.length > 0) {
@@ -279,7 +293,8 @@ export default {
           title: {}, // 标题
           subTitle: {},
           tag: {},
-          image: ''
+          image: '',
+          levelCatUuid: ''
         }
         this.form = obj
         this.bigImgUrl = ''
@@ -516,7 +531,8 @@ export default {
               name: this.form.name,
               title: this.form.title, // 标题
               subTitle: this.form.subTitle,
-              tag: this.form.tag
+              tag: this.form.tag,
+              levelCatUuid: this.form.levelCatUuid
             }
             addCourse(obj).then(res => {
               console.log(res)
@@ -540,7 +556,8 @@ export default {
                 name: this.form.name,
                 title: this.form.title,
                 subTitle: this.form.subTitle,
-                tag: this.form.tag
+                tag: this.form.tag,
+                levelCatUuid: this.form.levelCatUuid
               },
               uuid: this.form.uuid
             }
@@ -721,6 +738,7 @@ export default {
 .course-content .el-form-item__content {
   display: flex!important;
   flex-direction: column;
+  flex: 1;
 }
 .course-content .input-box .el-input {
   margin-bottom: 10px;

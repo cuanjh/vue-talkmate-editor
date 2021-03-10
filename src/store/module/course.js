@@ -332,6 +332,11 @@ export const course = {
       if (res.success) {
         let list = res.data.list || []
         console.log(list)
+        if (list.length > 0) {
+          list = list.filter(item => {
+            return item.isDel === false
+          })
+        }
         commit('updataLevelTypeList', list)
       }
     }
