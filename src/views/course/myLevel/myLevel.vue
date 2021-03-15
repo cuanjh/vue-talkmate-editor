@@ -29,6 +29,7 @@
     </div>
     <el-table
       class="course-table"
+      height="700"
       :data="list"
       @select="select"
       @select-all="selectAll"
@@ -65,8 +66,7 @@
         </template>
       </el-table-column>
       <el-table-column
-        label="数据"
-        width="200px">
+        label="数据">
         <template slot-scope="scope">
           <span v-for="(item, i) in scope.row.statistics" :key="i">
             {{ item.num + item['zh-CN'] + (item['en'] ? '（'+ item['en'] + '）' : '') }}
@@ -174,12 +174,15 @@ export default {
         pageNo: this.pageRequest.pageNo,
         pageSize: this.pageRequest.pageSize
       })
-      if (res.success) {
-        this.list = res.data.list
-        this.pageRequest.total = res.data.total
-      } else {
-        this.pageRequest.total = 0
-      }
+      this.list = res.data.list
+      this.pageRequest.total = res.data.total
+      setTimeout(() => {
+        document.querySelector('.admin-box').scrollTop = 0
+        const scrollTblEle = document.querySelector('.el-table--scrollable-y .el-table__body-wrapper')
+        if (scrollTblEle) {
+          scrollTblEle.scrollTop = 0
+        }
+      }, 100)
     },
     editLevel (row) {
       let obj = {

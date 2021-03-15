@@ -52,6 +52,7 @@
       </div>
     </div>
     <el-table
+      height="700"
       class="course-table"
       :data="courseList"
       @select="select"
@@ -316,6 +317,13 @@ export default {
       } else {
         this.pageRequest.total = 0
       }
+      setTimeout(() => {
+        document.querySelector('.admin-box').scrollTop = 0
+        const scrollTblEle = document.querySelector('.el-table--scrollable-y .el-table__body-wrapper')
+        if (scrollTblEle) {
+          scrollTblEle.scrollTop = 0
+        }
+      }, 100)
     },
     initVoiceActors () {
       getVoiceActorList({

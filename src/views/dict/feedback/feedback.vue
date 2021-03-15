@@ -146,8 +146,8 @@ export default {
         this.list = []
       }
       let res = await getFeedbackList({
-        page_index: this.currentPage,
-        page_size: this.pageSize,
+        pageNo: this.currentPage,
+        pageSize: this.pageSize,
         desc: this.searchKey,
         sort_type: -1,
         text_field: 'created_time'

@@ -39,6 +39,7 @@
       </div>
     </div>
     <el-table
+      height="700"
       :data="list"
       style="width: 100%;">
       <el-table-column
@@ -199,10 +200,15 @@ export default {
         sort_type: -1,
         text_field: 'createdTime'
       })
-      if (res.success && res.data) {
-        this.list = res.data.list
-        this.pageRequest.total = res.data.total
-      }
+      this.list = res.data.list
+      this.pageRequest.total = res.data.total
+      setTimeout(() => {
+        document.querySelector('.admin-box').scrollTop = 0
+        const scrollTblEle = document.querySelector('.el-table--scrollable-y .el-table__body-wrapper')
+        if (scrollTblEle) {
+          scrollTblEle.scrollTop = 0
+        }
+      }, 100)
     },
     handleSizeChange (val) {
       console.log(`每页 ${val} 条`)

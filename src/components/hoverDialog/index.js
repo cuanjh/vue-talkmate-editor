@@ -7,7 +7,7 @@ let hoverDom = null
 let flag = false
 function toggleHoverDialog (params) {
   console.log(params)
-  if (!hoverDom) {
+  if (!hoverDom && params.show) {
     hoverDom = new HoverDialog({
       el: document.createElement('div'),
       data () {
@@ -46,7 +46,7 @@ function toggleHoverDialog (params) {
   hoverDom.$el.addEventListener('mouseenter', () => {
     setTimeout(() => {
       flag = true
-    }, 500)
+    }, 200)
   })
   if (params.show) {
     document.body.appendChild(hoverDom.$el)

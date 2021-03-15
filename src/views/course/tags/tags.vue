@@ -28,6 +28,7 @@
         </div>
       </div>
       <el-table
+        height="700"
         :data="allTags"
         style="width: 100%;">
         <el-table-column
@@ -159,6 +160,13 @@ export default {
         if (res.success) {
           this.allTags = res.data.tags
           this.pageRequest.total = res.data.total
+          setTimeout(() => {
+            document.querySelector('.admin-box').scrollTop = 0
+            const scrollTblEle = document.querySelector('.el-table--scrollable-y .el-table__body-wrapper')
+            if (scrollTblEle) {
+              scrollTblEle.scrollTop = 0
+            }
+          }, 100)
         }
       })
     },

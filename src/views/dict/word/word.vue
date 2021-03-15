@@ -116,7 +116,7 @@ export default {
       isShow: false,
       currentPage: 1,
       total: 0,
-      pageSize: 50,
+      pageSize: 5,
       scrollTop: 0,
       isShowPagination: false
     }
@@ -162,15 +162,15 @@ export default {
         content: this.searchKey,
         from: this.fromLang,
         to: this.toLang,
-        page_index: this.currentPage,
-        page_size: this.pageSize,
+        pageNo: this.currentPage,
+        pageSize: this.pageSize,
         searchType: this.searchType,
-        text_field: 'content',
+        text_field: '',
         sort_type: 1
       })
       if (res.success && res.data) {
         let copy = this.list.slice()
-        this.list = copy.concat(res.data)
+        this.list = copy.concat(res.data.list)
         setTimeout(() => {
           this.$refs['content'].scrollTop = this.scrollTop
           onlyOne = true

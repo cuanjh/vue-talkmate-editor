@@ -15,6 +15,7 @@
         <el-button style="outline:none;" type="primary" class="btnAdd" @click="sortType()">排序</el-button>
       </div>
       <el-table
+        height="700"
         :data="contentTypeList"
         style="width: 100%;">
         <el-table-column
@@ -44,7 +45,6 @@
           </template>
         </el-table-column>
         <el-table-column
-          width="120"
           label="提示语">
           <template slot-scope="scope" v-if="scope.row.title && Object.keys(scope.row.title).length">
             <div v-for="l in langInfos" :key="l.langKey">
@@ -140,7 +140,17 @@ export default {
         if (res.success) {
           this.contentTypeList = res.data.types
           this.pageRequest.total = res.data.total
+        } else {
+          this.contentTypeList = []
+          this.pageRequest.total = 0
         }
+        setTimeout(() => {
+          document.querySelector('.admin-box').scrollTop = 0
+          const scrollTblEle = document.querySelector('.el-table--scrollable-y .el-table__body-wrapper')
+          if (scrollTblEle) {
+            scrollTblEle.scrollTop = 0
+          }
+        }, 100)
       })
     },
     handleSizeChange (val) {
@@ -193,9 +203,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.question-content {
-  padding-bottom: 50px;
-}
 .top-bar {
   padding: 20px 0px 0;
   text-align: right;

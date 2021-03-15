@@ -2198,3 +2198,107 @@ export const delLearnLevel = (data) => {
     data
   })
 }
+
+/**
+ * @Summary 获取视频标签列表
+ * @param {*} data
+ * @Router /editor/video_tag/list [post]
+ */
+export const getVideoTagList = (data) => {
+  return service({
+    url: '/editor/video_tag/list',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 创建视频标签
+ * @param {*} data
+ * @Router /editor/video_tag/create [post]
+ */
+export const createVideoTag = (data) => {
+  return service({
+    url: '/editor/video_tag/create',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 更新视频标签
+ * @param {*} data
+ * @Router /editor/video_tag/update [post]
+ */
+export const updateVideoTag = (data) => {
+  return service({
+    url: '/editor/video_tag/update',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 删除视频标签
+ * @param {*} data
+ * @Router /editor/video_tag/delete [post]
+ */
+export const delVideoTag = (data) => {
+  return service({
+    url: '/editor/video_tag/delete',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 获取视频标签列表
+ * @param {*} data
+ * @Router /editor/video/list [post]
+ */
+export const getVideoList = (data) => {
+  return service({
+    url: '/editor/video/list',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 创建视频
+ * @param {*} data
+ * @Router /editor/video/create [post]
+ */
+export const createVideo = (data) => {
+  return service({
+    url: '/editor/video/create',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 更新视频信息
+ * @param {*} data
+ * @Router /editor/video/update [post]
+ */
+export const updateVideo = (data) => {
+  return service({
+    url: '/editor/video/update',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 删除视频信息
+ * @param {*} data
+ * @Router /editor/video/delete [post]
+ */
+export const delVideo = (data) => {
+  return service({
+    url: '/editor/video/delete',
+    method: 'post',
+    data
+  })
+}

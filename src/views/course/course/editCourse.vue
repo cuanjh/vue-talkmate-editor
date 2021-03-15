@@ -86,7 +86,7 @@
             <el-upload
               list-type="picture-card"
               action="#"
-              accept="image/webp;image/png;image/jpg;image/jpeg"
+              accept="image/webp,image/png,image/jpg,image/jpeg"
               :file-list="bigImgs"
               :auto-upload="false"
               :on-change="onChangeImage"
@@ -99,7 +99,7 @@
             <el-upload
               list-type="picture-card"
               action="#"
-              accept="image/webp;image/png;image/jpg;image/jpeg"
+              accept="image/webp,image/png,image/jpg,image/jpeg"
               :file-list="smlImgs"
               :auto-upload="false"
               :on-change="onChangeImageSml"
@@ -112,7 +112,7 @@
             <el-upload
               class="avatar-uploader"
               action="#"
-              accept="image/webp;image/png;image/jpg;image/jpeg"
+              accept="image/webp,image/png,image/jpg,image/jpeg"
               :show-file-list="false"
               :auto-upload="false"
               :on-change="onChangeImage">

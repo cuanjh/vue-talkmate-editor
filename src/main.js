@@ -19,8 +19,8 @@ import 'element-ui/lib/theme-chalk/index.css'
 import axios from 'axios'
 
 // 引入video.js
-// import Videojs from 'video.js'
-// import 'video.js/dist/video-js.css'
+import Videojs from 'video.js'
+import 'video.js/dist/video-js.css'
 
 import VueIntro from 'vue-introjs'
 import 'intro.js/introjs.css'
@@ -38,7 +38,7 @@ Vue.filter('urlFix', urlfix)
 
 Vue.config.productionTip = false
 Vue.prototype.$http = axios
-// Vue.prototype.$video = Videojs
+Vue.prototype.$video = Videojs
 
 new Vue({
   render: h => h(App),

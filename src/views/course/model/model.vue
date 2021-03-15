@@ -5,6 +5,7 @@
         <el-button style="outline:none;" type="primary" class="btnAdd" @click="addModel()">添加</el-button>
       </div>
       <el-table
+        height="700"
         :data="modelList"
         style="width: 100%;">
         <el-table-column
@@ -25,7 +26,6 @@
           </template>
         </el-table-column>
         <el-table-column
-          width="300"
           label="名称">
           <template slot-scope="scope">
             <el-tooltip :content="scope.row.name" width="300" placement="top" effect="light">
@@ -34,6 +34,7 @@
           </template>
         </el-table-column>
         <el-table-column
+          width="200"
           fixed="right"
           label="操作">
           <template slot-scope="scope">
@@ -104,6 +105,13 @@ export default {
         console.log(res)
         this.modelList = res.data.models
         this.pageRequest.total = res.data.total
+        setTimeout(() => {
+          document.querySelector('.admin-box').scrollTop = 0
+          const scrollTblEle = document.querySelector('.el-table--scrollable-y .el-table__body-wrapper')
+          if (scrollTblEle) {
+            scrollTblEle.scrollTop = 0
+          }
+        }, 100)
       })
     },
     handleSizeChange (val) {

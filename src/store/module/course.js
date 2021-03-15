@@ -10,7 +10,8 @@ import {
   getContentTypeList,
   getOnlineList,
   tagTypes,
-  getLevelTypeList
+  getLevelTypeList,
+  getVideoTagList
 } from '@/api/course'
 import moment from 'moment'
 import { getMajiaUsers, GetDictTags } from '../../api/course'
@@ -133,7 +134,8 @@ export const course = {
       SPA: 'spa'
     },
     voiceActors: [], // 每个语言的声优列表
-    levelTypeList: [] // 我的等级分类列表
+    levelTypeList: [], // 我的等级分类列表
+    videoTagList: [] // 视频标签列表
   },
   mutations: {
     updateConfigInfo (state, configInfo) {
@@ -185,6 +187,9 @@ export const course = {
     },
     updataLevelTypeList (state, data) {
       state.levelTypeList = data
+    },
+    updateVideoTagList (state, data) {
+      state.videoTagList = data
     }
   },
   actions: {
@@ -338,6 +343,20 @@ export const course = {
           })
         }
         commit('updataLevelTypeList', list)
+      }
+    },
+    // 获取视频标签列表
+    async getVideoTagList ({ commit }, data) {
+      const res = await getVideoTagList(data)
+      if (res.success) {
+        let list = res.data.list || []
+        console.log(list)
+        if (list.length > 0) {
+          list = list.filter(item => {
+            return item.isDel === false
+          })
+        }
+        commit('updateVideoTagList', list)
       }
     }
   },

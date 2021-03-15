@@ -34,7 +34,7 @@
           <el-upload
             list-type="picture-card"
             action="#"
-            accept="image/webp;image/png;image/jpg;image/jpeg"
+            accept="image/webp,image/png,image/jpg,image/jpeg"
             :file-list="flags"
             :auto-upload="false"
             :on-change="onChangeImage"

@@ -6,6 +6,7 @@
         <el-button style="outline:none;" type="primary" class="btnAdd" @click="addLang()">创建新语言</el-button>
         <el-button style="outline:none;" type="primary" class="btnSort" @click="previewSort()">语言排序</el-button>
         <el-button
+            v-show="false"
             style="outline:none;"
             type="success"
             class="btnOnline"
@@ -13,6 +14,7 @@
       </div>
     </div>
     <el-table
+      height="700px"
       :data="langList"
       @select="select"
       @select-all="selectAll"
@@ -41,7 +43,6 @@
         prop="lan_code">
       </el-table-column>
       <el-table-column
-        width="220"
         label="名称">
         <template slot-scope="scope" v-if="Object.keys(scope.row.title).length">
           <!-- <div v-for="l in langInfos" :key="l.langKey">
@@ -100,17 +101,17 @@
         </template>
       </el-table-column> -->
       <el-table-column
-        width="80"
-        label="是否热门">
-        <template slot-scope="scope">
-          <i :class="scope.row.is_hot ? 'icon-yes' : 'icon-no'"></i>
-        </template>
-      </el-table-column>
-      <el-table-column
         width="100"
         label="是否显示">
         <template slot-scope="scope">
           <i :class="scope.row.is_show ? 'icon-yes' : 'icon-no'"></i>
+        </template>
+      </el-table-column>
+      <el-table-column
+        width="80"
+        label="是否热门">
+        <template slot-scope="scope">
+          <i :class="scope.row.is_hot ? 'icon-yes' : 'icon-no'"></i>
         </template>
       </el-table-column>
       <el-table-column fixed="right" width="300" label="操作">
@@ -206,6 +207,13 @@ export default {
         this.langList = res.data.list
         this.pageRequest.total = res.data.total
         this.assetsUrl = res.data.assetsUrl
+        setTimeout(() => {
+          document.querySelector('.admin-box').scrollTop = 0
+          const scrollTblEle = document.querySelector('.el-table--scrollable-y .el-table__body-wrapper')
+          if (scrollTblEle) {
+            scrollTblEle.scrollTop = 0
+          }
+        }, 100)
       }
     },
     handleSizeChange (val) {
@@ -297,7 +305,7 @@ export default {
             arr.push(i.code)
           })
         }
-        onlineCourses({ onlineType: item.dbEnv, hasCourse: true, hasTags: false, courseCodes: arr }).then(res => {
+        onlineCourses({ hasLangs: true, tagLangs: arr }).then(res => {
           if (res.success) {
             this.$message({
               type: 'success',

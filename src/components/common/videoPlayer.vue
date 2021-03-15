@@ -1,60 +1,77 @@
 <template>
-  <div>
-    <video ref="videoPlayer" class="video-js"></video>
-  </div>
+  <el-dialog
+    :visible.sync="dialogVisible"
+    @close="close">
+    <video id="myVideo" class="video-js"></video>
+  </el-dialog>
 </template>
 
 <script>
-import videojs from 'video.js'
+import { mapState } from 'vuex'
 
 export default {
   name: 'VideoPlayer',
-  props: {
-    options: {
-      type: Object,
-      default () {
-        return {}
+  data () {
+    return {
+      dialogVisible: false,
+      player: null,
+      options: {
+        controls: true,
+        sources: []
       }
     }
   },
-  data () {
-    return {
-      player: null
-    }
-  },
-  mounted () {
-    this.player = videojs(this.$refs.videoPlayer, this.options, function onPlayerReady () {
-      videojs.log('Your player is ready!')
-      console.log(this)
+  computed: {
+    ...mapState({
+      assetsDomain: state => state.course.assetsDomain
     })
   },
   methods: {
-    show (url) {
-      this.player.src([
+    show (video) {
+      const sources = [
         {
-          type: 'video/mp4',
-          src: url
+          src: this.assetsDomain + video.mp4,
+          type: 'video/mp4'
+        },
+        {
+          src: this.assetsDomain + video.m3u8,
+          type: 'application/x-mpegURL'
         }
-      ])
-      this.player.autoplay()
+      ]
+      this.dialogVisible = true
+      if (this.player) {
+        this.player.src(sources)
+        this.player.play()
+      } else {
+        this.options.sources = sources
+        this.$nextTick(() => {
+          let ele = document.getElementById('myVideo')
+          this.player = this.$video(ele, this.options, function onPlayerReady () {
+            // videojs.log('Your player is ready!')
+            console.log(this)
+            ele.play()
+          })
+        })
+      }
     },
     close () {
-      console.log(this.player)
       if (this.player) {
         this.player.pause()
       }
     }
   },
   beforeDestroy () {
-    this.close()
+    // this.close()
     if (this.player) {
       this.player.dispose()
     }
   }
 }
 </script>
-
 <style>
+.video-js {
+  width: 100%;
+}
 .video-js .vjs-big-play-button {
   display: none;
 }
