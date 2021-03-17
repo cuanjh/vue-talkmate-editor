@@ -305,7 +305,7 @@ export default {
             arr.push(i.lan_code)
           })
         }
-        onlineCourses({ hasLangs: true, tagLangs: arr }).then(res => {
+        onlineCourses({ onlineType: item.dbEnv, hasLangs: true, tagLangs: arr }).then(res => {
           if (res.success) {
             this.$message({
               type: 'success',
