@@ -302,7 +302,7 @@ export default {
         let arr = []
         if (this.selLangList.length) {
           this.selLangList.forEach(i => {
-            arr.push(i.code)
+            arr.push(i.lan_code)
           })
         }
         onlineCourses({ hasLangs: true, tagLangs: arr }).then(res => {
