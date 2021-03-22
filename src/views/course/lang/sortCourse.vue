@@ -86,7 +86,7 @@ export default {
     async initData () {
       let res = await getLangList({ 'pageNo': 0, 'pageSize': 999 })
       if (res.success) {
-        let sortLangs = res.data.langs.sort((a, b) => {
+        let sortLangs = res.data.list.sort((a, b) => {
           return a.list_order - b.list_order
         })
         this.allLangs = sortLangs

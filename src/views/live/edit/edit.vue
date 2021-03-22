@@ -499,7 +499,7 @@ export default {
     this.langList = []
     getLangList({ 'pageNo': 0, 'pageSize': 999 }).then(res => {
       console.log(res)
-      let langs = res.data.langs
+      let langs = res.data.list
       langs = langs.sort((a, b) => {
         if (a.is_hot > b.is_hot) {
           return -1
