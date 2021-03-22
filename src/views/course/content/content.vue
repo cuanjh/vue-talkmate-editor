@@ -799,6 +799,7 @@ export default {
           params['pUUID'] = this.uuid
         } else {
           params['pUUID'] = this.version.uuid
+          this.uuid = this.version.uuid
         }
       }
       params['trackNum'] = index - 1
