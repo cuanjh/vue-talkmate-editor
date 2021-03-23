@@ -23,4 +23,9 @@ export default {
 }
 </script>
 <style lang="scss">
+.el-submenu {
+  .is-active {
+    background-color: rgb(12, 49, 76) !important;
+  }
+}
 </style>
