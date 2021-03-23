@@ -85,7 +85,6 @@
         width="120">
         <template slot-scope="scope">
           <el-button @click="handleApprove(scope.row)" type="text" size="small">审核</el-button>
-          <el-button @click="handleFrozen(scope.row)" type="text" size="small">冻结</el-button>
           <el-button @click="handleEdit(scope.row)" type="text" size="small">编辑</el-button>
         </template>
       </el-table-column>

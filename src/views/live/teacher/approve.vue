@@ -77,6 +77,14 @@
         <el-image v-show="form.certificate_front" :src="uploadfileDomain + form.certificate_front" fit="cover"></el-image>
         <el-image v-show="form.certificate_back" :src="uploadfileDomain + form.certificate_back" fit="cover"></el-image>
       </el-form-item>
+      <el-form-item label="审核状态：">
+        <el-radio-group v-model="form.status">
+          <!-- <el-radio :label="1">待认证</el-radio> -->
+          <el-radio :label="2">不通过</el-radio>
+          <el-radio :label="3">通过</el-radio>
+          <el-radio :label="4">冻结</el-radio>
+        </el-radio-group>
+      </el-form-item>
       <el-form-item label="审核意见：">
         <el-input
           type="textarea"
@@ -87,8 +95,7 @@
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
-      <el-button @click="handleApprove(2)">审核不通过</el-button>
-      <el-button type="primary" @click="handleApprove(3)">审核通过</el-button>
+      <el-button @click="handleApprove()">确定</el-button>
     </span>
   </el-dialog>
 </template>
@@ -123,7 +130,8 @@ export default {
         lan_code: '',
         introduction: '',
         certificate_front: '',
-        certificate_back: ''
+        certificate_back: '',
+        status: 0
       }
     }
   },
@@ -150,6 +158,7 @@ export default {
       this.form.birth_date = getAge(params.birth_date)
       this.form.address = params.address
       this.form.live_nickname = params.live_nickname
+      this.form.status = params.status
       let langs = []
       if (params.lan_code.length && this.langs.length) {
         params.lan_code.forEach(item => {
@@ -165,8 +174,9 @@ export default {
       this.form.certificate_back = params.certificate_back
       console.log(this.form)
     },
-    handleApprove (status) {
-      if (status === 2 && !this.content) {
+    handleApprove () {
+      let status = this.form.status
+      if ((status === 2 || status === 4) && !this.content) {
         this.$message({
           type: 'warning',
           message: '请填写审核意见！'
