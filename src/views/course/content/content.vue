@@ -218,9 +218,9 @@ export default {
     CropperDialog
   },
   created () {
-    this.getModelList({ pageNo: 0, pageSize: 0 })
+    this.getModelList({ pageNo: 1, pageSize: 999 })
     this.getContentTypes()
-    this.getContentTags({ pageNo: 0, pageSize: 0 })
+    this.getContentTags({ pageNo: 1, pageSize: 99999 })
     this.getAuthorityUsers()
   },
   mounted () {
