@@ -48,6 +48,7 @@
         </el-form-item>
         <el-form-item label="父节点">
           <el-cascader
+            @change="changeCas"
             v-model="parentIds"
             :options="tableData"
             :props="{ checkStrictly: true, value: 'ID', label: 'nickName' }"
@@ -217,6 +218,9 @@ export default {
       this.parentIds = [parseInt(this.form.parentId)]
       this.dialogFormVisible = true
       this.isEdit = true
+    },
+    changeCas () {
+      console.log(this.parentIds)
     }
   },
   created () {

@@ -582,6 +582,12 @@
           <div class="text-radar-sound" v-if="f.type == 'textRadar'">
             <audio v-if="contents[activeFormIndex]['sound']" :src="assetsDomain + contents[activeFormIndex]['sound']" controls></audio>
           </div>
+          <!-- cascader -->
+          <el-cascader
+            v-model="contents[activeFormIndex]['' + f.feild + '']"
+            :props="props"
+            v-if="f.type == 'cascader'">
+          </el-cascader>
         </el-form-item>
         <el-form-item v-if="f.type == 'button'" style="text-align:center">
           <el-button type="primary" @click="analysisData(f.data_from)">{{f.name}}</el-button>
@@ -688,7 +694,12 @@ import {
   addMoreImages,
   cardAeneasJob,
   getContentTags,
-  getVoiceActorList
+  getVoiceActorList,
+  getLangList,
+  getCourseList,
+  getCourseVersionList,
+  getCatalogList,
+  getContent
 } from '@/api/course'
 import {
   uploadQiniu
@@ -699,6 +710,75 @@ import moment from 'moment'
 export default {
   data () {
     return {
+      props: {
+        lazy: true,
+        lazyLoad (node, resolve) {
+          const { level } = node
+          if (level === 0) {
+            getLangList({ pageNo: 1, pageSize: 999 }).then(res => {
+              const lang = res.data.list
+              const engLang = lang.find(l => {
+                return l.lan_code.toLowerCase() === 'eng'
+              })
+              const nodes = [{
+                value: engLang.lan_code,
+                label: engLang.title['zh-CN'],
+                leaf: false
+              }]
+              resolve(nodes)
+            })
+          } else if (level === 1) {
+            getCourseList({ 'lan_code': node.value, pageNo: 1, pageSize: 999 }).then(res => {
+              const courses = res.data.courses
+              const nodes = courses.map(item => ({
+                value: item.uuid,
+                label: item.name,
+                leaf: false
+              }))
+              resolve(nodes)
+            })
+          } else if (level === 2) {
+            getCourseVersionList({ parent_uuid: node.value, pageNo: 0, pageSize: 0 }).then(res => {
+              const contents = res.data.contents.filter(f => f.is_show)
+              const nodes = contents.map(item => ({
+                value: item.uuid,
+                label: item.name,
+                leaf: false
+              }))
+              resolve(nodes)
+            })
+          } else {
+            if (node.data.type === 'content') {
+              console.log('contentTypes', this.$store)
+              getContent({ content_model: node.data.content_model, parent_uuid: node.value }).then(res => {
+                const contents = res.data.contents.sort((a, b) => {
+                  return a.list_order - b.list_order
+                })
+                const nodes = contents.map(item => ({
+                  value: item.uuid,
+                  label: item.sentence + '(' + item.type + ')',
+                  leaf: true
+                }))
+                resolve(nodes)
+              })
+            } else {
+              getCatalogList({ parent_uuid: node.value }).then(res => {
+                const catalogs = res.data.catalogs.filter(f => f.is_show).sort((a, b) => {
+                  return a.list_order - b.list_order
+                })
+                const nodes = catalogs.map(item => ({
+                  value: item.uuid,
+                  label: item.name,
+                  type: item.type,
+                  content_model: item.content_model,
+                  leaf: false
+                }))
+                resolve(nodes)
+              })
+            }
+          }
+        }
+      },
       formHeight: 0,
       pathDesc: '',
       pUUID: '',
@@ -1804,6 +1884,9 @@ export default {
   }
 }
 
+.el-cascader {
+  width: 100%;
+}
 .self-sign {
   .el-tag {
     margin: 0 10px;

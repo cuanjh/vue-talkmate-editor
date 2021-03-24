@@ -182,7 +182,8 @@ export default {
         'arrayObject',
         'button',
         'select',
-        'checkboxGroup'
+        'checkboxGroup',
+        'cascader'
       ]
     }
   },

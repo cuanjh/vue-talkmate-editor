@@ -83,7 +83,7 @@
           class="track-wrap"
           style="width: 602px"
           id="track-wrap">
-          <div class="track-item" data-intro='右键点击空白区域可操作右键菜单' v-for="index in 5" :key="index">
+          <div class="track-item" data-intro='右键点击空白区域可操作右键菜单' v-for="index in 6" :key="index">
             <div class="list" :id="'track-item-' + index">
               <folder
                 :ref="'folder-' + f.uuid"
@@ -1164,6 +1164,7 @@ export default {
       // }
       .list {
         width: 100%;
+        min-height: 50px;
       }
       .other {
         flex: 1;
