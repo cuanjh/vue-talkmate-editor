@@ -170,7 +170,6 @@ import {
   addCatalog,
   editCatalog,
   getInfoToken,
-  getContentTags,
   setAuthority
 } from '@/api/course'
 import { uploadQiniu } from '@/utils/uploadQiniu'
@@ -189,7 +188,6 @@ export default {
       attr_tag: '',
       tags: [],
       folder: {},
-      contentTags: [],
       dialogImageUrl: '',
       dialogVisible: false,
       flag: [],
@@ -222,15 +220,13 @@ export default {
       this.form.cover = [...this.form.cover, ...data]
       console.log(this.form.cover)
     })
-    getContentTags({ page: 0, pageSize: 0 }).then(res => {
-      this.contentTags = res.data.tags
-    })
   },
   computed: {
     ...mapState({
       langInfos: state => state.course.langInfos,
       assetsDomain: state => state.course.assetsDomain,
       modelList: state => state.course.modelList,
+      contentTags: state => state.course.contentTags,
       version: state => state.course.version,
       userInfo: state => state.user.userInfo,
       lowerRoleUser: state => state.user.lowerRoleUser
