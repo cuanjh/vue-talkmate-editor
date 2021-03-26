@@ -584,7 +584,9 @@
           </div>
           <!-- cascader -->
           <el-cascader
+            ref="cascader"
             v-model="contents[activeFormIndex]['' + f.feild + '']"
+            @change="changeCascader"
             :props="props"
             v-if="f.type == 'cascader'">
           </el-cascader>
@@ -749,14 +751,15 @@ export default {
             })
           } else {
             if (node.data.type === 'content') {
-              console.log('contentTypes', this.$store)
+              const contentTypes = JSON.parse(localStorage.getItem('contentTypes'))
               getContent({ content_model: node.data.content_model, parent_uuid: node.value }).then(res => {
                 const contents = res.data.contents.sort((a, b) => {
                   return a.list_order - b.list_order
                 })
                 const nodes = contents.map(item => ({
                   value: item.uuid,
-                  label: item.sentence + '(' + item.type + ')',
+                  label: (item.sentence ? item.sentence : '') + '（' + contentTypes.find(t => t.type === item.type)['name'] + '）',
+                  sentence: item.sentence ? item.sentence : '',
                   leaf: true
                 }))
                 resolve(nodes)
@@ -973,6 +976,7 @@ export default {
           this.contents.forEach((item, index) => {
             let obj = item
             obj['list_order'] = (index + 1) * 10
+            obj['lang_code'] = this.version.selLang
             arr.push(obj)
           })
 
@@ -1727,6 +1731,11 @@ export default {
       xhr.open('GET', this.assetsDomain + videoUrl)
       xhr.responseType = 'blob'
       xhr.send()
+    },
+    changeCascader () {
+      const chkNode = this.$refs['cascader'][this.activeFormIndex].getCheckedNodes()[0]
+      this.$set(this.contents[this.activeFormIndex], 'refer_uuid', chkNode.value)
+      this.$set(this.contents[this.activeFormIndex], 'sentence_temp', chkNode.data.sentence)
     }
   }
 }

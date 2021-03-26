@@ -505,7 +505,7 @@ export default {
         if (curFolder) {
           this.clickFolder({ folder: curFolder, trackNum: num })
           setTimeout(() => {
-            this.trackLeftScroll()
+            // this.trackLeftScroll()
           }, 800)
         } else {
           if (this.courseContentPath === '') {
@@ -520,14 +520,14 @@ export default {
             if (fIndex === -1) {
               this.courseContentPath = ''
               setTimeout(() => {
-                this.trackLeftScroll()
+                // this.trackLeftScroll()
               }, 800)
             } else {
               this.clickFolder({ folder: this.tracks[num][fIndex], trackNum: num })
               if (arr.length === num + 2) {
                 this.courseContentPath = ''
                 setTimeout(() => {
-                  this.trackLeftScroll()
+                  // this.trackLeftScroll()
                 }, 800)
               }
             }

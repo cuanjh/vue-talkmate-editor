@@ -276,6 +276,7 @@ export const course = {
       const res = await getContentTypes()
       if (res.success) {
         let showTypes = res.data.showTypes
+        localStorage.setItem('contentTypes', JSON.stringify(showTypes))
         commit('updateContentTypes', showTypes)
       }
     },
