@@ -88,7 +88,7 @@
           </div>
         </el-form-item>
         <el-form-item label="封面">
-          <el-tag type="warning">请上传webp格式的图片</el-tag>
+          <el-tag type="warning">请上传webp格式的图片，第一张图为课程列表封面，第二张图为学习首页课程封面，第三张图为课程列表宝贝作品封面</el-tag>
           <div class="img-box big-img-box">
             <div class="img" v-if="form.cover && form.cover.length">
               <div

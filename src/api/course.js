@@ -1381,6 +1381,19 @@ export const removeLiveGag = (data) => {
 }
 
 /**
+ * @Summary 删除聊天室评论
+ * @param {*} data
+ * @Router /live/chatroom/delete [post]
+ */
+export const delChatroomComment = (data) => {
+  return service({
+    url: '/live/chatroom/delete',
+    method: 'post',
+    data
+  })
+}
+
+/**
  * @Summary 获取马甲用户
  * @param {*} data
  * @Router /live/chatroom/majia [get]

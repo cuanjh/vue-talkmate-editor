@@ -49,6 +49,14 @@
         </template>
       </el-table-column>
       <el-table-column prop="coins" label="打赏金币"></el-table-column>
+      <el-table-column label="操作" width="100" fixed="right">
+        <template slot-scope="scope">
+          <el-button
+            size="mini"
+            type="danger"
+            @click="delComment(scope.$index, scope.row)">删除</el-button>
+        </template>
+      </el-table-column>
     </el-table>
   </el-dialog>
 </template>
@@ -57,7 +65,8 @@
 import {
   getChartroomComments,
   addLiveGag,
-  removeLiveGag
+  removeLiveGag,
+  delChatroomComment
 } from '@/api/course'
 import moment from 'moment'
 export default {
@@ -166,6 +175,28 @@ export default {
           })
           this.initData()
         }
+      })
+    },
+    delComment (index, data) {
+      this.$confirm('确认要删除吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        delChatroomComment({ id: data.id }).then(res => {
+          if (res.success) {
+            this.$message({
+              type: 'success',
+              message: '删除成功'
+            })
+            this.initData()
+          }
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
       })
     }
   }
