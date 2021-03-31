@@ -39,10 +39,9 @@
               </el-form-item>
             </el-row>
           </el-form-item>
-          <el-form-item label="能力级别：" class="desc" required>
+          <el-form-item label="能力级别：" class="desc">
             <el-row v-for="l in langInfos" :key="'title' + l.langKey">
-              <el-form-item  class="input-box" :prop="'title.' + l.langKey"
-                :rules="[{required: true, message: '能力级别不能为空', trigger: 'blur'}]">
+              <el-form-item  class="input-box" :prop="'title.' + l.langKey">
                 <el-input v-model="form.title[l.langKey]" maxlength="100" show-word-limit></el-input>
                 <span>{{'(' + l.name + ')'}}</span>
               </el-form-item>
