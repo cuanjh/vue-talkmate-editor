@@ -26,6 +26,7 @@
     </div>
     <div class="arror">
       <span class="isShow" v-show="!folder.is_show"></span>
+      <i class="el-icon-lock" v-show="folder['is_lock']"></i>
       <i class="icon-offline" v-show="false" @click="updateOffline"></i>
       <i class="el-icon-caret-right" v-show="folder.type == 'catalog'"></i>
     </div>

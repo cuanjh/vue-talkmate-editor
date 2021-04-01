@@ -138,6 +138,12 @@
             <el-checkbox v-for="tag in selfContentTags" :key="tag.key" :label="tag.key">{{ tag.name }}</el-checkbox>
           </el-checkbox-group>
         </el-form-item>
+        <el-form-item label="是否上锁">
+          <el-radio-group v-model="form.isLock">
+            <el-radio :label="true">是</el-radio>
+            <el-radio :label="false">否</el-radio>
+          </el-radio-group>
+        </el-form-item>
         <el-form-item label="展示状态">
           <el-radio-group v-model="form.onlineState">
             <el-radio :label="1">即将上线</el-radio>
@@ -195,6 +201,7 @@ export default {
         title: {},
         goalTitle: '',
         onlineState: 0,
+        isLock: false,
         desc: {},
         is_show: true,
         flag: [],
@@ -317,6 +324,7 @@ export default {
         this.form.title = folder.title
         this.form.goalTitle = folder.goalTitle
         this.form.onlineState = folder.onlineState
+        this.form.isLock = folder.is_lock ? folder.is_lock : false
         this.form.desc = folder.desc
         this.form.flag = folder.flag
         this.form.cover = folder.cover
@@ -367,6 +375,7 @@ export default {
                 title: this.form.title,
                 goalTitle: this.form.goalTitle,
                 onlineState: this.form.onlineState,
+                is_lock: this.form.isLock,
                 type: this.form.type
               },
               num: this.form.num
@@ -411,6 +420,7 @@ export default {
                 title: this.form.title,
                 goalTitle: this.form.goalTitle,
                 onlineState: this.form.onlineState,
+                is_lock: this.form.isLock,
                 is_show: this.form.is_show
               },
               uuid: this.form.uuid
@@ -443,6 +453,7 @@ export default {
         title: {},
         goalTitle: '',
         onlineState: 0,
+        isLock: false,
         desc: {},
         is_show: true,
         flag: [],

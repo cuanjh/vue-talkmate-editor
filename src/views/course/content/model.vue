@@ -176,6 +176,17 @@
           @delForm="delForm"
           @switchForm="switchForm"/>
       </div>
+      <div class="list" id="sort-form" v-else-if="contentModel == 'content_model_single_choice'">
+        <form-single-choice
+          :data-id="index"
+          :class="{'active': activeFormIndex == index}"
+          v-for="(content, index) in contents"
+          :key="index"
+          :form="content"
+          :formIndex="index"
+          @delForm="delForm"
+          @switchForm="switchForm"/>
+      </div>
       <div class="list" id="sort-form" v-else>
         <form-comp
           :data-id="index"
@@ -684,6 +695,7 @@ import FormRubbingEar from './rubbingEar/rubbingEar'
 import FormListenRead from './listenRead/listenRead'
 import FormPictureSentence from './pictureSentence/pictureSentence'
 import FormAuditionChoice from './auditionChoice/auditionChoice'
+import FormSingleChoice from './singleChoice/singleChoice'
 import LookImage from './lookImage'
 import LookContent from './lookContent'
 import RightMenuForm from './rightMenuForm'
@@ -819,6 +831,7 @@ export default {
     FormListenRead,
     FormPictureSentence,
     FormAuditionChoice,
+    FormSingleChoice,
     LookImage,
     LookContent,
     RightMenuForm

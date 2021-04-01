@@ -16,9 +16,12 @@
           </el-upload>
         </el-input>
       </el-form-item>
-      <el-form-item v-if="form.videoUrl">
-        <video ref="video" :src="form.videoUrl" controls style="width: 200px;"></video>
+      <el-form-item label="视频时长">
+        <el-input v-model="form.videoTime" placeholder="单位为秒"></el-input>
       </el-form-item>
+      <!-- <el-form-item v-if="form.videoUrl">
+        <video ref="video" :src="form.videoUrl" controls style="width: 200px;"></video>
+      </el-form-item> -->
       <el-form-item label="视频封面" prop="videoCover">
         <el-input v-model="form.videoCover" placeholder="https://">
           <el-upload slot="prepend"
@@ -121,6 +124,7 @@ export default {
       this.title = params.title
       this.state = params.state
       this.form.videoUrl = params.videoUrl
+      this.form.videoTime = params.videoTime
       this.form.videoCover = params.videoCover
       this.form.finishTitle = params.finishTitle
       this.form.finishInfo = params.finishInfo
@@ -194,7 +198,7 @@ export default {
           this.form.date = moment(this.date).format('YYYY-MM-DD')
           this.form.startTime = startTime
           this.form.EndTime = endTime
-          this.form.videoTime = parseInt(this.$refs.video.duration)
+          this.form.videoTime = parseInt(this.form.videoTime) ? parseInt(this.form.videoTime) : 0
           editLiveCourse(this.form).then(res => {
             if (res.success) {
               this.$message({

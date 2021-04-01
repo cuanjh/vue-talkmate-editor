@@ -1,8 +1,7 @@
 <template>
   <div class="form-container" @click="switchForm">
     <div class="form-type">
-      <el-tag v-show="form.self_sign" size="small" effect="dark" :type="tagType">{{ typeName }}</el-tag>
-      <span v-show="!form.self_sign">{{ typeName }}</span>
+      <el-tag size="small" :effect="form.self_sign ? 'dark' : 'light'" :type="tagType">{{ typeName }}</el-tag>
       <div class="icons">
         <el-tooltip effect="dark" content="复制" placement="top">
           <i class="el-icon-document-copy" @click="copyForm"></i>
@@ -12,49 +11,42 @@
         </el-tooltip>
       </div>
     </div>
-    <div class="form-img">
-      <el-image v-show="imgUrl" :src="imgUrl | urlFix('imageView2/1/format/jpg')" fit="cover" @click="play"></el-image>
-    </div>
-    <div :class="['text', form.type]" v-if="form.type == 'pictureSentence'">
-      <div class="options" v-show="form.options.length">
-        <div class="option" v-for="(item, index) in form.options" :key="index">
-          {{ item }}
+    <div class="form">
+      <div class="form-wrap">
+        <div class="correct-area">
+          <div class="wrap">
+            {{ form.sentence }}
+          </div>
+        </div>
+        <div class="options">
+          <div class="option" v-for="(item, index) in form.options" :key="index">
+            {{ codeArr[index] + '. ' + item }}
+          </div>
         </div>
       </div>
-    </div>
-    <div class="text" v-else>
-      <span v-text="(form.type == 'fillGap' || form.type == 'fillGap2') && form.options ? form.sentence.replace(form.options[0], '______') : form.sentence"></span>
-      <i v-show="form.sound" @click="play"></i>
     </div>
   </div>
 </template>
 
 <script>
 import { mapState, mapMutations } from 'vuex'
+
 export default {
   props: ['form', 'formIndex'],
   data () {
     return {
-      myAudio: new Audio()
+      myAudio: new Audio(),
+      codeArr: ['A', 'B', 'C', 'D', 'E']
     }
+  },
+  components: {
   },
   computed: {
     ...mapState({
       contentTypes: state => state.course.contentTypes,
-      assetsDomain: state => state.course.assetsDomain,
       selfSigns: state => state.course.selfSigns,
-      lowerRoleUser: state => state.user.lowerRoleUser
+      assetsDomain: state => state.course.assetsDomain
     }),
-    tagType () {
-      let obj = this.selfSigns.find(item => {
-        return item.key === this.form.self_sign
-      })
-      let name = ''
-      if (obj) {
-        name = obj.type
-      }
-      return name
-    },
     typeName () {
       console.log(this.contentTypes)
       let obj = this.contentTypes.find(item => {
@@ -64,7 +56,17 @@ export default {
       if (obj) {
         name = obj.name
       }
-      return name ? (this.formIndex + 1) + '. ' + obj.name : (this.formIndex + 1)
+      return name
+    },
+    tagType () {
+      let obj = this.selfSigns.find(item => {
+        return item.key === this.form.self_sign
+      })
+      let name = ''
+      if (obj) {
+        name = obj.type
+      }
+      return name
     },
     imgUrl () {
       let url = ''
@@ -81,10 +83,13 @@ export default {
     switchForm () {
       this.$emit('switchForm', { content: this.form, formIndex: this.formIndex })
     },
-    play () {
-      if (!this.form.sound) return
-      this.myAudio.src = this.assetsDomain + this.form.sound
-      this.myAudio.play()
+    play (url) {
+      if (url) {
+        this.myAudio.src = this.assetsDomain + url
+        this.myAudio.oncanplay = () => {
+          this.myAudio.play()
+        }
+      }
     },
     delForm () {
       this.$emit('delForm', { form: this.form, formIndex: this.formIndex })
@@ -107,7 +112,6 @@ export default {
 .form-container {
   display: inline-block;
   background: #FFFFFF;
-  width: 208px;
   // height: 220px;
   border-radius: 15px;
   margin: 9px;
@@ -121,11 +125,12 @@ export default {
     span {
       font-size: 14px;
       font-weight: 400;
-      color: rgba($color: #000000, $alpha: 0.4)
+      color: rgba($color: #000000, $alpha: 0.4);
+      width: 200px;
     }
     .icons {
       i {
-        margin-right: 10px;
+        margin-left: 15px;
         cursor: pointer;
       }
     }
@@ -140,7 +145,6 @@ export default {
     .el-image {
       width: 100%;
       height: 100%;
-      cursor: pointer;
     }
   }
   .text {
@@ -157,7 +161,7 @@ export default {
       margin-left: 10px;
       height: 15px;
       display: inline-block;
-      background-image: url('../../../assets/images/course/icon-voice.png');
+      background-image: url('../../../../assets/images/course/icon-voice.png');
       background-repeat: no-repeat;
       background-size: cover;
       cursor: pointer;
@@ -167,18 +171,69 @@ export default {
 .active {
   border: 1px solid #007AFF;
 }
-
-.pictureSentence {
+.form {
+  margin-top: 16px;
+  border-radius: 4px;
+  background: #F5F6FA;
+  padding-bottom: 20px;
+  min-height: 220px;
+  width: 260px;
+  .correct-area {
+    text-align: center;
+    padding: 10px;
+    .wrap {
+      background: #FFF;
+      display: inline-block;
+      padding: 10px 20px;
+      border-radius: 20px;
+      text-align: left;
+    }
+  }
   .options {
     display: flex;
     flex-direction: column;
-    flex: 1;
+    box-sizing: border-box;
+    margin: 10px 20px;
     .option {
-      background: rgba($color: #000000, $alpha: .1);
-      margin-bottom: 5px;
-      border-radius: 4px;
+      background: #FFF;
+      margin: 5px 0;
       padding: 5px;
+      border-radius: 4px;
     }
+  }
+}
+
+.chapter {
+  height: 100%;
+  vertical-align: middle;
+  .correct-area {
+    text-align: center;
+    width: 100%;
+    padding: 20px 0 10px;
+    .wrap {
+      span {
+        margin-right: 5px;
+      }
+      i {
+        width: 15px;
+        min-width: 15px;
+        margin-right: 10px;
+        vertical-align: middle;
+        height: 15px;
+        display: inline-block;
+        background-image: url('../../../../assets/images/course/icon-voice.png');
+        background-repeat: no-repeat;
+        background-size: cover;
+        cursor: pointer;
+      }
+      display: inline-block;
+      padding: 10px 20px;
+      border-radius: 20px;
+    }
+  }
+  .word {
+    padding: 10px;
+    text-align: left;
   }
 }
 </style>
