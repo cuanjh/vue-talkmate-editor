@@ -185,7 +185,7 @@ export default {
         this.ruleForm.lang = params.form.lang
         this.ruleForm.photo = params.form.photo
         this.ruleForm.sound = params.form.sound
-        this.ruleForm.soundTime = params.form.soundTime
+        this.ruleForm.soundTime = params.form.sound_time
         this.ruleForm.status = params.form.status
         this.ruleForm.role = params.form.role
       }
@@ -263,7 +263,7 @@ export default {
               photo: photoUrl,
               role: this.ruleForm.role,
               sound: this.ruleForm.sound,
-              soundTime: this.ruleForm.soundTime,
+              sound_time: this.ruleForm.soundTime,
               status: 0
             }
             createVoiceActor(obj).then(res => {

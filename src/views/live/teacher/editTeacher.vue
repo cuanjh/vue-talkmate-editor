@@ -4,7 +4,7 @@
     :visible.sync="dialogVisible"
     @close="close"
     width="50%">
-    <el-form :model="form" ref="form" size="small" label-width="84px">
+    <el-form :model="form" ref="form" size="small" label-width="96px">
       <el-form-item label="头像：">
         <el-upload
           class="avatar-uploader"
@@ -17,8 +17,10 @@
           <i v-else class="el-icon-plus avatar-uploader-icon"></i>
         </el-upload>
       </el-form-item>
-      <el-form-item label="主修语言：">
-        <el-input v-model="form.ownLangs" placeholder="请输入主修语言"></el-input>
+      <el-form-item label="主修语言：" required prop="own_langs" :rules="[
+          { required: true, message: '主修语言不能为空', trigger: 'blur' }
+        ]">
+        <el-input v-model="form.own_langs" placeholder="请输入主修语言"></el-input>
         <el-tag type="warning">注：自定义格式如“英/法”</el-tag>
       </el-form-item>
       <el-form-item label="角色：">
@@ -56,7 +58,7 @@ export default {
       form: {
         user_id: '',
         photo: '',
-        ownLangs: '',
+        own_langs: '',
         status: '',
         role: ''
       }
@@ -74,7 +76,7 @@ export default {
       this.photoFile = null
       this.form.user_id = params.user_id
       this.form.photo = params.photo
-      this.form.ownLangs = params.ownLangs
+      this.form.own_langs = params.own_langs
       if (params.role) {
         this.checkRoles = params.role.split(',')
       }
@@ -86,29 +88,36 @@ export default {
       this.form.photo = URL.createObjectURL(file.raw)
     },
     async save () {
-      this.form.role = this.checkRoles.join(',')
-      if (this.photoFile) {
-        const file = this.photoFile
-        let date = moment(new Date()).format('YYYY/MM/DD')
-        let i = file.name.lastIndexOf('.')
-        let ext = file.name.substring(i + 1)
-        let url = `liveroom/images/${date}/${file.uid}.${ext}`
-        let resToken = await getInfoTokenUploadFile()
-        let res = await uploadQiniu(file.raw, resToken.data.token, url)
-        this.form.photo = res.key
-      }
-      updateTeacher(this.form).then(res => {
-        if (res.success) {
-          this.$message({
-            type: 'success',
-            message: res.msg
+      this.$refs['form'].validate(async (valid) => {
+        if (valid) {
+          this.form.role = this.checkRoles.join(',')
+          if (this.photoFile) {
+            const file = this.photoFile
+            let date = moment(new Date()).format('YYYY/MM/DD')
+            let i = file.name.lastIndexOf('.')
+            let ext = file.name.substring(i + 1)
+            let url = `liveroom/images/${date}/${file.uid}.${ext}`
+            let resToken = await getInfoTokenUploadFile()
+            let res = await uploadQiniu(file.raw, resToken.data.token, url)
+            this.form.photo = res.key
+          }
+          updateTeacher(this.form).then(res => {
+            if (res.success) {
+              this.$message({
+                type: 'success',
+                message: res.msg
+              })
+              this.dialogVisible = false
+            } else {
+              this.$message({
+                type: 'warning',
+                message: res.msg
+              })
+            }
           })
-          this.dialogVisible = false
         } else {
-          this.$message({
-            type: 'warning',
-            message: res.msg
-          })
+          console.log('error submit!!')
+          return false
         }
       })
     },

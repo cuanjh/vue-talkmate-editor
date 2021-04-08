@@ -33,10 +33,10 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="等级分类：" prop="levelCatUuid" :rules="[
+          <el-form-item label="等级分类：" prop="level_cat_uuid" :rules="[
             { required: true, message: '请选择等级分类', trigger: 'blur' }
           ]">
-            <el-select v-model="form.levelCatUuid"
+            <el-select v-model="form.level_cat_uuid"
               placeholder="请选择等级分类">
               <el-option
                 v-for="item in levelTypeList"
@@ -60,9 +60,9 @@
             </el-row>
           </el-form-item>
           <el-form-item label="副标题：" class="desc">
-            <el-row v-for="l in langInfos" :key="'subTitle' + l.langKey">
-              <el-form-item  class="input-box" :prop="'subTitle.' + l.langKey">
-                <el-input type="textarea" v-model="form.subTitle[l.langKey]" maxlength="100" show-word-limit></el-input>
+            <el-row v-for="l in langInfos" :key="'sub_title' + l.langKey">
+              <el-form-item  class="input-box" :prop="'sub_title.' + l.langKey">
+                <el-input type="textarea" v-model="form.sub_title[l.langKey]" maxlength="100" show-word-limit></el-input>
                 <span>{{'(' + l.name + ')'}}</span>
               </el-form-item>
             </el-row>
@@ -190,10 +190,10 @@ export default {
         default_actor: '',
         name: '',
         title: {}, // 标题
-        subTitle: {},
+        sub_title: {},
         tag: {},
         image: '',
-        levelCatUuid: ''
+        level_cat_uuid: ''
       },
       bigImgUrl: '',
       bigImgs: [],
@@ -291,10 +291,10 @@ export default {
           default_actor: '',
           name: '',
           title: {}, // 标题
-          subTitle: {},
+          sub_title: {},
           tag: {},
           image: '',
-          levelCatUuid: ''
+          level_cat_uuid: ''
         }
         this.form = obj
         this.bigImgUrl = ''
@@ -308,8 +308,8 @@ export default {
             this.checkVoiceActors.push(item.role)
           })
         }
-        if (!this.form.subTitle) {
-          this.form.subTitle = {}
+        if (!this.form.sub_title) {
+          this.form.sub_title = {}
         }
         if (!this.form.tag) {
           this.form.tag = {}
@@ -530,9 +530,9 @@ export default {
               tags: this.form.tags,
               name: this.form.name,
               title: this.form.title, // 标题
-              subTitle: this.form.subTitle,
+              sub_title: this.form.sub_title,
               tag: this.form.tag,
-              levelCatUuid: this.form.levelCatUuid
+              level_cat_uuid: this.form.level_cat_uuid
             }
             addCourse(obj).then(res => {
               console.log(res)
@@ -555,9 +555,9 @@ export default {
                 tags: [],
                 name: this.form.name,
                 title: this.form.title,
-                subTitle: this.form.subTitle,
+                sub_title: this.form.sub_title,
                 tag: this.form.tag,
-                levelCatUuid: this.form.levelCatUuid
+                level_cat_uuid: this.form.level_cat_uuid
               },
               uuid: this.form.uuid
             }

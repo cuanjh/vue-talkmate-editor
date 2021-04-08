@@ -101,7 +101,7 @@ export default {
         weixinNo: '',
         date: '',
         startTime: '',
-        EndTime: ''
+        endTime: ''
       },
       rules: {
         // videoUrl: [
@@ -132,7 +132,7 @@ export default {
       this.form.uuid = params.uuid
       this.date = params.date
       let st = params.state === -1 ? params.realStartTime : params.startTime
-      let et = params.state === -1 ? params.realEndTime : params.EndTime
+      let et = params.state === -1 ? params.realEndTime : params.endTime
       this.times = [
         new Date(st * 1000),
         new Date(et * 1000)
@@ -150,7 +150,7 @@ export default {
         weixinNo: '',
         date: '',
         startTime: '',
-        EndTime: ''
+        endTime: ''
       }
     },
     async uploadVideoOnchange (file, fileList) {
@@ -197,7 +197,7 @@ export default {
           let endTime = (new Date(this.date + ' ' + moment(this.times[1]).format('HH:mm:ss'))).getTime() / 1000
           this.form.date = moment(this.date).format('YYYY-MM-DD')
           this.form.startTime = startTime
-          this.form.EndTime = endTime
+          this.form.endTime = endTime
           this.form.videoTime = parseInt(this.form.videoTime) ? parseInt(this.form.videoTime) : 0
           editLiveCourse(this.form).then(res => {
             if (res.success) {

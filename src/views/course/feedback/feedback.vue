@@ -222,7 +222,7 @@ export default {
     },
     feedback (row) {
       console.log(row)
-      const parentUuids = row.parentUuids
+      const parentUuids = row.parent_uuids
       if (this.version.selCourse.uuid !== parentUuids[parentUuids.length - 1]) {
         this.$message({
           type: 'warning',
@@ -293,7 +293,7 @@ export default {
       })
     },
     formatterDate (obj) {
-      return obj && obj.createdTime ? moment(obj.createdTime).format('YYYY-MM-DD HH:mm') : ''
+      return obj && obj.created_time ? moment(obj.created_time).format('YYYY-MM-DD HH:mm') : ''
     },
     filterRepType (value, row) {
       return row.repType === value

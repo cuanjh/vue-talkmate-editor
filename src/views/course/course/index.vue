@@ -471,7 +471,7 @@ export default {
     formatterLevelType (obj) {
       let desc = ''
       let ct = this.levelTypeList.find(item => {
-        return item.uuid === obj.levelCatUuid
+        return item.uuid === obj.level_cat_uuid
       })
       if (ct) {
         desc = ct.title

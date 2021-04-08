@@ -13,16 +13,15 @@
     </div>
     <div class="form">
       <div class="form-wrap">
-        <div class="title" v-html="form.text.replace(/\n/g, '<br />')">
+        <div class="correct-area">
+          <div class="wrap" v-show="form.sound || form.sentence">
+            <i v-show="form.sound" @click="play(form.sound)"></i>
+            <span v-show="form.sentence">{{ form.sentence }}</span>
+          </div>
         </div>
-      </div>
-      <div class="question" v-show="form.radar.length">
-        <div class="question-item" v-for="(q, qindex) in form.radar" :key="qindex">
-          <div class="question-no">{{ qindex + 1 + '. ' + q.question }}</div>
-          <div class="options" v-if="q.options.length">
-            <div class="option" v-for="(item, index) in q.options" :key="index">
-              {{ codeArr[index] + '. ' + item }}
-            </div>
+        <div class="options" v-show="form.imgs_choice.length">
+          <div class="option" v-for="(item, index) in form.imgs_choice" :key="index">
+            <el-image lazy :src="(assetsDomain + item) | urlFix('imageView2/1/format/jpg')" fit="cover"></el-image>
           </div>
         </div>
       </div>
@@ -37,8 +36,7 @@ export default {
   props: ['form', 'formIndex'],
   data () {
     return {
-      myAudio: new Audio(),
-      codeArr: ['A', 'B', 'C', 'D', 'E', 'F']
+      myAudio: new Audio()
     }
   },
   components: {
@@ -85,8 +83,8 @@ export default {
     switchForm () {
       this.$emit('switchForm', { content: this.form, formIndex: this.formIndex })
     },
-    play (item) {
-      this.myAudio.src = this.assetsDomain + item.sound
+    play (sound) {
+      this.myAudio.src = this.assetsDomain + sound
       this.myAudio.oncanplay = () => {
         this.myAudio.play()
       }
@@ -177,6 +175,7 @@ export default {
   background: #F5F6FA;
   padding-bottom: 20px;
   min-height: 220px;
+  width: 260px;
   .correct-area {
     text-align: center;
     width: 100%;
@@ -203,32 +202,58 @@ export default {
   .options {
     display: flex;
     flex-direction: row;
+    justify-content:space-around;
+    flex-wrap: wrap;
     .option {
-      margin: 0 10px;
+      background: #FFF;
+      margin-top: 10px;
+      padding: 5px;
+      border-radius: 4px;
+      cursor: pointer;
+      .el-image {
+        width: 100px;
+        height: 50px;
+        border-radius: 4px;
+      }
     }
   }
 }
 
 .form-wrap {
-  max-height: 280px;
-  overflow-y: auto;
-  .title {
-    padding: 10px;
-    font-size: 12px;
-    line-height: 18px;
-  }
-}
-
-.question {
-  padding-left: 20px;
-  .question-item {
-    display: flex;
-    flex-direction: column;
-    margin: 10px;
-    .question-no {
-      margin-right: 10px;
-      margin-bottom: 10px;
+  height: 100%;
+  vertical-align: middle;
+  .correct-area {
+    text-align: center;
+    width: 100%;
+    padding: 20px 0 10px;
+    .wrap {
+      display: inline-block;
+      padding: 10px;
+      border-radius: 4px;
+      margin: 0 10px;
+      .el-image {
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      span {
+        margin-right: 5px;
+      }
+      i {
+        width: 15px;
+        min-width: 15px;
+        margin-right: 10px;
+        vertical-align: middle;
+        height: 15px;
+        display: inline-block;
+        background-image: url('../../../../assets/images/course/icon-voice.png');
+        background-repeat: no-repeat;
+        background-size: cover;
+        cursor: pointer;
+      }
     }
+  }
+  .word {
+    letter-spacing: 6px;
   }
 }
 </style>

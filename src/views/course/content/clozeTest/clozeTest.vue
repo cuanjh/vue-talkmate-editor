@@ -13,12 +13,11 @@
     </div>
     <div class="form">
       <div class="form-wrap">
-        <div class="title" v-html="form.text.replace(/\n/g, '<br />')">
-        </div>
+        <div class="text" v-html="form.text ? form.text.replace(new RegExp(/\[\w+\]/, 'g'), '_____') : ''"></div>
       </div>
       <div class="question" v-show="form.radar.length">
         <div class="question-item" v-for="(q, qindex) in form.radar" :key="qindex">
-          <div class="question-no">{{ qindex + 1 + '. ' + q.question }}</div>
+          <div class="question-no">{{ qindex + 1 + '. ' }}</div>
           <div class="options" v-if="q.options.length">
             <div class="option" v-for="(item, index) in q.options" :key="index">
               {{ codeArr[index] + '. ' + item }}
@@ -85,8 +84,8 @@ export default {
     switchForm () {
       this.$emit('switchForm', { content: this.form, formIndex: this.formIndex })
     },
-    play (item) {
-      this.myAudio.src = this.assetsDomain + item.sound
+    play (url) {
+      this.myAudio.src = this.assetsDomain + url
       this.myAudio.oncanplay = () => {
         this.myAudio.play()
       }
@@ -148,12 +147,12 @@ export default {
     }
   }
   .text {
-    margin-top: 10px;
     line-height: 20px;
     min-height: 40px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    padding: 10px 20px;
     span {}
     i {
       width: 15px;
@@ -209,25 +208,15 @@ export default {
   }
 }
 
-.form-wrap {
-  max-height: 280px;
-  overflow-y: auto;
-  .title {
-    padding: 10px;
-    font-size: 12px;
-    line-height: 18px;
-  }
-}
-
 .question {
   padding-left: 20px;
   .question-item {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    align-items: center;
     margin: 10px;
     .question-no {
       margin-right: 10px;
-      margin-bottom: 10px;
     }
   }
 }

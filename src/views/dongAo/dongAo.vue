@@ -5,7 +5,7 @@
         <el-col :span="24">
           <el-input v-model="school" placeholder="请输入想要查找的学校" @change="handlerSearch"></el-input>
           <el-input v-model="name" placeholder="请输入想要查找的姓名" @change="handlerSearch"></el-input>
-          <el-input v-model="entrollNo" placeholder="请输入想要查找的编号" @change="handlerSearch"></el-input>
+          <el-input v-model="entroll_no" placeholder="请输入想要查找的编号" @change="handlerSearch"></el-input>
           <el-input v-model="phone" placeholder="请输入想要查找的手机号" @change="handlerSearch"></el-input>
           <el-select v-model="selLang" filterable placeholder="请选择语言" @change="handlerSearch">
             <el-option label="所有语言" value=""></el-option>
@@ -47,7 +47,7 @@
       <div class="tb-body" v-if="list.length > 0">
         <div class="item" v-for="(item, index) in list" :key="index">
           <el-row class="item-row">
-            <el-col class="center" :span="3">{{ item.entrollNo }}</el-col>
+            <el-col class="center" :span="3">{{ item.entroll_no }}</el-col>
             <el-col class="center" :span="10">
               <div class="info">
                 <div class="left">
@@ -67,7 +67,7 @@
             <el-col class="center" :span="5">
               <video-item
                 v-if="item.dynamics && item.dynamics.length > 0"
-                :url="item.dynamics[0]['videoUrl']"
+                :url="item.dynamics[0]['video_url']"
                 :num="item.dynamics.length"
                 @openVideo="openVideo"/>
             </el-col>
@@ -97,7 +97,7 @@
                 class="mr50 mb10"
                 v-for="(v, i) in item.dynamics"
                 :key="i"
-                :url="v['videoUrl']"
+                :url="v['video_url']"
                 :num="item.dynamics.length - i"
                 @openVideo="openVideo"/>
             </div>
@@ -139,7 +139,7 @@ export default {
       searchKey: '',
       school: '',
       name: '',
-      entrollNo: '',
+      entroll_no: '',
       phone: '',
       selLang: '',
       selGroup: '',
@@ -188,10 +188,10 @@ export default {
       let res1 = await uploadQiniu(e.raw, token, url)
       createDynamic({
         content: '#冬奥会语言服务小使者#',
-        topicKey: 'dongAo',
-        typeInfo: 'video',
-        userId: this.selItem.userId,
-        videoUrl: res1.key
+        topic_key: 'dongAo',
+        type_info: 'video',
+        user_id: this.selItem.user_id,
+        video_url: res1.key
       }).then(r => {
         if (r.success) {
           this.$message({
@@ -206,13 +206,13 @@ export default {
       getDongAoList({
         school: this.school,
         name: this.name,
-        entrollNo: this.entrollNo ? parseInt(this.entrollNo) : null,
+        entroll_no: this.entroll_no ? parseInt(this.entroll_no) : null,
         phone: this.phone,
         lang: this.selLang,
         group: this.selGroup,
         page_index: this.currentPage,
         page_size: this.pageSize,
-        text_field: 'entrollNo',
+        text_field: 'entroll_no',
         sort_type: this.sortType
       }).then((res) => {
         console.log(res)
@@ -266,7 +266,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        delDongAo({ userId: item.userId }).then(res => {
+        delDongAo({ user_id: item.user_id }).then(res => {
           if (res.success) {
             this.$message({
               type: 'success',
@@ -274,7 +274,7 @@ export default {
             })
 
             let findex = this.list.findIndex(f => {
-              return f.userId === item.userId
+              return f.user_id === item.user_id
             })
             this.list.splice(findex, 1)
           }
@@ -290,13 +290,13 @@ export default {
       const obj = {
         school: this.school,
         name: this.name,
-        entrollNo: this.entrollNo ? parseInt(this.entrollNo) : null,
+        entroll_no: this.entroll_no ? parseInt(this.entroll_no) : null,
         phone: this.phone,
         lang: this.selLang,
         group: this.selGroup,
         page_index: this.currentPage,
         page_size: this.pageSize,
-        text_field: 'entrollNo',
+        text_field: 'entroll_no',
         sort_type: this.sortType
       }
       let objStr = ''

@@ -33,13 +33,13 @@
         <el-table-column
           label="普通会员？">
           <template slot-scope="scope">
-            {{ scope.row.isShow ? '是' : '否' }}
+            {{ scope.row.is_common ? '是' : '否' }}
           </template>
         </el-table-column>
         <el-table-column
           label="会员PLUS？">
           <template slot-scope="scope">
-            {{ scope.row.isVip ? '是' : '否' }}
+            {{ scope.row.is_vip ? '是' : '否' }}
           </template>
         </el-table-column>
         <el-table-column

@@ -105,7 +105,7 @@ export default {
       let days = new Date(year, month, 0).getDate()
       console.log(year, month, days)
       getAttendances({
-        userId: this.selTeacher,
+        user_id: this.selTeacher,
         startDate: `${year}-${month < 9 ? '0' + month : month}-01`,
         endDate: `${year}-${month < 9 ? '0' + month : month}-${days}`
       }).then(res => {
@@ -160,16 +160,16 @@ export default {
         })
         if (result && result.length > 0) {
           result.forEach(r => {
-            if (r.userId && this.teachers.length > 0) {
+            if (r.user_id && this.teachers.length > 0) {
               let teacher = this.teachers.find(t => {
-                return t.user_id === r.userId
+                return t.user_id === r.user_id
               })
               if (teacher) {
                 console.log(r)
                 arr.push({
                   url: this.uploadfileDomain + teacher.photo,
                   liveNickname: teacher.live_nickname,
-                  range: moment(r.startTime * 1000).format('HH:mm:ss').slice(0, 5) + ' - ' + moment(r.EndTime * 1000).format('HH:mm:ss').slice(0, 5),
+                  range: moment(r.startTime * 1000).format('HH:mm:ss').slice(0, 5) + ' - ' + moment(r.endTime * 1000).format('HH:mm:ss').slice(0, 5),
                   uuid: r.uuid
                 })
               }

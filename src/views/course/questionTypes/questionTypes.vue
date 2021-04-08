@@ -45,6 +45,7 @@
           </template>
         </el-table-column>
         <el-table-column
+          width="200"
           label="提示语">
           <template slot-scope="scope" v-if="scope.row.title && Object.keys(scope.row.title).length">
             <div v-for="l in langInfos" :key="l.langKey">

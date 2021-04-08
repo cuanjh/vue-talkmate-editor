@@ -2,7 +2,7 @@
   <div class="picture-item" @mouseleave="isShow = false">
     <el-card :body-style="{ padding: '0px' }">
       <div class="img-wrap">
-        <el-image v-if="picture.coverUrl" :src="(domain + picture.coverUrl) | urlFix('imageView2/1/format/jpg')" fit="cover">
+        <el-image v-if="picture.cover_url" :src="(domain + picture.cover_url) | urlFix('imageView2/1/format/jpg')" fit="cover">
           <div slot="error" class="image-slot">
             <i class="el-icon-picture-outline"></i>
           </div>

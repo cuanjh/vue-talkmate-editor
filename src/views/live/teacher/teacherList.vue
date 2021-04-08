@@ -61,7 +61,7 @@
         :formatter="formatterRole">
       </el-table-column>
       <el-table-column
-        prop="ownLangs"
+        prop="own_langs"
         label="主修语言">
       </el-table-column>
       <el-table-column

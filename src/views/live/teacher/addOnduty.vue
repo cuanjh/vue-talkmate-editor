@@ -62,7 +62,7 @@ export default {
       },
       form: {
         date: '',
-        EndTime: '',
+        endTime: '',
         livePullUrl: '',
         livePushUrl: '',
         onlineNumber: 0,
@@ -71,7 +71,7 @@ export default {
         roomId: 0,
         startTime: '',
         state: 0,
-        userId: '',
+        user_id: '',
         uuid: '',
         species: 1
       }
@@ -94,8 +94,8 @@ export default {
       } else {
         this.form = params.info
         this.list = [{
-          teacher: this.form.userId,
-          range: [new Date(this.form.startTime * 1000), new Date(this.form.EndTime * 1000)]
+          teacher: this.form.user_id,
+          range: [new Date(this.form.startTime * 1000), new Date(this.form.endTime * 1000)]
         }]
         console.log(this.form, this.list)
       }
@@ -113,9 +113,9 @@ export default {
             if (item.teacher && item.range && item.range.length > 1) {
               let obj = {
                 date: moment(item.range[0]).format('YYYY-MM-DD'),
-                EndTime: item.range[1].getTime() / 1000,
+                endTime: item.range[1].getTime() / 1000,
                 startTime: item.range[0].getTime() / 1000,
-                userId: item.teacher,
+                user_id: item.teacher,
                 species: 1
               }
               arr.push(obj)
@@ -142,13 +142,13 @@ export default {
               date: moment(item.range[0]).format('YYYY-MM-DD'),
               endTime: item.range[1].getTime() / 1000,
               startTime: item.range[0].getTime() / 1000,
-              userId: item.teacher
+              user_id: item.teacher
             }
             console.log(obj)
             this.form.date = obj.date
-            this.form.EndTime = obj.endTime
+            this.form.endTime = obj.endTime
             this.form.startTime = obj.startTime
-            this.form.userId = obj.userId
+            this.form.user_id = obj.user_id
           }
           updateAttendance(this.form).then(res => {
             console.log(res)

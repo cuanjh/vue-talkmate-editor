@@ -13,16 +13,14 @@
     </div>
     <div class="form">
       <div class="form-wrap">
-        <div class="title" v-html="form.text.replace(/\n/g, '<br />')">
+        <div class="correct-area">
+          <div class="wrap" v-show="form.sentence">
+            <span>{{ form.sentence }}</span>
+          </div>
         </div>
-      </div>
-      <div class="question" v-show="form.radar.length">
-        <div class="question-item" v-for="(q, qindex) in form.radar" :key="qindex">
-          <div class="question-no">{{ qindex + 1 + '. ' + q.question }}</div>
-          <div class="options" v-if="q.options.length">
-            <div class="option" v-for="(item, index) in q.options" :key="index">
-              {{ codeArr[index] + '. ' + item }}
-            </div>
+        <div class="options" v-show="form.options.length">
+          <div class="option" v-for="(item, index) in form.options" :key="index">
+            {{ item }}
           </div>
         </div>
       </div>
@@ -37,8 +35,7 @@ export default {
   props: ['form', 'formIndex'],
   data () {
     return {
-      myAudio: new Audio(),
-      codeArr: ['A', 'B', 'C', 'D', 'E', 'F']
+      myAudio: new Audio()
     }
   },
   components: {
@@ -177,9 +174,9 @@ export default {
   background: #F5F6FA;
   padding-bottom: 20px;
   min-height: 220px;
+  width: 260px;
   .correct-area {
     text-align: center;
-    width: 100%;
     padding: 20px 0 10px;
     .wrap {
       background: #FFF;
@@ -202,32 +199,45 @@ export default {
   }
   .options {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
+    flex: 1;
     .option {
-      margin: 0 10px;
+      background: #FFF;
+      margin: 10px 10px 0 10px;
+      padding: 5px 10px;
+      border-radius: 4px;
+      .el-image {
+        border-radius: 4px;
+      }
     }
   }
 }
 
 .form-wrap {
-  max-height: 280px;
-  overflow-y: auto;
-  .title {
-    padding: 10px;
-    font-size: 12px;
-    line-height: 18px;
+  .correct-area {
+    text-align: center;
+    margin: 0 10px;
+    padding: 20px 0 10px;
+    .wrap {
+      background: #FFF;
+      display: inline-block;
+      padding: 10px 20px;
+      border-radius: 20px;
+    }
   }
-}
-
-.question {
-  padding-left: 20px;
-  .question-item {
+  .options {
     display: flex;
-    flex-direction: column;
-    margin: 10px;
-    .question-no {
-      margin-right: 10px;
-      margin-bottom: 10px;
+    flex-direction: row;
+    justify-content:flex-start;
+    align-items: center;
+    flex-wrap: wrap;
+    margin: 0 10px;
+    .option {
+      background: #FFF;
+      margin: 6px 5px;
+      padding: 10px;
+      border-radius: 4px;
+      cursor: pointer;
     }
   }
 }

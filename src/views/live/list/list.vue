@@ -344,7 +344,7 @@ export default {
         result += moment(new Date(item.realStartTime * 1000)).format('MM月DD日') + ' '
       }
       let startTime = moment(new Date(item.startTime * 1000)).format('HH:mm')
-      let endTime = moment(new Date(item.EndTime * 1000)).format('HH:mm')
+      let endTime = moment(new Date(item.endTime * 1000)).format('HH:mm')
       if (item.state === 1 || item.state === -1) {
         startTime = moment(new Date(item.realStartTime * 1000)).format('HH:mm')
       }

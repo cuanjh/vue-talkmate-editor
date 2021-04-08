@@ -6,10 +6,10 @@
     <div class="edit-content">
       <div class="course-content">
         <el-form ref="form" :model="form">
-          <el-form-item label="等级分类：" prop="levelCatUuid" :rules="[
+          <el-form-item label="等级分类：" prop="level_cat_uuid" :rules="[
             { required: true, message: '请选择等级分类', trigger: 'blur' }
           ]">
-            <el-select v-model="form.levelCatUuid"
+            <el-select v-model="form.level_cat_uuid"
               placeholder="请选择等级分类"
               :rules="[
                 { required: true, message: '请选择等级分类', trigger: 'change' }
@@ -23,10 +23,10 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="等级：" prop="levelCode" :rules="[
+          <el-form-item label="等级：" prop="level_code" :rules="[
             { required: true, message: '等级不能为空', trigger: 'blur' }
           ]">
-            <el-input v-model="form.levelCode" maxlength="20" placeholder="A1">
+            <el-input v-model="form.level_code" maxlength="20" placeholder="A1">
             </el-input>
           </el-form-item>
           <el-form-item label="标签：" class="desc" required>
@@ -87,7 +87,7 @@
             </el-input>
           </el-form-item>
           <el-form-item label="声音时长：">
-            <el-input v-model="form.soundTime" disabled></el-input>
+            <el-input v-model="form.sound_time" disabled></el-input>
           </el-form-item>
           <el-form-item label="数据：">
             <div class="statistics">
@@ -136,8 +136,8 @@ export default {
       dialogImageVisible: false,
       form: {
         uuid: '',
-        levelCode: '',
-        levelCatUuid: '', // 等级分类
+        level_code: '',
+        level_cat_uuid: '', // 等级分类
         bgImg: [], // 大图标
         desc: {}, // 描述
         color: '',
@@ -145,7 +145,7 @@ export default {
         tag: {},
         statistics: [],
         sound: '',
-        soundTime: ''
+        sound_time: ''
       },
       bigImgUrl: '',
       bigImgs: [],
@@ -176,8 +176,8 @@ export default {
       if (this.type === 'add') {
         let obj = {
           uuid: '',
-          levelCode: '',
-          levelCatUuid: '', // 课程分类
+          level_code: '',
+          level_cat_uuid: '', // 课程分类
           bgImg: [], // 大图标
           desc: {}, // 描述
           color: '',
@@ -192,12 +192,12 @@ export default {
             }
           ],
           sound: '',
-          soundTime: ''
+          sound_time: ''
         }
         this.form = obj
         this.bigImgUrl = ''
       } else if (this.type === 'edit') {
-        this.lang = params.form.levelCode.split('-')[0]
+        this.lang = params.form.level_code.split('-')[0]
         this.form = params.form
         if (!this.form.tag) {
           this.form.tag = {}
@@ -280,15 +280,15 @@ export default {
           this.form.bgImg = bgImg
           let obj = {
             uuid: this.form.uuid,
-            levelCode: this.form.levelCode,
-            levelCatUuid: this.form.levelCatUuid, // 等级分类
+            level_code: this.form.level_code,
+            level_cat_uuid: this.form.level_cat_uuid, // 等级分类
             bgImg: this.form.bgImg, // 大图标
             desc: this.form.desc, // 描述
             color: this.form.color,
             title: this.form.title, // 标题
             tag: this.form.tag,
             sound: this.form.sound,
-            soundTime: this.form.soundTime ? this.form.soundTime : 0,
+            sound_time: this.form.sound_time ? this.form.sound_time : 0,
             statistics: this.form.statistics
           }
           console.log(obj)
@@ -370,7 +370,7 @@ export default {
       let mySound = new Audio()
       mySound.src = this.assetsDomain + res.key
       mySound.oncanplay = () => {
-        this.$set(this.form, 'soundTime', mySound.duration)
+        this.$set(this.form, 'sound_time', mySound.duration)
       }
     },
     playAudio (url) {

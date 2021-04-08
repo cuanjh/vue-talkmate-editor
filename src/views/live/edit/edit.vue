@@ -9,8 +9,8 @@
           ]">
           <el-input v-model="form.moduleName" maxlength="30" show-word-limit></el-input>
         </el-form-item>
-        <el-form-item label="分类" prop="albumType">
-          <el-radio-group v-model="form.albumType">
+        <el-form-item label="分类" prop="album_type">
+          <el-radio-group v-model="form.album_type">
             <el-radio :label="0">直播</el-radio>
             <el-radio :label="1">讲座</el-radio>
           </el-radio-group>
@@ -406,7 +406,7 @@ export default {
         basicProfilePhoto: '',
         dateNotice: '',
         coverV2: '', // 大图
-        albumType: 0,
+        album_type: 0,
         lanCode: 'ALL',
         money: 0,
         moneyDiscount: 0,
@@ -560,7 +560,7 @@ export default {
         this.form.lanCode = this.roomInfo.lan_code
         this.form.tagKeys = this.roomInfo.tag_keys
         this.form.coverV2 = this.roomInfo.cover_v2
-        this.form.albumType = this.roomInfo.albumType
+        this.form.album_type = this.roomInfo.album_type
         this.form.money = this.roomInfo.money
         this.form.moneyDiscount = this.roomInfo.moneyDiscount
         this.form.level = this.roomInfo.liveInfo.level
@@ -617,7 +617,7 @@ export default {
         liveRooms.courses.forEach(c => {
           let obj = c
           let st = c.state === -1 ? c.realStartTime : c.startTime
-          let et = c.state === -1 ? c.realEndTime : c.EndTime
+          let et = c.state === -1 ? c.realEndTime : c.endTime
           obj['times'] = [
             new Date(st * 1000),
             new Date(et * 1000)
@@ -716,7 +716,7 @@ export default {
             //   state = item.state
             // }
             let obj = {
-              EndTime: endTime,
+              endTime: endTime,
               courseCode: this.code,
               cover: this.form.coverV2,
               date: moment(item.date).format('YYYY-MM-DD'),
@@ -810,7 +810,7 @@ export default {
                 liveUserUUID: this.form.liveUserUUID
               },
               module_name: this.form.moduleName,
-              albumType: this.form.albumType,
+              album_type: this.form.album_type,
               money: this.form.money,
               moneyDiscount: this.form.moneyDiscount,
               money_type: 'CNY',
@@ -989,7 +989,7 @@ export default {
       let st = (this.flag === 'add') ? moment(new Date()).format('YYYY-MM-DD') + ' ' + moment(this.form.time[0]).format('HH:mm:ss') : moment(new Date()).format('YYYY-MM-DD') + ' ' + this.roomInfo.liveInfo.startTime
       let et = (this.flag === 'add') ? moment(new Date()).format('YYYY-MM-DD') + ' ' + moment(this.form.time[1]).format('HH:mm:ss') : moment(new Date()).format('YYYY-MM-DD') + ' ' + this.roomInfo.liveInfo.endTime
       let obj = {
-        EndTime: (new Date(et)).getTime() / 1000,
+        endTime: (new Date(et)).getTime() / 1000,
         date: moment(new Date()).format('YYYY-MM-DD'),
         startTime: (new Date(st)).getTime() / 1000,
         listOrder: this.form.courses.length + 1,

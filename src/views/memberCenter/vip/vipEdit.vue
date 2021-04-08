@@ -16,23 +16,23 @@
               </el-form-item>
             </el-row>
           </el-form-item>
-          <el-form-item label="普通会员？" prop="isCommon"
+          <el-form-item label="普通会员？" prop="is_common"
             :rules="[
               { required: true, message: '请选择是否普通会员', trigger: 'change' }
             ]
           ">
-            <el-select v-model="form.isCommon"
+            <el-select v-model="form.is_common"
               placeholder="请选择...">
               <el-option label="是" :value="1"></el-option>
               <el-option label="否" :value="0"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="会员PLUS？" prop="isVip"
+          <el-form-item label="会员PLUS？" prop="is_vip"
             :rules="[
               { required: true, message: '请选择是否会员PLUS', trigger: 'change' }
             ]
           ">
-            <el-select v-model="form.isVip"
+            <el-select v-model="form.is_vip"
               placeholder="请选择...">
               <el-option label="是" :value="1"></el-option>
               <el-option label="否" :value="0"></el-option>
@@ -79,10 +79,10 @@ export default {
       showEdit: false,
       form: {
         uuid: '',
-        listOrder: 0,
+        list_order: 0,
         name: {},
-        isCommon: 0,
-        isVip: 1,
+        is_common: 0,
+        is_vip: 1,
         status: 1,
         icon: ''
       },
@@ -107,10 +107,10 @@ export default {
       } else {
         this.form = {
           uuid: '',
-          listOrder: params.listOrder,
+          list_order: params.list_order,
           name: {},
-          isCommon: 0,
-          isVip: 1,
+          is_common: 0,
+          is_vip: 1,
           status: 1
         }
       }

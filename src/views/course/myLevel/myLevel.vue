@@ -49,7 +49,7 @@
       <el-table-column
         width="140"
         label="等级"
-        prop="levelCode">
+        prop="level_code">
       </el-table-column>
       <el-table-column
         width="180"
@@ -170,7 +170,7 @@ export default {
     },
     async initData () {
       let res = await getLevelList({
-        levelCatUuid: this.selLevelType,
+        level_cat_uuid: this.selLevelType,
         pageNo: this.pageRequest.pageNo,
         pageSize: this.pageRequest.pageSize
       })

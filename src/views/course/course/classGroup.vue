@@ -7,16 +7,16 @@
       :data="classWXList"
       style="width: 100%">
       <el-table-column
-        prop="weixinNo"
+        prop="weixin_no"
         label="微信号"
         width="180">
       </el-table-column>
       <el-table-column
-        prop="weixinCode"
+        prop="weixin_code"
         label="验证码">
       </el-table-column>
       <el-table-column
-        prop="isShow"
+        prop="is_show"
         :formatter="formatterIsShow"
         label="是否展示">
       </el-table-column>
@@ -36,14 +36,14 @@
       :visible.sync="innerVisible"
       append-to-body>
       <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="ruleForm">
-        <el-form-item label="微信号" prop="weixinNo">
-          <el-input v-model="ruleForm.weixinNo" maxlength="30" show-word-limit></el-input>
+        <el-form-item label="微信号" prop="weixin_no">
+          <el-input v-model="ruleForm.weixin_no" maxlength="30" show-word-limit></el-input>
         </el-form-item>
-        <el-form-item label="验证码" prop="weixinCode">
-          <el-input v-model="ruleForm.weixinCode" maxlength="30" show-word-limit></el-input>
+        <el-form-item label="验证码" prop="weixin_code">
+          <el-input v-model="ruleForm.weixin_code" maxlength="30" show-word-limit></el-input>
         </el-form-item>
-        <el-form-item label="是否展示" prop="isShow">
-          <el-radio-group v-model="ruleForm.isShow">
+        <el-form-item label="是否展示" prop="is_show">
+          <el-radio-group v-model="ruleForm.is_show">
             <el-radio :label="true">是</el-radio>
             <el-radio :label="false">否</el-radio>
           </el-radio-group>
@@ -76,16 +76,16 @@ export default {
       classWXList: [],
       ruleForm: {
         id: '',
-        courseCode: '',
-        weixinNo: '',
-        isShow: true,
-        weixinCode: ''
+        course_code: '',
+        weixin_no: '',
+        is_show: true,
+        weixin_code: ''
       },
       rules: {
-        weixinNo: [
+        weixin_no: [
           { required: true, message: '请输入微信号', trigger: 'blur' }
         ],
-        weixinCode: [
+        weixin_code: [
           { required: true, message: '请输入验证码', trigger: 'blur' }
         ]
       }
@@ -93,30 +93,30 @@ export default {
   },
   methods: {
     show (params) {
-      this.ruleForm.courseCode = params.code
+      this.ruleForm.course_code = params.code
       this.loadClassWXList()
       this.dialogVisible = true
     },
     async loadClassWXList () {
-      const res = await getClassWXList({ courseCode: this.ruleForm.courseCode, pageNo: 0, pageSize: 0 })
+      const res = await getClassWXList({ course_code: this.ruleForm.course_code, pageNo: 0, pageSize: 0 })
       console.log(res)
       if (res.success) {
         this.classWXList = res.data.class_weixin
       }
     },
     formatterIsShow (row) {
-      return row.isShow ? '是' : '否'
+      return row.is_show ? '是' : '否'
     },
     add () {
       this.title = '添加'
       this.flag = 'add'
-      let courseCode = this.ruleForm.courseCode
+      let courseCode = this.ruleForm.course_code
       this.ruleForm = {
         id: '',
-        courseCode: courseCode,
-        weixinNo: '',
-        isShow: true,
-        weixinCode: ''
+        course_code: courseCode,
+        weixin_no: '',
+        is_show: true,
+        weixin_code: ''
       }
       this.innerVisible = true
     },
@@ -124,11 +124,11 @@ export default {
       console.log(row)
       this.title = '编辑'
       this.flag = 'edit'
-      this.ruleForm.courseCode = row.courseCode
+      this.ruleForm.course_code = row.course_code
       this.ruleForm.id = row.id
-      this.ruleForm.weixinNo = row.weixinNo
-      this.ruleForm.weixinCode = row.weixinCode
-      this.ruleForm.isShow = row.isShow
+      this.ruleForm.weixin_no = row.weixin_no
+      this.ruleForm.weixin_code = row.weixin_code
+      this.ruleForm.is_show = row.is_show
       this.innerVisible = true
     },
     del (row) {
@@ -158,10 +158,10 @@ export default {
         if (valid) {
           if (this.flag === 'add') {
             let obj = {
-              courseCode: this.ruleForm.courseCode,
-              weixinNo: this.ruleForm.weixinNo,
-              isShow: this.ruleForm.isShow,
-              weixinCode: this.ruleForm.weixinCode
+              course_code: this.ruleForm.course_code,
+              weixin_no: this.ruleForm.weixin_no,
+              is_show: this.ruleForm.is_show,
+              weixin_code: this.ruleForm.weixin_code
             }
             addClassWX(obj).then(res => {
               if (res.success) {

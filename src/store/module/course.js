@@ -340,7 +340,7 @@ export const course = {
         console.log(list)
         if (list.length > 0) {
           list = list.filter(item => {
-            return item.isDel === false
+            return item.is_del === false
           })
         }
         commit('updataLevelTypeList', list)
@@ -354,7 +354,7 @@ export const course = {
         console.log(list)
         if (list.length > 0) {
           list = list.filter(item => {
-            return item.isDel === false
+            return item.is_del === false
           })
         }
         commit('updateVideoTagList', list)

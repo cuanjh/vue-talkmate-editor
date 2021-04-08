@@ -13,6 +13,9 @@
     </div>
     <div class="form">
       <div class="form-wrap">
+        <div class="form-img" v-if="form.image">
+          <el-image v-if="form.image" :src="assetsDomain + form.image" fit="cover"></el-image>
+        </div>
         <div class="correct-area">
           <div class="wrap">
             {{ form.sentence }}
