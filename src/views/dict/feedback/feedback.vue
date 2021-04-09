@@ -37,8 +37,8 @@
         :filter-method="filterRepType"
         label="分类">
         <template slot-scope="props">
-          <el-tag v-if="props.row.repType == 'word'">单词</el-tag>
-          <el-tag type="success" v-if="props.row.repType == 'sentence'">句子</el-tag>
+          <el-tag v-if="props.row.rep_type == 'word'">单词</el-tag>
+          <el-tag type="success" v-if="props.row.rep_type == 'sentence'">句子</el-tag>
         </template>
       </el-table-column>
       <el-table-column
@@ -165,7 +165,7 @@ export default {
       console.log(row)
       let fromLang = row.fromLang
       let toLang = row.toLang
-      if (!row.repType) {
+      if (!row.rep_type) {
         this.$message({
           type: 'warning',
           message: '请先设置纠错分类'
@@ -181,7 +181,7 @@ export default {
         return
       }
 
-      if (row.repType === 'sentence') {
+      if (row.rep_type === 'sentence') {
         getSentenceDetail({ uuid: row.conId, from: fromLang, to: toLang }).then(res => {
           let obj = {
             type: 'edit',
@@ -259,10 +259,10 @@ export default {
       })
     },
     formatterDate (obj) {
-      return obj && obj.createdTime ? moment(obj.createdTime).format('YYYY-MM-DD HH:mm') : ''
+      return obj && obj.created_time ? moment(obj.created_time).format('YYYY-MM-DD HH:mm') : ''
     },
     filterRepType (value, row) {
-      return row.repType === value
+      return row.rep_type === value
     },
     filterState (value, row) {
       return row.state === value

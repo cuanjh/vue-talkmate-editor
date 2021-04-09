@@ -9,7 +9,7 @@
         <el-input v-model="ruleForm.content"></el-input>
       </el-form-item>
       <el-form-item label="发音：">
-        <div class="soundInfos">
+        <div class="sound_infos">
           <div class="sound-info-item" v-for="(ctr, index) in ruleForm.sound_infos" :key="'si' + index">
             <div class="left">
               <div class="row">
@@ -260,8 +260,8 @@ export default {
       if (this.flag === 'edit') {
         this.ruleForm.uuid = params.form.uuid
         this.ruleForm.content = params.form.content
-        if (params.form.soundInfos && params.form.soundInfos.length > 0) {
-          this.ruleForm.sound_infos = params.form.soundInfos
+        if (params.form.sound_infos && params.form.sound_infos.length > 0) {
+          this.ruleForm.sound_infos = params.form.sound_infos
         }
         if (params.form.images && params.form.images.length > 0) {
           params.form.images.forEach(i => {
@@ -531,7 +531,7 @@ export default {
               from: this.selLang,
               images: images,
               phrase: this.ruleForm.phrase,
-              soundInfos: this.ruleForm.sound_infos.filter(item => { return item.ct.trim().length > 0 }),
+              sound_infos: this.ruleForm.sound_infos.filter(item => { return item.ct.trim().length > 0 }),
               to: this.toLang,
               uuid: this.ruleForm.uuid
             }
@@ -560,7 +560,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.soundInfos {
+.sound_infos {
   display:  flex;
   flex-direction: column;
   .sound-info-item {
@@ -710,7 +710,7 @@ export default {
 </style>
 
 <style lang="scss">
-.soundInfos {
+.sound_infos {
   .el-icon-upload2 {
     font-size: 20px;
   }

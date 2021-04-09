@@ -34,12 +34,12 @@
           </el-select>
         </el-form-item>
         <el-form-item label="官方课程">
-          <el-select v-model="form.basicCourseCode" filterable @change="changeBasicCourse">
+          <el-select v-model="form.basic_course_code" filterable @change="changeBasicCourse">
             <el-option v-for="item in basicCourses" :key="item.code" :label="item.title['' + locale + '']" :value="item.code"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="课程级别">
-          <el-select v-model="form.basicContentLevel" filterable placeholder="请选择课程级别">
+          <el-select v-model="form.basic_content_level" filterable placeholder="请选择课程级别">
             <el-option label="无" value=""></el-option>
             <el-option label="L1" value="L1"></el-option>
             <el-option label="L2" value="L2"></el-option>
@@ -57,8 +57,8 @@
             :on-change="uploadOnchange"
             :show-file-list="false"
             :auto-upload="false">
-            <div class="upload-area" @click="setUploadField('image,basicChapterCover')">
-              <img v-if="form.basicChapterCover" :src="uploadfileDomain + form.basicChapterCover" class="cover">
+            <div class="upload-area" @click="setUploadField('image,basic_chapter_cover')">
+              <img v-if="form.basic_chapter_cover" :src="uploadfileDomain + form.basic_chapter_cover" class="cover">
               <i v-else class="el-icon-plus cover-uploader-icon"></i>
             </div>
           </el-upload>
@@ -72,8 +72,8 @@
             :on-change="uploadOnchange"
             :show-file-list="false"
             :auto-upload="false">
-            <div class="upload-area" @click="setUploadField('image,basicProfilePhoto')">
-              <img v-if="form.basicProfilePhoto" :src="uploadfileDomain + form.basicProfilePhoto" class="cover">
+            <div class="upload-area" @click="setUploadField('image,basic_profile_photo')">
+              <img v-if="form.basic_profile_photo" :src="uploadfileDomain + form.basic_profile_photo" class="cover">
               <i v-else class="el-icon-plus cover-uploader-icon"></i>
             </div>
           </el-upload>
@@ -146,7 +146,7 @@
           </el-upload>
           <el-tag type="warning">注：讲师照片将在分类课程-直播处展示</el-tag>
         </el-form-item>
-        <el-form-item label="发现首页讲师照片" prop="disTechPhoto">
+        <el-form-item label="发现首页讲师照片" prop="dis_tech_photo">
           <el-upload
             class="avatar-uploader"
             action="#"
@@ -154,8 +154,8 @@
             :on-change="uploadOnchange"
             :show-file-list="false"
             :auto-upload="false">
-            <div class="upload-area" @click="setUploadField('image,disTechPhoto')">
-              <img v-if="form.disTechPhoto" :src="uploadfileDomain + form.disTechPhoto" class="teacher">
+            <div class="upload-area" @click="setUploadField('image,dis_tech_photo')">
+              <img v-if="form.dis_tech_photo" :src="uploadfileDomain + form.dis_tech_photo" class="teacher">
               <i v-else class="el-icon-plus teacher-uploader-icon"></i>
             </div>
           </el-upload>
@@ -171,8 +171,8 @@
             </el-option>
         </el-select>
         </el-form-item>
-        <el-form-item label="直播老师(编辑器)" prop="liveUserUUID">
-          <el-select v-model="form.liveUserUUID" filterable placeholder="请选择直播老师">
+        <el-form-item label="直播老师(编辑器)" prop="live_user_uuid">
+          <el-select v-model="form.live_user_uuid" filterable placeholder="请选择直播老师">
             <el-option
               v-for="item in userList"
               :key="item.uuid"
@@ -306,7 +306,7 @@
           </div>
         </el-form-item>
         <el-form-item label="日期描述">
-          <el-input style="width: 500px" type="textarea" v-model="form.dateNotice" maxlength="100" show-word-limit></el-input>
+          <el-input style="width: 500px" type="textarea" v-model="form.date_notice" maxlength="100" show-word-limit></el-input>
         </el-form-item>
       </div>
       <div class="course-info">
@@ -400,20 +400,20 @@ export default {
       form: {
         moduleName: '',
         level: 0,
-        basicContentLevel: '',
-        basicCourseCode: '',
-        basicChapterCover: '',
-        basicProfilePhoto: '',
-        dateNotice: '',
+        basic_content_level: '',
+        basic_course_code: '',
+        basic_chapter_cover: '',
+        basic_profile_photo: '',
+        date_notice: '',
         coverV2: '', // 大图
         album_type: 0,
         lanCode: 'ALL',
         money: 0,
         moneyDiscount: 0,
         teacherPhoto: '',
-        disTechPhoto: '',
+        dis_tech_photo: '',
         selTeacher: '',
-        liveUserUUID: '',
+        live_user_uuid: '',
         teacherName: '',
         teacherDesc: '',
         finishTitle: '',
@@ -564,15 +564,15 @@ export default {
         this.form.money = this.roomInfo.money
         this.form.moneyDiscount = this.roomInfo.moneyDiscount
         this.form.level = this.roomInfo.liveInfo.level
-        this.form.basicCourseCode = this.roomInfo.liveInfo.basicCourseCode
-        this.form.basicContentLevel = this.roomInfo.liveInfo.basicContentLevel
-        this.form.basicChapterCover = this.roomInfo.liveInfo.basicChapterCover
-        this.form.basicProfilePhoto = this.roomInfo.liveInfo.basicProfilePhoto
-        this.form.dateNotice = this.roomInfo.liveInfo.dateNotice
+        this.form.basic_course_code = this.roomInfo.liveInfo.basic_course_code
+        this.form.basic_content_level = this.roomInfo.liveInfo.basic_content_level
+        this.form.basic_chapter_cover = this.roomInfo.liveInfo.basic_chapter_cover
+        this.form.basic_profile_photo = this.roomInfo.liveInfo.basic_profile_photo
+        this.form.date_notice = this.roomInfo.liveInfo.date_notice
         this.form.teacherPhoto = this.roomInfo.liveInfo.tech_photo
-        this.form.disTechPhoto = this.roomInfo.liveInfo.disTechPhoto
+        this.form.dis_tech_photo = this.roomInfo.liveInfo.dis_tech_photo
         this.form.selTeacher = this.roomInfo.user_id
-        this.form.liveUserUUID = this.roomInfo.liveInfo.liveUserUUID
+        this.form.live_user_uuid = this.roomInfo.liveInfo.live_user_uuid
         this.form.teacherName = this.roomInfo.liveInfo.tech_name
         this.form.teacherDesc = this.roomInfo.liveInfo.tech_desc
         this.form.weixinNo = this.roomInfo.liveInfo.weixinNo
@@ -649,10 +649,10 @@ export default {
           this.basicCourses = [...this.basicCourses, ...res.data.courses]
         }
       } else {
-        this.form.basicCourseCode = ''
-        this.form.basicContentLevel = ''
-        this.form.basicChapterCover = ''
-        this.form.basicProfilePhoto = ''
+        this.form.basic_course_code = ''
+        this.form.basic_content_level = ''
+        this.form.basic_chapter_cover = ''
+        this.form.basic_profile_photo = ''
         this.basicCourses = []
       }
     },
@@ -661,16 +661,16 @@ export default {
       if (message === '' && this.form.level === 0) {
         message = '请选择定级'
       }
-      if (this.form.basicCourseCode !== '') {
-        if (message === '' && this.form.basicContentLevel === '') {
+      if (this.form.basic_course_code !== '') {
+        if (message === '' && this.form.basic_content_level === '') {
           message = '请选择课程级别'
         }
 
-        if (message === '' && this.form.basicChapterCover === '') {
+        if (message === '' && this.form.basic_chapter_cover === '') {
           message = '请上传首页封面'
         }
 
-        if (message === '' && this.form.basicProfilePhoto === '') {
+        if (message === '' && this.form.basic_profile_photo === '') {
           message = '请上传结束页头像'
         }
       } else {
@@ -790,7 +790,7 @@ export default {
                 tech_desc: this.form.teacherDesc,
                 tech_name: this.form.teacherName,
                 tech_photo: this.form.teacherPhoto,
-                disTechPhoto: this.form.disTechPhoto,
+                dis_tech_photo: this.form.dis_tech_photo,
                 weixinNo: this.form.weixinNo,
                 finishTitle: this.form.finishTitle,
                 finishInfo: this.form.finishInfo,
@@ -802,12 +802,12 @@ export default {
                 sharePoster: this.form.sharePoster,
                 weekDays: weekDays,
                 level: this.form.level,
-                basicCourseCode: this.form.basicCourseCode,
-                basicContentLevel: this.form.basicContentLevel,
-                basicChapterCover: this.form.basicChapterCover,
-                basicProfilePhoto: this.form.basicProfilePhoto,
-                dateNotice: this.form.dateNotice,
-                liveUserUUID: this.form.liveUserUUID
+                basic_course_code: this.form.basic_course_code,
+                basic_content_level: this.form.basic_content_level,
+                basic_chapter_cover: this.form.basic_chapter_cover,
+                basic_profile_photo: this.form.basic_profile_photo,
+                date_notice: this.form.date_notice,
+                live_user_uuid: this.form.live_user_uuid
               },
               module_name: this.form.moduleName,
               album_type: this.form.album_type,
@@ -976,10 +976,10 @@ export default {
       this.loadBasicCourses()
     },
     changeBasicCourse () {
-      if (this.form.basicCourseCode === '') {
-        this.form.basicContentLevel = ''
-        this.form.basicChapterCover = ''
-        this.form.basicProfilePhoto = ''
+      if (this.form.basic_course_code === '') {
+        this.form.basic_content_level = ''
+        this.form.basic_chapter_cover = ''
+        this.form.basic_profile_photo = ''
       }
     },
     minusCourse (index) {

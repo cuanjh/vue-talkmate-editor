@@ -92,8 +92,8 @@ export default {
           mp4: '',
           m3u8: ''
         },
-        videoTime: 0,
-        coverUrl: '',
+        video_time: 0,
+        cover_url: '',
         tags: []
       }
     }
@@ -119,21 +119,22 @@ export default {
           mp4: '',
           m3u8: ''
         },
-        videoTime: 0,
-        coverUrl: ''
+        video_time: 0,
+        cover_url: ''
       }
       console.log(params)
       this.flag = params.flag
       if (this.flag === 'edit') {
         this.form = params.form
         this.flags = [{
-          name: this.form.coverUrl,
-          url: this.assetsDomain + this.form.coverUrl
+          name: this.form.cover_url,
+          url: this.assetsDomain + this.form.cover_url
         }]
       }
       this.dialogVisible = true
     },
     close () {
+      this.flags = []
       this.dialogVisible = false
     },
     async submitUpload () {
@@ -161,7 +162,7 @@ export default {
         const resToken = await getInfoToken()
         const token = resToken.data.token
         await uploadQiniu(file.raw, token, url)
-        this.form.coverUrl = url
+        this.form.cover_url = url
       }
       let obj = this.form
       console.log(obj)
@@ -209,7 +210,7 @@ export default {
         })
         this.form.video.mp4 = res.data.mp4
         this.form.video.m3u8 = res.data.m3u8
-        this.form.videoTime = res.data.videoTime
+        this.form.video_time = res.data.video_time
         console.log(this.form)
       } else {
         this.$message({

@@ -12,32 +12,32 @@
         <el-input type="textarea" v-model="ruleForm.contentTr"></el-input>
       </el-form-item>
       <el-form-item label="声音：">
-        <div class="soundInfos">
-          <div class="sound-info-item" v-for="(ctr, index) in ruleForm.soundInfos" :key="'si' + index">
+        <div class="sound_infos">
+          <div class="sound-info-item" v-for="(ctr, index) in ruleForm.sound_infos" :key="'si' + index">
             <div class="left">
               <div class="row">
-                <el-select size="small" v-model="ruleForm.soundInfos[index]['gender']" placeholder="请选择男女声">
+                <el-select size="small" v-model="ruleForm.sound_infos[index]['gender']" placeholder="请选择男女声">
                   <el-option label="男" value="male"></el-option>
                   <el-option label="女" value="female"></el-option>
                 </el-select>
               </div>
               <div class="row">
-                <el-input size="small" placeholder="请上传声音" v-model="ruleForm.soundInfos[index]['sound']" class="input-with-select">
+                <el-input size="small" placeholder="请上传声音" v-model="ruleForm.sound_infos[index]['sound']" class="input-with-select">
                   <el-upload slot="prepend"
                     action="#"
                     :accept="'audio/mp3'"
                     :on-change="uploadOnchange"
                     :show-file-list="false"
                     :auto-upload="false">
-                    <el-button icon="el-icon-upload2" @click="upload('audio', 'soundInfos', index)"></el-button>
+                    <el-button icon="el-icon-upload2" @click="upload('audio', 'sound_infos', index)"></el-button>
                   </el-upload>
-                  <el-button slot="append" icon="el-icon-video-play" @click="playAudio(ruleForm.soundInfos[index]['sound'])"></el-button>
+                  <el-button slot="append" icon="el-icon-video-play" @click="playAudio(ruleForm.sound_infos[index]['sound'])"></el-button>
                 </el-input>
               </div>
             </div>
             <div class="right">
               <el-button icon="el-icon-minus" circle @click="minusSoundInfo(index)"></el-button>
-              <el-button v-if="ruleForm.soundInfos.length == index + 1" icon="el-icon-plus" circle @click="plusSoundInfo"></el-button>
+              <el-button v-if="ruleForm.sound_infos.length == index + 1" icon="el-icon-plus" circle @click="plusSoundInfo"></el-button>
             </div>
           </div>
         </div>
@@ -96,12 +96,12 @@ export default {
       disabled: false,
       ruleForm: {
         uuid: '',
-        courseInfos: null,
+        course_infos: null,
         images: [],
         source: '',
         mold: 0,
         sentence: '',
-        soundInfos: [],
+        sound_infos: [],
         contentTr: [],
         parent: '',
         tags: []
@@ -131,14 +131,14 @@ export default {
       this.toLang = params.toLang
       console.log(this.partOfSpeech)
       this.ruleForm.uuid = ''
-      this.ruleForm.courseInfos = null
+      this.ruleForm.course_infos = null
       this.ruleForm.contentTr = ''
       this.ruleForm.parent = ''
       this.ruleForm.mold = 0
       this.ruleForm.source = ''
       this.ruleForm.sentence = ''
       this.ruleForm.tags = []
-      this.ruleForm.soundInfos = [
+      this.ruleForm.sound_infos = [
         {
           sound: '',
           gender: ''
@@ -149,20 +149,20 @@ export default {
         this.ruleForm.uuid = params.form.uuid
         this.ruleForm.mold = params.form.mold
         this.ruleForm.source = params.form.source
-        this.ruleForm.courseInfos = params.form.courseInfos
+        this.ruleForm.course_infos = params.form.course_infos
         this.ruleForm.sentence = params.form.sentence
-        this.ruleForm.sentenceTr = params.form.sentenceTr
-        if (params.form.sentenceTr) {
-          if (params.form.sentenceTr.tags) {
-            params.form.sentenceTr.tags.forEach(item => {
+        this.ruleForm.sentence_tr = params.form.sentence_tr
+        if (params.form.sentence_tr) {
+          if (params.form.sentence_tr.tags) {
+            params.form.sentence_tr.tags.forEach(item => {
               this.ruleForm.tags.push(item.key)
             })
           }
-          this.ruleForm.contentTr = params.form.sentenceTr.contentTr
-          this.ruleForm.parent = params.form.sentenceTr.parent
+          this.ruleForm.contentTr = params.form.sentence_tr.contentTr
+          this.ruleForm.parent = params.form.sentence_tr.parent
         }
-        if (params.form.soundInfos) {
-          this.ruleForm.soundInfos = params.form.soundInfos
+        if (params.form.sound_infos) {
+          this.ruleForm.sound_infos = params.form.sound_infos
         }
         if (params.form.image && params.form.image.length > 0) {
           params.form.image.forEach(item => {
@@ -182,16 +182,16 @@ export default {
         sound: '',
         gender: ''
       }
-      this.ruleForm.soundInfos.push(obj)
+      this.ruleForm.sound_infos.push(obj)
     },
     minusSoundInfo (index) {
-      if (this.ruleForm.soundInfos.length === 1) {
-        this.ruleForm.soundInfos = [{
+      if (this.ruleForm.sound_infos.length === 1) {
+        this.ruleForm.sound_infos = [{
           sound: '',
           gender: ''
         }]
       } else {
-        this.ruleForm.soundInfos.splice(index, 1)
+        this.ruleForm.sound_infos.splice(index, 1)
       }
     },
     handleRemove (file) {
@@ -220,14 +220,14 @@ export default {
       let name = file.name.substring(0, i)
       let url = ''
       if (dataFrom === 'audio') {
-        if (!this.ruleForm.soundInfos[index]['gender']) {
+        if (!this.ruleForm.sound_infos[index]['gender']) {
           this.$message({
             type: 'waring',
             message: '请选择男女声'
           })
           return
         }
-        url = `dict/${this.selLang.toLowerCase()}/sentence/${this.ruleForm.soundInfos[index]['gender']}/${md5(time)}.${ext}`
+        url = `dict/${this.selLang.toLowerCase()}/sentence/${this.ruleForm.sound_infos[index]['gender']}/${md5(time)}.${ext}`
       } else if (dataFrom === 'image') {
         url = 'dict/images/' + date + '/' + file.uid + '.' + ext
         this.saveImages([url], [name])
@@ -236,8 +236,8 @@ export default {
       }
       console.log(url)
       let res = await uploadQiniu(file.raw, this.token, url)
-      if (feild === 'soundInfos') {
-        this.$set(this.ruleForm['soundInfos'][index], 'sound', res.key)
+      if (feild === 'sound_infos') {
+        this.$set(this.ruleForm['sound_infos'][index], 'sound', res.key)
       }
       console.log(this.ruleForm)
     },
@@ -279,19 +279,19 @@ export default {
           }
           if (this.flag === 'edit') {
             let obj = {
-              courseInfos: this.ruleForm.courseInfos,
+              course_infos: this.ruleForm.course_infos,
               from: this.selLang,
               image: images,
               mold: this.ruleForm.mold,
               sentence: this.ruleForm.sentence,
-              sentenceTr: {
+              sentence_tr: {
                 contentTr: this.ruleForm.contentTr,
                 from: this.selLang,
                 parent: this.ruleForm.parent,
                 tags: tags,
                 to: this.toLang
               },
-              soundInfos: this.ruleForm.soundInfos,
+              sound_infos: this.ruleForm.sound_infos,
               source: this.ruleForm.source,
               to: this.toLang,
               uuid: this.ruleForm.uuid
@@ -321,7 +321,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.soundInfos {
+.sound_infos {
   display:  flex;
   flex-direction: column;
   .sound-info-item {
@@ -471,7 +471,7 @@ export default {
 </style>
 
 <style lang="scss">
-.soundInfos {
+.sound_infos {
   .el-icon-upload2 {
     font-size: 20px;
   }
