@@ -11,16 +11,16 @@
             { required: true, message: 'key不能为空', trigger: 'blur'},
             {pattern: /^[1-9a-zA-Z_]{1,}$/, message: '只允许输入字母或下划线！'}
           ]">
-            <el-input :disabled="flag == 'edit'" v-model="form.type" maxlength="30" show-word-limit></el-input>
+            <el-input :disabled="flag == 'edit'" v-model="form.type" maxlength="100" show-word-limit></el-input>
           </el-form-item>
           <el-form-item label="名称: " prop="name"  :rules="{ required: true, message: '名称不能为空', trigger: 'blur'}">
-            <el-input v-model="form.name" maxlength="25" show-word-limit></el-input>
+            <el-input v-model="form.name" maxlength="100" show-word-limit></el-input>
           </el-form-item>
           <el-form-item label="提示语：" class="name" required>
             <el-row v-for="l in langInfos" :key="'title' + l.langKey">
               <el-form-item  class="input-box" :prop="'title.' + l.langKey"
                 :rules="[{required: true, message: '提示语不能为空', trigger: 'blur'}]">
-                <el-input v-model="form.title[l.langKey]" maxlength="30" show-word-limit></el-input>
+                <el-input v-model="form.title[l.langKey]" maxlength="100" show-word-limit></el-input>
                 <span>{{'(' + l.name + ')'}}</span>
               </el-form-item>
             </el-row>
@@ -41,7 +41,7 @@
             </el-checkbox-group>
           </el-form-item>
           <el-form-item label="描述: " prop="desc"  :rules="{ required: true, message: '描述不能为空', trigger: 'blur'}">
-            <el-input type="textarea" rows="4" v-model="form.desc" maxlength="350" show-word-limit></el-input>
+            <el-input type="textarea" rows="4" v-model="form.desc" maxlength="500" show-word-limit></el-input>
           </el-form-item>
         </el-form>
         <div class="btns">
