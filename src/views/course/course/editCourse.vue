@@ -182,7 +182,7 @@ export default {
         cover: [], // 大图标
         desc: {}, // 描述
         flag: [], // 小图标
-        is_show: true, // 是否上线
+        is_show: false, // 是否上线
         has_dict: false, // 是否显示词典
         lan_code: '', // 语种的编码
         tags: [],
@@ -283,7 +283,7 @@ export default {
           cover: [], // 大图标
           desc: {}, // 描述
           flag: [], // 小图标
-          is_show: true, // 是否上线
+          is_show: false, // 是否上线
           has_dict: false,
           lan_code: params.selLang, // 语种的编码
           tags: [],
