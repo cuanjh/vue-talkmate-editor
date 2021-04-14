@@ -102,7 +102,7 @@
                 @resetTrackData="resetTrackData"
               />
             </div>
-            <div class="other" @contextmenu="otherContextMenu($event, tracks[index - 1][0], index)"></div>
+            <div class="other" @contextmenu="otherContextMenu($event, tracks[index - 1] ? tracks[index - 1][0] : null , index)">右键选择菜单区域</div>
           </div>
         </div>
         <edit-file ref="editFile" v-show="isShowEditFile"/>
@@ -795,6 +795,11 @@ export default {
       } else {
         if (index > 1) {
           // let uuidArr = this.path.split('/')
+          const parentTrack = this.tracks[index - 2]
+          const parentNode = parentTrack && parentTrack.find(f => {
+            return f.uuid === this.curUUID
+          })
+          if (!parentNode || parentNode.type === 'content') return
           this.uuid = this.curUUID
           params['pUUID'] = this.uuid
         } else {
@@ -1153,8 +1158,8 @@ export default {
       min-width: 200px;
       background: #FAFAFA;
       overflow-y: scroll;
-      display: flex;
-      flex-direction: column;
+      // display: flex;
+      // flex-direction: column;
       border-right: 1px solid rgba($color: #000000, $alpha: 0.1);
       // &::-webkit-scrollbar {
       //   width: 16px;
@@ -1167,7 +1172,14 @@ export default {
         min-height: 50px;
       }
       .other {
-        flex: 1;
+        // flex: 1;
+        min-height: 100px;
+        background: rgba($color: gray, $alpha: .1);
+        // opacity: .1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: rgba($color: gray, $alpha: .4);
       }
       .list {
       }
