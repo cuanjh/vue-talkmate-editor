@@ -17,8 +17,7 @@
           <el-image v-if="form.image" :src="assetsDomain + form.image" fit="cover"></el-image>
         </div>
         <div class="correct-area">
-          <div class="wrap">
-            {{ form.sentence }}
+          <div class="wrap" v-html="form.sentence ? form.sentence.replace(new RegExp(/\n/, 'g'), '<br />') : ''">
           </div>
         </div>
         <div class="options">

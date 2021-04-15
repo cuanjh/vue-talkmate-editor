@@ -16,6 +16,9 @@
         <div class="title">
           {{ form.text ? form.text.replace(/\[(.*?)\]/g, "______") : '' }}
         </div>
+        <div class="options">
+          <div class="option" v-for="(o, i) in form.options" :key="i">{{o}}</div>
+        </div>
       </div>
     </div>
   </div>
@@ -100,6 +103,7 @@ export default {
 
 <style lang="scss" scoped>
 .form-container {
+  width: 100%;
   display: inline-block;
   background: #FFFFFF;
   // height: 220px;
@@ -167,7 +171,6 @@ export default {
   background: #F5F6FA;
   padding-bottom: 20px;
   min-height: 220px;
-  width: 260px;
   .correct-area {
     text-align: center;
     width: 100%;
@@ -194,17 +197,12 @@ export default {
   .options {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     .option {
       background: #FFF;
-      width: 100px;
-      height: 50px;
       margin: 10px;
       padding: 5px;
       border-radius: 4px;
-      cursor: pointer;
-      .el-image {
-        border-radius: 4px;
-      }
     }
   }
 }

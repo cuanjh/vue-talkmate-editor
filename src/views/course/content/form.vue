@@ -23,7 +23,7 @@
       </div>
     </div>
     <div class="text" v-else>
-      <span v-text="(form.type == 'fillGap' || form.type == 'fillGap2') && form.options ? form.sentence.replace(form.options[0], '______') : form.sentence"></span>
+      <span v-text="(form.type == 'fillGap' || form.type == 'sentence_completion') && form.options ? form.sentence.replace(form.options[0], '______') : form.sentence"></span>
       <i v-show="form.sound" @click="play"></i>
     </div>
   </div>
