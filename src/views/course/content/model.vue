@@ -300,8 +300,8 @@
             v-model="contents[activeFormIndex]['' + f.feild + '']"
             @change="changeCheckbox(f.feild)">
             <el-checkbox
-              v-for="item in contentTags.filter(i => { return i.type.toLowerCase() === 'coursecontent'})"
-              :key="item.key" :label="item.key">
+              v-for="(item, i) in selfContentTags"
+              :key="item.key" :label="item.key + i">
               {{ item.name }}
             </el-checkbox>
           </el-checkbox-group>
@@ -701,7 +701,7 @@
         </el-form-item>
       </div>
       <el-form-item class="btn-handler">
-        <el-button type="primary" @click="onSubmit">保存</el-button>
+        <el-button :disabled="auth !== 'rw'" type="primary" @click="onSubmit">保存</el-button>
       </el-form-item>
     </el-form>
     <right-menu-form
@@ -844,9 +844,11 @@ export default {
       copyBaseFormDataSelf: '',
       uploadIndex: '',
       contentTags: [],
+      selfContentTags: [],
       soundActors: [],
       checkedSoundActors: [],
       courseSoundActors: [],
+      trackRootNode: null,
       audio: new Audio()
     }
   },
@@ -887,6 +889,7 @@ export default {
     }
     getContentTags({ pageNo: 1, pageSize: 999 }).then(res => {
       this.contentTags = res.data.tags
+      this.selfContentTags = this.contentTags.filter(i => { return i.type.toLowerCase() === 'coursecontent' })
     })
   },
   computed: {
@@ -897,7 +900,8 @@ export default {
       version: state => state.course.version,
       partOfSpeech: state => state.course.partOfSpeech,
       lowerRoleUser: state => state.user.lowerRoleUser,
-      soundLangMap: state => state.course.soundLangMap
+      soundLangMap: state => state.course.soundLangMap,
+      userInfo: state => state.user.userInfo
     }),
     selfContentTypes () {
       // return this.contentTypes.filter(item => {
@@ -906,6 +910,18 @@ export default {
       return this.contentTypes.filter(item => {
         return item.model_keys && item.model_keys.findIndex(m => { return m === this.contentModel }) > -1
       })
+    },
+    auth () {
+      if (this.userInfo && this.trackRootNode) {
+        if (this.userInfo.authorityId === '1') return 'rw'
+        const obj = this.trackRootNode.authorities.find(a => {
+          return a.user_uuid === this.userInfo.uuid
+        })
+        if (obj) {
+          return obj.auth
+        }
+      }
+      return ''
     }
   },
   methods: {
@@ -914,6 +930,7 @@ export default {
       getInfoToken().then(res => {
         this.token = res.data.token
       })
+      this.trackRootNode = params.trackRootNode
       this.activeFormIndex = 0
       this.pathDesc = params.pathDesc
       this.$set(this.$data, 'pUUID', params.pUUID)
@@ -933,7 +950,7 @@ export default {
         }
       }
       this.$bus.$emit('curContentForm', params.contents[this.activeFormIndex])
-      if (this.contentModel === 'content_model_dubbing_repeat' && this.contents[this.activeFormIndex]['tags'].length > 0) {
+      if (this.contentModel === 'content_model_dubbing_repeat' && this.contents[this.activeFormIndex]['tags'] && this.contents[this.activeFormIndex]['tags'].length > 0) {
         this.changeCheckbox('tags')
       }
       if (params.contentModel === 'content_model_read_in_role') {
@@ -945,7 +962,7 @@ export default {
           sort_type: -1
         }).then(res => {
           this.soundActors = res.data
-          if (this.contents[this.activeFormIndex]['checked_sound_actors'].length > 0) {
+          if (this.contents[this.activeFormIndex]['checked_sound_actors'] && this.contents[this.activeFormIndex]['checked_sound_actors'].length > 0) {
             this.changeSoundActors('checked_sound_actors')
           }
         })
@@ -1643,7 +1660,7 @@ export default {
     changeCheckbox (feild) {
       console.log(this.contents[this.activeFormIndex]['' + feild + ''])
       const arr = []
-      if (this.contents[this.activeFormIndex]['' + feild + ''].length > 0) {
+      if (this.contents[this.activeFormIndex]['' + feild + ''] && this.contents[this.activeFormIndex]['' + feild + ''].length > 0) {
         this.contents[this.activeFormIndex]['' + feild + ''].forEach(item => {
           let f = this.contentTags.find(i => {
             return i.key === item
@@ -1662,7 +1679,7 @@ export default {
     changeSoundActors (feild) {
       this.checkedSoundActors = []
       let arr = []
-      if (this.contents[this.activeFormIndex]['' + feild + ''].length > 0) {
+      if (this.contents[this.activeFormIndex]['' + feild + ''] && this.contents[this.activeFormIndex]['' + feild + ''].length > 0) {
         this.contents[this.activeFormIndex]['' + feild + ''].forEach(item => {
           let f = this.soundActors.find(i => {
             return i.uuid === item

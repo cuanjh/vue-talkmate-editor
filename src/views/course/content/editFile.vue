@@ -97,7 +97,7 @@ export default {
         this.contents.push(baseFormData)
       }
       setTimeout(() => {
-        this.$refs['model'].initData({ pUUID: params.folder.uuid, contents: this.contents, feilds: this.feilds, contentModel: this.contentModel, baseFormData: JSON.stringify(baseFormData), pathDesc: params.pathDesc })
+        this.$refs['model'].initData({ pUUID: params.folder.uuid, contents: this.contents, feilds: this.feilds, contentModel: this.contentModel, baseFormData: JSON.stringify(baseFormData), pathDesc: params.pathDesc, trackRootNode: params.trackRootNode })
       }, 0)
     },
     closed () {

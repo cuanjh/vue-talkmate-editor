@@ -707,7 +707,11 @@ export default {
           let contents = res.data.contents
           // this.$refs['editForm'].show({ contents: contents, model: model, folder: params.folder, pathDesc: this.pathDesc })
           this.isShowEditFile = true
-          this.$refs['editFile'].show({ contents: contents, model: model, folder: params.folder, pathDesc: this.pathDesc })
+          const rootUUID = this.path.split('/')[0]
+          const trackRootNode = this.tracks[0].find(t => {
+            return t.uuid === rootUUID
+          })
+          this.$refs['editFile'].show({ contents: contents, model: model, folder: params.folder, pathDesc: this.pathDesc, trackRootNode: trackRootNode })
         })
       }
     },
