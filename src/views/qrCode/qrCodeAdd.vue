@@ -78,11 +78,14 @@ export default {
         this.form.type = '1'
         this.form.title = this.qrcodeInfo.title
         this.form.size = this.qrcodeInfo.size
-        if (this.qrcodeInfo.info && this.qrcodeInfo.info.website) {
-          this.form.website = this.qrcodeInfo.info.website
-          this.form.json = this.qrcodeInfo.info
+        this.form.website = ''
+        if (this.qrcodeInfo.info) {
+          const info = JSON.parse(this.qrcodeInfo.info)
+          if (info.website) {
+            this.form.website = info.website
+          }
+          this.form.json = info
         } else {
-          this.form.website = ''
           this.form.json = {
             website: ''
           }
