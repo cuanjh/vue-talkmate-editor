@@ -1,22 +1,13 @@
 <template>
   <div id="photo-gallery">
-    <el-select class="mr10" v-model="selTag"
-      filterable
-      default-first-option
-      placeholder="请选择标签"
-      @change="search">
-      <el-option
-        v-for="item in videoTagList"
-        :key="item['uuid']"
-        :label="item.title"
-        :value="item.uuid">
-      </el-option>
-    </el-select>
-    <el-input style="width: 500px" placeholder="请输入要查找的内容" v-model="searchKey" @change="search" class="input-with-select mr10"></el-input>
-    <el-button type="primary" @click="showEditTags">新建标签</el-button>
-    <el-button v-if="false" type="primary" @click="reset">重置</el-button>
-    <el-button type="primary" :disabled="!(videoTagList && videoTagList.length > 0)" @click="upload">上传视频</el-button>
-    <el-button v-if="false" type="primary" @click="download">下载</el-button>
+    <el-input
+      style="width: 500px"
+      placeholder="请输入要查找的内容"
+      v-model="searchKey"
+      @change="search"
+      class="input-with-select mr10">
+    </el-input>
+    <el-button type="primary" @click="add">添加</el-button>
     <el-divider></el-divider>
     <el-row>
       <el-col :span="24">
@@ -36,9 +27,8 @@
         </div>
       </el-col>
     </el-row>
-    <edit-tags ref="editTags" @loadTags="loadTags"/>
     <upload ref="upload" @closeLoad="loadData"/>
-    <video-player ref="videoPlayer" />
+    <video-player ref="videoPlayer"/>
     <div class="pagination-box">
       <el-pagination
         @size-change="handleSizeChange"
@@ -54,15 +44,13 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
+import { mapState } from 'vuex'
 import {
-  getVideoList,
+  listStudyMethod,
   getInfoToken
-  // downloadImageExcel
 } from '@/api/course'
 
 import VideoPlayer from '@/components/common/videoPlayer'
-import EditTags from './editTags'
 import PhotoItem from './photoItem'
 import Upload from './upload'
 
@@ -70,9 +58,6 @@ export default {
   data () {
     return {
       searchKey: '',
-      tags: [],
-      selTag: '',
-      activeTag: '',
       list: [],
       showPicData: [],
       page: 1,
@@ -90,12 +75,10 @@ export default {
   },
   components: {
     VideoPlayer,
-    EditTags,
     PhotoItem,
     Upload
   },
   mounted () {
-    this.loadTags()
     // 获取上传图片token
     getInfoToken().then(res => {
       this.token = res.data.token
@@ -105,7 +88,6 @@ export default {
   computed: {
     ...mapState({
       assetsDomain: state => state.course.assetsDomain,
-      videoTagList: state => state.course.videoTagList,
       pageSizes: state => state.pageSizes
     }),
     rotate180 () {
@@ -113,17 +95,8 @@ export default {
     }
   },
   methods: {
-    ...mapActions({
-      getVideoTagList: 'course/getVideoTagList'
-    }),
-    loadTags () {
-      this.getVideoTagList({ pageNo: 1, pageSize: 99 })
-    },
     search () {
       this.handleCurrentChange(1)
-    },
-    showEditTags () {
-      this.$refs['editTags'].show()
     },
     showEditPicture (item) {
       this.$refs['upload'].show({ flag: 'edit', form: item })
@@ -132,11 +105,11 @@ export default {
       let obj = {
         pageNo: this.pageRequest.pageNo,
         pageSize: this.pageRequest.pageSize,
-        tagUuid: this.selTag,
-        searchKey: this.searchKey
-        // searchType: this.searchType ? 1 : 0
+        searchKey: this.searchKey,
+        sortType: 0,
+        textField: 'list_order'
       }
-      getVideoList(obj).then(res => {
+      listStudyMethod(obj).then(res => {
         console.log(res)
         if (res.data.list && res.data.list.length > 0) {
           this.list = res.data.list
@@ -147,7 +120,7 @@ export default {
         }
       })
     },
-    upload () {
+    add () {
       this.$refs['upload'].show({ flag: 'add' })
     },
     scroll (e) {
@@ -161,20 +134,8 @@ export default {
     },
     reset () {
       this.page = 1
-      this.activeTag = ''
       this.list = []
       this.search()
-    },
-    download () {
-      if (!this.activeTag) {
-        this.$message({
-          type: 'warning',
-          message: '请先选择要下载的图片分类'
-        })
-        return false
-      }
-      window.location.href = process.env.VUE_APP_BASE_API + '/editor/image/download?tagKey=' + this.activeTag
-      // downloadImageExcel({ tagKey: this.activeTag })
     },
     playVideo (video) {
       this.$refs['videoPlayer'].show(video)
@@ -194,72 +155,6 @@ export default {
 <style lang="scss" scoped>
 #photo-gallery {
   overflow: auto;
-}
-
-.tags {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  height: 100%;
-  font-size: 17px;
-  padding-top: 20px;
-  span {
-    width: 66px;
-  }
-  ul {
-    // flex-grow: 1;
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    // max-height: 50px;
-    overflow: hidden;
-    transition: max-height .5s;
-    -webkit-transition: max-height .5s;
-    -moz-transition: max-height .5s;
-    -o-transition: max-height .5s;
-    li {
-      min-width: 80px;
-      margin-right: 10px;
-      line-height: 30px;
-      a {
-        display: contents;
-        color: rgba(0, 0, 0, .6);
-        text-decoration: none;
-        &:hover{
-          color: #EE2759;
-        }
-      }
-      .active {
-        color: #EE2759;
-      }
-    }
-  }
-  .expand {
-    max-height: 1000px;
-    transition: max-height .5s;
-    -webkit-transition: max-height .5s;
-    -moz-transition: max-height .5s;
-    -o-transition: max-height .5s;
-  }
-  a {
-    width: 30px;
-    margin-top: 20px;
-    margin-right: 29px;
-    i {
-      display: inline-block;
-      width: 19px;
-      height: 11px;
-      // background-image: url('../assets/images/icon-down.svg');
-      background-repeat: no-repeat;
-      background-size: cover;
-      transition: transform .5s;
-      -webkit-transition: transform .5s;
-      -moz-transition: transform .5s;
-      -o-transition: transform .5s;
-    }
-  }
 }
 
 .picture-wrap {

@@ -64,11 +64,13 @@ export default {
   },
   created () {
     this.getConfigInfo()
+    this.getLangList({ pageNo: 1, pageSize: 999 })
   },
   methods: {
     ...mapActions({
       LoginOut: 'user/LoginOut',
-      getConfigInfo: 'course/getConfigInfo'
+      getConfigInfo: 'course/getConfigInfo',
+      getLangList: 'course/getLangList'
     }),
     totalCollapse () {
       this.isCollapse = !this.isCollapse

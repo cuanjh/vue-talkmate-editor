@@ -1,6 +1,7 @@
 <template>
   <el-dialog
     :visible.sync="dialogVisible"
+    append-to-body
     @close="close">
     <video id="myVideo" class="video-js"></video>
   </el-dialog>
@@ -28,6 +29,7 @@ export default {
   },
   methods: {
     show (video) {
+      if (!(video.mp4 || video.m3u8)) return
       const sources = [
         {
           src: this.assetsDomain + video.mp4,

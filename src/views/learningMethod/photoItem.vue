@@ -2,7 +2,7 @@
   <div class="picture-item" @mouseleave="isShow = false">
     <el-card :body-style="{ padding: '0px' }">
       <div class="img-wrap">
-        <el-image v-if="picture.cover_url" :src="(domain + picture.cover_url) | urlFix('imageView2/1/format/jpg')" fit="cover">
+        <el-image v-if="picture[lang].cover_url" :src="(domain + picture[lang].cover_url) | urlFix('imageView2/1/format/jpg')" fit="cover">
           <div slot="error" class="image-slot">
             <i class="el-icon-picture-outline"></i>
           </div>
@@ -12,16 +12,16 @@
         </div>
       </div>
       <div style="padding: 14px;">
-        <p><span>标题：</span>{{ picture.title }}</p>
-        <p><span>描述：</span>{{ picture.desc }}</p>
+        <p><span>标题：</span>{{ picture[lang].title }}</p>
+        <p><span>描述：</span>{{ picture[lang].desc }}</p>
         <div class="bottom clearfix">
+          <el-input type="text" size="small" class="list-order" v-model.number="picture.list_order" @change="edit"></el-input>
           <el-button type="text" class="button" @click="showEditPicture()">编辑</el-button>
           <el-button type="text" class="button" @click="delPicture()">删除</el-button>
-          <el-button type="text" class="button" @click="download" v-show="false">下载</el-button>
-          <el-tooltip class="item" effect="dark" :content="picture.video.mp4" placement="top">
+          <el-tooltip class="item" effect="dark" :content="picture[lang].video.mp4" placement="top">
             <el-button type="text" class="button btnLink" :id="`btnLink-${picture.uuid}-mp4`" @click="copyLink('mp4')">复制mp4</el-button>
           </el-tooltip>
-          <el-tooltip class="item" effect="dark" :content="picture.video.m3u8" placement="top">
+          <el-tooltip class="item" effect="dark" :content="picture[lang].video.m3u8" placement="top">
             <el-button type="text" class="button btnLink" :id="`btnLink-${picture.uuid}-m3u8`" @click="copyLink('m3u8')">复制m3u8</el-button>
           </el-tooltip>
         </div>
@@ -33,12 +33,14 @@
 <script>
 import Clipboard from 'clipboard'
 import {
-  delVideo
+  delStudyMethod,
+  updateStudyMethod
 } from '@/api/course'
 export default {
   props: ['picture', 'domain'],
   data () {
     return {
+      lang: 'zh-CN',
       currentDate: new Date(),
       isShow: false,
       height: 0,
@@ -66,7 +68,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        delVideo({ uuid: this.picture.uuid }).then(res => {
+        delStudyMethod({ uuid: this.picture.uuid }).then(res => {
           if (res.success) {
             this.$message({
               type: 'success',
@@ -105,7 +107,15 @@ export default {
       })
     },
     playVideo (picture) {
-      this.$emit('playVideo', picture.video)
+      this.$emit('playVideo', picture['zh-CN'].video || picture['en'].video)
+    },
+    edit () {
+      console.log(this.picture)
+      updateStudyMethod(this.picture).then(res => {
+        if (res.success) {
+          this.$emit('loadData')
+        }
+      })
     }
   }
 }
@@ -241,5 +251,13 @@ export default {
   background: #f5f7fa;
   color: #909399;
   font-size: 30px;
+}
+
+.list-order {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  width: 50px;
+  margin-right: 10px;
 }
 </style>

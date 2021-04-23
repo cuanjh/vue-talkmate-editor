@@ -10,7 +10,17 @@
           <el-checkbox v-for="item in videoTagList" :key="item.uuid" :label="item.uuid">{{item.title}}</el-checkbox>
         </el-checkbox-group>
       </el-form-item>
-      <el-form-item label="视频：">
+      <el-form-item label="选择语言">
+        <el-select v-model="form.lang_code">
+          <el-option
+            v-for="item in sortLangs"
+            :key="item.lan_code"
+            :label="item.title"
+            :value="item.lan_code">
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="视频：" required>
         <el-input placeholder="请输入视频地址"  v-model="form.video.mp4">
           <el-upload
             slot="prepend"
@@ -25,7 +35,7 @@
             :on-success="uploadSuccess">
             <el-button type="text">上传</el-button>
           </el-upload>
-          <el-button slot="append" @click="playVideo()">预览</el-button>
+          <el-button slot="append" @click="playVideo(form.video)">预览</el-button>
         </el-input>
       </el-form-item>
       <el-form-item label="封面：">
@@ -42,12 +52,7 @@
         </el-upload>
       </el-form-item>
       <el-form-item label="标题：" class="desc" required>
-        <el-row class="mb10" v-for="l in langInfos" :key="'title' + l.langKey">
-          <el-form-item class="input-box" :prop="'title.' + l.langKey">
-            <el-input style="width: 90%" class="mr10" v-model="form.title[l.langKey]" maxlength="100" show-word-limit></el-input>
-            <span>{{'(' + l.name + ')'}}</span>
-          </el-form-item>
-        </el-row>
+        <el-input v-model="form.title" maxlength="100" show-word-limit></el-input>
       </el-form-item>
       <el-form-item label="描述：">
         <el-input type="textarea" v-model="form.desc"></el-input>
@@ -57,6 +62,7 @@
     <a class="cancel" @click="close()">取消</a>
     <a class="determine active" @click="submitUpload()">保存</a>
   </div>
+  <video-player ref="videoPlayer" />
   <el-dialog :visible.sync="dialogImageVisible" append-to-body>
     <img width="100%" :src="dialogImageUrl" alt="">
   </el-dialog>
@@ -71,6 +77,7 @@ import {
   createVideo,
   updateVideo
 } from '@/api/course'
+import VideoPlayer from '@/components/common/videoPlayer'
 import { mapState, mapGetters } from 'vuex'
 export default {
   data () {
@@ -86,8 +93,9 @@ export default {
       flags: [],
       form: {
         uuid: '',
-        title: {},
+        title: '',
         desc: '',
+        lang_code: 'CHI',
         video: {
           mp4: '',
           m3u8: ''
@@ -98,11 +106,15 @@ export default {
       }
     }
   },
+  components: {
+    VideoPlayer
+  },
   computed: {
     ...mapState({
       langInfos: state => state.course.langInfos,
       videoTagList: state => state.course.videoTagList,
-      assetsDomain: state => state.course.assetsDomain
+      assetsDomain: state => state.course.assetsDomain,
+      sortLangs: state => state.course.sortLangs
     }),
     ...mapGetters({
       token: 'user/token'
@@ -113,7 +125,8 @@ export default {
       this.form = {
         tags: [],
         uuid: '',
-        title: {},
+        title: '',
+        lang_code: 'CHI',
         desc: '',
         video: {
           mp4: '',
@@ -126,10 +139,12 @@ export default {
       this.flag = params.flag
       if (this.flag === 'edit') {
         this.form = params.form
-        this.flags = [{
-          name: this.form.cover_url,
-          url: this.assetsDomain + this.form.cover_url
-        }]
+        if (this.form.cover_url) {
+          this.flags = [{
+            name: this.form.cover_url,
+            url: this.assetsDomain + this.form.cover_url
+          }]
+        }
       }
       this.dialogVisible = true
     },
@@ -146,14 +161,22 @@ export default {
         return false
       }
 
-      if (!(this.form.title && this.form.title['en'] && this.form.title['zh-CN'])) {
+      if (!(this.form.video.mp4 && this.form.video.m3u8)) {
+        this.$message({
+          type: 'warning',
+          message: '请上传视频'
+        })
+        return false
+      }
+
+      if (!this.form.title) {
         this.$message({
           type: 'warning',
           message: '请输入标题内容'
         })
         return false
       }
-      if (this.flags[0].raw) {
+      if (this.flags.length > 0 && this.flags[0].raw) {
         const file = this.flags[0]
         let i = file.name.lastIndexOf('.')
         let ext = file.name.substring(i + 1)
@@ -233,6 +256,9 @@ export default {
         this.dialogImageUrl = file.url
       }
       this.dialogImageVisible = true
+    },
+    playVideo (video) {
+      this.$refs['videoPlayer'].show(video)
     }
   }
 }

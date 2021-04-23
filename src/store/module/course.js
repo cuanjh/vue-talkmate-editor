@@ -58,6 +58,7 @@ export const course = {
     uploadfileDomain: '',
     langInfos: [],
     langList: [],
+    sortLangs: [],
     selLangState: '',
     courseTypes: [],
     version: {
@@ -152,6 +153,17 @@ export const course = {
     updateLangList (state, langs) {
       state.langList = langs
     },
+    updateSortLangs (state, langs) {
+      state.sortLangs = langs.sort((a, b) => {
+        return b.is_hot - a.is_hot
+      }).map(item => {
+        return {
+          lan_code: item.lan_code,
+          title: `${item.title['zh-CN']}（${item.title['en']}）`
+        }
+      })
+      console.log(state.sortLangs)
+    },
     updateVersion (state, { key, val }) {
       state.version[key] = val
     },
@@ -205,6 +217,7 @@ export const course = {
       const res = await getLangList(data)
       if (res.success) {
         commit('updateLangList', res.data.list)
+        commit('updateSortLangs', res.data.list)
         if (!state.version.selLang) {
           commit('updateVersion', { key: 'selLang', val: res.data.list[0]['lan_code'] })
         }

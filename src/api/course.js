@@ -2315,3 +2315,55 @@ export const delVideo = (data) => {
     data
   })
 }
+
+/**
+ * @Summary 添加学习方法
+ * @param {*} data
+ * @Router /editor/study_method/create [post]
+ */
+export const createStudyMethod = (data) => {
+  return service({
+    url: '/editor/study_method/create',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 学习方法列表
+ * @param {*} data
+ * @Router /editor/study_method/list [post]
+ */
+export const listStudyMethod = (data) => {
+  return service({
+    url: '/editor/study_method/list',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 更新学习方法
+ * @param {*} data
+ * @Router /editor/study_method/update [post]
+ */
+export const updateStudyMethod = (data) => {
+  return service({
+    url: '/editor/study_method/update',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * @Summary 删除学习方法
+ * @param {*} data
+ * @Router /editor/study_method/delete [post]
+ */
+export const delStudyMethod = (data) => {
+  return service({
+    url: '/editor/study_method/delete',
+    method: 'post',
+    data
+  })
+}
