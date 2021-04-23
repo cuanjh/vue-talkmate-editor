@@ -17,6 +17,19 @@
           <i v-else class="el-icon-plus avatar-uploader-icon"></i>
         </el-upload>
       </el-form-item>
+      <el-form-item label="通用头像：">
+        <el-upload
+          list-type="picture-card"
+          action="#"
+          accept="image/webp,image/png,image/jpg,image/jpeg"
+          :file-list="bigImgs"
+          :auto-upload="false"
+          :on-change="onChangeImage"
+          :on-preview="handlePictureCardPreview"
+          :on-remove="handleRemove">
+          <i class="el-icon-plus"></i>
+        </el-upload>
+      </el-form-item>
       <el-form-item label="主修语言：" required prop="own_langs" :rules="[
           { required: true, message: '主修语言不能为空', trigger: 'blur' }
         ]">
@@ -30,6 +43,9 @@
         </el-checkbox-group>
       </el-form-item>
     </el-form>
+    <el-dialog :visible.sync="dialogImageVisible" append-to-body>
+      <img width="100%" :src="dialogImageUrl" alt="">
+    </el-dialog>
     <span slot="footer" class="dialog-footer">
       <el-button @click="save">保存</el-button>
     </span>
@@ -53,14 +69,18 @@ export default {
   data () {
     return {
       dialogVisible: false,
+      dialogImageVisible: false,
+      dialogImageUrl: '',
       checkRoles: [],
       photoFile: null,
+      bigImgs: [],
       form: {
         user_id: '',
         photo: '',
         own_langs: '',
         status: '',
-        role: ''
+        role: '',
+        live_image: []
       }
     }
   },
@@ -80,6 +100,15 @@ export default {
       if (params.role) {
         this.checkRoles = params.role.split(',')
       }
+      this.bigImgs = []
+      if (params.live_image && params.live_image.length > 0) {
+        params.live_image.forEach(c => {
+          this.bigImgs.push({
+            name: c,
+            url: this.uploadfileDomain + c
+          })
+        })
+      }
       this.form.status = params.status
       console.log(this.form)
     },
@@ -91,16 +120,33 @@ export default {
       this.$refs['form'].validate(async (valid) => {
         if (valid) {
           this.form.role = this.checkRoles.join(',')
+          let resToken = await getInfoTokenUploadFile()
           if (this.photoFile) {
             const file = this.photoFile
             let date = moment(new Date()).format('YYYY/MM/DD')
             let i = file.name.lastIndexOf('.')
             let ext = file.name.substring(i + 1)
             let url = `liveroom/images/${date}/${file.uid}.${ext}`
-            let resToken = await getInfoTokenUploadFile()
             let res = await uploadQiniu(file.raw, resToken.data.token, url)
             this.form.photo = res.key
           }
+          let covers = []
+          if (this.bigImgs.length > 0) {
+            for (let j = 0; j < this.bigImgs.length; j++) {
+              let img = this.bigImgs[j]
+              if (img.raw) {
+                let date = moment(new Date()).format('YYYY/MM/DD')
+                let i = img.name.lastIndexOf('.')
+                let ext = img.name.substring(i + 1)
+                let url = `liveroom/images/${date}/${img.uid}.${ext}`
+                let res = await uploadQiniu(img.raw, resToken.data.token, url)
+                covers.push(res.key)
+              } else {
+                covers.push(img.name)
+              }
+            }
+          }
+          this.form.live_image = covers
           updateTeacher(this.form).then(res => {
             if (res.success) {
               this.$message({
@@ -122,7 +168,23 @@ export default {
       })
     },
     close () {
+      this.bigImgs = []
       this.$emit('loadData')
+    },
+    onChangeImage (file, fileList) {
+      this.bigImgs = fileList
+    },
+    handleRemove (file, fileList) {
+      this.bigImgs = fileList
+    },
+    handlePictureCardPreview (file) {
+      console.log(file)
+      if (file.raw) {
+        this.dialogImageUrl = URL.createObjectURL(file.raw)
+      } else {
+        this.dialogImageUrl = file.url
+      }
+      this.dialogImageVisible = true
     }
   }
 }

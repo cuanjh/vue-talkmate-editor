@@ -13,8 +13,12 @@
             <i class="el-icon-check"></i>
           </div>
           <div class="desc">
-            <p><span>标题：</span>{{ picture.title }}</p>
-            <p><span>描述：</span>{{ picture.desc }}</p>
+            <el-tooltip :content="picture.title">
+              <p><span>标题：</span>{{ picture.title }}</p>
+            </el-tooltip>
+            <el-tooltip :content="picture.desc">
+              <p><span>描述：</span>{{ picture.desc }}</p>
+            </el-tooltip>
           </div>
         </div>
       </div>
@@ -80,7 +84,6 @@ export default {
       .desc {
         position: absolute;
         width: 100%;
-        padding-left: 10px;
         bottom: 0;
         color: #FFFFFF;
         display: flex;
@@ -88,7 +91,11 @@ export default {
         justify-content: left;
         p {
           font-size: 12px;
-          margin-bottom: 2px;
+          margin: 0 5px 2px;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          -o-text-overflow: ellipsis;/* for Opera */
           span {
             font-size: 12px;
           }
