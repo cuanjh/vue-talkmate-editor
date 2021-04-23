@@ -525,7 +525,7 @@ export default {
       status: 3
     }).then(res => {
       if (res.success && res.data) {
-        this.teacherList = res.data
+        this.teacherList = res.data.list
         console.log(this.teacherList)
       }
     })

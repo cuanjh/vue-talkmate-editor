@@ -89,16 +89,17 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-pagination
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
-      :current-page="currentPage"
-      :hide-on-single-page="isShowPagination"
-      :page-sizes="[10, 20, 50, 100]"
-      :page-size="pageSize"
-      layout="total, sizes, prev, pager, next, jumper"
-      :total="total">
-    </el-pagination>
+    <div class="pagination-box">
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="pageRequest.pageNo"
+        :page-sizes="pageSizes"
+        :page-size="pageRequest.pageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="pageRequest.total">
+      </el-pagination>
+    </div>
     <approve-comp ref="approve" :langs="langs" @loadData="loadData" />
     <edit-teacher ref="edit" @loadData="loadData"/>
   </div>
@@ -128,9 +129,13 @@ export default {
       liveTeacherName: '',
       teacherList: [],
       currentPage: 1,
-      total: 0,
       pageSize: 10,
-      isShowPagination: false
+      // 分页信息
+      pageRequest: {
+        pageNo: 1,
+        pageSize: 10,
+        total: 0
+      }
     }
   },
   components: {
@@ -148,7 +153,8 @@ export default {
   },
   computed: {
     ...mapState({
-      uploadfileDomain: state => state.course.uploadfileDomain
+      uploadfileDomain: state => state.course.uploadfileDomain,
+      pageSizes: state => state.pageSizes
     })
   },
   methods: {
@@ -181,31 +187,20 @@ export default {
       getTeacherList({
         lan_code: this.selLang,
         real_name: this.liveTeacherName,
-        page_index: this.currentPage,
-        page_size: this.pageSize,
+        pageNo: this.pageRequest.pageNo,
+        pageSize: this.pageRequest.pageSize,
         status: this.selStatus ? this.selStatus : 0
       }).then(res => {
         console.log(res)
         if (res.success && res.data) {
-          this.teacherList = res.data
-          this.total = this.teacherList.length
-          if (this.pageSize > this.total) {
-            this.isShowPagination = true
-          }
+          this.teacherList = res.data.list
+          this.pageRequest.total = res.data.total
         } else {
           this.teacherList = []
+          this.pageRequest.total = 0
+          this.pageRequest.pageNo = 1
         }
       })
-    },
-    handleSizeChange (val) {
-      console.log(`每页 ${val} 条`)
-      this.pageSize = val
-      this.loadData()
-    },
-    handleCurrentChange (val) {
-      console.log(`当前页: ${val}`)
-      this.currentPage = val
-      this.loadData()
     },
     reset () {
       this.selLang = ''
@@ -216,23 +211,16 @@ export default {
     handleApprove (data) {
       this.$refs['approve'].show(data)
     },
-    handleFrozen (data) {
-      console.log(data)
-      this.$confirm('确认要冻结吗?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消冻结'
-        })
-      })
-    },
     handleEdit (data) {
       this.$refs['edit'].show(data)
+    },
+    handleSizeChange (val) {
+      this.pageRequest.pageSize = val
+      this.loadData()
+    },
+    handleCurrentChange (val) {
+      this.pageRequest.pageNo = val
+      this.loadData()
     }
   }
 }
@@ -260,10 +248,5 @@ export default {
     flex: 1;
     text-align: right;
   }
-}
-
-.el-pagination {
-  text-align: center;
-  margin-top: 30px;
 }
 </style>

@@ -123,6 +123,17 @@
               <img width="100%" :src="dialogImageUrl" alt="">
             </el-dialog>
           </el-form-item>
+          <el-form-item label="主题色：">
+            <el-input type="text" v-model="form.theme_colors" placeholder="#000000"></el-input>
+          </el-form-item>
+          <el-form-item label="目录层级：" prop="catalog_number"
+          :rules="[
+            { pattern: /^[0-3]+$/, message: '只允许输入1、2、3数字！' }
+          ]">
+            <el-input v-model.number="form.catalog_number" :min="1" :max="3" :maxlength="1"
+              placeholder="请输入1、2、3中的一个数字"
+            ></el-input>
+          </el-form-item>
           <el-form-item label="是否显示：" class="flex-class">
             <el-radio-group v-model="form.is_show">
               <el-radio :label="true">是</el-radio>
@@ -193,7 +204,9 @@ export default {
         sub_title: {},
         tag: {},
         image: '',
-        level_cat_uuid: ''
+        level_cat_uuid: '',
+        catalog_number: 2,
+        theme_colors: ''
       },
       bigImgUrl: '',
       bigImgs: [],
@@ -294,7 +307,9 @@ export default {
           sub_title: {},
           tag: {},
           image: '',
-          level_cat_uuid: ''
+          level_cat_uuid: '',
+          catalog_number: 2,
+          theme_colors: ''
         }
         this.form = obj
         this.bigImgUrl = ''
@@ -336,6 +351,8 @@ export default {
       }
     },
     close () {
+      this.bigImgs = []
+      this.smlImgs = []
       this.showEdit = false
     },
     async uploadBig () {
@@ -532,7 +549,9 @@ export default {
               title: this.form.title, // 标题
               sub_title: this.form.sub_title,
               tag: this.form.tag,
-              level_cat_uuid: this.form.level_cat_uuid
+              level_cat_uuid: this.form.level_cat_uuid,
+              catalog_number: this.form.catalog_number,
+              theme_colors: this.form.theme_colors
             }
             addCourse(obj).then(res => {
               console.log(res)
@@ -557,7 +576,9 @@ export default {
                 title: this.form.title,
                 sub_title: this.form.sub_title,
                 tag: this.form.tag,
-                level_cat_uuid: this.form.level_cat_uuid
+                level_cat_uuid: this.form.level_cat_uuid,
+                catalog_number: this.form.catalog_number,
+                theme_colors: this.form.theme_colors
               },
               uuid: this.form.uuid
             }

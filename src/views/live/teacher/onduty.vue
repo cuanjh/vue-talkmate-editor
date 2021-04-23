@@ -68,8 +68,8 @@ export default {
       page_size: 1000
     }).then(res => {
       console.log(res)
-      if (res.data && res.data.length > 0) {
-        res.data.forEach(item => {
+      if (res.data.list && res.data.list.length > 0) {
+        res.data.list.forEach(item => {
           if ((item.role + ',').indexOf('2,') > -1) {
             this.teachers.push(item)
           }
