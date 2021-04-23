@@ -161,7 +161,9 @@
           </el-upload>
           <el-tag type="warning">注：发现首页讲师照片将在发现页小图处展示</el-tag>
         </el-form-item>
-        <el-form-item label="直播老师(app)" prop="selTeacher">
+        <el-form-item label="直播老师(app)" prop="selTeacher" required :rules="[
+          { required: true, message: '直播老师(app)不能为空'}
+        ]">
           <el-select v-model="form.selTeacher" filterable placeholder="请选择直播老师">
             <el-option
               v-for="item in teacherList"
