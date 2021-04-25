@@ -89,6 +89,9 @@
           <el-form-item label="声音时长：">
             <el-input v-model="form.sound_time" disabled></el-input>
           </el-form-item>
+          <el-form-item label="排序号：">
+            <el-input v-model.number="form.list_order"></el-input>
+          </el-form-item>
           <el-form-item label="数据：">
             <div class="statistics">
               <div class="statistics-item" v-for="(ctr, index) in form.statistics" :key="'ctr' + index">
@@ -145,7 +148,8 @@ export default {
         tag: {},
         statistics: [],
         sound: '',
-        sound_time: ''
+        sound_time: '',
+        list_order: 0
       },
       bigImgUrl: '',
       bigImgs: [],
@@ -192,7 +196,8 @@ export default {
             }
           ],
           sound: '',
-          sound_time: ''
+          sound_time: '',
+          list_order: 0
         }
         this.form = obj
         this.bigImgUrl = ''
@@ -216,6 +221,7 @@ export default {
     },
     close () {
       this.showEdit = false
+      this.bigImgs = []
       this.$emit('close')
     },
     async uploadBig () {
@@ -289,6 +295,7 @@ export default {
             tag: this.form.tag,
             sound: this.form.sound,
             sound_time: this.form.sound_time ? this.form.sound_time : 0,
+            list_order: this.form.list_order ? this.form.list_order : 0,
             statistics: this.form.statistics
           }
           console.log(obj)

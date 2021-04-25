@@ -227,11 +227,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.teacher-container {
-  padding: 20px;
-  flex: 1;
-}
-
 .el-select {
   width: 260px;
 }
