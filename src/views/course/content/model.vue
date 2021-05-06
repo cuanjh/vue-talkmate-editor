@@ -1055,7 +1055,7 @@ export default {
             // 判断声音拓展名
             let sound = item['sound']
             if (sound) {
-              let ext = sound.substring(sound.lastIndexOf('.') + 1)
+              let ext = sound.substr(sound.lastIndexOf('.') + 1, 3)
               if (ext.toLowerCase() !== 'mp3') {
                 msg = '上传的声音文件地址格式不对，需要上传mp3格式的声音'
                 break
@@ -1063,7 +1063,7 @@ export default {
             }
             let image = item['image']
             if (image) {
-              let ext = image.substring(image.lastIndexOf('.') + 1)
+              let ext = image.substr(image.lastIndexOf('.') + 1, 4)
               if (ext.toLowerCase() !== 'webp') {
                 msg = '上传的图片文件地址格式不对，需要上传webp格式的图片'
                 break
@@ -1071,7 +1071,7 @@ export default {
             }
             let video = item['video']
             if (video) {
-              let ext = video.substring(video.lastIndexOf('.') + 1)
+              let ext = video.substr(video.lastIndexOf('.') + 1, 3)
               if (ext.toLowerCase() !== 'mp4') {
                 msg = '上传的视频文件地址格式不对，需要上传MP4格式的视频'
                 break
