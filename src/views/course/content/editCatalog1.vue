@@ -48,6 +48,12 @@
             <div class="text" v-text="'(' + l.name + ')'"></div>
           </div>
         </el-form-item>
+        <el-form-item label="副标题">
+          <div class="lang-input" v-for="l in langInfos" :key="l.langKey">
+            <el-input v-if="form.sub_title" v-model="form.sub_title[l.langKey]" :disabled="attr_tag != ''"></el-input>
+            <div class="text" v-text="'(' + l.name + ')'"></div>
+          </div>
+        </el-form-item>
         <el-form-item label="描述">
           <div class="lang-input" v-for="l in langInfos" :key="l.langKey">
             <el-input type="textarea" v-if="form.desc" v-model="form.desc[l.langKey]" :disabled="attr_tag != ''"></el-input>
@@ -202,6 +208,7 @@ export default {
         uuid: '',
         name: '',
         title: {},
+        sub_title: {},
         onlineState: 0,
         isLock: false,
         goalTitle: '',
@@ -332,6 +339,7 @@ export default {
         this.tags = folder.tags ? folder.tags : []
         this.form.name = folder.name
         this.form.title = folder.title
+        this.form.sub_title = folder.sub_title ?? {}
         this.form.goalTitle = folder.goalTitle
         this.form.onlineState = folder.onlineState
         this.form.isLock = folder.is_lock ? folder.is_lock : false
@@ -383,6 +391,7 @@ export default {
                 name: this.form.name,
                 parent_uuid: this.form.parent_uuid,
                 title: this.form.title,
+                sub_title: this.form.sub_title,
                 goalTitle: this.form.goalTitle,
                 onlineState: this.form.onlineState,
                 is_lock: this.form.isLock,
@@ -428,6 +437,7 @@ export default {
                 name: this.form.name,
                 tags: this.tags,
                 title: this.form.title,
+                sub_title: this.form.sub_title,
                 goalTitle: this.form.goalTitle,
                 onlineState: this.form.onlineState,
                 is_lock: this.form.isLock,
@@ -458,6 +468,7 @@ export default {
         uuid: '',
         name: '',
         title: {},
+        sub_title: {},
         goalTitle: '',
         onlineState: 0,
         isLock: false,
@@ -517,6 +528,7 @@ export default {
         console.log(attr)
         if (attr) {
           this.form.title = attr.title ? attr.title : {}
+          this.form.sub_title = attr.sub_title ?? {}
           this.form.desc = attr.desc ? attr.desc : {}
           this.form.cover = attr.cover
           attr.flag.map(item => {
@@ -525,12 +537,14 @@ export default {
           this.flag = flag
         } else {
           this.form.title = {}
+          this.form.sub_title = {}
           this.form.desc = {}
           this.form.cover = ''
           this.flag = []
         }
       } else {
         this.form.title = this.folder.title
+        this.form.sub_title = this.folder.sub_title ?? {}
         this.form.desc = this.folder.desc
         this.form.cover = this.folder.cover
         this.folder.flag.map(item => {
