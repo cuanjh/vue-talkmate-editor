@@ -765,6 +765,13 @@ export default {
       this.$refs['rightMenu'].hide()
       this.rightUUID = params.folder.uuid
       params['type'] = 'folder'
+      if (params.folder.type === 'content') {
+        let model = this.modelList.find(item => {
+          return item.model_key === params.folder.content_model
+        })
+        params['model'] = model
+      }
+
       let authorities = params.folder.authorities
       if (!authorities || !authorities.length) {
         authorities = this.getParentAuthorities(params.folder.parent_uuid, params.trackNum - 1)

@@ -295,6 +295,20 @@ export const getCourseVersionList = (data) => {
 }
 
 /**
+ * @Summary 清理课程内容
+ * @Produce  application/json
+ * @param {*} data
+ * @Router /editor/content/clearTrs [post]
+ */
+export const clearContent = (data) => {
+  return service({
+    url: '/editor/content/clearTrs',
+    method: 'post',
+    data
+  })
+}
+
+/**
  * @Summary 导出课程内容
  * @Produce  application/json
  * @param {*} data

@@ -71,6 +71,26 @@
               </div>
             </transition>
           </div>
+          <div class="menu-item" v-show="userInfo.authorityId === '1' && folder && folder.type=='content'" @mouseenter="isShowClear = true" @mouseleave="isShowClear = false">
+            <div class="name">
+              清理数据
+              <i class="el-icon-caret-right"></i>
+            </div>
+            <transition name="fade">
+              <div class="authority-container" v-show="isShowClear">
+                <div class="authority-wrap">
+                  <div class="user-item">
+                    <el-radio-group v-model="checkModel">
+                      <el-radio v-for="f in models" :key="f.feild" :label="f.feild">{{f.name}}</el-radio>
+                    </el-radio-group>
+                  </div>
+                  <div class="handler">
+                    <el-button size="small" type="primary" @click="clearData">确定</el-button>
+                  </div>
+                </div>
+              </div>
+            </transition>
+          </div>
           <div class="menu-item" v-show="authorityUsers && authorityUsers.length" @mouseenter="isShowAuthority = true" @mouseleave="isShowAuthority = false">
             <div class="name">
               权限设置
@@ -156,7 +176,8 @@ import {
   examin,
   addOnlineJob,
   setIsShowCatalog,
-  exportCourseContent
+  exportCourseContent,
+  clearContent
 } from '@/api/course'
 import { mapState } from 'vuex'
 import DialogOnline from '@/components/dialogOnline'
@@ -169,6 +190,7 @@ export default {
       isShowAuthority: false,
       isShowAuthority1: false,
       isShowDownload: false,
+      isShowClear: false,
       merge: false,
       editors: [],
       chiefEditors: [],
@@ -179,6 +201,8 @@ export default {
       pUUID: '',
       type: '',
       trackNum: 0,
+      checkModel: '',
+      models: [],
       form: {
         examin_state: 2,
         comment: ''
@@ -273,6 +297,11 @@ export default {
           }
         }
       }
+      if (params.folder.type === 'content' && params.model) {
+        this.models = params.model.feilds.filter(item => {
+          return item.feild !== 'list_order' && item.feild !== 'is_show'
+        })
+      }
       console.log(params.folder)
       this.type = params.type
       this.trackNum = params.trackNum
@@ -353,6 +382,40 @@ export default {
           message: '设置成功'
         })
         this.$emit('resetTrackData', { pUUID: this.folder.parent_uuid, trackNum: this.trackNum, curUUID: this.folder.uuid })
+        this.hide()
+      })
+    },
+    clearData () {
+      console.log(this.folder.content_model, this.folder.uuid, this.checkModel)
+      if (!this.checkModel) {
+        this.$message({
+          type: 'warning',
+          message: '请选择要清理的字段'
+        })
+        return false
+      }
+      this.$confirm(`确定要清理吗?`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        clearContent({
+          content_model: this.folder.content_model,
+          content_field: this.checkModel,
+          parent_uuid: this.folder.uuid
+        }).then(res => {
+          this.$message({
+            type: 'success',
+            message: '清理完成'
+          })
+          this.$emit('resetTrackData', { pUUID: this.folder.parent_uuid, trackNum: this.trackNum })
+          this.hide()
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消'
+        })
         this.hide()
       })
     },
