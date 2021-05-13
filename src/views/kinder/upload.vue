@@ -214,10 +214,10 @@ export default {
       if (!item) return
       this.form.video_url = item.video
       this.form.video_time = item.video_time
-      this.form.image_url = item.image_url
+      this.form.image_url = item.cover_url
       this.form.title['zh-CN'] = item.title
       this.form.title['en'] = item.title
-      this.form.describe = item.describe
+      this.form.describe = item.desc
     },
     checkedImage (item) {
       if (!item) return
