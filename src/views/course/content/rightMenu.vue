@@ -297,7 +297,7 @@ export default {
           }
         }
       }
-      if (params.folder.type === 'content' && params.model) {
+      if (params.folder?.type === 'content' && params.model) {
         this.models = params.model.feilds.filter(item => {
           return item.feild !== 'list_order' && item.feild !== 'is_show'
         })
